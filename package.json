@@ -12,6 +12,7 @@
     "cap:android": "cap open android"
   },
   "dependencies": {
+    "@capacitor/app": "^7.1.2",
     "phaser": "^3.87.0"
   },
   "devDependencies": {

@@ -199,16 +199,10 @@ export class MenuScene extends Phaser.Scene {
    * 설정 패널이 열려있으면 닫고, 아니면 앱을 종료한다.
    */
   _onBack() {
+    // 설정 패널이 열려있으면 닫기, 아니면 아무 동작 없음 (앱 종료 금지)
     if (this._settingsContainer) {
       this._closeSettingsPanel();
-      return;
     }
-    try {
-      const Capacitor = window.Capacitor;
-      if (Capacitor && Capacitor.isNativePlatform()) {
-        Capacitor.Plugins.App.exitApp();
-      }
-    } catch (e) { /* 브라우저 환경 무시 */ }
   }
 
   // ── 설정 UI (Phase 10-6) ────────────────────────────────────────
