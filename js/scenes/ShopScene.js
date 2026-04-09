@@ -13,6 +13,7 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { STAFF_TYPES } from '../data/staffData.js';
+import { TutorialManager } from '../managers/TutorialManager.js';
 
 // ── Phase 8-3: 테이블/인테리어 상수 ──
 
@@ -98,6 +99,18 @@ export class ShopScene extends Phaser.Scene {
     // 콘텐츠 영역
     this._renderContent();
 
+    // ── Phase 11-3a: 상점 튜토리얼 ──
+    this._tutorial = new TutorialManager(this, 'shop', [
+      '1/3 \uC8FC\uBC29 \uCF54\uC778\uC73C\uB85C\n\uC5C5\uADF8\uB808\uC774\uB4DC\uB97C \uAD6C\uB9E4\uD558\uC138\uC694!',
+      '2/3 \uB808\uC2DC\uD53C \uD0ED\uC5D0\uC11C\n\uC0C8 \uBA54\uB274\uB97C \uD574\uAE08\uD560 \uC218 \uC788\uC5B4\uC694!',
+      '3/3 \uD14C\uC774\uBE14\xB7\uC778\uD14C\uB9AC\uC5B4\xB7\uC9C1\uC6D0 \uD0ED\uC73C\uB85C\n\uB808\uC2A4\uD1A0\uB791\uC744 \uC131\uC7A5\uC2DC\uD0A4\uC138\uC694!',
+    ]);
+    // 트리거: 1-1 클리어 후 첫 진입 (stage 1-1이 cleared 상태)
+    const stage1cleared = !!SaveManager.load().stages?.['1-1']?.cleared;
+    if (stage1cleared) {
+      this._tutorial.start();
+    }
+
     // 하단 돌아가기 버튼
     const backBtn = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT - 35, 180, 40, 0x444444)
       .setInteractive({ useHandCursor: true });
@@ -143,10 +156,28 @@ export class ShopScene extends Phaser.Scene {
       }).setOrigin(0.5);
 
       bg.on('pointerdown', () => {
+        const prevTab = this._activeTab;
         this._activeTab = tab.key;
         this._recipeFilter = 'all';
         this._updateTabHighlight();
         this._renderContent();
+
+        // ── Phase 11-3a: 상점 튜토리얼 진행 ──
+        if (this._tutorial?.isActive()) {
+          const step = this._tutorial._stepIndex;
+          // step 0 → 1: 업그레이드 탭에서 다른 탭으로 이동
+          if (step === 0 && prevTab === 'upgrade' && tab.key !== 'upgrade') {
+            this._tutorial.advance();
+          }
+          // step 1 → 2: 레시피 탭 선택
+          else if (step === 1 && tab.key === 'recipe') {
+            this._tutorial.advance();
+          }
+          // step 2 → end: 테이블/인테리어/직원 탭 선택
+          else if (step === 2 && (tab.key === 'table' || tab.key === 'interior' || tab.key === 'staff')) {
+            this._tutorial.advance();
+          }
+        }
       });
 
       this._tabBgs[tab.key] = bg;
@@ -802,6 +833,8 @@ export class ShopScene extends Phaser.Scene {
    * @param {string} sceneKey
    */
   _fadeToScene(sceneKey) {
+    // Phase 11-3a: 씬 전환 시 튜토리얼 정리
+    this._tutorial?.end?.();
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start(sceneKey);

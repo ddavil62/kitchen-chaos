@@ -12,6 +12,7 @@ import { ENEMY_TYPES } from '../data/gameData.js';
 import { Enemy } from '../entities/Enemy.js';
 import { GAME_WIDTH, STARTING_LIVES, WAVE_CLEAR_BONUS } from '../config.js';
 import { SoundManager } from '../managers/SoundManager.js';
+import { TutorialManager } from '../managers/TutorialManager.js';
 
 export class EndlessScene extends MarketScene {
   constructor() {
@@ -56,6 +57,33 @@ export class EndlessScene extends MarketScene {
     // 4. super.create가 설정한 waveManager를 엔드리스 웨이브로 교체
     this._patchWaveManagerForEndless();
     this._prepareEndlessWave(this.endlessWave + 1);
+
+    // ── Phase 11-3a: 엔드리스 튜토리얼 ──
+    // super.create()가 생성한 _tutorial(battle)을 엔드리스 전용으로 덮어쓴다
+    if (this._tutorial) {
+      // 부모의 battle 튜토리얼이 아직 active이면 조용히 정리 (완료 기록 안 함)
+      if (this._tutorial._container) {
+        this._tutorial._container.destroy();
+        this._tutorial._container = null;
+      }
+      this._tutorial._active = false;
+    }
+    this._tutorial = new TutorialManager(this, 'endless', [
+      '1/3 \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC!\n\uC6E8\uC774\uBE0C\uAC00 \uB05D\uC5C6\uC774 \uC774\uC5B4\uC9D1\uB2C8\uB2E4.',
+      '2/3 5\uC6E8\uC774\uBE0C\uB9C8\uB2E4\n\uC624\uB298\uC758 \uC2A4\uD398\uC15C \uB808\uC2DC\uD53C\uB85C \uC601\uC5C5!',
+      '3/3 \uCD5C\uB300\uD55C \uC624\uB798 \uBC84\uD600\n\uB7AD\uD0B9\uC5D0 \uC774\uB984\uC744 \uC62C\uB9AC\uC138\uC694!',
+    ]);
+    // 타이머 기반 자동 진행: 2초 후 시작, 3초 간격 진행
+    this.time.delayedCall(2000, () => {
+      if (!this._tutorial) return;
+      this._tutorial.start();
+    });
+    this.time.delayedCall(5000, () => {
+      if (this._tutorial?.isActive()) this._tutorial.advance();
+    });
+    this.time.delayedCall(8000, () => {
+      if (this._tutorial?.isActive()) this._tutorial.advance();
+    });
   }
 
   // ── 데일리 시드 레시피 선정 ─────────────────────────────────────

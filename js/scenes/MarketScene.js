@@ -28,6 +28,7 @@ import { ChefManager } from '../managers/ChefManager.js';
 import { OrderManager } from '../managers/OrderManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { VFXManager } from '../managers/VFXManager.js';
+import { TutorialManager } from '../managers/TutorialManager.js';
 
 export class MarketScene extends Phaser.Scene {
   constructor() {
@@ -131,8 +132,12 @@ export class MarketScene extends Phaser.Scene {
     this._createWaveButton();
 
     // ── 튜토리얼 ──
-    this._tutorialStep = 0;
-    this._startTutorial();
+    this._tutorial = new TutorialManager(this, 'battle', [
+      '1/3 \uD558\uB2E8 \uD0C0\uC6CC \uBC14\uC5D0\uC11C\n\uD504\uB77C\uC774\uD32C\uC744 \uC120\uD0DD\uD558\uC138\uC694!',
+      '2/3 \uACBD\uB85C \uC606 \uBE48 \uCE78\uC5D0\n\uD0C0\uC6CC\uB97C \uBC30\uCE58\uD558\uC138\uC694!',
+      '3/3 \uC900\uBE44\uB418\uBA74\n\uC6E8\uC774\uBE0C \uC2DC\uC791 \uBC84\uD2BC\uC744 \uD0ED!',
+    ]);
+    this._tutorial.start();
 
     this.cameras.main.fadeIn(400, 0, 0, 0);
 
@@ -426,7 +431,7 @@ export class MarketScene extends Phaser.Scene {
         this.selectedTowerType = this.selectedTowerType === id ? null : id;
         this._updateTowerBarSelection();
         // 튜토리얼 1단계: 타워 선택 완료
-        if (this._tutorialStep === 1 && this.selectedTowerType) this._advanceTutorial();
+        if (this._tutorial?.isActive() && this.selectedTowerType) this._tutorial.advance();
       });
 
       // 컨테이너로 묶어 한 번에 destroy 가능
@@ -661,7 +666,7 @@ export class MarketScene extends Phaser.Scene {
     });
 
     // 튜토리얼 2단계: 타워 배치 완료
-    if (this._tutorialStep === 2) this._advanceTutorial();
+    if (this._tutorial?.isActive()) this._tutorial.advance();
   }
 
   // ── 이벤트 핸들러 (씬 내부) ────────────────────────────────────
@@ -1059,7 +1064,7 @@ export class MarketScene extends Phaser.Scene {
       if (!this._waveBtnEnabled) return;
       this.waveManager.startNextWave();
       // 튜토리얼 3단계 완료
-      if (this._tutorialStep === 3) this._advanceTutorial();
+      if (this._tutorial?.isActive()) this._tutorial.advance();
     });
     this._waveBtnBg.on('pointerover', () => {
       if (this._waveBtnEnabled) this._waveBtnBg.setFillStyle(0xff8c00);
@@ -1103,66 +1108,6 @@ export class MarketScene extends Phaser.Scene {
       this._waveBtnBg.setScale(1);
       this._waveBtnText.setScale(1);
     }
-  }
-
-  // ── 튜토리얼 ──────────────────────────────────────────────────
-
-  /** 3단계 튜토리얼 시작 (이미 완료한 경우 스킵) */
-  _startTutorial() {
-    if (SaveManager.isTutorialDone()) {
-      this._tutorialStep = 0;
-      return;
-    }
-    this._tutorialStep = 1;
-    this._showTutorialHint('1/3 \uD558\uB2E8 \uD0C0\uC6CC \uBC14\uC5D0\uC11C\n\uD504\uB77C\uC774\uD32C\uC744 \uC120\uD0DD\uD558\uC138\uC694!');
-  }
-
-  /**
-   * 튜토리얼 힌트 표시.
-   * @param {string} text
-   */
-  _showTutorialHint(text) {
-    if (this._tutorialContainer) {
-      this._tutorialContainer.destroy();
-      this._tutorialContainer = null;
-    }
-
-    const cx = GAME_WIDTH / 2;
-    const cy = GAME_AREA_Y + 40;
-    const bg = this.add.rectangle(cx, cy, 280, 50, 0x0000aa, 0.85).setDepth(130);
-    const label = this.add.text(cx, cy - 8, text, {
-      fontSize: '13px', color: '#ffffff', align: 'center', lineSpacing: 4,
-      stroke: '#000000', strokeThickness: 2,
-    }).setOrigin(0.5).setDepth(131);
-
-    const skip = this.add.text(cx + 120, cy + 16, '[\uAC74\uB108\uB6F0\uAE30]', {
-      fontSize: '10px', color: '#aaaaaa',
-    }).setOrigin(1, 0.5).setDepth(131).setInteractive({ useHandCursor: true });
-    skip.on('pointerdown', () => this._endTutorial());
-
-    this._tutorialContainer = this.add.container(0, 0, [bg, label, skip]).setDepth(130);
-  }
-
-  /** 튜토리얼 단계 진행 */
-  _advanceTutorial() {
-    this._tutorialStep++;
-    if (this._tutorialStep === 2) {
-      this._showTutorialHint('2/3 \uACBD\uB85C \uC606 \uBE48 \uCE78\uC5D0\n\uD0C0\uC6CC\uB97C \uBC30\uCE58\uD558\uC138\uC694!');
-    } else if (this._tutorialStep === 3) {
-      this._showTutorialHint('3/3 \uC900\uBE44\uB418\uBA74\n\uC6E8\uC774\uBE0C \uC2DC\uC791 \uBC84\uD2BC\uC744 \uD0ED!');
-    } else {
-      this._endTutorial();
-    }
-  }
-
-  /** 튜토리얼 종료 */
-  _endTutorial() {
-    this._tutorialStep = 0;
-    if (this._tutorialContainer) {
-      this._tutorialContainer.destroy();
-      this._tutorialContainer = null;
-    }
-    SaveManager.completeTutorial();
   }
 
   // ── 오더 HUD ──────────────────────────────────────────────────
@@ -1403,5 +1348,6 @@ export class MarketScene extends Phaser.Scene {
     this.events.off('ingredient_collected_at', this._onIngredientCollectedAt, this);
     this.ingredientManager?.destroy();
     this.vfx?.destroy();
+    this._tutorial?.end?.();
   }
 }

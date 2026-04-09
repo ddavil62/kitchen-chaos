@@ -7,12 +7,13 @@
  * Phase 8-4: isStaffHired, hireStaff 메서드 추가.
  * Phase 10-6: v6 마이그레이션 — soundSettings 추가.
  * Phase 11-1: v7 마이그레이션 — endless 엔드리스 기록 추가.
+ * Phase 11-3a: v8 마이그레이션 — tutorialBattle/Service/Shop/Endless 4개 플래그로 분리.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaos_save';
-const SAVE_VERSION = 7;
+const SAVE_VERSION = 8;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -21,6 +22,11 @@ function createDefault() {
     stages: {},
     totalGoldEarned: 0,
     tutorialDone: false,
+    // ── Phase 11-3a 추가 ──
+    tutorialBattle: false,   // 전투(MarketScene) 튜토리얼 완료
+    tutorialService: false,  // 영업(ServiceScene) 튜토리얼 완료
+    tutorialShop: false,     // 상점(ShopScene) 튜토리얼 완료
+    tutorialEndless: false,  // 엔드리스(EndlessScene) 튜토리얼 완료
     // ── Phase 5 추가 ──
     kitchenCoins: 0,
     upgrades: {
@@ -448,17 +454,35 @@ export class SaveManager {
   }
 
   /**
-   * 튜토리얼 완료 여부.
+   * 씬별 튜토리얼 완료 여부 확인.
+   * @param {'battle'|'service'|'shop'|'endless'} key
    * @returns {boolean}
    */
-  static isTutorialDone() {
-    return SaveManager.load().tutorialDone;
+  static isTutorialDone(key) {
+    if (key === undefined) {
+      // @deprecated 인수 없는 레거시 호출 — tutorialDone 참조
+      return SaveManager.load().tutorialDone;
+    }
+    const data = SaveManager.load();
+    const field = `tutorial${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    return !!data[field];
   }
 
-  /** 튜토리얼 완료 기록 */
-  static completeTutorial() {
+  /**
+   * 씬별 튜토리얼 완료 기록.
+   * @param {'battle'|'service'|'shop'|'endless'} key
+   */
+  static completeTutorial(key) {
+    if (key === undefined) {
+      // @deprecated 인수 없는 레거시 호출 — tutorialDone 기록
+      const data = SaveManager.load();
+      data.tutorialDone = true;
+      SaveManager.save(data);
+      return;
+    }
     const data = SaveManager.load();
-    data.tutorialDone = true;
+    const field = `tutorial${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    data[field] = true;
     SaveManager.save(data);
   }
 
@@ -536,6 +560,17 @@ export class SaveManager {
         data.endless.unlocked = true;
       }
       data.version = 7;
+    }
+
+    // v7 → v8: 튜토리얼 플래그 분리
+    if (data.version < 8) {
+      // 기존 tutorialDone:true → tutorialBattle:true 자동 변환
+      data.tutorialBattle = data.tutorialDone === true ? true : (data.tutorialBattle || false);
+      data.tutorialService = data.tutorialService || false;
+      data.tutorialShop = data.tutorialShop || false;
+      data.tutorialEndless = data.tutorialEndless || false;
+      // 구 플래그 제거하지 않음 (하위 호환 유지)
+      data.version = 8;
     }
 
     return data;

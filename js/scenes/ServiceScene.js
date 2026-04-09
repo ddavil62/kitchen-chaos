@@ -29,6 +29,7 @@ import InventoryManager from '../managers/InventoryManager.js';
 import { STAFF_TYPES } from '../data/staffData.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { VFXManager } from '../managers/VFXManager.js';
+import { TutorialManager } from '../managers/TutorialManager.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -314,6 +315,23 @@ export class ServiceScene extends Phaser.Scene {
     if (this.isEndless && this.dailySpecials.length > 0) {
       this.time.delayedCall(500, () => this._showDailySpecialsPopup());
     }
+
+    // ── Phase 11-3a: 영업 튜토리얼 ──
+    this._tutorial = new TutorialManager(this, 'service', [
+      '1/4 \uC190\uB2D8\uC774 \uC549\uC73C\uBA74\n\uC8FC\uBB38\uC744 \uAE30\uB2E4\uB9AC\uC138\uC694!',
+      '2/4 \uD558\uB2E8 \uB808\uC2DC\uD53C \uD035\uC2AC\uB86F\uC5D0\uC11C\n\uC694\uB9AC\uB97C \uC120\uD0DD\uD574 \uC870\uB9AC \uC2DC\uC791!',
+      '3/4 \uC870\uB9AC\uAC00 \uC644\uB8CC\uB418\uBA74\n\uC644\uB8CC\uB41C \uC694\uB9AC\uB97C \uD0ED\uD558\uC5EC \uC11C\uBE59!',
+      '4/4 \uC798 \uC11C\uBE59\uD558\uBA74 \uD301\uC744 \uBC1B\uC544\n\uB9CC\uC871\uB3C4\uAC00 \uC62C\uB77C\uAC11\uB2C8\uB2E4!',
+    ]);
+    // 트리거: stageId가 '1-1'이고 엔드리스 모드가 아닐 때만
+    if (this.stageId === '1-1' && !this.isEndless) {
+      this._tutorial.start();
+    }
+    // 튜토리얼 advance 조건 플래그 초기화
+    this._tutAdvanced0 = false;
+    this._tutAdvanced1 = false;
+    this._tutAdvanced2 = false;
+    this._tutAdvanced3 = false;
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this._shutdown, this);
@@ -993,8 +1011,57 @@ export class ServiceScene extends Phaser.Scene {
       return;
     }
 
+    // ── Phase 11-3a: 영업 튜토리얼 자동 진행 ──
+    if (this._tutorial?.isActive()) {
+      this._updateTutorialAdvance();
+    }
+
     // HUD 갱신
     this._updateHUD();
+  }
+
+  /**
+   * 영업 튜토리얼 자동 진행 조건 체크.
+   * 각 단계 조건이 처음 충족될 때 advance()를 호출한다.
+   * @private
+   */
+  _updateTutorialAdvance() {
+    const step = this._tutorial._stepIndex;
+
+    // step 0: 첫 번째 손님이 착석하면 advance
+    if (step === 0 && !this._tutAdvanced0) {
+      const hasSeated = this.tables.some(t => t !== null);
+      if (hasSeated) {
+        this._tutAdvanced0 = true;
+        this._tutorial.advance();
+      }
+    }
+
+    // step 1: 첫 번째 조리 슬롯에 요리가 배정되면 advance
+    if (step === 1 && !this._tutAdvanced1) {
+      const hasCooking = this.cookingSlots.some(s => s.recipe !== null);
+      if (hasCooking) {
+        this._tutAdvanced1 = true;
+        this._tutorial.advance();
+      }
+    }
+
+    // step 2: 첫 번째 요리가 완료(ready=true)되면 advance
+    if (step === 2 && !this._tutAdvanced2) {
+      const hasReady = this.cookingSlots.some(s => s.recipe && s.ready);
+      if (hasReady) {
+        this._tutAdvanced2 = true;
+        this._tutorial.advance();
+      }
+    }
+
+    // step 3: 첫 번째 서빙 완료(servedCount > 0)되면 advance → end
+    if (step === 3 && !this._tutAdvanced3) {
+      if (this.servedCount > 0) {
+        this._tutAdvanced3 = true;
+        this._tutorial.advance();
+      }
+    }
   }
 
   // ── 손님 스폰 ─────────────────────────────────────────────────────
@@ -2108,5 +2175,7 @@ export class ServiceScene extends Phaser.Scene {
     this.freezeTimeLeft = 0;
     this.skillBtnBg = null;
     this.skillBtnText = null;
+    // Phase 11-3a: 튜토리얼 정리
+    this._tutorial?.end?.();
   }
 }
