@@ -114,7 +114,7 @@ export class SpriteLoader {
     for (const id of TOWER_IDS) {
       scene.load.image(
         `tower_${id}`,
-        `${SPRITES_ROOT}/towers/${id}/rotations/south.png`
+        `${SPRITES_ROOT}/towers/${id}/tower.png`
       );
     }
   }
