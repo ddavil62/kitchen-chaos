@@ -7,6 +7,7 @@
 import { FRESHNESS_WINDOW_MS } from '../config.js';
 import { INGREDIENT_TYPES } from '../data/gameData.js';
 import { GameEventBus } from '../events/GameEventBus.js';
+import { UpgradeManager } from './UpgradeManager.js';
 
 // 드롭 아이템 자동 수거 대기 시간 (ms)
 const AUTO_COLLECT_DELAY = 8000;
@@ -98,12 +99,23 @@ export class IngredientManager {
    * @private
    * @param {IngredientDrop} drop
    */
+  /**
+   * 재료 타입별 최대 보유량 (fridge 업그레이드 반영).
+   * @returns {number}
+   */
+  getMaxInventory() {
+    const base = 10;
+    return base + UpgradeManager.getFridgeBonus();
+  }
+
   _collectDrop(drop) {
     const idx = this.drops.indexOf(drop);
     if (idx === -1) return;
 
     this.drops.splice(idx, 1);
-    this.inventory[drop.type] = (this.inventory[drop.type] || 0) + drop.count;
+    const max = this.getMaxInventory();
+    const current = this.inventory[drop.type] || 0;
+    this.inventory[drop.type] = Math.min(current + drop.count, max);
 
     // 수거 연출
     this.scene.tweens.add({

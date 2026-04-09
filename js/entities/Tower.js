@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { Projectile } from './Projectile.js';
+import { UpgradeManager } from '../managers/UpgradeManager.js';
 
 export class Tower extends Phaser.GameObjects.Container {
   /**
@@ -114,7 +115,9 @@ export class Tower extends Phaser.GameObjects.Container {
     // 비전투 타워: 배달(수거)·수프솥(오라)은 발사하지 않음
     if (this.data_.id === 'delivery' || this.data_.id === 'soup_pot') return;
 
-    const effectiveFireRate = this.baseFireRate / this.speedMultiplier;
+    // knife 업그레이드: 글로벌 공격속도 보너스
+    const knifeBonus = UpgradeManager.getKnifeMultiplier();
+    const effectiveFireRate = this.baseFireRate / (this.speedMultiplier * knifeBonus);
     this.shootTimer += delta;
 
     if (this.shootTimer >= effectiveFireRate) {

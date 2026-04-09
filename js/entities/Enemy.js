@@ -57,6 +57,10 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── 재생 (치즈 골렘) ──
     this.regenRate = enemyData.regenRate || 0;
 
+    // ── 보스 소환 타이머 ──
+    this._summonTimer = 0;
+    this._enraged = false;
+
     // ── 신선도 타이머 ──
     this.freshnessTimer = FRESHNESS_WINDOW_MS;
     this.isFresh = true;
@@ -80,7 +84,11 @@ export class Enemy extends Phaser.GameObjects.Container {
     const id = data.id;
 
     // 몸체
-    if (id === 'cheese_golem') {
+    if (id === 'pasta_boss') {
+      // 보스: 40×40 금색 사각형
+      const body = this.scene.add.rectangle(0, 0, 40, 40, color);
+      this.add(body);
+    } else if (id === 'cheese_golem') {
       // 골렘: 큰 사각형
       const body = this.scene.add.rectangle(0, 0, 28, 28, color);
       this.add(body);
@@ -127,6 +135,28 @@ export class Enemy extends Phaser.GameObjects.Container {
       const tail2 = this.scene.add.triangle(5, 14, -3, 0, 3, 0, 0, 6, 0xfaebd7);
       this.add(tail1);
       this.add(tail2);
+    } else if (id === 'egg_sprite') {
+      // 달걀 요정: 날개 + 후광
+      const wing1 = this.scene.add.triangle(-12, -4, 0, -5, 0, 5, -8, 0, 0xffffcc);
+      const wing2 = this.scene.add.triangle(12, -4, 0, -5, 0, 5, 8, 0, 0xffffcc);
+      this.add(wing1);
+      this.add(wing2);
+    } else if (id === 'rice_slime') {
+      // 밥 슬라임: 반짝이는 입자 표시
+      const grain1 = this.scene.add.circle(-3, 5, 2, 0xeeeeee);
+      const grain2 = this.scene.add.circle(4, 3, 2, 0xeeeeee);
+      const grain3 = this.scene.add.circle(0, 8, 2, 0xeeeeee);
+      this.add(grain1);
+      this.add(grain2);
+      this.add(grain3);
+    } else if (id === 'pasta_boss') {
+      // 보스: 면발 장식
+      for (let i = -2; i <= 2; i++) {
+        const noodle = this.scene.add.rectangle(i * 6, 20, 2, 12, 0xffd700);
+        this.add(noodle);
+      }
+      const crown = this.scene.add.triangle(0, -24, -8, 0, 8, 0, 0, -10, 0xffaa00);
+      this.add(crown);
     }
 
     // HP 바
@@ -220,6 +250,25 @@ export class Enemy extends Phaser.GameObjects.Container {
       this.hpBar.width = 26 * ratio;
     }
 
+    // ── 보스 소환 ──
+    if (this.data_.isBoss && this.data_.summonInterval) {
+      this._summonTimer += delta;
+      if (this._summonTimer >= this.data_.summonInterval) {
+        this._summonTimer = 0;
+        this.scene.events.emit('boss_summon', {
+          type: this.data_.summonType,
+          x: this.x, y: this.y,
+        });
+      }
+      // 격노 (HP 50% 이하 → 속도 2배)
+      if (!this._enraged && this.data_.enrageHpThreshold &&
+          this.hp / this.maxHp <= this.data_.enrageHpThreshold) {
+        this._enraged = true;
+        this.speed = this.data_.speed * 2;
+        this.setTint(0xff4444);
+      }
+    }
+
     // ── 이동 ──
     this._moveAlongPath(delta);
   }
@@ -303,6 +352,31 @@ export class Enemy extends Phaser.GameObjects.Container {
     if (this.isDead) return;
     this.isDead = true;
     this.active = false;
+
+    // 분열 (egg_sprite): 10% 확률로 소형 분열체 생성
+    if (this.data_.splitChance && Math.random() < this.data_.splitChance) {
+      this.scene.events.emit('enemy_split', {
+        type: this.data_.id,
+        x: this.x, y: this.y,
+        hp: this.data_.splitHp || 30,
+        waypointIndex: this.waypointIndex,
+      });
+    }
+
+    // 사망 시 주변 적 힐 (rice_slime)
+    if (this.data_.healOnDeath) {
+      this.scene.events.emit('enemy_death_heal', {
+        x: this.x, y: this.y,
+        healPercent: this.data_.healOnDeath,
+        radius: this.data_.healRadius || 80,
+      });
+    }
+
+    // 보스 처치 보상
+    if (this.data_.bossReward) {
+      this.scene.events.emit('boss_killed', { reward: this.data_.bossReward });
+    }
+
     this.scene.events.emit('enemy_died', this);
     this.destroy();
   }

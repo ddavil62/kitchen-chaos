@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, RESTAURANT_HEIGHT } from '../config.js';
 import { BUFF_RECIPES, SERVING_RECIPE_MAP } from '../data/gameData.js';
+import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { GameEventBus } from '../events/GameEventBus.js';
 import { CustomerManager } from '../managers/CustomerManager.js';
 import { CustomerZoneUI } from '../ui/CustomerZoneUI.js';
@@ -91,11 +92,13 @@ export class RestaurantScene extends Phaser.Scene {
     if (!this.ingredientManager.canCook(recipe)) return;
     this.ingredientManager.consume(recipe);
 
-    // 조리 시작
+    // 조리 시작 (cook_training 업그레이드 반영)
+    const cookMult = UpgradeManager.getCookTrainingMultiplier();
+    const effectiveCookTime = Math.round((recipe.cookTime || 3000) * cookMult);
     this.cookingSlot = {
       recipeId,
-      timer: recipe.cookTime || 3000,
-      totalTime: recipe.cookTime || 3000,
+      timer: effectiveCookTime,
+      totalTime: effectiveCookTime,
     };
 
     this.kitchenPanelUI.updateIngredients();

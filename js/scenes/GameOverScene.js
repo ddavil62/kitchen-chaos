@@ -55,14 +55,22 @@ export class GameOverScene extends Phaser.Scene {
       else if (this.lives >= this.starThresholds.two) stars = 2;
       else stars = 1;
 
-      // 세이브에 기록
-      SaveManager.clearStage(this.stageId, stars);
+      // 세이브에 기록 + 코인 지급
+      const coinsEarned = SaveManager.clearStage(this.stageId, stars);
 
       const starStr = '★'.repeat(stars) + '☆'.repeat(3 - stars);
       this.add.text(GAME_WIDTH / 2, 210, starStr, {
         fontSize: '36px', color: '#ffd700',
         stroke: '#8b4500', strokeThickness: 3,
       }).setOrigin(0.5);
+
+      // 코인 획득 표시
+      if (coinsEarned > 0) {
+        this.add.text(GAME_WIDTH / 2, 245, `+${coinsEarned} 🪙`, {
+          fontSize: '20px', fontStyle: 'bold', color: '#ffcc00',
+          stroke: '#000', strokeThickness: 3,
+        }).setOrigin(0.5);
+      }
     }
 
     // 통계

@@ -11,13 +11,15 @@ import { GAME_WIDTH, GAME_HEIGHT, GRID_COLS, GRID_ROWS,
          PATH_CELLS, isPathCell, cellToWorld, worldToCell, cellDiamond,
          buildPathCellsFromSegments, buildWaypointsFromSegments,
          STARTING_GOLD, STARTING_LIVES, WAVE_CLEAR_BONUS } from '../config.js';
-import { TOWER_TYPES } from '../data/gameData.js';
+import { TOWER_TYPES, ENEMY_TYPES } from '../data/gameData.js';
+import { Enemy } from '../entities/Enemy.js';
 import { STAGES } from '../data/stageData.js';
 import { GameEventBus } from '../events/GameEventBus.js';
 import { Tower } from '../entities/Tower.js';
 import { WaveManager } from '../managers/WaveManager.js';
 import { IngredientManager } from '../managers/IngredientManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
+import { UpgradeManager } from '../managers/UpgradeManager.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -77,6 +79,10 @@ export class GameScene extends Phaser.Scene {
     this.events.on('enemy_died', this._onEnemyDied, this);
     this.events.on('enemy_reached_base', this._onEnemyReachedBase, this);
     this.events.on('wave_started', this._onWaveStarted, this);
+    this.events.on('boss_summon', this._onBossSummon, this);
+    this.events.on('enemy_split', this._onEnemySplit, this);
+    this.events.on('enemy_death_heal', this._onEnemyDeathHeal, this);
+    this.events.on('boss_killed', this._onBossKilled, this);
 
     // ── GameEventBus 이벤트 수신 ──
     GameEventBus.on('gold_earned', this._onGoldEarned, this);
@@ -376,6 +382,93 @@ export class GameScene extends Phaser.Scene {
     this._checkWaveProgress();
   }
 
+  // ── 보스/특수 적 이벤트 핸들러 ──────────────────────────────────
+
+  /**
+   * 보스 소환 이벤트 - 보스 위치에 하급 적 생성.
+   * @param {{ type: string, x: number, y: number }} data
+   */
+  _onBossSummon({ type, x, y }) {
+    const enemyData = ENEMY_TYPES[type];
+    if (!enemyData) return;
+    const waypoints = this.stageWaypoints || undefined;
+    const enemy = new Enemy(this.scene || this, enemyData, waypoints);
+    // 보스 위치에서 스폰 (경로 시작이 아닌 보스 근처)
+    enemy.x = x + Phaser.Math.Between(-20, 20);
+    enemy.y = y + Phaser.Math.Between(-10, 10);
+    // 가장 가까운 웨이포인트부터 이동
+    const wp = enemy._waypoints;
+    let bestIdx = 1;
+    let bestDist = Infinity;
+    for (let i = 1; i < wp.length; i++) {
+      const d = Phaser.Math.Distance.Between(enemy.x, enemy.y, wp[i].x, wp[i].y);
+      if (d < bestDist) { bestDist = d; bestIdx = i; }
+    }
+    enemy.waypointIndex = bestIdx;
+    this.enemies.add(enemy);
+  }
+
+  /**
+   * 적 분열 이벤트 - 죽은 위치에서 소형 분열체 생성.
+   * @param {{ type: string, x: number, y: number, hp: number, waypointIndex: number }} data
+   */
+  _onEnemySplit({ type, x, y, hp, waypointIndex }) {
+    const baseData = ENEMY_TYPES[type];
+    if (!baseData) return;
+    // 약화된 분열체 데이터 생성
+    const splitData = { ...baseData, hp, speed: baseData.speed * 1.2, splitChance: 0 };
+    const waypoints = this.stageWaypoints || undefined;
+    const enemy = new Enemy(this.scene || this, splitData, waypoints);
+    enemy.x = x + Phaser.Math.Between(-15, 15);
+    enemy.y = y + Phaser.Math.Between(-8, 8);
+    enemy.waypointIndex = waypointIndex;
+    this.enemies.add(enemy);
+  }
+
+  /**
+   * 적 사망 힐 이벤트 - 범위 내 아군 적 HP 회복.
+   * @param {{ x: number, y: number, healPercent: number, radius: number }} data
+   */
+  _onEnemyDeathHeal({ x, y, healPercent, radius }) {
+    this.enemies.getChildren().forEach(enemy => {
+      if (!enemy.active || enemy.isDead) return;
+      const dist = Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y);
+      if (dist > radius) return;
+      const healAmount = enemy.maxHp * healPercent;
+      enemy.hp = Math.min(enemy.maxHp, enemy.hp + healAmount);
+      // HP 바 갱신
+      const ratio = enemy.hp / enemy.maxHp;
+      enemy.hpBar.width = 26 * ratio;
+      if (ratio >= 0.7) enemy.hpBar.setFillStyle(0x44ff44);
+      else if (ratio >= 0.4) enemy.hpBar.setFillStyle(0xffaa00);
+      // 힐 이펙트: 초록 플래시
+      this.tweens.add({
+        targets: enemy, alpha: 0.5,
+        duration: 150, yoyo: true,
+      });
+    });
+  }
+
+  /**
+   * 보스 처치 보상 이벤트 - 골드 지급.
+   * @param {{ reward: number }} data
+   */
+  _onBossKilled({ reward }) {
+    this.gold += reward;
+    this._updateHUD();
+
+    const popup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 60, `🏆 보스 처치! +${reward}g`, {
+      fontSize: '16px', color: '#ffd700', fontStyle: 'bold',
+      stroke: '#000000', strokeThickness: 3,
+    }).setOrigin(0.5).setDepth(115);
+
+    this.tweens.add({
+      targets: popup, y: popup.y - 50, alpha: 0,
+      duration: 1500,
+      onComplete: () => popup.destroy(),
+    });
+  }
+
   // ── GameEventBus 핸들러 ────────────────────────────────────────
 
   _onGoldEarned({ amount }) {
@@ -435,7 +528,10 @@ export class GameScene extends Phaser.Scene {
     this.towers.getChildren().forEach(tower => {
       if (!tower.active || tower.data_?.id !== 'delivery') return;
       tower._collectTimer = (tower._collectTimer || 0) + delta;
-      if (tower._collectTimer < (tower.data_.collectInterval || 2000)) return;
+      // delivery_speed 업그레이드: 수거 간격 단축
+      const deliveryBonus = UpgradeManager.getDeliverySpeedMultiplier();
+      const effectiveInterval = (tower.data_.collectInterval || 2000) / deliveryBonus;
+      if (tower._collectTimer < effectiveInterval) return;
       tower._collectTimer = 0;
 
       // 범위 내 드롭 수거
@@ -762,6 +858,10 @@ export class GameScene extends Phaser.Scene {
   shutdown() {
     this.events.off('enemy_died', this._onEnemyDied, this);
     this.events.off('enemy_reached_base', this._onEnemyReachedBase, this);
+    this.events.off('boss_summon', this._onBossSummon, this);
+    this.events.off('enemy_split', this._onEnemySplit, this);
+    this.events.off('enemy_death_heal', this._onEnemyDeathHeal, this);
+    this.events.off('boss_killed', this._onBossKilled, this);
     this.events.off('wave_started', this._onWaveStarted, this);
     GameEventBus.off('gold_earned', this._onGoldEarned, this);
     GameEventBus.off('combo_changed', this._onComboChanged, this);

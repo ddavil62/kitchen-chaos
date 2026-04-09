@@ -55,6 +55,40 @@ export const ENEMY_TYPES = {
     bodyColor: 0xfaebd7,
     invisible: true,      // 기본 반투명, 소금/냉동고만 타겟 가능
   },
+  // ── Phase 5 신규 적 ──
+  egg_sprite: {
+    id: 'egg_sprite',
+    nameKo: '달걀 요정',
+    hp: 70,
+    speed: 95,
+    ingredient: 'egg',
+    bodyColor: 0xfff8dc,
+    splitChance: 0.10,      // 피격 시 10% 확률 분열
+    splitHp: 30,
+  },
+  rice_slime: {
+    id: 'rice_slime',
+    nameKo: '밥 슬라임',
+    hp: 120,
+    speed: 55,
+    ingredient: 'rice',
+    bodyColor: 0xf5f5f5,
+    healOnDeath: 0.20,     // 사망 시 주변 적 HP 20% 회복
+    healRadius: 80,
+  },
+  pasta_boss: {
+    id: 'pasta_boss',
+    nameKo: '거대 파스타',
+    hp: 2000,
+    speed: 25,
+    ingredient: null,       // 보스는 재료 드롭 없음
+    bodyColor: 0xffd700,
+    isBoss: true,
+    summonInterval: 2000,   // 2초마다 carrot_goblin 소환
+    summonType: 'carrot_goblin',
+    enrageHpThreshold: 0.5, // HP 50% 이하 시 속도 2배
+    bossReward: 100,        // 처치 시 +100 골드
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -169,6 +203,19 @@ export const INGREDIENT_TYPES = {
     nameKo: '밀가루',
     color: 0xfaebd7,
     icon: '🌾',
+  },
+  // ── Phase 5 신규 재료 ──
+  egg: {
+    id: 'egg',
+    nameKo: '달걀',
+    color: 0xfff8dc,
+    icon: '🥚',
+  },
+  rice: {
+    id: 'rice',
+    nameKo: '쌀',
+    color: 0xf5f5f5,
+    icon: '🍚',
   },
 };
 

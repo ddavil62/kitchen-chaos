@@ -4,6 +4,8 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { SaveManager } from '../managers/SaveManager.js';
+import { RecipeManager } from '../managers/RecipeManager.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -86,12 +88,51 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.InOut',
     });
 
+    // 상점 버튼
+    const shopBtn = this.add.rectangle(GAME_WIDTH / 2, 490, 160, 40, 0x886600)
+      .setInteractive({ useHandCursor: true });
+    this.add.text(GAME_WIDTH / 2, 490, '🪙 주방 상점', {
+      fontSize: '16px', fontStyle: 'bold', color: '#ffcc00',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    shopBtn.on('pointerdown', () => {
+      this.cameras.main.fadeOut(300, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('ShopScene');
+      });
+    });
+    shopBtn.on('pointerover', () => shopBtn.setFillStyle(0xaa8800));
+    shopBtn.on('pointerout', () => shopBtn.setFillStyle(0x886600));
+
+    // 도감 버튼
+    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 540, 160, 36, 0x336644)
+      .setInteractive({ useHandCursor: true });
+    this.add.text(GAME_WIDTH / 2, 540, '📖 레시피 도감', {
+      fontSize: '14px', fontStyle: 'bold', color: '#88ffaa',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    bookBtn.on('pointerdown', () => {
+      this.cameras.main.fadeOut(300, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('RecipeCollectionScene');
+      });
+    });
+    bookBtn.on('pointerover', () => bookBtn.setFillStyle(0x448855));
+    bookBtn.on('pointerout', () => bookBtn.setFillStyle(0x336644));
+
+    // 평판 + 수집률
+    const { current, max } = SaveManager.getTotalStars();
+    const { unlocked, total, percent } = RecipeManager.getCollectionProgress();
+    this.add.text(GAME_WIDTH / 2, 578, `⭐ ${current}/${max}    📖 ${unlocked}/${total} (${percent}%)`, {
+      fontSize: '12px', color: '#aaaaaa',
+    }).setOrigin(0.5);
+
     // 하단 설명
-    this.add.text(GAME_WIDTH / 2, 520, '적을 처치하면 재료가 드롭됩니다\n재료를 모아 요리하면 타워가 강해집니다', {
-      fontSize: '13px',
-      color: '#aaaaaa',
+    this.add.text(GAME_WIDTH / 2, 610, '적을 처치하면 재료가 드롭됩니다\n재료를 모아 요리하면 타워가 강해집니다', {
+      fontSize: '12px',
+      color: '#777777',
       align: 'center',
-      lineSpacing: 6,
+      lineSpacing: 4,
     }).setOrigin(0.5);
 
     // 페이드인

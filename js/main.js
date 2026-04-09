@@ -11,6 +11,8 @@ import { StageSelectScene } from './scenes/StageSelectScene.js';
 import { GameScene } from './scenes/GameScene.js';
 import { RestaurantScene } from './scenes/RestaurantScene.js';
 import { GameOverScene } from './scenes/GameOverScene.js';
+import { ShopScene } from './scenes/ShopScene.js';
+import { RecipeCollectionScene } from './scenes/RecipeCollectionScene.js';
 import { GAME_WIDTH, GAME_HEIGHT } from './config.js';
 
 /**
@@ -27,7 +29,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, StageSelectScene, GameScene, RestaurantScene, GameOverScene],
+  scene: [BootScene, MenuScene, StageSelectScene, GameScene, RestaurantScene, GameOverScene, ShopScene, RecipeCollectionScene],
   input: {
     activePointers: 1,
   },
