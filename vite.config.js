@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: '.',
-  base: './',
+  base: '/',  // Capacitor Android WebView는 상대경로(./)가 아닌 절대경로(/) 필요
   build: {
     outDir: 'dist',
     assetsInlineLimit: 0,
