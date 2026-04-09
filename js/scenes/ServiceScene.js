@@ -4,6 +4,7 @@
  * Phase 8-3: 동적 테이블 석수, 테이블 등급, 인테리어 글로벌 버프 반영.
  * Phase 8-4: 직원 시스템 — 세척 대기시간, 자동 서빙, 직원 아이콘 표시.
  * Phase 8-5: 특수 손님 5종(일반/VIP/미식가/급한/단체) + 영업 이벤트 4종.
+ * Phase 8-6: 셰프 영업 액티브 스킬 (특급 서비스 / 화염 조리 / 시간 동결).
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -12,7 +13,7 @@
  *   280~340  조리 슬롯 (2개)
  *   340~440  재료 재고 표시
  *   440~570  레시피 퀵슬롯
- *   570~640  하단 바 (셰프 스킬, 직원 아이콘, 일시정지)
+ *   570~640  하단 바 (셰프 스킬 버튼, 직원 아이콘, 일시정지)
  */
 
 import Phaser from 'phaser';
@@ -252,6 +253,18 @@ export class ServiceScene extends Phaser.Scene {
     this.chapter = parseInt(this.stageId.split('-')[0], 10) || 1;
     /** 장별 특수 손님 출현 확률 테이블 */
     this.specialRates = SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[1];
+
+    // ── Phase 8-6: 셰프 영업 액티브 스킬 상태 ──
+    /** 스킬 쿨다운 남은 시간 (ms) */
+    this.skillCooldownLeft = 0;
+    /** 스킬 총 쿨다운 (ms) */
+    this.skillCooldownMax = 0;
+    /** 꼬마셰프 스킬: 남은 인내심 리셋 대상 수 */
+    this.patienceResetRemaining = 0;
+    /** 얼음 요리장 스킬: 인내심 정지 상태 */
+    this.patienceFrozen = false;
+    /** 얼음 요리장 스킬: 정지 남은 시간 (ms) */
+    this.freezeTimeLeft = 0;
 
     // ── Phase 8-5: 영업 이벤트 시스템 ──
     /** @type {{ type: string, timeLeft: number, data: object }|null} */
@@ -714,16 +727,30 @@ export class ServiceScene extends Phaser.Scene {
     this.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_H / 2, GAME_WIDTH, BOTTOM_H, 0x0d0d1a)
       .setDepth(100);
 
-    // 셰프 스킬 버튼 (영업 패시브 표시용)
+    // ── Phase 8-6: 셰프 영업 액티브 스킬 버튼 ──
     const chefData = ChefManager.getChefData();
-    let chefLabel = '\uC158\uD504 \uC5C6\uC74C';
-    if (chefData) {
-      const passiveName = this._getServicePassiveDesc(chefData.id);
-      chefLabel = `${chefData.icon} ${passiveName}`;
+    const skill = ChefManager.getServiceSkill();
+
+    if (chefData && skill) {
+      // 스킬 버튼 배경 (120x36)
+      this.skillBtnBg = this.add.rectangle(70, BOTTOM_Y + 14, 120, 36, 0x446688, 0.9)
+        .setStrokeStyle(1, 0x6688aa)
+        .setInteractive({ useHandCursor: true })
+        .setDepth(101);
+      // 스킬 버튼 텍스트
+      this.skillBtnText = this.add.text(70, BOTTOM_Y + 14, `${chefData.icon} ${skill.name}`, {
+        fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
+      }).setOrigin(0.5).setDepth(102);
+
+      this.skillBtnBg.on('pointerdown', () => this._onSkillTap());
+    } else {
+      // 셰프 미선택 시 기존 텍스트 표시
+      this.skillBtnBg = null;
+      this.skillBtnText = null;
+      this.add.text(20, BOTTOM_Y + 14, '\uC158\uD504 \uC5C6\uC74C', {
+        fontSize: '11px', color: '#aaddff',
+      }).setOrigin(0, 0.5).setDepth(101);
     }
-    this.add.text(20, BOTTOM_Y + 14, chefLabel, {
-      fontSize: '11px', color: '#aaddff',
-    }).setOrigin(0, 0.5).setDepth(101);
 
     // ── Phase 8-4: 직원 아이콘 표시 ──
     this._createStaffIcons();
@@ -789,6 +816,94 @@ export class ServiceScene extends Phaser.Scene {
     }
   }
 
+  // ── Phase 8-6: 셰프 영업 액티브 스킬 ──────────────────────────────
+
+  /**
+   * 스킬 버튼 클릭 핸들러.
+   * 쿨다운 시작 + 스킬 유형별 효과 발동.
+   * @private
+   */
+  _onSkillTap() {
+    if (this.skillCooldownLeft > 0 || this.isPaused || this.isServiceOver) return;
+
+    const skill = ChefManager.getServiceSkill();
+    if (!skill) return;
+
+    const chefData = ChefManager.getChefData();
+
+    // 쿨다운 시작
+    this.skillCooldownLeft = skill.cooldown;
+    this.skillCooldownMax = skill.cooldown;
+
+    switch (skill.type) {
+      case 'patience_reset':
+        this.patienceResetRemaining = skill.value; // 3
+        this._showMessage(`${chefData.icon} \uD2B9\uAE09 \uC11C\uBE44\uC2A4! \uB2E4\uC74C ${skill.value}\uBA85 \uC778\uB0B4\uC2EC \uB9AC\uC14B`);
+        break;
+      case 'instant_cook':
+        this._activateInstantCook();
+        this._showMessage(`${chefData.icon} \uD654\uC5FC \uC870\uB9AC! \uBAA8\uB4E0 \uC694\uB9AC \uC989\uC2DC \uC644\uC131!`);
+        break;
+      case 'freeze_patience':
+        this._activateFreezePatience(skill.value); // 10000ms
+        this._showMessage('\u2744\uFE0F \uC2DC\uAC04 \uB3D9\uACB0! 10\uCD08\uAC04 \uC778\uB0B4\uC2EC \uC815\uC9C0');
+        break;
+    }
+  }
+
+  /**
+   * 화염 조리 스킬: 조리 중인 모든 요리 즉시 완성.
+   * @private
+   */
+  _activateInstantCook() {
+    for (let i = 0; i < this.cookingSlots.length; i++) {
+      const slot = this.cookingSlots[i];
+      // 조리 중인 슬롯만 (세척/사고/빈 슬롯 제외)
+      if (slot.recipe && !slot.ready && !slot.washing && i !== this.accidentSlotIdx) {
+        slot.ready = true;
+        slot.timeLeft = 0;
+      }
+      this._updateCookSlotUI(i);
+    }
+  }
+
+  /**
+   * 시간 동결 스킬: 전체 손님 인내심 일정 시간 정지.
+   * @param {number} duration - 동결 지속시간 (ms)
+   * @private
+   */
+  _activateFreezePatience(duration) {
+    this.patienceFrozen = true;
+    this.freezeTimeLeft = duration;
+  }
+
+  /**
+   * 스킬 버튼 UI 업데이트 (쿨다운/준비 상태 반영).
+   * @private
+   */
+  _updateSkillButton() {
+    if (!this.skillBtnBg || !this.skillBtnText) return;
+
+    const chefData = ChefManager.getChefData();
+    const skill = ChefManager.getServiceSkill();
+    if (!chefData || !skill) return;
+
+    if (this.skillCooldownLeft > 0) {
+      // 쿨다운 중: 어둡게 + 남은 초 표시
+      this.skillBtnBg.setFillStyle(0x333344, 0.9);
+      const remainSec = Math.ceil(this.skillCooldownLeft / 1000);
+      this.skillBtnText.setText(`${remainSec}\uCD08`).setColor('#888888');
+    } else if (this.patienceResetRemaining > 0) {
+      // 꼬마셰프: 리셋 남은 수 표시
+      this.skillBtnBg.setFillStyle(0x44aa44, 0.9);
+      this.skillBtnText.setText(`\uB9AC\uC14B \uB0A8\uC74C: ${this.patienceResetRemaining}\uBA85`).setColor('#ffffff');
+    } else {
+      // 준비 완료: 밝게 + 스킬 이름
+      this.skillBtnBg.setFillStyle(0x446688, 0.9);
+      this.skillBtnText.setText(`${chefData.icon} ${skill.name}`).setColor('#ffffff');
+    }
+  }
+
   // ── 일시정지 ──────────────────────────────────────────────────────
 
   /** @private */
@@ -832,6 +947,24 @@ export class ServiceScene extends Phaser.Scene {
 
     // Phase 8-5: 영업 이벤트 시스템 업데이트
     this._updateEvents(dt);
+
+    // Phase 8-6: 스킬 쿨다운 감소
+    if (this.skillCooldownLeft > 0) {
+      this.skillCooldownLeft -= delta;
+      if (this.skillCooldownLeft < 0) this.skillCooldownLeft = 0;
+    }
+
+    // Phase 8-6: 인내심 동결 타이머 감소
+    if (this.patienceFrozen) {
+      this.freezeTimeLeft -= delta;
+      if (this.freezeTimeLeft <= 0) {
+        this.patienceFrozen = false;
+        this.freezeTimeLeft = 0;
+      }
+    }
+
+    // Phase 8-6: 스킬 버튼 UI 갱신
+    this._updateSkillButton();
 
     // 재료 소진 체크 — Phase 8-4: 세척 중인 슬롯도 "진행 중"으로 간주
     if (this._isAllStockEmpty() && !this._hasCookingInProgress() && !this._hasReadyDish() && !this._hasWashingSlot()) {
@@ -973,6 +1106,12 @@ export class ServiceScene extends Phaser.Scene {
       groupPairIdx: -1, // 단체가 아니면 -1
     };
 
+    // Phase 8-6: 꼬마셰프 특급 서비스 — 인내심 최대치 리셋
+    if (this.patienceResetRemaining > 0) {
+      customer.patience = customer.maxPatience;
+      this.patienceResetRemaining--;
+    }
+
     this.tables[tableIdx] = customer;
     this.customersSpawned++;
     this.totalCustomers++;
@@ -1038,8 +1177,23 @@ export class ServiceScene extends Phaser.Scene {
       sharedPatience: sharedPatience, // 인내심 공유 참조
     });
 
-    this.tables[idx1] = createGroupMember(idx1, recipe1, idx2);
-    this.tables[idx2] = createGroupMember(idx2, recipe2, idx1);
+    const member1 = createGroupMember(idx1, recipe1, idx2);
+    const member2 = createGroupMember(idx2, recipe2, idx1);
+
+    // Phase 8-6: 꼬마셰프 특급 서비스 — 인내심 최대치 리셋 (단체 각 멤버 개별 카운트)
+    if (this.patienceResetRemaining > 0) {
+      member1.patience = member1.maxPatience;
+      if (member1.sharedPatience) member1.sharedPatience.value = member1.maxPatience;
+      this.patienceResetRemaining--;
+    }
+    if (this.patienceResetRemaining > 0) {
+      member2.patience = member2.maxPatience;
+      // sharedPatience는 동일 참조이므로 이미 위에서 리셋됨
+      this.patienceResetRemaining--;
+    }
+
+    this.tables[idx1] = member1;
+    this.tables[idx2] = member2;
 
     this.customersSpawned += 2;
     this.totalCustomers += 2;
@@ -1106,10 +1260,14 @@ export class ServiceScene extends Phaser.Scene {
   /**
    * 손님 인내심 감소 처리.
    * Phase 8-5: 단체 손님 인내심 공유 + 급한 손님 퇴장 시 추가 페널티.
+   * Phase 8-6: 시간 동결 스킬 활성 시 인내심 감소 스킵.
    * @param {number} delta - ms
    * @private
    */
   _updateCustomerPatience(delta) {
+    // Phase 8-6: 동결 중에는 인내심 감소 스킵 (퇴장 체크도 건너뜀)
+    if (this.patienceFrozen) return;
+
     // 단체 손님 인내심 공유: sharedPatience.value를 한 번만 감소시키기 위해 처리된 쌍 추적
     const processedGroupPairs = new Set();
 
@@ -1794,5 +1952,13 @@ export class ServiceScene extends Phaser.Scene {
     this.activeEvent = null;
     this.accidentSlotIdx = -1;
     this.foodReviewRemaining = 0;
+    // Phase 8-6: 스킬 상태 정리
+    this.skillCooldownLeft = 0;
+    this.skillCooldownMax = 0;
+    this.patienceResetRemaining = 0;
+    this.patienceFrozen = false;
+    this.freezeTimeLeft = 0;
+    this.skillBtnBg = null;
+    this.skillBtnText = null;
   }
 }

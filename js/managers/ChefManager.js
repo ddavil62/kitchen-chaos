@@ -1,6 +1,7 @@
 /**
  * @fileoverview 셰프 관리자. 선택, 패시브 조회, 스킬 발동.
  * Phase 7-2: 영업 패시브 메서드 추가 (조리시간, 그릴보상, 인내심).
+ * Phase 8-6: 영업 액티브 스킬 조회 (getServiceSkill).
  */
 
 import { CHEF_TYPES } from '../data/chefData.js';
@@ -94,5 +95,16 @@ export class ChefManager {
   static getPatienceBonus() {
     const id = ChefManager.getSelectedChef();
     return id === 'ice_chef' ? 1.20 : 1.0;
+  }
+
+  // ── 영업 액티브 스킬 (Phase 8-6) ──
+
+  /**
+   * 현재 셰프의 영업 액티브 스킬 데이터 반환 (없으면 null).
+   * @returns {{ name: string, desc: string, type: string, value?: number, cooldown: number }|null}
+   */
+  static getServiceSkill() {
+    const chef = ChefManager.getChefData();
+    return chef?.serviceSkill || null;
   }
 }
