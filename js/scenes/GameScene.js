@@ -20,6 +20,7 @@ import { WaveManager } from '../managers/WaveManager.js';
 import { IngredientManager } from '../managers/IngredientManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
+import { ChefManager } from '../managers/ChefManager.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -66,8 +67,16 @@ export class GameScene extends Phaser.Scene {
       waypoints: this.stageWaypoints,
     });
 
+    // ── 셰프 스킬 상태 ──
+    this._chefData = ChefManager.getChefData();
+    this._skillCooldownTimer = 0;
+    this._skillReady = true;
+
     // ── HUD ──
     this._createHUD();
+
+    // ── 셰프 스킬 버튼 ──
+    this._createChefSkillButton();
 
     // ── 타워 선택 바 ──
     this._createTowerBar();
@@ -175,6 +184,132 @@ export class GameScene extends Phaser.Scene {
   _updateHUD() {
     this.goldText.setText(`🪙 ${this.gold}`);
     this.livesText.setText(`❤️ ${this.lives}`);
+  }
+
+  // ── 셰프 스킬 버튼 (HUD 영역, 골드 옆) ───────────────────────
+
+  /**
+   * 셰프 스킬 버튼 생성.
+   * ChefManager.getChefData()가 null이면 숨김.
+   * @private
+   */
+  _createChefSkillButton() {
+    if (!this._chefData) return;
+
+    const btnX = 100;
+    const btnY = 15;
+
+    // 아이콘 배경 (둥근 사각형)
+    this._skillBtnBg = this.add.rectangle(btnX, btnY + 10, 34, 34, 0x333355)
+      .setDepth(101).setInteractive({ useHandCursor: true })
+      .setStrokeStyle(2, this._chefData.color);
+
+    // 셰프 아이콘
+    this._skillBtnIcon = this.add.text(btnX, btnY + 6, this._chefData.icon, {
+      fontSize: '16px',
+    }).setOrigin(0.5).setDepth(102);
+
+    // 쿨다운 오버레이 (어둡게)
+    this._skillCooldownOverlay = this.add.rectangle(btnX, btnY + 10, 34, 34, 0x000000, 0.6)
+      .setDepth(103).setVisible(false);
+
+    // 쿨다운 텍스트
+    this._skillCooldownText = this.add.text(btnX, btnY + 18, '', {
+      fontSize: '10px', color: '#ff8888', fontStyle: 'bold',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(104).setVisible(false);
+
+    // 클릭 이벤트
+    this._skillBtnBg.on('pointerdown', () => {
+      if (this.isGameOver || this.isVictory) return;
+      if (!this._skillReady) return;
+      this._activateChefSkill();
+    });
+
+    this._skillBtnBg.on('pointerover', () => {
+      if (this._skillReady) this._skillBtnBg.setFillStyle(0x555577);
+    });
+    this._skillBtnBg.on('pointerout', () => {
+      this._skillBtnBg.setFillStyle(0x333355);
+    });
+  }
+
+  /**
+   * 셰프 스킬 발동.
+   * @private
+   */
+  _activateChefSkill() {
+    if (!this._chefData) return;
+
+    const type = this._chefData.skillType;
+
+    if (type === 'instant_collect') {
+      // 꼬마 셰프: 맵 위 모든 드롭 재료 즉시 수거
+      const drops = [...this.ingredientManager.drops];
+      for (let i = drops.length - 1; i >= 0; i--) {
+        this.ingredientManager._collectDrop(drops[i]);
+      }
+      this._showMessage(`${this._chefData.skillName}!\n모든 재료를 수거했습니다`, 1500);
+    } else if (type === 'global_burn') {
+      // 불꽃 요리사: 전체 적에게 화상
+      const val = this._chefData.skillValue;
+      const burnDamage = val.dps;  // 틱당 DPS (interval 1초)
+      const burnDuration = val.duration;
+      const burnInterval = 1000;
+      this.enemies.getChildren().forEach(enemy => {
+        if (!enemy.active || enemy.isDead) return;
+        enemy.applyBurn(burnDamage, burnDuration, burnInterval);
+      });
+      this._showMessage(`${this._chefData.skillName}!\n전체 적에게 화상!`, 1500);
+    } else if (type === 'global_freeze') {
+      // 얼음 요리장: 전체 적 빙결
+      const duration = this._chefData.skillValue.duration;
+      this.enemies.getChildren().forEach(enemy => {
+        if (!enemy.active || enemy.isDead) return;
+        enemy.applyFreeze(duration);
+      });
+      this._showMessage(`${this._chefData.skillName}!\n전체 적 빙결!`, 1500);
+    }
+
+    // 쿨다운 시작
+    this._skillReady = false;
+    this._skillCooldownTimer = this._chefData.skillCooldown;
+    this._skillCooldownOverlay.setVisible(true);
+    this._skillCooldownText.setVisible(true);
+
+    // 발동 연출
+    this.tweens.add({
+      targets: this._skillBtnBg,
+      scaleX: 1.3, scaleY: 1.3,
+      duration: 200, yoyo: true,
+    });
+  }
+
+  /**
+   * 셰프 스킬 쿨다운 업데이트 (매 프레임).
+   * @param {number} delta
+   * @private
+   */
+  _updateChefSkillCooldown(delta) {
+    if (!this._chefData || this._skillReady) return;
+
+    this._skillCooldownTimer -= delta;
+    if (this._skillCooldownTimer <= 0) {
+      this._skillReady = true;
+      this._skillCooldownTimer = 0;
+      this._skillCooldownOverlay.setVisible(false);
+      this._skillCooldownText.setVisible(false);
+
+      // 준비 완료 연출
+      this.tweens.add({
+        targets: [this._skillBtnBg, this._skillBtnIcon],
+        scaleX: 1.15, scaleY: 1.15,
+        duration: 300, yoyo: true,
+      });
+    } else {
+      const sec = Math.ceil(this._skillCooldownTimer / 1000);
+      this._skillCooldownText.setText(`${sec}s`);
+    }
   }
 
   // ── 타워 선택 바 (370~420px) ────────────────────────────────────
@@ -626,7 +761,9 @@ export class GameScene extends Phaser.Scene {
         const dist = Phaser.Math.Distance.Between(
           tower.x, tower.y, drop.container.x, drop.container.y
         );
-        if (dist <= (tower.data_.collectRadius || 110)) {
+        // petit_chef 패시브: 수거 범위 보너스
+        const collectRange = (tower.data_.collectRadius || 110) * ChefManager.getCollectRangeBonus();
+        if (dist <= collectRange) {
           this.ingredientManager._collectDrop(drop);
           break; // 한 번에 1개만 수거
         }
@@ -895,6 +1032,9 @@ export class GameScene extends Phaser.Scene {
 
     // 수프 솥 오라 버프
     this._updateSoupPotAuras(delta);
+
+    // 셰프 스킬 쿨다운
+    this._updateChefSkillCooldown(delta);
   }
 
   // ── 수프 솥 오라 버프 ──────────────────────────────────────────

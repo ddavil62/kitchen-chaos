@@ -1,12 +1,13 @@
 /**
  * @fileoverview 세이브 매니저.
  * Phase 5: v2 마이그레이션 — kitchenCoins, upgrades, unlockedRecipes 추가.
+ * Phase 6: v3 마이그레이션 — selectedChef, completedOrders 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaos_save';
-const SAVE_VERSION = 2;
+const SAVE_VERSION = 3;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -24,6 +25,9 @@ function createDefault() {
       cook_training: 0,
     },
     unlockedRecipes: [],  // 해금한 레시피 ID 목록 (스타터 12종은 코드에서 항상 해금)
+    // ── Phase 6 추가 ──
+    selectedChef: null,       // 'petit_chef' | 'flame_chef' | 'ice_chef'
+    completedOrders: [],      // 완료된 오더 통계용
   };
 }
 
@@ -217,6 +221,13 @@ export class SaveManager {
       };
       data.unlockedRecipes = data.unlockedRecipes || [];
       data.version = 2;
+    }
+
+    // v2 → v3: 셰프 선택, 오더 기록 추가
+    if (data.version < 3) {
+      data.selectedChef = data.selectedChef || null;
+      data.completedOrders = data.completedOrders || [];
+      data.version = 3;
     }
 
     return data;

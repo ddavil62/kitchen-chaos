@@ -8,6 +8,7 @@ import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene.js';
 import { MenuScene } from './scenes/MenuScene.js';
 import { StageSelectScene } from './scenes/StageSelectScene.js';
+import { ChefSelectScene } from './scenes/ChefSelectScene.js';
 import { GameScene } from './scenes/GameScene.js';
 import { RestaurantScene } from './scenes/RestaurantScene.js';
 import { GameOverScene } from './scenes/GameOverScene.js';
@@ -29,7 +30,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, StageSelectScene, GameScene, RestaurantScene, GameOverScene, ShopScene, RecipeCollectionScene],
+  scene: [BootScene, MenuScene, StageSelectScene, ChefSelectScene, GameScene, RestaurantScene, GameOverScene, ShopScene, RecipeCollectionScene],
   input: {
     activePointers: 1,
   },

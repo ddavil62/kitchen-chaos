@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { Projectile } from './Projectile.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
+import { ChefManager } from '../managers/ChefManager.js';
 
 export class Tower extends Phaser.GameObjects.Container {
   /**
@@ -162,12 +163,31 @@ export class Tower extends Phaser.GameObjects.Container {
       ...this.data_,
       damage: Math.round(this.baseDamage * this.damageMultiplier),
     };
+
+    // flame_chef 패시브: grill 타워 피해 보너스
+    if (this.data_.id === 'grill') {
+      projData.damage = Math.round(projData.damage * ChefManager.getGrillDamageBonus());
+    }
+
     // 화상/둔화 배율 적용
     if (projData.burnDamage) {
       projData.burnDamage = Math.round(projData.burnDamage * this.burnMultiplier);
+      // flame_chef 패시브: grill 화상 피해 보너스
+      if (this.data_.id === 'grill') {
+        projData.burnDamage = Math.round(projData.burnDamage * ChefManager.getGrillDamageBonus());
+      }
     }
     if (projData.slowFactor) {
       projData.slowFactor = Math.max(0.1, projData.slowFactor * (1 - (this.slowMultiplier - 1) * 0.5));
+    }
+
+    // ice_chef 패시브: salt/freezer CC 지속시간 보너스
+    const ccBonus = ChefManager.getCCDurationBonus();
+    if (projData.slowDuration) {
+      projData.slowDuration = Math.round(projData.slowDuration * ccBonus);
+    }
+    if (projData.freezeDuration) {
+      projData.freezeDuration = Math.round(projData.freezeDuration * ccBonus);
     }
 
     const proj = new Projectile(this.scene, this.x, this.y, target, projData);

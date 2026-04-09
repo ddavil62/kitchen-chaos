@@ -162,7 +162,7 @@ export class StageSelectScene extends Phaser.Scene {
       bg.on('pointerdown', () => {
         this.cameras.main.fadeOut(300, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
-          this.scene.start('GameScene', { stageId });
+          this.scene.start('ChefSelectScene', { stageId });
         });
       });
       bg.on('pointerover', () => bg.setFillStyle(is2nd ? 0x1a3a4a : 0x3a2a1a));
