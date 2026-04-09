@@ -1,5 +1,61 @@
 # Changelog
 
+## [2026-04-10] - Phase 11-2 스테이지 월드맵
+
+### 추가
+
+- **WorldMapScene** (`js/scenes/WorldMapScene.js`, 622줄 신규)
+  - StageSelectScene을 대체하는 비주얼 노드맵 씬
+  - 6개 챕터를 2열 3행 지그재그 노드 그래프로 배치 (NODE_POSITIONS: 100,140 / 260,140 / 100,270 / 260,270 / 100,400 / 260,400)
+  - 노드 간 연결선 7개 (Phaser Graphics): 해금 경로=실선(3px, 0xaaaaaa), 잠금 경로=점선(2px, 0x555555, 10px 간격)
+  - 노드 상태 3종: 잠금(회색 원 + 자물쇠 아이콘) / 진행중(테마색 + glow tween 알파 0.1~0.35) / 올클리어(골든 테두리 4px + 체크마크)
+  - `_buildChapterStates()`: SaveManager.isUnlocked() 기반 챕터 해금/진행/클리어 판정
+  - `_openStagePanel(chapterIdx)`: 슬라이드업 패널 (300x400, 250ms Power2 tween), dim overlay, 패널 내 스크롤 지원
+  - `_closeStagePanel()`: 슬라이드다운 닫기 (200ms Power2 tween)
+  - `_createStageItem()`: StageSelectScene 로직 재활용, 스테이지 선택 -> ChefSelectScene 전환
+  - `_createHUD()`: 상단 40px 영역 -- 뒤로가기(좌), 총 별점(중앙, SaveManager.getTotalStars), 레시피 수집률(우, RecipeManager.getCollectionProgress)
+  - `_createEndlessSection()`: 하단 엔드리스 버튼(해금: 보라색 0x6622cc / 잠금: 회색 0x444444) + 최고 웨이브 기록 + v1.0.0 푸터
+  - 모든 인터랙티브 요소: pointerover/pointerout 피드백 + SoundManager.playSFX('sfx_ui_tap')
+  - fadeIn(400ms) / fadeOut(300ms) 일관 적용
+
+### 변경
+
+- **MenuScene** (`js/scenes/MenuScene.js`, +2줄)
+  - "게임 시작" 전환 대상: `StageSelectScene` -> `WorldMapScene`
+  - fileoverview에 Phase 11-2 기록 추가
+
+- **main.js** (`js/main.js`, +2줄)
+  - WorldMapScene import 추가
+  - scene 배열에 WorldMapScene 등록 (StageSelectScene 뒤)
+
+### 유지
+
+- **StageSelectScene.js** -- 삭제하지 않고 유지 (scene 배열에도 존재, 직접 진입 경로만 끊김)
+
+### 설계 결정
+
+- **StageSelectScene 비삭제**: 하위 호환 보존 + 11-3에서 참조 가능성
+- **CHAPTERS 상수 재정의**: StageSelectScene에서 import하지 않고 WorldMapScene 내부에 독립 정의 (씬 간 결합도 최소화)
+- **3장 챕터명 축약**: StageSelectScene "3장: 바닷가 씨푸드 바" -> WorldMapScene "3장: 씨푸드 바" (노드 라벨 공간 제약)
+- **엔드리스 y좌표 조정**: 스펙 y=560~600 -> 구현 y=555~625 (레이아웃 밸런스)
+- **dim overlay depth 구조**: dim overlay(depth 100) > HUD(depth 50~52) > 노드/연결선(기본 depth) -- 패널 열린 상태에서 HUD 클릭 차단
+
+### QA 결과
+
+- **판정**: PASS (34/34)
+- 수용 기준 14/14, 예외 시나리오 7/7, 회귀 2/2, 시각 검증 10건 확인
+- Playwright 34개 통과 (테스트 파일: `tests/worldmap-qa.spec.js`)
+- LOW 이슈 3건 (기능 영향 없음): 스크롤 리스너 방어 코드, dim overlay 좌표 주석, HUD 수집률 텍스트 우측 미세 클리핑
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-09-kitchen-chaos-phase11-2-spec.md`
+- 리포트: `.claude/specs/2026-04-09-kitchen-chaos-phase11-2-report.md`
+- QA: `.claude/specs/2026-04-09-kitchen-chaos-phase11-2-qa.md`
+- Phase 11 기획서: `.claude/specs/2026-04-09-kitchen-chaos-phase11-scope.md`
+
+---
+
 ## [2026-04-09] - Phase 11-1 엔드리스 모드
 
 ### 추가

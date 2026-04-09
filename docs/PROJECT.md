@@ -1,6 +1,6 @@
 # Kitchen Chaos Defense 기획서
 
-> 최종 업데이트: 2026-04-09
+> 최종 업데이트: 2026-04-10
 
 ## 프로젝트 개요
 
@@ -28,7 +28,8 @@ kitchen-chaos/
     scenes/
       BootScene.js           # 에셋 로드
       MenuScene.js           # 메인 메뉴 (캠페인/엔드리스/상점/도감)
-      StageSelectScene.js    # 스테이지 선택
+      WorldMapScene.js       # 월드맵 (6챕터 노드맵 + 스테이지 패널)
+      StageSelectScene.js    # 스테이지 선택 (레거시, WorldMapScene으로 교체됨)
       ChefSelectScene.js     # 셰프 선택 (캠페인/엔드리스 분기)
       MarketScene.js         # TD 페이즈 (장보기)
       EndlessScene.js        # 엔드리스 TD 페이즈 (MarketScene 상속)
@@ -58,6 +59,7 @@ kitchen-chaos/
 | 모듈 | 파일 | 역할 |
 |------|------|------|
 | TD 코어 | MarketScene.js | 타워 배치, 적 AI, 재료 드롭, 웨이브 진행 |
+| 월드맵 | WorldMapScene.js | 6챕터 노드맵, 슬라이드업 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 데일리 스페셜 보상 |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시 |
@@ -68,8 +70,8 @@ kitchen-chaos/
 ### 게임 루프
 
 ```
-메뉴 → 스테이지 선택 → 셰프 선택 → MarketScene(TD) → ServiceScene(타이쿤) → ResultScene
-메뉴 → 셰프 선택 → EndlessScene(TD) ↔ ServiceScene(5웨이브마다) → ResultScene(게임오버)
+메뉴 → 월드맵 → 셰프 선택 → MarketScene(TD) → ServiceScene(타이쿤) → ResultScene
+메뉴 → 월드맵 → 엔드리스 → 셰프 선택 → EndlessScene(TD) ↔ ServiceScene(5웨이브마다) → ResultScene(게임오버)
 ```
 
 ## 기능 목록
@@ -86,7 +88,7 @@ kitchen-chaos/
 | 사운드 | SFX 20종 + BGM 5종, 설정 UI | 완료 |
 | VFX | 파티클, 스크린 효과, 플로팅 텍스트 | 완료 |
 | 엔드리스 모드 | 무한 웨이브 TD, 데일리 스페셜, 로컬 랭킹 | 완료 |
-| 월드맵 UI | StageSelectScene을 비주얼 월드맵으로 교체 | 미착수 |
+| 월드맵 UI | 6챕터 노드맵, 슬라이드업 스테이지 패널, 진행률 HUD, 엔드리스 섹션 | 완료 |
 | 튜토리얼 개선 | 영업/상점/엔드리스 안내, 개별 플래그 | 미착수 |
 | UI/UX 폴리시 | 씬 전환, 버튼 스타일, 터치 피드백 통일 | 미착수 |
 | 성능 최적화 | 오브젝트 풀링, 텍스처 아틀라스 | 미착수 |
@@ -110,9 +112,10 @@ kitchen-chaos/
 - 온라인 랭킹 미구현 (엔드리스는 로컬 기록만)
 - 엔드리스 ServiceScene은 1장(stageId='1-1') 기준 config 사용
 - 튜토리얼이 1-1 전투만 존재 (영업/상점/엔드리스 튜토리얼 미구현)
+- WorldMapScene HUD 레시피 수집률 텍스트가 3자리 수("100/106")일 때 우측 끝 미세 클리핑 (LOW)
+- StageSelectScene.js는 레거시로 유지 중 (WorldMapScene으로 교체됨, 삭제 예정 미정)
 
 ## 향후 계획
 
-- Phase 11-2: 스테이지 월드맵 UI
 - Phase 11-3: 튜토리얼 개선, UI/UX 통합 점검, 성능 최적화, 출시 준비
 - 상세: `docs/ROADMAP.md` 참조
