@@ -89,6 +89,49 @@ export const ENEMY_TYPES = {
     enrageHpThreshold: 0.5, // HP 50% 이하 시 속도 2배
     bossReward: 100,        // 처치 시 +100 골드
   },
+  // ── Phase 6 신규 적 ──
+  fish_knight: {
+    id: 'fish_knight',
+    nameKo: '생선 기사',
+    hp: 180,
+    speed: 50,
+    ingredient: 'fish',
+    bodyColor: 0x4488cc,
+    shieldFront: 0.5,  // 전면 피해 50% 감소
+  },
+  mushroom_scout: {
+    id: 'mushroom_scout',
+    nameKo: '버섯 정찰병',
+    hp: 60,
+    speed: 120,
+    ingredient: 'mushroom',
+    bodyColor: 0x8b6914,
+    sporeDebuff: { speedReduction: 0.20, duration: 5000 }, // 사망 시 주변 타워 공격속도 -20%, 5초
+  },
+  cheese_rat: {
+    id: 'cheese_rat',
+    nameKo: '치즈 쥐',
+    hp: 90,
+    speed: 100,
+    ingredient: 'cheese',
+    bodyColor: 0xffcc33,
+    swarmSpeedBonus: 0.30,  // 근처 같은 타입 3마리 이상이면 속도 +30%
+    swarmRadius: 80,
+  },
+  dragon_ramen: {
+    id: 'dragon_ramen',
+    nameKo: '용 라멘',
+    hp: 3000,
+    speed: 20,
+    ingredient: null,
+    bodyColor: 0xff4444,
+    isBoss: true,
+    summonInterval: 3000,
+    summonType: 'cheese_rat',
+    enrageHpThreshold: 0.4,
+    bossReward: 150,
+    bossDebuff: { speedReduction: 0.30, duration: 15000 },  // HP 40% 이하 시 전체 타워 공격속도 -30%, 15초, 1회
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -216,6 +259,25 @@ export const INGREDIENT_TYPES = {
     nameKo: '쌀',
     color: 0xf5f5f5,
     icon: '🍚',
+  },
+  // ── Phase 6 신규 재료 ──
+  fish: {
+    id: 'fish',
+    nameKo: '생선',
+    color: 0x4488cc,
+    icon: '🐟',
+  },
+  mushroom: {
+    id: 'mushroom',
+    nameKo: '버섯',
+    color: 0x8b6914,
+    icon: '🍄',
+  },
+  cheese: {
+    id: 'cheese',
+    nameKo: '치즈',
+    color: 0xffcc33,
+    icon: '🧀',
   },
 };
 

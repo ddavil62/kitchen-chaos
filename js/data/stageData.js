@@ -702,7 +702,324 @@ export const STAGES = {
     ],
     starThresholds: { three: 14, two: 10 },
   },
+
+  // ── Phase 6 2장: 동양 요리 식당 ──
+
+  '2-1': {
+    id: '2-1',
+    nameKo: '이자카야',
+    theme: 'oriental',
+    availableTowers: ['pan', 'salt', 'grill', 'delivery'],
+    gridCols: 9,
+    gridRows: 8,
+    // 직선 + 분기 경로
+    pathSegments: [
+      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 7 },
+      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 0, rowEnd: 4 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'carrot_goblin', count: 10, interval: 1200 },
+        { type: 'fish_knight', count: 2, interval: 3000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'fish_knight', count: 4, interval: 2200 },
+        { type: 'carrot_goblin', count: 8, interval: 1000 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'meat_ogre', count: 4, interval: 2000 },
+        { type: 'fish_knight', count: 5, interval: 1800 },
+        { type: 'chili_demon', count: 3, interval: 2000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'carrot_goblin', count: 14, interval: 700 },
+        { type: 'fish_knight', count: 6, interval: 1600 },
+        { type: 'egg_sprite', count: 4, interval: 2000 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'fish_knight', count: 8, interval: 1400 },
+        { type: 'meat_ogre', count: 5, interval: 1800 },
+        { type: 'octopus_mage', count: 3, interval: 2200 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'carrot_goblin', count: 18, interval: 600 },
+        { type: 'fish_knight', count: 6, interval: 1500 },
+        { type: 'cheese_golem', count: 2, interval: 3500 },
+      ]},
+      { wave: 7, enemies: [
+        { type: 'fish_knight', count: 10, interval: 1200 },
+        { type: 'chili_demon', count: 8, interval: 1200 },
+        { type: 'meat_ogre', count: 6, interval: 1800 },
+      ]},
+      { wave: 8, enemies: [
+        { type: 'carrot_goblin', count: 20, interval: 500 },
+        { type: 'fish_knight', count: 10, interval: 1200 },
+        { type: 'meat_ogre', count: 8, interval: 1500 },
+        { type: 'cheese_golem', count: 3, interval: 3000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [
+        { dish: 'carrot_soup', patience: 35000, baseReward: 25, tipMultiplier: 1.5 },
+      ]},
+      { wave: 2, customers: [
+        { dish: 'steak_plate', patience: 32000, baseReward: 55, tipMultiplier: 1.5 },
+        { dish: 'carrot_soup', patience: 28000, baseReward: 25, tipMultiplier: 1.3 },
+      ]},
+      { wave: 3, customers: [
+        { dish: 'spicy_stir_fry', patience: 28000, baseReward: 50, tipMultiplier: 1.5 },
+        { dish: 'seafood_pasta', patience: 28000, baseReward: 60, tipMultiplier: 1.3 },
+      ]},
+      { wave: 4, customers: [
+        { dish: 'mixed_platter', patience: 28000, baseReward: 70, tipMultiplier: 1.5 },
+        { dish: 'steak_plate', patience: 24000, baseReward: 55, tipMultiplier: 1.3 },
+      ]},
+      { wave: 5, customers: [
+        { dish: 'cheese_fondue', patience: 26000, baseReward: 65, tipMultiplier: 1.5, vip: true },
+        { dish: 'seafood_pasta', patience: 22000, baseReward: 60, tipMultiplier: 1.3 },
+      ]},
+      { wave: 6, customers: [
+        { dish: 'mixed_platter', patience: 24000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+        { dish: 'spicy_stir_fry', patience: 22000, baseReward: 50, tipMultiplier: 1.3 },
+      ]},
+      { wave: 7, customers: [
+        { dish: 'cheese_fondue', patience: 22000, baseReward: 70, tipMultiplier: 1.5, vip: true },
+        { dish: 'steak_plate', patience: 20000, baseReward: 55, tipMultiplier: 1.3, vip: true },
+      ]},
+      { wave: 8, customers: [
+        { dish: 'cheese_fondue', patience: 20000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+        { dish: 'mixed_platter', patience: 18000, baseReward: 80, tipMultiplier: 1.5, vip: true },
+        { dish: 'seafood_pasta', patience: 18000, baseReward: 60, tipMultiplier: 1.3 },
+      ]},
+    ],
+    starThresholds: { three: 12, two: 8 },
+  },
+
+  '2-2': {
+    id: '2-2',
+    nameKo: '야시장',
+    theme: 'oriental',
+    availableTowers: ['pan', 'salt', 'grill', 'delivery', 'soup_pot'],
+    gridCols: 9,
+    gridRows: 8,
+    // 지그재그 경로
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 6 },
+      { type: 'vertical', col: 6, rowStart: 1, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 2, rowStart: 3, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 8 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'carrot_goblin', count: 10, interval: 1100 },
+        { type: 'mushroom_scout', count: 3, interval: 2500 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'mushroom_scout', count: 6, interval: 1800 },
+        { type: 'cheese_rat', count: 4, interval: 2000 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'fish_knight', count: 5, interval: 1800 },
+        { type: 'mushroom_scout', count: 5, interval: 1600 },
+        { type: 'egg_sprite', count: 4, interval: 2000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cheese_rat', count: 8, interval: 1200 },
+        { type: 'meat_ogre', count: 4, interval: 2200 },
+        { type: 'mushroom_scout', count: 4, interval: 1800 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'carrot_goblin', count: 16, interval: 600 },
+        { type: 'cheese_rat', count: 6, interval: 1500 },
+        { type: 'fish_knight', count: 4, interval: 2000 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'mushroom_scout', count: 8, interval: 1200 },
+        { type: 'cheese_rat', count: 8, interval: 1200 },
+        { type: 'rice_slime', count: 3, interval: 2800 },
+      ]},
+      { wave: 7, enemies: [
+        { type: 'fish_knight', count: 8, interval: 1500 },
+        { type: 'cheese_rat', count: 10, interval: 1000 },
+        { type: 'mushroom_scout', count: 6, interval: 1500 },
+        { type: 'cheese_golem', count: 2, interval: 3500 },
+      ]},
+      { wave: 8, enemies: [
+        { type: 'meat_ogre', count: 8, interval: 1500 },
+        { type: 'cheese_rat', count: 12, interval: 900 },
+        { type: 'mushroom_scout', count: 8, interval: 1200 },
+        { type: 'egg_sprite', count: 6, interval: 1500 },
+      ]},
+      { wave: 9, enemies: [
+        { type: 'carrot_goblin', count: 22, interval: 450 },
+        { type: 'fish_knight', count: 10, interval: 1200 },
+        { type: 'cheese_rat', count: 10, interval: 1000 },
+        { type: 'mushroom_scout', count: 8, interval: 1200 },
+        { type: 'cheese_golem', count: 3, interval: 3000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [
+        { dish: 'carrot_soup', patience: 32000, baseReward: 25, tipMultiplier: 1.5 },
+        { dish: 'steak_plate', patience: 35000, baseReward: 55, tipMultiplier: 1.5 },
+      ]},
+      { wave: 2, customers: [
+        { dish: 'spicy_stir_fry', patience: 28000, baseReward: 50, tipMultiplier: 1.5 },
+        { dish: 'seafood_pasta', patience: 28000, baseReward: 60, tipMultiplier: 1.3 },
+      ]},
+      { wave: 3, customers: [
+        { dish: 'mixed_platter', patience: 28000, baseReward: 70, tipMultiplier: 1.5 },
+        { dish: 'cheese_fondue', patience: 26000, baseReward: 65, tipMultiplier: 1.3 },
+      ]},
+      { wave: 4, customers: [
+        { dish: 'steak_plate', patience: 24000, baseReward: 55, tipMultiplier: 1.5, vip: true },
+        { dish: 'spicy_stir_fry', patience: 22000, baseReward: 50, tipMultiplier: 1.3 },
+      ]},
+      { wave: 5, customers: [
+        { dish: 'cheese_fondue', patience: 24000, baseReward: 70, tipMultiplier: 1.5, vip: true },
+        { dish: 'mixed_platter', patience: 22000, baseReward: 70, tipMultiplier: 1.3 },
+      ]},
+      { wave: 6, customers: [
+        { dish: 'seafood_pasta', patience: 22000, baseReward: 65, tipMultiplier: 1.5, vip: true },
+        { dish: 'steak_plate', patience: 20000, baseReward: 55, tipMultiplier: 1.3 },
+      ]},
+      { wave: 7, customers: [
+        { dish: 'mixed_platter', patience: 22000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+        { dish: 'cheese_fondue', patience: 20000, baseReward: 70, tipMultiplier: 1.5, vip: true },
+      ]},
+      { wave: 8, customers: [
+        { dish: 'cheese_fondue', patience: 20000, baseReward: 70, tipMultiplier: 1.5, vip: true },
+        { dish: 'seafood_pasta', patience: 18000, baseReward: 65, tipMultiplier: 1.3, vip: true },
+        { dish: 'mixed_platter', patience: 18000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+      ]},
+      { wave: 9, customers: [
+        { dish: 'cheese_fondue', patience: 18000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+        { dish: 'mixed_platter', patience: 16000, baseReward: 80, tipMultiplier: 1.5, vip: true },
+        { dish: 'steak_plate', patience: 16000, baseReward: 60, tipMultiplier: 1.3, vip: true },
+      ]},
+    ],
+    starThresholds: { three: 14, two: 10 },
+  },
+
+  '2-3': {
+    id: '2-3',
+    nameKo: '용궁 라멘집 (보스)',
+    theme: 'oriental',
+    availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
+    gridCols: 9,
+    gridRows: 8,
+    // 나선 경로
+    pathSegments: [
+      { type: 'horizontal', row: 0, colStart: 0, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 0, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 2, colEnd: 7 },
+      { type: 'vertical', col: 2, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 3, colStart: 2, colEnd: 5 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'carrot_goblin', count: 12, interval: 900 },
+        { type: 'fish_knight', count: 4, interval: 2000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'mushroom_scout', count: 6, interval: 1500 },
+        { type: 'cheese_rat', count: 6, interval: 1500 },
+        { type: 'meat_ogre', count: 3, interval: 2500 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'fish_knight', count: 8, interval: 1400 },
+        { type: 'octopus_mage', count: 5, interval: 1800 },
+        { type: 'egg_sprite', count: 4, interval: 2000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cheese_rat', count: 10, interval: 1000 },
+        { type: 'mushroom_scout', count: 8, interval: 1200 },
+        { type: 'cheese_golem', count: 2, interval: 3500 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'carrot_goblin', count: 20, interval: 500 },
+        { type: 'fish_knight', count: 8, interval: 1400 },
+        { type: 'chili_demon', count: 6, interval: 1500 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'mushroom_scout', count: 10, interval: 1000 },
+        { type: 'cheese_rat', count: 10, interval: 1000 },
+        { type: 'rice_slime', count: 5, interval: 2200 },
+        { type: 'flour_ghost', count: 4, interval: 2500 },
+      ]},
+      { wave: 7, enemies: [
+        { type: 'fish_knight', count: 10, interval: 1200 },
+        { type: 'meat_ogre', count: 8, interval: 1500 },
+        { type: 'cheese_golem', count: 3, interval: 3000 },
+        { type: 'egg_sprite', count: 6, interval: 1500 },
+      ]},
+      { wave: 8, enemies: [
+        { type: 'chili_demon', count: 10, interval: 1000 },
+        { type: 'cheese_rat', count: 12, interval: 900 },
+        { type: 'mushroom_scout', count: 8, interval: 1200 },
+        { type: 'flour_ghost', count: 6, interval: 1800 },
+      ]},
+      { wave: 9, enemies: [
+        { type: 'carrot_goblin', count: 25, interval: 400 },
+        { type: 'fish_knight', count: 10, interval: 1200 },
+        { type: 'meat_ogre', count: 10, interval: 1200 },
+        { type: 'cheese_golem', count: 4, interval: 2800 },
+        { type: 'mushroom_scout', count: 6, interval: 1500 },
+        { type: 'rice_slime', count: 4, interval: 2500 },
+      ]},
+      // 웨이브 10: 보스
+      { wave: 10, enemies: [
+        { type: 'dragon_ramen', count: 1, interval: 1000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [
+        { dish: 'carrot_soup', patience: 30000, baseReward: 30, tipMultiplier: 1.5 },
+        { dish: 'steak_plate', patience: 32000, baseReward: 55, tipMultiplier: 1.5 },
+      ]},
+      { wave: 2, customers: [
+        { dish: 'spicy_stir_fry', patience: 26000, baseReward: 50, tipMultiplier: 1.5 },
+        { dish: 'seafood_pasta', patience: 26000, baseReward: 60, tipMultiplier: 1.3 },
+      ]},
+      { wave: 3, customers: [
+        { dish: 'mixed_platter', patience: 26000, baseReward: 70, tipMultiplier: 1.5 },
+        { dish: 'cheese_fondue', patience: 24000, baseReward: 65, tipMultiplier: 1.3 },
+      ]},
+      { wave: 4, customers: [
+        { dish: 'cheese_fondue', patience: 24000, baseReward: 70, tipMultiplier: 1.5, vip: true },
+        { dish: 'steak_plate', patience: 20000, baseReward: 55, tipMultiplier: 1.3 },
+      ]},
+      { wave: 5, customers: [
+        { dish: 'mixed_platter', patience: 22000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+        { dish: 'seafood_pasta', patience: 20000, baseReward: 65, tipMultiplier: 1.3, vip: true },
+      ]},
+      { wave: 6, customers: [
+        { dish: 'cheese_fondue', patience: 20000, baseReward: 70, tipMultiplier: 1.5, vip: true },
+        { dish: 'mixed_platter', patience: 18000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+      ]},
+      { wave: 7, customers: [
+        { dish: 'steak_plate', patience: 18000, baseReward: 60, tipMultiplier: 1.5, vip: true },
+        { dish: 'cheese_fondue', patience: 18000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+        { dish: 'seafood_pasta', patience: 16000, baseReward: 65, tipMultiplier: 1.3, vip: true },
+      ]},
+      { wave: 8, customers: [
+        { dish: 'mixed_platter', patience: 18000, baseReward: 80, tipMultiplier: 1.5, vip: true },
+        { dish: 'cheese_fondue', patience: 16000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+      ]},
+      { wave: 9, customers: [
+        { dish: 'cheese_fondue', patience: 16000, baseReward: 80, tipMultiplier: 1.5, vip: true },
+        { dish: 'mixed_platter', patience: 14000, baseReward: 85, tipMultiplier: 1.5, vip: true },
+        { dish: 'steak_plate', patience: 14000, baseReward: 65, tipMultiplier: 1.3, vip: true },
+      ]},
+      { wave: 10, customers: [
+        { dish: 'cheese_fondue', patience: 60000, baseReward: 100, tipMultiplier: 2.0, vip: true },
+      ]},
+    ],
+    starThresholds: { three: 16, two: 11 },
+  },
 };
 
 /** 스테이지 순서 */
-export const STAGE_ORDER = ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6'];
+export const STAGE_ORDER = ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '2-1', '2-2', '2-3'];

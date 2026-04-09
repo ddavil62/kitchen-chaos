@@ -60,6 +60,10 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── 보스 소환 타이머 ──
     this._summonTimer = 0;
     this._enraged = false;
+    this._bossDebuffFired = false;  // dragon_ramen: bossDebuff 1회 발동 여부
+
+    // ── 무리 이동 (cheese_rat) ──
+    this._swarmBoosted = false;
 
     // ── 신선도 타이머 ──
     this.freshnessTimer = FRESHNESS_WINDOW_MS;
@@ -84,13 +88,25 @@ export class Enemy extends Phaser.GameObjects.Container {
     const id = data.id;
 
     // 몸체
-    if (id === 'pasta_boss') {
-      // 보스: 40×40 금색 사각형
+    if (id === 'pasta_boss' || id === 'dragon_ramen') {
+      // 보스: 40×40 사각형
       const body = this.scene.add.rectangle(0, 0, 40, 40, color);
       this.add(body);
     } else if (id === 'cheese_golem') {
       // 골렘: 큰 사각형
       const body = this.scene.add.rectangle(0, 0, 28, 28, color);
+      this.add(body);
+    } else if (id === 'fish_knight') {
+      // 생선 기사: 파란색 사각형 몸(26x26)
+      const body = this.scene.add.rectangle(0, 0, 26, 26, color);
+      this.add(body);
+    } else if (id === 'mushroom_scout') {
+      // 버섯 정찰병: 갈색 작은 원
+      const body = this.scene.add.circle(0, 0, 10, color);
+      this.add(body);
+    } else if (id === 'cheese_rat') {
+      // 치즈 쥐: 작은 몸
+      const body = this.scene.add.circle(0, 0, 10, color);
       this.add(body);
     } else {
       // 기본: 원형
@@ -157,6 +173,44 @@ export class Enemy extends Phaser.GameObjects.Container {
       }
       const crown = this.scene.add.triangle(0, -24, -8, 0, 8, 0, 0, -10, 0xffaa00);
       this.add(crown);
+    } else if (id === 'fish_knight') {
+      // 생선 기사: 전면 방패 (좌측 작은 사각형)
+      const shield = this.scene.add.rectangle(-16, 0, 6, 20, 0x2266aa);
+      this.add(shield);
+      // 꼬리 지느러미
+      const fin = this.scene.add.triangle(14, -2, 0, -6, 0, 6, 8, 0, 0x66aadd);
+      this.add(fin);
+    } else if (id === 'mushroom_scout') {
+      // 버섯 정찰병: 버섯 갓 (반원 표현 = 넓은 삼각형)
+      const cap = this.scene.add.triangle(0, -12, -12, 0, 12, 0, 0, -10, 0x5a3d0a);
+      this.add(cap);
+      // 포자 점
+      const sp1 = this.scene.add.circle(-4, -10, 1.5, 0xccaa44);
+      const sp2 = this.scene.add.circle(3, -8, 1.5, 0xccaa44);
+      this.add(sp1);
+      this.add(sp2);
+    } else if (id === 'cheese_rat') {
+      // 치즈 쥐: 삼각형 귀 2개
+      const ear1 = this.scene.add.triangle(-6, -12, -3, 0, 3, 0, 0, -7, 0xffdd66);
+      const ear2 = this.scene.add.triangle(6, -12, -3, 0, 3, 0, 0, -7, 0xffdd66);
+      this.add(ear1);
+      this.add(ear2);
+      // 꼬리
+      const tail = this.scene.add.rectangle(0, 14, 2, 10, 0xffaa22);
+      this.add(tail);
+    } else if (id === 'dragon_ramen') {
+      // 용 라멘 보스: 면발 장식 + 왕관
+      for (let i = -2; i <= 2; i++) {
+        const noodle = this.scene.add.rectangle(i * 7, 22, 3, 14, 0xffcc88);
+        this.add(noodle);
+      }
+      const dragonCrown = this.scene.add.triangle(0, -26, -10, 0, 10, 0, 0, -12, 0xffaa00);
+      this.add(dragonCrown);
+      // 뿔 2개 (용)
+      const dhorn1 = this.scene.add.triangle(-10, -22, -2, 0, 2, 0, 0, -10, 0xcc2222);
+      const dhorn2 = this.scene.add.triangle(10, -22, -2, 0, 2, 0, 0, -10, 0xcc2222);
+      this.add(dhorn1);
+      this.add(dhorn2);
     }
 
     // HP 바
@@ -250,6 +304,25 @@ export class Enemy extends Phaser.GameObjects.Container {
       this.hpBar.width = 26 * ratio;
     }
 
+    // ── 무리 이동 보너스 (cheese_rat) ──
+    if (this.data_.swarmSpeedBonus && this.scene?.enemies) {
+      const radius = this.data_.swarmRadius || 80;
+      let nearCount = 0;
+      this.scene.enemies.getChildren().forEach(other => {
+        if (!other.active || other === this || other.isDead) return;
+        if (other.data_?.id !== this.data_.id) return;
+        const dist = Phaser.Math.Distance.Between(this.x, this.y, other.x, other.y);
+        if (dist <= radius) nearCount++;
+      });
+      if (nearCount >= 3 && !this._swarmBoosted) {
+        this._swarmBoosted = true;
+        this.speed = this.data_.speed * (1 + this.data_.swarmSpeedBonus);
+      } else if (nearCount < 3 && this._swarmBoosted) {
+        this._swarmBoosted = false;
+        this.speed = this.data_.speed;
+      }
+    }
+
     // ── 보스 소환 ──
     if (this.data_.isBoss && this.data_.summonInterval) {
       this._summonTimer += delta;
@@ -260,12 +333,21 @@ export class Enemy extends Phaser.GameObjects.Container {
           x: this.x, y: this.y,
         });
       }
-      // 격노 (HP 50% 이하 → 속도 2배)
+      // 격노 (HP 임계 이하 → 속도 2배)
       if (!this._enraged && this.data_.enrageHpThreshold &&
           this.hp / this.maxHp <= this.data_.enrageHpThreshold) {
         this._enraged = true;
         this.speed = this.data_.speed * 2;
         this.setTint(0xff4444);
+      }
+      // 보스 디버프 (dragon_ramen: HP 40% 이하 시 1회 전체 타워 공격속도 감소)
+      if (!this._bossDebuffFired && this.data_.bossDebuff &&
+          this.hp / this.maxHp <= (this.data_.enrageHpThreshold || 0.4)) {
+        this._bossDebuffFired = true;
+        this.scene.events.emit('boss_debuff', {
+          speedReduction: this.data_.bossDebuff.speedReduction,
+          duration: this.data_.bossDebuff.duration,
+        });
       }
     }
 
@@ -302,6 +384,12 @@ export class Enemy extends Phaser.GameObjects.Container {
   /** @param {number} amount */
   takeDamage(amount) {
     if (this.isDead) return;
+
+    // 생선 기사: 전면 피해 50% 감소 (이동 방향 기준, 진행 중이면 전면 피격으로 간주)
+    if (this.data_.shieldFront && this.waypointIndex < this._waypoints.length) {
+      amount *= (1 - this.data_.shieldFront);
+    }
+
     this.hp -= amount;
     const ratio = Math.max(0, this.hp / this.maxHp);
     this.hpBar.width = 26 * ratio;
@@ -360,6 +448,15 @@ export class Enemy extends Phaser.GameObjects.Container {
         x: this.x, y: this.y,
         hp: this.data_.splitHp || 30,
         waypointIndex: this.waypointIndex,
+      });
+    }
+
+    // 사망 시 포자 디버프 (mushroom_scout)
+    if (this.data_.sporeDebuff) {
+      this.scene.events.emit('spore_debuff', {
+        x: this.x, y: this.y,
+        speedReduction: this.data_.sporeDebuff.speedReduction,
+        duration: this.data_.sporeDebuff.duration,
       });
     }
 

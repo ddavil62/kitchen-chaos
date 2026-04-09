@@ -83,6 +83,8 @@ export class GameScene extends Phaser.Scene {
     this.events.on('enemy_split', this._onEnemySplit, this);
     this.events.on('enemy_death_heal', this._onEnemyDeathHeal, this);
     this.events.on('boss_killed', this._onBossKilled, this);
+    this.events.on('spore_debuff', this._onSporeDebuff, this);
+    this.events.on('boss_debuff', this._onBossDebuff, this);
 
     // ── GameEventBus 이벤트 수신 ──
     GameEventBus.on('gold_earned', this._onGoldEarned, this);
@@ -466,6 +468,88 @@ export class GameScene extends Phaser.Scene {
       targets: popup, y: popup.y - 50, alpha: 0,
       duration: 1500,
       onComplete: () => popup.destroy(),
+    });
+  }
+
+  /**
+   * 포자 디버프 이벤트 - 범위 내 타워 공격속도 임시 감소.
+   * @param {{ x: number, y: number, speedReduction: number, duration: number }} data
+   */
+  _onSporeDebuff({ x, y, speedReduction, duration }) {
+    const debuffRadius = 120;
+    this.towers.getChildren().forEach(tower => {
+      if (!tower.active) return;
+      if (tower.data_?.id === 'delivery' || tower.data_?.id === 'soup_pot') return;
+      const dist = Phaser.Math.Distance.Between(x, y, tower.x, tower.y);
+      if (dist > debuffRadius) return;
+
+      // 공격속도 감소 (음수 buff로 적용)
+      if (tower.applyBuff) tower.applyBuff('speed', -speedReduction);
+
+      // 보라색 플래시
+      this.tweens.add({
+        targets: tower, alpha: 0.6,
+        duration: 200, yoyo: true,
+      });
+
+      // 지속시간 후 해제
+      this.time.delayedCall(duration, () => {
+        if (tower.active && tower.removeBuff) tower.removeBuff();
+        // 현재 글로벌 버프 재적용
+        if (this._currentBuff) this._applyBuffToTower(tower, this._currentBuff);
+      });
+    });
+
+    // 포자 이펙트 팝업
+    const popup = this.add.text(x, y - 20, '🍄 포자!', {
+      fontSize: '12px', color: '#8b6914',
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(115);
+    this.tweens.add({
+      targets: popup, y: popup.y - 30, alpha: 0,
+      duration: 1000,
+      onComplete: () => popup.destroy(),
+    });
+  }
+
+  /**
+   * 보스 디버프 이벤트 - 전체 타워 공격속도 임시 감소.
+   * @param {{ speedReduction: number, duration: number }} data
+   */
+  _onBossDebuff({ speedReduction, duration }) {
+    this.towers.getChildren().forEach(tower => {
+      if (!tower.active) return;
+      if (tower.data_?.id === 'delivery' || tower.data_?.id === 'soup_pot') return;
+      if (tower.applyBuff) tower.applyBuff('speed', -speedReduction);
+    });
+
+    // 경고 팝업
+    const popup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 80, '🐉 용의 포효! 공격속도 감소!', {
+      fontSize: '14px', color: '#ff4444', fontStyle: 'bold',
+      stroke: '#000000', strokeThickness: 3,
+    }).setOrigin(0.5).setDepth(115);
+    this.tweens.add({
+      targets: popup, y: popup.y - 40, alpha: 0,
+      duration: 2000,
+      onComplete: () => popup.destroy(),
+    });
+
+    // 지속시간 후 해제
+    this.time.delayedCall(duration, () => {
+      this.towers.getChildren().forEach(tower => {
+        if (tower.active && tower.removeBuff) tower.removeBuff();
+        if (this._currentBuff) this._applyBuffToTower(tower, this._currentBuff);
+      });
+
+      const recoverPopup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 80, '디버프 해제!', {
+        fontSize: '12px', color: '#44ff44',
+        stroke: '#000000', strokeThickness: 2,
+      }).setOrigin(0.5).setDepth(115);
+      this.tweens.add({
+        targets: recoverPopup, y: recoverPopup.y - 30, alpha: 0,
+        duration: 1000,
+        onComplete: () => recoverPopup.destroy(),
+      });
     });
   }
 
@@ -862,6 +946,8 @@ export class GameScene extends Phaser.Scene {
     this.events.off('enemy_split', this._onEnemySplit, this);
     this.events.off('enemy_death_heal', this._onEnemyDeathHeal, this);
     this.events.off('boss_killed', this._onBossKilled, this);
+    this.events.off('spore_debuff', this._onSporeDebuff, this);
+    this.events.off('boss_debuff', this._onBossDebuff, this);
     this.events.off('wave_started', this._onWaveStarted, this);
     GameEventBus.off('gold_earned', this._onGoldEarned, this);
     GameEventBus.off('combo_changed', this._onComboChanged, this);
