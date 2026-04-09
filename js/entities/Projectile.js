@@ -14,7 +14,7 @@ export class Projectile extends Phaser.GameObjects.Arc {
    * @param {object} towerData - 타워 데이터 (damage, projectileSpeed 등)
    */
   constructor(scene, x, y, target, towerData) {
-    super(scene, x, y, 5, 0xffff00);
+    super(scene, x, y, 5, 0, 360, false, 0xffff00);
     scene.add.existing(this);
     this.setDepth(15);
 
