@@ -8,9 +8,8 @@ export default defineConfig({
     assetsInlineLimit: 0,
     rollupOptions: {
       output: {
-        manualChunks: {
-          phaser: ['phaser'],
-        },
+        // Android WebView 청크 로딩 순서 문제 방지 — 단일 번들로 빌드
+        manualChunks: () => 'index',
       },
     },
   },
