@@ -5,6 +5,7 @@
  * 전 웨이브 클리어 시 ServiceScene으로 전환.
  * Phase 10-4: SoundManager BGM + 씬 이벤트 SFX 추가.
  * Phase 10-5: VFXManager 연동 (파티클, 화면 효과, 플로팅 텍스트).
+ * Phase 11-3b: fadeIn 300ms 통일, 보스 웨이브 BGM 전환 추가.
  */
 
 import Phaser from 'phaser';
@@ -139,7 +140,8 @@ export class MarketScene extends Phaser.Scene {
     ]);
     this._tutorial.start();
 
-    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this.shutdown, this);
@@ -680,11 +682,36 @@ export class MarketScene extends Phaser.Scene {
     this.vfx.waveAnnounce(waveNum);
     this.vfx.screenFlash(0xffffff, 0.3, 200);
 
+    // ── Phase 11-3b: 보스 웨이브 BGM 전환 ──
+    this._checkBossWaveBGM(waveNum);
+
     // ── 오더 생성 시도 ──
     const order = this.orderManager.tryGenerateOrder(waveNum);
     this._updateOrderHUD();
     if (order) {
       this._showMessage(`[\uC624\uB354] ${order.descKo}`, 2000);
+    }
+  }
+
+  /**
+   * 현재 웨이브에 보스 적이 포함되어 있으면 bgm_boss로 전환하고,
+   * 보스가 없으면 bgm_battle로 복귀한다.
+   * @param {number} waveNum - 1-based 웨이브 번호
+   * @private
+   */
+  _checkBossWaveBGM(waveNum) {
+    const waveDef = this.waveManager._waves[waveNum - 1];
+    if (!waveDef) return;
+
+    const hasBoss = waveDef.enemies.some(
+      (e) => ENEMY_TYPES[e.type]?.isBoss
+    );
+
+    if (hasBoss) {
+      SoundManager.playBGM('bgm_boss');
+    } else if (SoundManager._currentBGMId === 'bgm_boss') {
+      // 보스 웨이브 이후 일반 웨이브로 복귀 시 전투 BGM 재개
+      SoundManager.playBGM('bgm_battle');
     }
   }
 

@@ -122,7 +122,8 @@ export class GameScene extends Phaser.Scene {
     this._tutorialStep = 0;
     this._startTutorial();
 
-    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this.shutdown, this);

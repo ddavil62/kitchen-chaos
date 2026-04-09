@@ -27,7 +27,8 @@ export class GameOverScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.fadeIn(500, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_result');

@@ -3,6 +3,7 @@
  * Phase 11-2: StageSelectScene을 비주얼 노드맵으로 교체.
  * 6개 챕터를 2열 3행 지그재그 노드 그래프로 표현한다.
  * 노드 터치 -> 슬라이드업 패널 -> 스테이지 선택 -> ChefSelectScene.
+ * Phase 11-3b: fadeIn 300ms 통일.
  */
 
 import Phaser from 'phaser';
@@ -49,7 +50,8 @@ export class WorldMapScene extends Phaser.Scene {
    * 씬 생성. 배경, 챕터 노드, 연결선, HUD, 엔드리스 섹션을 그린다.
    */
   create() {
-    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // 1. 배경
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0a0a1a);

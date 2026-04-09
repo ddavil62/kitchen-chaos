@@ -3,6 +3,7 @@
  * Phase 6: 스테이지 선택 후, 게임 시작 전에 셰프를 고르는 화면.
  * Phase 7: GameScene → MarketScene 전환에 따라 씬 키 변경.
  * Phase 11-1: stageId='endless' 시 EndlessScene으로 전환.
+ * Phase 11-3b: fadeIn 300ms 통일, 버튼 Disabled 팔레트 적용.
  * 360x640 레이아웃: 3장의 세로 배치 카드 + "셰프 없이 시작" 버튼.
  */
 
@@ -29,7 +30,8 @@ export class ChefSelectScene extends Phaser.Scene {
     const stageData = this._isEndless ? null : STAGES[this.stageId];
     const stageName = this._isEndless ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC' : (stageData?.nameKo || this.stageId);
 
-    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // 배경
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0d0d1a);
@@ -66,7 +68,8 @@ export class ChefSelectScene extends Phaser.Scene {
 
     // ── 하단: "셰프 없이 시작" 버튼 ──
     const skipY = GAME_HEIGHT - 50;
-    const skipBtn = this.add.rectangle(GAME_WIDTH / 2, skipY, 200, 40, 0x333333)
+    // Phase 11-3b: Disabled 팔레트 적용
+    const skipBtn = this.add.rectangle(GAME_WIDTH / 2, skipY, 200, 40, 0x444444)
       .setInteractive({ useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, skipY, '셰프 없이 시작', {
       fontSize: '14px', color: '#aaaaaa',
@@ -76,8 +79,8 @@ export class ChefSelectScene extends Phaser.Scene {
     skipBtn.on('pointerdown', () => {
       this._startGame(null);
     });
-    skipBtn.on('pointerover', () => skipBtn.setFillStyle(0x555555));
-    skipBtn.on('pointerout', () => skipBtn.setFillStyle(0x333333));
+    skipBtn.on('pointerover', () => skipBtn.setFillStyle(0x666666));
+    skipBtn.on('pointerout', () => skipBtn.setFillStyle(0x444444));
 
     // ── 뒤로 가기 버튼 ──
     const backBtn = this.add.rectangle(40, GAME_HEIGHT - 50, 60, 32, 0x444444)

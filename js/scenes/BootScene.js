@@ -3,6 +3,7 @@
  * Phase 9-4: SpriteLoader를 사용하여 PixelLab 에셋을 Phaser preload로 로드.
  * Phase 10-4: SoundManager 초기화 추가.
  * Phase 10-6: 저장된 사운드 설정 복원 추가.
+ * Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms).
  */
 
 import Phaser from 'phaser';
@@ -53,6 +54,9 @@ export class BootScene extends Phaser.Scene {
 
     // ── 저장된 사운드 설정 복원 (Phase 10-6) ──
     SoundManager.applySettings(SaveManager.getSoundSettings());
+
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     this._startGame();
   }

@@ -179,6 +179,13 @@ export class ShopScene extends Phaser.Scene {
           }
         }
       });
+      // Phase 11-3b: 탭 터치 피드백
+      bg.on('pointerover', () => {
+        if (tab.key !== this._activeTab) bg.setFillStyle(0x444444);
+      });
+      bg.on('pointerout', () => {
+        bg.setFillStyle(tab.key === this._activeTab ? 0x553300 : 0x333333);
+      });
 
       this._tabBgs[tab.key] = bg;
       this._tabTexts[tab.key] = txt;

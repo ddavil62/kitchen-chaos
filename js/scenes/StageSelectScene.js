@@ -64,7 +64,8 @@ export class StageSelectScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // 배경
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0d0d1a);

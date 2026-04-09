@@ -2,6 +2,7 @@
  * @fileoverview 엔드리스 모드 TD 씬.
  * Phase 11-1: MarketScene을 상속하여 무한 웨이브 로직만 override.
  * 5웨이브마다 ServiceScene으로 전환, 라이프 0 시 엔드리스 결과 화면으로 전환.
+ * Phase 11-3b: 보스 웨이브(10의 배수) BGM 전환 추가.
  */
 
 import { MarketScene } from './MarketScene.js';
@@ -366,6 +367,13 @@ export class EndlessScene extends MarketScene {
     if (this.vfx) {
       this.vfx.waveAnnounce(this.endlessWave);
       this.vfx.screenFlash(0xffffff, 0.3, 200);
+    }
+
+    // ── Phase 11-3b: 보스 웨이브(10의 배수) BGM 전환 ──
+    if (this.endlessWave > 0 && this.endlessWave % 10 === 0) {
+      SoundManager.playBGM('bgm_boss');
+    } else if (SoundManager._currentBGMId === 'bgm_boss') {
+      SoundManager.playBGM('bgm_battle');
     }
 
     // 엔드리스에서는 오더 생성 안 함

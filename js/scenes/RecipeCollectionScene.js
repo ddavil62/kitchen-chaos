@@ -39,15 +39,20 @@ export class RecipeCollectionScene extends Phaser.Scene {
     this._gridContainer = this.add.container(0, 0).setDepth(1);
     this._renderGrid();
 
-    // ── 뒤로가기 버튼 ──
-    const backBtn = this.add.rectangle(50, 30, 70, 28, 0x555555)
+    // ── 뒤로가기 버튼 (Phase 11-3b: Disabled 팔레트 + 터치 피드백 + fadeOut) ──
+    const backBtn = this.add.rectangle(50, 30, 70, 28, 0x444444)
       .setInteractive({ useHandCursor: true }).setDepth(10);
     this.add.text(50, 30, '← 돌아가기', {
       fontSize: '10px', color: '#ffffff',
     }).setOrigin(0.5).setDepth(11);
     backBtn.on('pointerdown', () => {
-      this.scene.start('MenuScene');
+      this.cameras.main.fadeOut(300, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('MenuScene');
+      });
     });
+    backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
+    backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
 
     this.cameras.main.fadeIn(300, 0, 0, 0);
   }
@@ -73,6 +78,13 @@ export class RecipeCollectionScene extends Phaser.Scene {
         this._currentCategory = cat.id;
         this._refreshTabs();
         this._renderGrid();
+      });
+      // Phase 11-3b: 탭 터치 피드백
+      bg.on('pointerover', () => {
+        if (cat.id !== this._currentCategory) bg.setFillStyle(0x444444);
+      });
+      bg.on('pointerout', () => {
+        bg.setFillStyle(cat.id === this._currentCategory ? 0xff6b35 : 0x333333);
       });
 
       this._tabObjects.push({ bg, label, catId: cat.id });
@@ -214,8 +226,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
       }
     }
 
-    // 닫기 버튼
-    const closeBtn = this.add.rectangle(cx + 120, cy - 100, 40, 24, 0xff4444)
+    // 닫기 버튼 (Phase 11-3b: Danger 팔레트 + 터치 피드백)
+    const closeBtn = this.add.rectangle(cx + 120, cy - 100, 40, 24, 0xcc2222)
       .setInteractive({ useHandCursor: true });
     container.add(closeBtn);
     const closeText = this.add.text(cx + 120, cy - 100, '✕', {
@@ -226,6 +238,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
       container.destroy();
       this._detailContainer = null;
     });
+    closeBtn.on('pointerover', () => closeBtn.setFillStyle(0xff3333));
+    closeBtn.on('pointerout', () => closeBtn.setFillStyle(0xcc2222));
 
     this._detailContainer = container;
   }

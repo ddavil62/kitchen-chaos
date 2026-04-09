@@ -3,6 +3,7 @@
  * Phase 10-4: BGM 재생 추가.
  * Phase 10-6: 사운드 설정 UI(기어 버튼 + 설정 패널) 추가.
  * Phase 11-2: "게임 시작" -> WorldMapScene 전환.
+ * Phase 11-3b: fadeIn 300ms 통일, 도감 버튼 Secondary 팔레트 적용.
  */
 
 import Phaser from 'phaser';
@@ -111,11 +112,11 @@ export class MenuScene extends Phaser.Scene {
     shopBtn.on('pointerover', () => shopBtn.setFillStyle(0xaa8800));
     shopBtn.on('pointerout', () => shopBtn.setFillStyle(0x886600));
 
-    // 도감 버튼 (Phase 11-1: y 500으로 이동)
-    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 500, 160, 36, 0x336644)
+    // 도감 버튼 (Phase 11-1: y 500으로 이동, Phase 11-3b: Secondary 팔레트 적용)
+    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 500, 160, 36, 0x886600)
       .setInteractive({ useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, 500, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
-      fontSize: '14px', fontStyle: 'bold', color: '#88ffaa',
+      fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     bookBtn.on('pointerdown', () => {
@@ -124,8 +125,8 @@ export class MenuScene extends Phaser.Scene {
         this.scene.start('RecipeCollectionScene');
       });
     });
-    bookBtn.on('pointerover', () => bookBtn.setFillStyle(0x448855));
-    bookBtn.on('pointerout', () => bookBtn.setFillStyle(0x336644));
+    bookBtn.on('pointerover', () => bookBtn.setFillStyle(0xaa8800));
+    bookBtn.on('pointerout', () => bookBtn.setFillStyle(0x886600));
 
     // ── 엔드리스 모드 버튼 (Phase 11-1) ──
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
@@ -180,8 +181,8 @@ export class MenuScene extends Phaser.Scene {
     // ── 설정 버튼 (Phase 10-6) ──
     this._createSettingsButton();
 
-    // 페이드인
-    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
   }
 
   // ── 설정 UI (Phase 10-6) ────────────────────────────────────────

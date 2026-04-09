@@ -308,8 +308,8 @@ export class ServiceScene extends Phaser.Scene {
     this._createRecipeQuickSlots();
     this._createBottomBar();
 
-    // 페이드 인
-    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // ── Phase 11-1: 스페셜 레시피 팝업 표시 (엔드리스 모드) ──
     if (this.isEndless && this.dailySpecials.length > 0) {
