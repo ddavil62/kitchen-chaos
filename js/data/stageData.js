@@ -13,7 +13,7 @@ export const STAGES = {
     theme: 'pasta',
     availableTowers: ['pan', 'delivery', 'salt'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // L자 경로: 위→아래 → 왼쪽→오른쪽 → 위→아래
     pathSegments: [
       { type: 'vertical', col: 1, rowStart: 0, rowEnd: 3 },
@@ -125,7 +125,7 @@ export const STAGES = {
     theme: 'pasta',
     availableTowers: ['pan', 'salt', 'grill', 'delivery'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // S자 경로
     pathSegments: [
       { type: 'vertical', col: 2, rowStart: 0, rowEnd: 2 },
@@ -256,7 +256,7 @@ export const STAGES = {
     theme: 'pasta',
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // 지그재그 경로
     pathSegments: [
       { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
@@ -414,7 +414,7 @@ export const STAGES = {
     theme: 'pasta',
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'soup_pot'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // U자 경로
     pathSegments: [
       { type: 'vertical', col: 1, rowStart: 0, rowEnd: 6 },
@@ -512,7 +512,7 @@ export const STAGES = {
     theme: 'pasta',
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // 십자(+) 경로
     pathSegments: [
       { type: 'vertical', col: 4, rowStart: 0, rowEnd: 3 },
@@ -626,7 +626,7 @@ export const STAGES = {
     theme: 'pasta',
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // 나선 경로
     pathSegments: [
       { type: 'horizontal', row: 0, colStart: 0, colEnd: 8 },
@@ -753,7 +753,7 @@ export const STAGES = {
     theme: 'oriental',
     availableTowers: ['pan', 'salt', 'grill', 'delivery'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // 직선 + 분기 경로
     pathSegments: [
       { type: 'vertical', col: 0, rowStart: 0, rowEnd: 7 },
@@ -851,7 +851,7 @@ export const STAGES = {
     theme: 'oriental',
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'soup_pot'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // 지그재그 경로
     pathSegments: [
       { type: 'horizontal', row: 1, colStart: 0, colEnd: 6 },
@@ -965,7 +965,7 @@ export const STAGES = {
     theme: 'oriental',
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
-    gridRows: 8,
+    gridRows: 10,
     // 나선 경로
     pathSegments: [
       { type: 'horizontal', row: 0, colStart: 0, colEnd: 7 },
