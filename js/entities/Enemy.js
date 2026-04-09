@@ -48,7 +48,7 @@ export class Enemy extends Phaser.GameObjects.Container {
     this._buildVisual(enemyData);
 
     scene.add.existing(this);
-    setDepth(this, 10);
+    this.setDepth(10);
   }
 
   /**
@@ -237,13 +237,4 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.scene.events.emit('enemy_reached_base', this);
     this.destroy();
   }
-}
-
-/**
- * Container에 depth 설정 헬퍼.
- * @param {Phaser.GameObjects.Container} container
- * @param {number} depth
- */
-function setDepth(container, depth) {
-  container.setDepth(depth);
 }

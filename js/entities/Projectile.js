@@ -5,7 +5,7 @@
 
 import Phaser from 'phaser';
 
-export class Projectile extends Phaser.GameObjects.Circle {
+export class Projectile extends Phaser.GameObjects.Arc {
   /**
    * @param {Phaser.Scene} scene
    * @param {number} x
