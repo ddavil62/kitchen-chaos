@@ -1,6 +1,6 @@
 /**
  * @fileoverview 레시피 컬렉션 데이터.
- * Phase 8: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 = 66종.
+ * Phase 9: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 + Phase 9 23종 = 89종.
  * 향후 120종까지 확장 예정.
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
@@ -322,6 +322,118 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { shrimp: 1, tomato: 1, butter: 1, meat: 1, cheese: 1 }, baseReward: 160, cookTime: 12000,
     unlockCost: 200, gateStage: '3-6',
   },
+
+  // ── Phase 9 신규 서빙 20종 (4장: 화산 BBQ) ──
+
+  // ★ 1성 (4종)
+  {
+    id: 'caramel_popcorn', nameKo: '캐러멜 팝콘', icon: '🍿', category: 'dessert',
+    tier: 1, ingredients: { sugar: 1 }, baseReward: 18, cookTime: 2000,
+    unlockCost: 12, gateStage: '4-1',
+  },
+  {
+    id: 'milk_pudding', nameKo: '우유 푸딩', icon: '🍮', category: 'dessert',
+    tier: 1, ingredients: { milk: 1 }, baseReward: 20, cookTime: 3000,
+    unlockCost: 12, gateStage: '4-1',
+  },
+  {
+    id: 'sugar_toast', nameKo: '설탕 토스트', icon: '🍞', category: 'dessert',
+    tier: 1, ingredients: { sugar: 1, flour: 1 }, baseReward: 24, cookTime: 3000,
+    unlockCost: 15, gateStage: '4-1',
+  },
+  {
+    id: 'milkshake', nameKo: '밀크 쉐이크', icon: '🥤', category: 'dessert',
+    tier: 1, ingredients: { milk: 1, sugar: 1 }, baseReward: 26, cookTime: 3000,
+    unlockCost: 15, gateStage: '4-1',
+  },
+
+  // ★★ 2성 (6종)
+  {
+    id: 'crepe', nameKo: '크레페', icon: '🥞', category: 'dessert',
+    tier: 2, ingredients: { milk: 1, flour: 1, egg: 1 }, baseReward: 42, cookTime: 4000,
+    unlockCost: 28, gateStage: '4-2',
+  },
+  {
+    id: 'castella', nameKo: '카스테라', icon: '🍰', category: 'dessert',
+    tier: 2, ingredients: { sugar: 1, flour: 1, egg: 1 }, baseReward: 40, cookTime: 4000,
+    unlockCost: 28, gateStage: '4-2',
+  },
+  {
+    id: 'french_toast', nameKo: '프렌치 토스트', icon: '🍞', category: 'dessert',
+    tier: 2, ingredients: { milk: 1, egg: 1, butter: 1 }, baseReward: 45, cookTime: 4000,
+    unlockCost: 30, gateStage: '4-2',
+  },
+  {
+    id: 'caramel_shrimp', nameKo: '캐러멜 새우', icon: '🦐', category: 'grill',
+    tier: 2, ingredients: { sugar: 1, shrimp: 1 }, baseReward: 44, cookTime: 4000,
+    unlockCost: 30, gateStage: '4-2',
+  },
+  {
+    id: 'milk_risotto', nameKo: '밀크 리조또', icon: '🍚', category: 'special',
+    tier: 2, ingredients: { milk: 1, rice: 1, cheese: 1 }, baseReward: 48, cookTime: 5000,
+    unlockCost: 32, gateStage: '4-2',
+  },
+  {
+    id: 'tomato_cream_soup', nameKo: '토마토 크림 수프', icon: '🍅', category: 'soup',
+    tier: 2, ingredients: { tomato: 1, milk: 1 }, baseReward: 42, cookTime: 4000,
+    unlockCost: 28, gateStage: '4-2',
+  },
+
+  // ★★★ 3성 (4종)
+  {
+    id: 'tiramisu', nameKo: '티라미수', icon: '🍰', category: 'dessert',
+    tier: 3, ingredients: { milk: 1, sugar: 1, flour: 1, egg: 1 }, baseReward: 65, cookTime: 6000,
+    unlockCost: 60, gateStage: '4-3',
+  },
+  {
+    id: 'creme_brulee', nameKo: '크림 브륄레', icon: '🍮', category: 'dessert',
+    tier: 3, ingredients: { sugar: 1, milk: 1, egg: 1 }, baseReward: 62, cookTime: 6000,
+    unlockCost: 58, gateStage: '4-3',
+  },
+  {
+    id: 'milk_steak', nameKo: '밀크 스테이크', icon: '🥩', category: 'grill',
+    tier: 3, ingredients: { milk: 1, meat: 1, butter: 1 }, baseReward: 70, cookTime: 7000,
+    unlockCost: 65, gateStage: '4-3',
+  },
+  {
+    id: 'cream_puff', nameKo: '슈크림', icon: '🧁', category: 'dessert',
+    tier: 3, ingredients: { sugar: 1, milk: 1, flour: 1, butter: 1 }, baseReward: 72, cookTime: 7000,
+    unlockCost: 68, gateStage: '4-3',
+  },
+
+  // ★★★★ 4성 (4종)
+  {
+    id: 'volcano_lava_cake', nameKo: '화산 용암 케이크', icon: '🌋', category: 'dessert',
+    tier: 4, ingredients: { sugar: 1, milk: 1, egg: 1, flour: 1, butter: 1 }, baseReward: 110, cookTime: 9000,
+    unlockCost: 120, gateStage: '4-5',
+  },
+  {
+    id: 'grand_crepe_suzette', nameKo: '그랑 크레페 수제트', icon: '🥞', category: 'dessert',
+    tier: 4, ingredients: { sugar: 1, milk: 1, egg: 1, butter: 1 }, baseReward: 100, cookTime: 9000,
+    unlockCost: 110, gateStage: '4-5',
+  },
+  {
+    id: 'mille_feuille_steak', nameKo: '밀피유 스테이크', icon: '🥩', category: 'grill',
+    tier: 4, ingredients: { meat: 2, milk: 1, flour: 1 }, baseReward: 105, cookTime: 10000,
+    unlockCost: 115, gateStage: '4-5',
+  },
+  {
+    id: 'seafood_cream_risotto', nameKo: '해물 크림 리조또', icon: '🦐', category: 'special',
+    tier: 4, ingredients: { shrimp: 1, milk: 1, rice: 1, cheese: 1, butter: 1 }, baseReward: 115, cookTime: 10000,
+    unlockCost: 130, gateStage: '4-5',
+  },
+
+  // ★★★★★ 5성 (2종)
+  {
+    id: 'fantasy_dessert_course', nameKo: '환상의 디저트 풀코스', icon: '🎂', category: 'dessert',
+    tier: 5, ingredients: { sugar: 1, milk: 1, egg: 1, flour: 1, butter: 1, cheese: 1 }, baseReward: 180, cookTime: 14000,
+    unlockCost: 280, gateStage: '4-6',
+  },
+  {
+    id: 'legendary_master_course', nameKo: '전설의 마스터 코스', icon: '👨‍🍳', category: 'special',
+    tier: 5, ingredients: { sugar: 1, milk: 1, shrimp: 1, meat: 1, tomato: 1, butter: 1 }, baseReward: 200, cookTime: 15000,
+    unlockCost: 350, gateStage: '4-6',
+  },
 ];
 
 /**
@@ -424,6 +536,26 @@ export const ALL_BUFF_RECIPES = [
     tier: 3, ingredients: { butter: 1, cheese: 1 },
     effectDesc: '생명력 -1 방어 (1회)', effectType: 'buff_barrier', effectValue: 1,
     duration: 1, durationUnit: 'use', unlockCost: 60, gateStage: '3-4',
+  },
+
+  // ── Phase 9 신규 버프 3종 (4장: 화산 BBQ) ──
+  {
+    id: 'sugar_boost', nameKo: '설탕 부스트', icon: '🍬', category: 'buff',
+    tier: 2, ingredients: { sugar: 1 },
+    effectDesc: '재료 드롭률 +25% (1웨이브)', effectType: 'buff_drop', effectValue: 0.25,
+    duration: 1, durationUnit: 'wave', unlockCost: 20, gateStage: '4-1',
+  },
+  {
+    id: 'milk_shield', nameKo: '밀크 쉴드', icon: '🥛', category: 'buff',
+    tier: 2, ingredients: { milk: 1 },
+    effectDesc: '생명력 -1 방어 (1회)', effectType: 'buff_barrier', effectValue: 1,
+    duration: 1, durationUnit: 'use', unlockCost: 20, gateStage: '4-1',
+  },
+  {
+    id: 'caramel_coating', nameKo: '카라멜 코팅', icon: '🍯', category: 'buff',
+    tier: 3, ingredients: { sugar: 1, milk: 1, butter: 1 },
+    effectDesc: '전체 타워 공격력 +20% 공격속도 +10% (2웨이브)', effectType: 'buff_both', effectValue: 0.20,
+    duration: 2, durationUnit: 'wave', unlockCost: 55, gateStage: '4-3',
   },
 ];
 
