@@ -1,6 +1,6 @@
 /**
  * @fileoverview Kitchen Chaos Defense 게임 데이터 정의.
- * Phase 8: 적 16종(일반 13 + 보스 3), 타워 6종, 재료 13종, 레시피 12종, 15 스테이지.
+ * Phase 9: 적 19종(일반 16 + 보스 4), 타워 6종, 재료 15종, 레시피 12종, 21 스테이지.
  */
 
 // ── 적 타입 정의 ──
@@ -175,6 +175,48 @@ export const ENEMY_TYPES = {
     bossReward: 200,
     inkDebuff: { rangeReduction: 0.50, duration: 3000 },  // HP 30% 이하 시 전체 타워 사거리 -50%, 3초, 1회
   },
+  // ── Phase 9 신규 적 ──
+  sugar_fairy: {
+    id: 'sugar_fairy',
+    nameKo: '설탕 요정',
+    hp: 60,
+    speed: 95,
+    ingredient: 'sugar',
+    bodyColor: 0xff88cc,
+    special: 'deathDebuff',           // 처치 시 주변 1칸 타워 공격속도 -30% (3초)
+    deathDebuffRadius: 1,
+    deathDebuffEffect: 'attackSpeed',
+    deathDebuffValue: -0.30,
+    deathDebuffDuration: 3000,
+  },
+  milk_phantom: {
+    id: 'milk_phantom',
+    nameKo: '우유 팬텀',
+    hp: 200,
+    speed: 40,
+    ingredient: 'milk',
+    bodyColor: 0xffffff,
+    special: 'coagulate',             // 피격 5회마다 2초 정지 + HP 10% 회복
+    coagulateHitCount: 5,
+    coagulatePauseDuration: 2000,
+    coagulateHealPercent: 0.10,
+  },
+  // Phase 9 보스
+  lava_dessert_golem: {
+    id: 'lava_dessert_golem',
+    nameKo: '용암 디저트 골렘',
+    hp: 5000,
+    speed: 15,
+    ingredient: null,
+    bodyColor: 0xff4400,
+    isBoss: true,
+    special: 'lavaCoating',           // 피격 시 공격자 타워 화상 반사 (공격력 -10%, 3초)
+    summonType: ['sugar_fairy', 'sugar_fairy', 'milk_phantom'],  // HP 50% 이하 시 소환
+    summonThreshold: 0.5,
+    magmaBlastThreshold: 0.2,         // HP 20% 이하 시 전체 타워 3초 비활성화
+    magmaBlastDuration: 3000,
+    bossReward: 250,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -340,6 +382,19 @@ export const INGREDIENT_TYPES = {
     nameKo: '버터',
     color: 0xffd700,
     icon: '🧈',
+  },
+  // ── Phase 9 신규 재료 ──
+  sugar: {
+    id: 'sugar',
+    nameKo: '설탕',
+    color: 0xff88cc,
+    icon: '🍬',
+  },
+  milk: {
+    id: 'milk',
+    nameKo: '우유',
+    color: 0xffffff,
+    icon: '🥛',
   },
 };
 

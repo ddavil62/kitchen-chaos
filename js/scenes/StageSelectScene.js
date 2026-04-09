@@ -3,6 +3,7 @@
  * Phase 4: 스테이지 리스트, 별점 표시, 잠금/해금.
  * Phase 6: 2장 동양 요리 식당 추가, 스크롤 지원.
  * Phase 8: 3장 바닷가 씨푸드 바 추가.
+ * Phase 9: 4장 화산 BBQ 추가.
  */
 
 import Phaser from 'phaser';
@@ -32,6 +33,13 @@ const CHAPTERS = [
     titleColor: '#66eeff',
     strokeColor: '#1a6688',
     stages: ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6'],
+  },
+  {
+    id: 'ch4',
+    nameKo: '4장: 화산 BBQ',
+    titleColor: '#ff6622',
+    strokeColor: '#881100',
+    stages: ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6'],
   },
 ];
 
