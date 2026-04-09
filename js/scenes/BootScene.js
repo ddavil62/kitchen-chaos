@@ -1,10 +1,14 @@
 /**
  * @fileoverview 부트 씬. 스프라이트 에셋을 로드하고 프로그래매틱 텍스처를 생성한다.
  * Phase 9-4: SpriteLoader를 사용하여 PixelLab 에셋을 Phaser preload로 로드.
+ * Phase 10-4: SoundManager 초기화 추가.
+ * Phase 10-6: 저장된 사운드 설정 복원 추가.
  */
 
 import Phaser from 'phaser';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
+import { SoundManager } from '../managers/SoundManager.js';
+import { SaveManager } from '../managers/SaveManager.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -43,6 +47,13 @@ export class BootScene extends Phaser.Scene {
   create() {
     // 프로그래매틱 텍스처 생성 (맵 타일 등)
     this._createTileTextures();
+
+    // ── 사운드 매니저 초기화 (Phase 10-4) ──
+    SoundManager.init(this);
+
+    // ── 저장된 사운드 설정 복원 (Phase 10-6) ──
+    SoundManager.applySettings(SaveManager.getSoundSettings());
+
     this._startGame();
   }
 

@@ -5,12 +5,13 @@
  * Phase 7-3: v4 마이그레이션 — cookingSlots, bestSatisfaction 추가.
  * Phase 8-3: v5 마이그레이션 — tableUpgrades, unlockedTables, interiors, staff 추가.
  * Phase 8-4: isStaffHired, hireStaff 메서드 추가.
+ * Phase 10-6: v6 마이그레이션 — soundSettings 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaos_save';
-const SAVE_VERSION = 5;
+const SAVE_VERSION = 6;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -45,6 +46,12 @@ function createDefault() {
     staff: {
       waiter: false,               // 서빙 도우미 영구 해금 여부
       dishwasher: false,           // 세척 도우미 영구 해금 여부
+    },
+    // ── Phase 10-6 추가 ──
+    soundSettings: {
+      bgmVolume: 0.7,             // BGM 볼륨 (0.0~1.0)
+      sfxVolume: 0.8,             // SFX 볼륨 (0.0~1.0)
+      muted: false,               // 전체 음소거 여부
     },
   };
 }
@@ -292,6 +299,39 @@ export class SaveManager {
     SaveManager.save(data);
   }
 
+  // ── 사운드 설정 (Phase 10-6) ──
+
+  /**
+   * 저장된 사운드 설정 반환.
+   * 세이브 데이터에 값이 없으면 기본값을 반환한다.
+   * @returns {{ bgmVolume: number, sfxVolume: number, muted: boolean }}
+   */
+  static getSoundSettings() {
+    const data = SaveManager.load();
+    return data.soundSettings || { bgmVolume: 0.7, sfxVolume: 0.8, muted: false };
+  }
+
+  /**
+   * 사운드 설정을 세이브 데이터에 저장한다.
+   * @param {{ bgmVolume?: number, sfxVolume?: number, muted?: boolean }} settings
+   */
+  static saveSoundSettings(settings) {
+    const data = SaveManager.load();
+    if (!data.soundSettings) {
+      data.soundSettings = { bgmVolume: 0.7, sfxVolume: 0.8, muted: false };
+    }
+    if (typeof settings.bgmVolume === 'number') {
+      data.soundSettings.bgmVolume = settings.bgmVolume;
+    }
+    if (typeof settings.sfxVolume === 'number') {
+      data.soundSettings.sfxVolume = settings.sfxVolume;
+    }
+    if (typeof settings.muted === 'boolean') {
+      data.soundSettings.muted = settings.muted;
+    }
+    SaveManager.save(data);
+  }
+
   // ── 기존 메서드 ──
 
   /**
@@ -393,6 +433,16 @@ export class SaveManager {
       data.interiors = data.interiors || { flower: 0, kitchen: 0, lighting: 0 };
       data.staff = data.staff || { waiter: false, dishwasher: false };
       data.version = 5;
+    }
+
+    // v5 → v6: 사운드 설정 추가
+    if (data.version < 6) {
+      data.soundSettings = data.soundSettings || {
+        bgmVolume: 0.7,
+        sfxVolume: 0.8,
+        muted: false,
+      };
+      data.version = 6;
     }
 
     return data;
