@@ -56,6 +56,7 @@ export class CustomerManager {
       maxPatience: custData.patience,
       baseReward: custData.baseReward,
       tipMultiplier: custData.tipMultiplier,
+      vip: custData.vip || false,
     };
 
     const emptySlot = this.slots.indexOf(null);
@@ -70,22 +71,14 @@ export class CustomerManager {
 
   /**
    * 손님에게 서빙 시도.
+   * Phase 3: 재료 확인/소비는 RestaurantScene._onServeRecipe에서 조리 시작 시 처리.
+   * 여기서는 완성된 요리(readyDishes)로만 서빙한다.
    * @param {number} slotIndex - 0~2
    * @returns {{ success: boolean, totalGold?: number, baseReward?: number, tip?: number, comboBonus?: number }}
    */
   serve(slotIndex) {
     const customer = this.slots[slotIndex];
     if (!customer) return { success: false };
-
-    const recipe = customer.recipe;
-
-    // 재료 충족 확인
-    if (!this.ingredientManager.canCook(recipe)) {
-      return { success: false };
-    }
-
-    // 재료 소비
-    this.ingredientManager.consume(recipe);
 
     // 팁 등급 계산
     const patienceRatio = customer.patience / customer.maxPatience;
@@ -102,10 +95,12 @@ export class CustomerManager {
     this.comboCount++;
     const comboMult = this.getComboMultiplier();
 
+    // VIP는 보상 2배
+    const vipMult = customer.vip ? 2.0 : 1.0;
     const baseReward = customer.baseReward;
     const tip = Math.floor(baseReward * (tipGrade - 1));
     const comboBonus = Math.floor(baseReward * tipGrade * (comboMult - 1));
-    const totalGold = Math.floor(baseReward * tipGrade * comboMult);
+    const totalGold = Math.floor(baseReward * tipGrade * comboMult * vipMult);
 
     // 슬롯 비우기
     this.slots[slotIndex] = null;

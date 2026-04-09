@@ -122,7 +122,8 @@ export class CustomerZoneUI {
     slot.customer = customer;
 
     slot.emptyText.setVisible(false);
-    slot.dishText.setText(`${customer.recipe.icon} ${customer.recipe.nameKo}`);
+    const vipTag = customer.vip ? ' ⭐VIP' : '';
+    slot.dishText.setText(`${customer.recipe.icon} ${customer.recipe.nameKo}${vipTag}`);
     slot.dishText.setVisible(true);
     slot.gaugeBg.setVisible(true);
     slot.gaugeBar.setVisible(true);
@@ -216,13 +217,16 @@ export class CustomerZoneUI {
 
   /**
    * 서빙 버튼 활성/비활성 상태 갱신.
+   * Phase 3: readyDishes 배열에 해당 요리가 있으면 서빙 가능.
    * @param {import('../managers/IngredientManager.js').IngredientManager} ingredientManager
+   * @param {string[]} readyDishes - 완성된 요리 ID 목록
    */
-  updateButtonStates(ingredientManager) {
+  updateButtonStates(ingredientManager, readyDishes) {
     for (const slot of this.slotUIs) {
       if (!slot.customer) continue;
-      const canServe = ingredientManager.canCook(slot.customer.recipe);
+      const canServe = readyDishes.includes(slot.customer.dish);
       slot.btnBg.setFillStyle(canServe ? 0x228b22 : 0x555555);
+      slot.btnText.setText(canServe ? '서빙!' : '대기중');
     }
   }
 

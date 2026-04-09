@@ -1,10 +1,10 @@
 /**
  * @fileoverview Kitchen Chaos Defense 전역 설정 상수.
- * 화면 크기, 듀얼 씬 레이아웃, 그리드, 경로 웨이포인트를 정의한다.
+ * Phase 3: 아이소메트릭 다이아몬드 그리드, 듀얼 씬 레이아웃.
  *
- * Phase 2 레이아웃 (360×640):
+ * 화면 레이아웃 (360×640):
  *   0~50    HUD (GameScene)
- *   50~370  맵 그리드 (GameScene) — 8행 × 40px = 320px
+ *   50~370  아이소메트릭 맵 그리드 (GameScene) — 다이아몬드 9×8
  *   370~420 타워 선택 바 (GameScene)
  *   420~520 손님 대기존 (RestaurantScene)
  *   520~640 주방 패널 (RestaurantScene)
@@ -17,76 +17,89 @@ export const GAME_HEIGHT = 640;
 // ── GameScene 레이아웃 ──
 export const HUD_HEIGHT = 50;
 export const GAME_AREA_Y = HUD_HEIGHT;
-export const GAME_AREA_HEIGHT = 320;          // 8행 × 40px
+export const GAME_AREA_HEIGHT = 320;
 export const TOWER_BAR_Y = HUD_HEIGHT + GAME_AREA_HEIGHT;  // 370
-export const TOWER_BAR_HEIGHT = 50;           // 타워 선택 바
+export const TOWER_BAR_HEIGHT = 50;
 
 // ── RestaurantScene 레이아웃 ──
-export const RESTAURANT_Y = 420;              // RestaurantScene 뷰포트 시작
-export const RESTAURANT_HEIGHT = 220;         // 420~640
-export const CUSTOMER_ZONE_HEIGHT = 100;      // 손님 대기존 (0~100 in scene local)
-export const KITCHEN_PANEL_Y = CUSTOMER_ZONE_HEIGHT;  // 100 (scene local)
-export const KITCHEN_PANEL_HEIGHT = 120;      // 주방 패널 (100~220 in scene local)
+export const RESTAURANT_Y = 420;
+export const RESTAURANT_HEIGHT = 220;
+export const CUSTOMER_ZONE_HEIGHT = 100;
+export const KITCHEN_PANEL_Y = CUSTOMER_ZONE_HEIGHT;
+export const KITCHEN_PANEL_HEIGHT = 120;
 
-// ── 그리드 ──
-export const CELL_SIZE = 40;
-export const GRID_COLS = 9;   // 360 / 40 = 9
-export const GRID_ROWS = 8;   // 320 / 40 = 8
+// ── 아이소메트릭 그리드 ──
+export const GRID_COLS = 9;
+export const GRID_ROWS = 8;
+export const CELL_W = 48;           // 셀 가로 (다이아몬드 대각선 가로 길이)
+export const CELL_H = 24;           // 셀 세로 (다이아몬드 대각선 세로 길이, 2:1 비율)
+export const HALF_W = CELL_W / 2;   // 24
+export const HALF_H = CELL_H / 2;   // 12
+
+// 아이소메트릭 원점: 다이아몬드 그리드의 (0,0) 셀 중심
+// 그리드 가로 범위: ORIGIN_X ± max(cols,rows)*HALF_W → 360px에 꽉 맞춤
+export const ORIGIN_X = 168;
+export const ORIGIN_Y = 120;
+
+// 하위 호환: 일부 코드에서 CELL_SIZE를 참조할 수 있음
+export const CELL_SIZE = CELL_W;
 
 /**
- * 그리드 좌표 → 월드 픽셀 중심 좌표 변환.
+ * 그리드 좌표 → 아이소메트릭 월드 픽셀 중심 좌표 변환.
  * @param {number} col
  * @param {number} row
  * @returns {{x: number, y: number}}
  */
 export function cellToWorld(col, row) {
   return {
-    x: col * CELL_SIZE + CELL_SIZE / 2,
-    y: GAME_AREA_Y + row * CELL_SIZE + CELL_SIZE / 2,
+    x: ORIGIN_X + (col - row) * HALF_W,
+    y: ORIGIN_Y + (col + row) * HALF_H,
   };
 }
 
 /**
- * 월드 픽셀 좌표 → 그리드 좌표 변환.
- * @param {number} x
- * @param {number} y
+ * 월드 픽셀 좌표 → 그리드 좌표 변환 (아이소메트릭 역변환).
+ * @param {number} sx - 화면 x 좌표
+ * @param {number} sy - 화면 y 좌표
  * @returns {{col: number, row: number}}
  */
-export function worldToCell(x, y) {
-  return {
-    col: Math.floor(x / CELL_SIZE),
-    row: Math.floor((y - GAME_AREA_Y) / CELL_SIZE),
-  };
+export function worldToCell(sx, sy) {
+  const dx = sx - ORIGIN_X;
+  const dy = sy - ORIGIN_Y;
+  const col = Math.floor((dx / HALF_W + dy / HALF_H) / 2 + 0.5);
+  const row = Math.floor((dy / HALF_H - dx / HALF_W) / 2 + 0.5);
+  return { col, row };
 }
 
-// ── 경로 웨이포인트 (8행 맞춤, 2턴 지그재그) ──
-// 경로: 상단 중앙 진입 → 좌로 → 아래 → 우로 → 주방(하단)
-export const PATH_WAYPOINTS = [
-  { x: 180, y: GAME_AREA_Y - 10 },   // 화면 위 스폰 지점
-  { x: 180, y: GAME_AREA_Y + 2 * CELL_SIZE },  // (col 4, row 2) 아래로 — 130
-  { x: 60,  y: GAME_AREA_Y + 2 * CELL_SIZE },  // (col 1, row 2) 왼쪽으로
-  { x: 60,  y: GAME_AREA_Y + 5 * CELL_SIZE },  // (col 1, row 5) 아래로 — 250
-  { x: 300, y: GAME_AREA_Y + 5 * CELL_SIZE },  // (col 7, row 5) 오른쪽으로
-  { x: 300, y: GAME_AREA_Y + 7 * CELL_SIZE },  // (col 7, row 7) 아래로 — 330
-  { x: 180, y: GAME_AREA_Y + 7 * CELL_SIZE },  // (col 4, row 7) 왼쪽으로 (중앙)
-  { x: 180, y: GAME_AREA_Y + GAME_AREA_HEIGHT + 20 }, // 맵 아래 탈출
-];
+// ── 경로 (아이소메트릭 최적화: col+row 항상 증가 → 화면 아래로만 이동) ──
+// 경로: col=1 아래로 → row=3 오른쪽 → col=7 아래로
+// col+row: 1→4 → 5→10 → 11→14 (단조 증가)
+
+/** 경로 웨이포인트를 셀 좌표에서 생성 */
+function buildWaypoints() {
+  const entry = cellToWorld(1, 0);
+  const exit = cellToWorld(7, 7);
+  return [
+    { x: entry.x, y: GAME_AREA_Y - 10 },   // 스폰: 화면 위
+    cellToWorld(1, 0),   // 진입
+    cellToWorld(1, 3),   // 첫 번째 턴 (아래→오른쪽)
+    cellToWorld(7, 3),   // 두 번째 턴 (오른쪽→아래)
+    cellToWorld(7, 7),   // 경로 끝
+    { x: exit.x, y: GAME_AREA_Y + GAME_AREA_HEIGHT + 20 },  // 탈출: 맵 아래
+  ];
+}
+
+export const PATH_WAYPOINTS = buildWaypoints();
 
 // ── 경로 셀 집합 (타워 배치 불가 구역) ──
 function buildPathCells() {
   const cells = new Set();
-  // col=4, rows 0-2 (세로 진입로)
-  for (let r = 0; r <= 2; r++) cells.add(`4,${r}`);
-  // row=2, cols 1-4 (첫 가로)
-  for (let c = 1; c <= 4; c++) cells.add(`${c},2`);
-  // col=1, rows 2-5 (두 번째 세로)
-  for (let r = 2; r <= 5; r++) cells.add(`1,${r}`);
-  // row=5, cols 1-7 (두 번째 가로)
-  for (let c = 1; c <= 7; c++) cells.add(`${c},5`);
-  // col=7, rows 5-7 (세 번째 세로)
-  for (let r = 5; r <= 7; r++) cells.add(`7,${r}`);
-  // row=7, cols 4-7 (마지막 가로, 중앙으로)
-  for (let c = 4; c <= 7; c++) cells.add(`${c},7`);
+  // col=1, rows 0-3 (세로 진입로)
+  for (let r = 0; r <= 3; r++) cells.add(`1,${r}`);
+  // row=3, cols 1-7 (가로 구간)
+  for (let c = 1; c <= 7; c++) cells.add(`${c},3`);
+  // col=7, rows 3-7 (세로 출구)
+  for (let r = 3; r <= 7; r++) cells.add(`7,${r}`);
   return cells;
 }
 
@@ -102,9 +115,25 @@ export function isPathCell(col, row) {
   return PATH_CELLS.has(`${col},${row}`);
 }
 
+/**
+ * 아이소메트릭 다이아몬드 셀의 4 꼭짓점 좌표.
+ * @param {number} col
+ * @param {number} row
+ * @returns {{top:{x,y}, right:{x,y}, bottom:{x,y}, left:{x,y}}}
+ */
+export function cellDiamond(col, row) {
+  const c = cellToWorld(col, row);
+  return {
+    top:    { x: c.x,          y: c.y - HALF_H },
+    right:  { x: c.x + HALF_W, y: c.y },
+    bottom: { x: c.x,          y: c.y + HALF_H },
+    left:   { x: c.x - HALF_W, y: c.y },
+  };
+}
+
 // ── 게임 규칙 상수 ──
 export const STARTING_GOLD = 150;
 export const STARTING_LIVES = 10;
 export const FRESHNESS_WINDOW_MS = 5000;
-export const WAVE_CLEAR_BONUS = 15;           // 웨이브 클리어 보너스 골드
-export const INGREDIENT_SELL_PRICE = 10;      // 재료 긴급 판매 가격
+export const WAVE_CLEAR_BONUS = 15;
+export const INGREDIENT_SELL_PRICE = 10;
