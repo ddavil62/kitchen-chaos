@@ -4,6 +4,7 @@
  * Phase 6: 2장 동양 요리 식당 추가, 스크롤 지원.
  * Phase 8: 3장 바닷가 씨푸드 바 추가.
  * Phase 9: 4장 화산 BBQ 추가.
+ * Phase 10: 5장 마법사 디저트 카페 + 6장 그랑 가스트로노미 추가.
  */
 
 import Phaser from 'phaser';
@@ -40,6 +41,20 @@ const CHAPTERS = [
     titleColor: '#ff6622',
     strokeColor: '#881100',
     stages: ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6'],
+  },
+  {
+    id: 'ch5',
+    nameKo: '5장: 마법사 디저트 카페',
+    titleColor: '#cc88ff',
+    strokeColor: '#5522aa',
+    stages: ['5-1', '5-2', '5-3', '5-4', '5-5', '5-6'],
+  },
+  {
+    id: 'ch6',
+    nameKo: '6장: 그랑 가스트로노미',
+    titleColor: '#ffd700',
+    strokeColor: '#886600',
+    stages: ['6-1', '6-2', '6-3'],
   },
 ];
 

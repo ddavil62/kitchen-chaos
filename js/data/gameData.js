@@ -1,6 +1,6 @@
 /**
  * @fileoverview Kitchen Chaos Defense 게임 데이터 정의.
- * Phase 9: 적 19종(일반 16 + 보스 4), 타워 6종, 재료 15종, 레시피 12종, 21 스테이지.
+ * Phase 10: 적 22종(일반 16 + 보스 6), 타워 6종, 재료 15종, 레시피 12종, 30 스테이지.
  */
 
 // ── 적 타입 정의 ──
@@ -216,6 +216,49 @@ export const ENEMY_TYPES = {
     magmaBlastThreshold: 0.2,         // HP 20% 이하 시 전체 타워 3초 비활성화
     magmaBlastDuration: 3000,
     bossReward: 250,
+  },
+  // ── Phase 10 보스 ──
+  master_patissier: {
+    id: 'master_patissier',
+    nameKo: '마스터 파티시에',
+    hp: 6000,
+    speed: 12,
+    ingredient: null,
+    bodyColor: 0xcc88ff,
+    isBoss: true,
+    special: 'cakeDisable',            // 매 6초마다 랜덤 타워 1개 케이크화 (4초 공격불가)
+    cakeDisableInterval: 6000,
+    cakeDisableDuration: 4000,
+    shieldThreshold: 0.6,              // HP 60% 이하 시 1000 HP 보호막
+    shieldHp: 1000,
+    summonType: ['sugar_fairy', 'sugar_fairy', 'sugar_fairy', 'milk_phantom', 'milk_phantom'],
+    summonThreshold: 0.4,              // HP 40% 이하 시 소환 (1회)
+    magicBlastThreshold: 0.2,          // HP 20% 이하 시 전체 투사체 4초 무효화 + sugar_fairy x2 추가소환
+    magicBlastDuration: 4000,
+    bossReward: 300,
+  },
+  cuisine_god: {
+    id: 'cuisine_god',
+    nameKo: '요리의 신',
+    hp: 8000,
+    speed: 10,
+    ingredient: null,
+    bodyColor: 0xffd700,
+    isBoss: true,
+    special: 'threePhase',
+    // Phase 1 (100~60%): 매 8초 이전 보스 능력 랜덤 복제 + 일반 적 2마리 소환
+    phase1SummonInterval: 8000,
+    // Phase 2 (60~30%): 5초마다 랜덤 적 3마리 소환, 전체 타워 사거리 -30%, 자가 회복 20HP/초
+    phase2SummonInterval: 5000,
+    phase2RangeReduction: 0.30,
+    phase2RegenRate: 20,
+    // Phase 3 (30~0%): 전체 타워 공격속도 -40%, 자가 회복 50HP/초, 4초마다 랜덤 적 5마리, 10초마다 500HP 보호막
+    phase3AttackSpeedReduction: 0.40,
+    phase3RegenRate: 50,
+    phase3SummonInterval: 4000,
+    phase3ShieldInterval: 10000,
+    phase3ShieldHp: 500,
+    bossReward: 500,
   },
 };
 

@@ -1,6 +1,6 @@
 /**
  * @fileoverview 레시피 컬렉션 데이터.
- * Phase 9: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 + Phase 9 23종 = 89종.
+ * Phase 10: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 + Phase 9 23종 + Phase 10 17종 = 106종.
  * 향후 120종까지 확장 예정.
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
@@ -434,6 +434,91 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { sugar: 1, milk: 1, shrimp: 1, meat: 1, tomato: 1, butter: 1 }, baseReward: 200, cookTime: 15000,
     unlockCost: 350, gateStage: '4-6',
   },
+
+  // ── Phase 10 신규 서빙 15종 (5장+6장: 마법사 디저트 카페 & 그랑 가스트로노미) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'wizard_toast', nameKo: '마법사의 토스트', icon: '🍞', category: 'dessert',
+    tier: 2, ingredients: { flour: 1, butter: 1, sugar: 1 }, baseReward: 46, cookTime: 4000,
+    unlockCost: 30, gateStage: '5-1',
+  },
+  {
+    id: 'crystal_salad', nameKo: '크리스탈 샐러드', icon: '🥗', category: 'special',
+    tier: 2, ingredients: { carrot: 1, cheese: 1, tomato: 1 }, baseReward: 48, cookTime: 4000,
+    unlockCost: 32, gateStage: '5-1',
+  },
+
+  // ★★★ 3성 (4종)
+  {
+    id: 'magic_croissant', nameKo: '마법 크로와상', icon: '🥐', category: 'dessert',
+    tier: 3, ingredients: { flour: 1, butter: 1, egg: 1, sugar: 1 }, baseReward: 68, cookTime: 6000,
+    unlockCost: 60, gateStage: '5-2',
+  },
+  {
+    id: 'magic_seafood_stew', nameKo: '해물 마법 스튜', icon: '🍲', category: 'soup',
+    tier: 3, ingredients: { fish: 1, shrimp: 1, tomato: 1, milk: 1 }, baseReward: 75, cookTime: 7000,
+    unlockCost: 65, gateStage: '5-3',
+  },
+  {
+    id: 'golden_omurice', nameKo: '황금 오므라이스', icon: '🍳', category: 'special',
+    tier: 3, ingredients: { egg: 2, rice: 1, butter: 1 }, baseReward: 72, cookTime: 6000,
+    unlockCost: 62, gateStage: '5-4',
+  },
+  {
+    id: 'final_fried_rice', nameKo: '최후의 볶음밥', icon: '🍳', category: 'fry',
+    tier: 3, ingredients: { rice: 1, egg: 1, meat: 1, carrot: 1 }, baseReward: 78, cookTime: 7000,
+    unlockCost: 68, gateStage: '6-1',
+  },
+
+  // ★★★★ 4성 (5종)
+  {
+    id: 'wizard_dessert_course', nameKo: '마법사의 풀코스 디저트', icon: '🍰', category: 'dessert',
+    tier: 4, ingredients: { sugar: 1, milk: 1, egg: 1, flour: 1, cheese: 1 }, baseReward: 115, cookTime: 10000,
+    unlockCost: 125, gateStage: '5-4',
+  },
+  {
+    id: 'crystal_seafood_platter', nameKo: '크리스탈 씨푸드 플래터', icon: '🦐', category: 'grill',
+    tier: 4, ingredients: { shrimp: 1, squid: 1, fish: 1, butter: 1 }, baseReward: 110, cookTime: 10000,
+    unlockCost: 120, gateStage: '5-5',
+  },
+  {
+    id: 'golden_beef_stew', nameKo: '황금 비프 스튜', icon: '🍲', category: 'soup',
+    tier: 4, ingredients: { meat: 1, carrot: 1, tomato: 1, butter: 1, cheese: 1 }, baseReward: 120, cookTime: 11000,
+    unlockCost: 130, gateStage: '5-6',
+  },
+  {
+    id: 'michelin_omakase', nameKo: '미슐랭 오마카세', icon: '🍣', category: 'special',
+    tier: 4, ingredients: { fish: 1, shrimp: 1, rice: 1, egg: 1, milk: 1 }, baseReward: 125, cookTime: 11000,
+    unlockCost: 135, gateStage: '6-1',
+  },
+  {
+    id: 'legend_pasta', nameKo: '레전드 파스타', icon: '🍝', category: 'noodle',
+    tier: 4, ingredients: { flour: 1, tomato: 1, cheese: 1, meat: 1, mushroom: 1 }, baseReward: 118, cookTime: 10000,
+    unlockCost: 128, gateStage: '6-2',
+  },
+
+  // ★★★★★ 5성 (4종)
+  {
+    id: 'starlight_magic_cake', nameKo: '별빛 마법 케이크', icon: '🎂', category: 'dessert',
+    tier: 5, ingredients: { sugar: 1, milk: 1, egg: 1, flour: 1, butter: 1, cheese: 1 }, baseReward: 185, cookTime: 14000,
+    unlockCost: 290, gateStage: '5-6',
+  },
+  {
+    id: 'emperor_seafood_stew', nameKo: '제왕의 해물탕', icon: '🍲', category: 'soup',
+    tier: 5, ingredients: { shrimp: 1, squid: 1, fish: 1, tomato: 1, butter: 1, pepper: 1 }, baseReward: 195, cookTime: 15000,
+    unlockCost: 320, gateStage: '6-2',
+  },
+  {
+    id: 'final_master_course', nameKo: '최종 마스터 코스', icon: '👨‍🍳', category: 'special',
+    tier: 5, ingredients: { meat: 1, fish: 1, mushroom: 1, cheese: 1, egg: 1, milk: 1 }, baseReward: 210, cookTime: 16000,
+    unlockCost: 340, gateStage: '6-3',
+  },
+  {
+    id: 'cuisine_god_banquet', nameKo: '요리의 신의 만찬', icon: '👑', category: 'special',
+    tier: 5, ingredients: { meat: 1, shrimp: 1, sugar: 1, milk: 1, egg: 1, flour: 1, butter: 1 }, baseReward: 220, cookTime: 18000,
+    unlockCost: 350, gateStage: '6-3',
+  },
 ];
 
 /**
@@ -556,6 +641,20 @@ export const ALL_BUFF_RECIPES = [
     tier: 3, ingredients: { sugar: 1, milk: 1, butter: 1 },
     effectDesc: '전체 타워 공격력 +20% 공격속도 +10% (2웨이브)', effectType: 'buff_both', effectValue: 0.20,
     duration: 2, durationUnit: 'wave', unlockCost: 55, gateStage: '4-3',
+  },
+
+  // ── Phase 10 신규 버프 2종 (5장+6장) ──
+  {
+    id: 'wizard_blessing', nameKo: '마법사의 축복', icon: '✨', category: 'buff',
+    tier: 3, ingredients: { sugar: 1, milk: 1, egg: 1 },
+    effectDesc: '타워 사거리 +20% 적 이동속도 -10% (2웨이브)', effectType: 'buff_range_slow', effectValue: 0.20,
+    duration: 2, durationUnit: 'wave', unlockCost: 65, gateStage: '5-3',
+  },
+  {
+    id: 'final_awakening', nameKo: '최종 각성', icon: '🔥', category: 'buff',
+    tier: 4, ingredients: { meat: 1, shrimp: 1, sugar: 1, butter: 1 },
+    effectDesc: '공격력 +30% 공격속도 +20% 드롭률 +30% (3웨이브)', effectType: 'buff_all', effectValue: 0.30,
+    duration: 3, durationUnit: 'wave', unlockCost: 100, gateStage: '6-2',
   },
 ];
 
