@@ -46,6 +46,15 @@ export const ENEMY_TYPES = {
     bodyColor: 0xffd700,
     regenRate: 3,     // HP/초 자연 재생
   },
+  flour_ghost: {
+    id: 'flour_ghost',
+    nameKo: '밀가루 유령',
+    hp: 60,
+    speed: 75,
+    ingredient: 'flour',
+    bodyColor: 0xfaebd7,
+    invisible: true,      // 기본 반투명, 소금/냉동고만 타겟 가능
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -93,9 +102,33 @@ export const TOWER_TYPES = {
     range: 110,
     fireRate: 0,
     projectileSpeed: 0,
-    collectRadius: 110,   // 재료 자동 수거 범위
-    collectInterval: 2000, // 수거 주기 ms
+    collectRadius: 110,
+    collectInterval: 2000,
     color: 0x00cc88,
+  },
+  freezer: {
+    id: 'freezer',
+    nameKo: '냉동고',
+    cost: 70,
+    damage: 8,
+    range: 100,
+    fireRate: 1500,
+    projectileSpeed: 160,
+    freezeDuration: 1500,       // 1.5초 빙결
+    canTargetInvisible: true,   // 투명 적 타겟 가능
+    color: 0x00bfff,
+  },
+  soup_pot: {
+    id: 'soup_pot',
+    nameKo: '수프 솥',
+    cost: 60,
+    damage: 0,
+    range: 120,
+    fireRate: 0,
+    projectileSpeed: 0,
+    auraInterval: 3000,         // 3초마다 버프
+    auraEffect: 0.15,           // 공격속도 +15%
+    color: 0x32cd32,
   },
 };
 
@@ -332,22 +365,21 @@ export const WAVES = [
   {
     wave: 1,
     enemies: [
-      { type: 'carrot_goblin', count: 8, interval: 1200 },
+      { type: 'carrot_goblin', count: 6, interval: 1500 },
     ],
   },
   {
     wave: 2,
     enemies: [
-      { type: 'carrot_goblin', count: 10, interval: 1000 },
-      { type: 'meat_ogre', count: 2, interval: 3000 },
+      { type: 'carrot_goblin', count: 8, interval: 1200 },
+      { type: 'meat_ogre', count: 1, interval: 3000 },
     ],
   },
   {
     wave: 3,
     enemies: [
-      { type: 'carrot_goblin', count: 12, interval: 900 },
-      { type: 'meat_ogre', count: 4, interval: 2500 },
-      { type: 'chili_demon', count: 2, interval: 2000 },
+      { type: 'carrot_goblin', count: 10, interval: 1000 },
+      { type: 'meat_ogre', count: 3, interval: 2500 },
     ],
   },
   {

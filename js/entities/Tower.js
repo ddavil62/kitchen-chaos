@@ -1,6 +1,7 @@
 /**
  * @fileoverview 타워 엔티티 클래스.
  * Phase 3: 배달 타워 비주얼 + 사거리/화상/둔화 버프 지원.
+ * Phase 4: 냉동고(빙결) + 수프 솥(오라) 타워.
  */
 
 import Phaser from 'phaser';
@@ -73,6 +74,22 @@ export class Tower extends Phaser.GameObjects.Container {
       this.add(wheel2);
       this.add(botBody);
       this.add(antenna);
+    } else if (data.id === 'freezer') {
+      // 냉동고: 파란 사각형 + 눈꽃 무늬
+      const box = this.scene.add.rectangle(0, 0, 22, 22, 0x00bfff);
+      const snowflake = this.scene.add.text(0, -2, '❄', {
+        fontSize: '12px',
+      }).setOrigin(0.5);
+      this.add(box);
+      this.add(snowflake);
+    } else if (data.id === 'soup_pot') {
+      // 수프 솥: 초록 원 + 김 이모지
+      const pot = this.scene.add.circle(0, 2, 12, 0x32cd32);
+      const steam = this.scene.add.text(0, -12, '♨', {
+        fontSize: '10px', color: '#aaffaa',
+      }).setOrigin(0.5);
+      this.add(pot);
+      this.add(steam);
     }
 
     // 범위 표시 원 (기본 숨김)
@@ -94,8 +111,8 @@ export class Tower extends Phaser.GameObjects.Container {
    * @param {Phaser.GameObjects.Group} enemyGroup
    */
   update(time, delta, enemyGroup) {
-    // 배달 타워는 발사하지 않음 — GameScene에서 수거 처리
-    if (this.data_.id === 'delivery') return;
+    // 비전투 타워: 배달(수거)·수프솥(오라)은 발사하지 않음
+    if (this.data_.id === 'delivery' || this.data_.id === 'soup_pot') return;
 
     const effectiveFireRate = this.baseFireRate / this.speedMultiplier;
     this.shootTimer += delta;
@@ -114,9 +131,15 @@ export class Tower extends Phaser.GameObjects.Container {
     let bestTarget = null;
     let bestProgress = -1;
     const effectiveRange = this.range * this.rangeMultiplier;
+    const canSeeInvisible = this.data_.canTargetInvisible ||
+                            this.data_.id === 'salt';  // 소금 분사기도 투명 적 타겟 가능
 
     enemyGroup.getChildren().forEach(enemy => {
       if (!enemy.active || enemy.isDead) return;
+
+      // 투명 적: 타겟 불가 (피격으로 드러난 상태는 예외)
+      if (enemy.isInvisible && enemy.visibleTimer <= 0 && !canSeeInvisible) return;
+
       const dist = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
       if (dist > effectiveRange) return;
 

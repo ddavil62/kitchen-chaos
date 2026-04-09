@@ -131,9 +131,67 @@ export function cellDiamond(col, row) {
   };
 }
 
+// ── 동적 경로 생성 (스테이지 시스템용) ──
+
+/**
+ * pathSegments 배열에서 경로 셀 집합 생성.
+ * @param {{ type: string, col?: number, row?: number, rowStart?: number, rowEnd?: number, colStart?: number, colEnd?: number }[]} segments
+ * @returns {Set<string>}
+ */
+export function buildPathCellsFromSegments(segments) {
+  const cells = new Set();
+  for (const seg of segments) {
+    if (seg.type === 'vertical') {
+      const step = seg.rowEnd >= seg.rowStart ? 1 : -1;
+      for (let r = seg.rowStart; step > 0 ? r <= seg.rowEnd : r >= seg.rowEnd; r += step) {
+        cells.add(`${seg.col},${r}`);
+      }
+    } else if (seg.type === 'horizontal') {
+      const step = seg.colEnd >= seg.colStart ? 1 : -1;
+      for (let c = seg.colStart; step > 0 ? c <= seg.colEnd : c >= seg.colEnd; c += step) {
+        cells.add(`${c},${seg.row}`);
+      }
+    }
+  }
+  return cells;
+}
+
+/**
+ * pathSegments 배열에서 웨이포인트 배열 생성.
+ * 스폰/탈출 지점을 맵 위/아래에 자동 추가한다.
+ * @param {{ type: string }[]} segments
+ * @returns {{x: number, y: number}[]}
+ */
+export function buildWaypointsFromSegments(segments) {
+  if (!segments || segments.length === 0) return PATH_WAYPOINTS;
+  const points = [];
+
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
+    let startCell, endCell;
+    if (seg.type === 'vertical') {
+      startCell = { col: seg.col, row: seg.rowStart };
+      endCell = { col: seg.col, row: seg.rowEnd };
+    } else {
+      startCell = { col: seg.colStart, row: seg.row };
+      endCell = { col: seg.colEnd, row: seg.row };
+    }
+    if (i === 0) points.push(cellToWorld(startCell.col, startCell.row));
+    points.push(cellToWorld(endCell.col, endCell.row));
+  }
+
+  const entry = points[0];
+  const exit = points[points.length - 1];
+  return [
+    { x: entry.x, y: GAME_AREA_Y - 10 },
+    ...points,
+    { x: exit.x, y: GAME_AREA_Y + GAME_AREA_HEIGHT + 20 },
+  ];
+}
+
 // ── 게임 규칙 상수 ──
-export const STARTING_GOLD = 150;
-export const STARTING_LIVES = 10;
+export const STARTING_GOLD = 120;
+export const STARTING_LIVES = 15;
 export const FRESHNESS_WINDOW_MS = 5000;
-export const WAVE_CLEAR_BONUS = 15;
+export const WAVE_CLEAR_BONUS = 25;
 export const INGREDIENT_SELL_PRICE = 10;

@@ -2,6 +2,7 @@
  * @fileoverview 적 엔티티 클래스.
  * 웨이포인트를 따라 이동하며 신선도 보너스 타이머를 관리한다.
  * Phase 3: 5종 적 비주얼 + 치즈 골렘 재생 + 아이소메트릭 depth.
+ * Phase 4: 밀가루 유령(투명) + 빙결 상태이상.
  */
 
 import Phaser from 'phaser';
@@ -11,13 +12,17 @@ export class Enemy extends Phaser.GameObjects.Container {
   /**
    * @param {Phaser.Scene} scene
    * @param {object} enemyData - ENEMY_TYPES의 적 데이터
+   * @param {{x:number,y:number}[]} [waypoints] - 커스텀 웨이포인트 (없으면 기본)
    */
-  constructor(scene, enemyData) {
-    const spawn = PATH_WAYPOINTS[0];
+  constructor(scene, enemyData, waypoints) {
+    const wp = waypoints || PATH_WAYPOINTS;
+    const spawn = wp[0];
     super(scene, spawn.x, spawn.y);
 
     this.scene = scene;
     this.data_ = enemyData;
+    /** @type {{x:number,y:number}[]} */
+    this._waypoints = wp;
 
     // ── 스탯 ──
     this.hp = enemyData.hp;
@@ -41,6 +46,14 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.burnIntervalTimer = 0;
     this.burnDamage = 0;
 
+    // ── 빙결 ──
+    this.isFrozen = false;
+    this.freezeTimer = 0;
+
+    // ── 투명 (밀가루 유령) ──
+    this.isInvisible = !!enemyData.invisible;
+    this.visibleTimer = 0;  // 피격 시 2초간 보임
+
     // ── 재생 (치즈 골렘) ──
     this.regenRate = enemyData.regenRate || 0;
 
@@ -50,6 +63,9 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // ── 비주얼 ──
     this._buildVisual(enemyData);
+
+    // 투명 적: 기본 반투명
+    if (this.isInvisible) this.setAlpha(0.3);
 
     scene.add.existing(this);
     this.setDepth(10 + Math.floor(spawn.y));
@@ -105,6 +121,12 @@ export class Enemy extends Phaser.GameObjects.Container {
       const hole2 = this.scene.add.circle(6, -4, 2, 0xdaa520);
       this.add(hole1);
       this.add(hole2);
+    } else if (id === 'flour_ghost') {
+      // 유령 꼬리 (아래쪽 물결)
+      const tail1 = this.scene.add.triangle(-5, 14, -3, 0, 3, 0, 0, 6, 0xfaebd7);
+      const tail2 = this.scene.add.triangle(5, 14, -3, 0, 3, 0, 0, 6, 0xfaebd7);
+      this.add(tail1);
+      this.add(tail2);
     }
 
     // HP 바
@@ -146,6 +168,34 @@ export class Enemy extends Phaser.GameObjects.Container {
       }
     }
 
+    // ── 빙결 ──
+    if (this.isFrozen) {
+      this.freezeTimer -= delta;
+      if (this.freezeTimer <= 0) {
+        this.isFrozen = false;
+        this.setTint();  // 빙결 틴트 해제
+      }
+      // 빙결 중에는 이동/재생 불가, 화상 DoT만 적용
+      if (this.isBurning) {
+        this.burnTimer -= delta;
+        this.burnIntervalTimer -= delta;
+        if (this.burnIntervalTimer <= 0) {
+          this.takeDamage(this.burnDamage);
+          this.burnIntervalTimer = this.burnInterval;
+        }
+        if (this.burnTimer <= 0) this.isBurning = false;
+      }
+      return;
+    }
+
+    // ── 투명 타이머 ──
+    if (this.isInvisible && this.visibleTimer > 0) {
+      this.visibleTimer -= delta;
+      if (this.visibleTimer <= 0) {
+        this.setAlpha(0.3);  // 다시 투명
+      }
+    }
+
     // ── 슬로우 ──
     if (this.slowTimer > 0) {
       this.slowTimer -= delta;
@@ -176,12 +226,12 @@ export class Enemy extends Phaser.GameObjects.Container {
 
   /** @private */
   _moveAlongPath(delta) {
-    if (this.waypointIndex >= PATH_WAYPOINTS.length) {
+    if (this.waypointIndex >= this._waypoints.length) {
       this._reachBase();
       return;
     }
 
-    const target = PATH_WAYPOINTS[this.waypointIndex];
+    const target = this._waypoints[this.waypointIndex];
     const dx = target.x - this.x;
     const dy = target.y - this.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -191,7 +241,7 @@ export class Enemy extends Phaser.GameObjects.Container {
       this.x = target.x;
       this.y = target.y;
       this.waypointIndex++;
-      if (this.waypointIndex >= PATH_WAYPOINTS.length) {
+      if (this.waypointIndex >= this._waypoints.length) {
         this._reachBase();
       }
     } else {
@@ -208,6 +258,13 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.hpBar.width = 26 * ratio;
     if (ratio < 0.4) this.hpBar.setFillStyle(0xff4444);
     else if (ratio < 0.7) this.hpBar.setFillStyle(0xffaa00);
+
+    // 피격 시 투명 해제 (2초)
+    if (this.isInvisible) {
+      this.setAlpha(0.8);
+      this.visibleTimer = 2000;
+    }
+
     if (this.hp <= 0) this._die();
   }
 
@@ -220,6 +277,16 @@ export class Enemy extends Phaser.GameObjects.Container {
       this.slowFactor = factor;
       this.slowTimer = duration;
     }
+  }
+
+  /**
+   * 빙결 상태 적용 (이동 정지 + 파란 틴트).
+   * @param {number} duration - ms
+   */
+  applyFreeze(duration) {
+    this.isFrozen = true;
+    this.freezeTimer = duration;
+    this.setTint(0x00bfff);
   }
 
   /** @param {number} damage @param {number} duration @param {number} interval */

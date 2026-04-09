@@ -9,10 +9,12 @@ export class CustomerManager {
   /**
    * @param {Phaser.Scene} scene - RestaurantScene
    * @param {import('../managers/IngredientManager.js').IngredientManager} ingredientManager
+   * @param {object[]} [customCustomers] - 스테이지별 커스텀 손님 데이터
    */
-  constructor(scene, ingredientManager) {
+  constructor(scene, ingredientManager, customCustomers) {
     this.scene = scene;
     this.ingredientManager = ingredientManager;
+    this._customCustomers = customCustomers || null;
 
     /** @type {(CustomerSlot|null)[]} 최대 3슬롯 */
     this.slots = [null, null, null];
@@ -29,7 +31,8 @@ export class CustomerManager {
    * @param {number} waveIndex - 0-based
    */
   spawnCustomers(waveIndex) {
-    const waveData = WAVE_CUSTOMERS[waveIndex];
+    const src = this._customCustomers || WAVE_CUSTOMERS;
+    const waveData = src[waveIndex];
     if (!waveData) return;
 
     // 2초 간격으로 순차 등장

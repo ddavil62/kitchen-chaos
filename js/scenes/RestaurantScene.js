@@ -17,7 +17,7 @@ export class RestaurantScene extends Phaser.Scene {
     super({ key: 'RestaurantScene' });
   }
 
-  /** @param {{ ingredientManager: IngredientManager }} data */
+  /** @param {{ ingredientManager: IngredientManager, customers?: object[] }} data */
   create(data) {
     this.cameras.main.setViewport(0, 420, GAME_WIDTH, RESTAURANT_HEIGHT);
     this.cameras.main.setScroll(0, 0);
@@ -31,7 +31,7 @@ export class RestaurantScene extends Phaser.Scene {
     this.readyDishes = [];
 
     // ── 매니저 ──
-    this.customerManager = new CustomerManager(this, this.ingredientManager);
+    this.customerManager = new CustomerManager(this, this.ingredientManager, data.customers);
 
     // ── 버프 상태 ──
     this.activeBuff = null;

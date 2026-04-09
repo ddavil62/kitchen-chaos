@@ -1,6 +1,6 @@
 /**
  * @fileoverview 웨이브 매니저.
- * 웨이브별 적 스폰 타이밍을 관리한다.
+ * Phase 4: 스테이지별 커스텀 웨이브/웨이포인트 지원.
  */
 
 import { WAVES } from '../data/gameData.js';
@@ -11,24 +11,28 @@ export class WaveManager {
   /**
    * @param {Phaser.Scene} scene
    * @param {Phaser.GameObjects.Group} enemyGroup
+   * @param {object} [options]
+   * @param {object[]} [options.waves] - 커스텀 웨이브 배열 (없으면 기본 WAVES 사용)
+   * @param {{x:number,y:number}[]} [options.waypoints] - 커스텀 웨이포인트 (없으면 기본)
    */
-  constructor(scene, enemyGroup) {
+  constructor(scene, enemyGroup, options = {}) {
     this.scene = scene;
     this.enemyGroup = enemyGroup;
 
-    this.currentWave = 0;        // 0 = 아직 시작 전
-    this.totalWaves = WAVES.length;
+    this._waves = options.waves || WAVES;
+    this._waypoints = options.waypoints || null;
+
+    this.currentWave = 0;
+    this.totalWaves = this._waves.length;
     this.isActive = false;
     this.isAllWavesComplete = false;
-    this._spawnQueue = [];        // 이번 웨이브 스폰 대기열
+    this._spawnQueue = [];
     this._spawnTimer = 0;
     this._enemiesSpawned = 0;
     this._totalToSpawn = 0;
   }
 
-  /**
-   * 다음 웨이브 시작.
-   */
+  /** 다음 웨이브 시작 */
   startNextWave() {
     if (this.currentWave >= this.totalWaves) {
       this.isAllWavesComplete = true;
@@ -36,7 +40,7 @@ export class WaveManager {
     }
 
     this.currentWave++;
-    const waveDef = WAVES[this.currentWave - 1];
+    const waveDef = this._waves[this.currentWave - 1];
     this._buildSpawnQueue(waveDef);
     this.isActive = true;
     this._enemiesSpawned = 0;
@@ -45,15 +49,12 @@ export class WaveManager {
 
   /**
    * 웨이브 정의에서 스폰 대기열 구성.
-   * 적 타입별 count와 interval을 시간순으로 플래튼한다.
    * @private
-   * @param {object} waveDef
    */
   _buildSpawnQueue(waveDef) {
     this._spawnQueue = [];
     this._totalToSpawn = 0;
 
-    // 각 적 그룹을 순차 스폰 대기열로 변환
     waveDef.enemies.forEach(group => {
       for (let i = 0; i < group.count; i++) {
         this._spawnQueue.push({ type: group.type, delay: group.interval });
@@ -87,36 +88,26 @@ export class WaveManager {
   /**
    * 적 스폰.
    * @private
-   * @param {string} typeId
    */
   _spawnEnemy(typeId) {
     const enemyData = ENEMY_TYPES[typeId];
     if (!enemyData) return;
 
-    const enemy = new Enemy(this.scene, enemyData);
+    const enemy = new Enemy(this.scene, enemyData, this._waypoints);
     this.enemyGroup.add(enemy);
   }
 
-  /**
-   * 이번 웨이브의 스폰이 모두 완료되었는지 확인.
-   * @returns {boolean}
-   */
+  /** 스폰 완료 여부 */
   isSpawnComplete() {
     return this._spawnIndex >= this._spawnQueue.length;
   }
 
-  /**
-   * 이번 웨이브가 완전히 종료되었는지 확인 (스폰 완료 + 모든 적 처치).
-   * @returns {boolean}
-   */
+  /** 웨이브 완전 종료 여부 (스폰 완료 + 모든 적 처치) */
   isWaveCleared() {
     return this.isSpawnComplete() && this.enemyGroup.countActive() === 0;
   }
 
-  /**
-   * 마지막 웨이브인지 확인.
-   * @returns {boolean}
-   */
+  /** 마지막 웨이브 여부 */
   isLastWave() {
     return this.currentWave >= this.totalWaves;
   }

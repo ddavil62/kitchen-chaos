@@ -14,7 +14,9 @@ export class Projectile extends Phaser.GameObjects.Arc {
    * @param {object} towerData - 타워 데이터 (damage, projectileSpeed 등)
    */
   constructor(scene, x, y, target, towerData) {
-    super(scene, x, y, 5, 0, 360, false, 0xffff00);
+    // 냉동고 발사체는 하늘색
+    const color = towerData.freezeDuration ? 0x00bfff : 0xffff00;
+    super(scene, x, y, 5, 0, 360, false, color);
     scene.add.existing(this);
     this.setDepth(15);
 
@@ -29,6 +31,7 @@ export class Projectile extends Phaser.GameObjects.Arc {
     this.burnDamage = towerData.burnDamage || 0;
     this.burnDuration = towerData.burnDuration || 0;
     this.burnInterval = towerData.burnInterval || 500;
+    this.freezeDuration = towerData.freezeDuration || 0;
 
     this.active = true;
   }
@@ -84,6 +87,10 @@ export class Projectile extends Phaser.GameObjects.Arc {
 
     if (this.burnDamage && this._isTargetValid()) {
       this.target.applyBurn(this.burnDamage, this.burnDuration, this.burnInterval);
+    }
+
+    if (this.freezeDuration && this._isTargetValid()) {
+      this.target.applyFreeze(this.freezeDuration);
     }
 
     this.destroy();
