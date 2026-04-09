@@ -41,6 +41,9 @@ export class GameScene extends Phaser.Scene {
     this.lives = STARTING_LIVES;
     this.score = 0;
     this.selectedTowerType = null;
+    this._activeTowerCategory = 'attack';
+    this._towerBarButtons = [];
+    this._towerTabObjects = [];
     this.isGameOver = false;
     this.isVictory = false;
     this.waitingForNextWave = false;
@@ -167,30 +170,88 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ── 타워 선택 바 (370~420px) ────────────────────────────────────
+  // 탭 영역(16px) + 버튼 영역(34px) = 50px
 
   _createTowerBar() {
+    this._renderTowerBarBackground();
+    this._renderTowerTabs();
+    this._renderTowerButtons();
+  }
+
+  /** 타워 바 배경 (1회 호출) */
+  _renderTowerBarBackground() {
     this.add.rectangle(
       GAME_WIDTH / 2, TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2,
       GAME_WIDTH, TOWER_BAR_HEIGHT, 0x111122
     ).setDepth(100);
+  }
 
-    const towerIds = Object.keys(TOWER_TYPES);
-    const btnWidth = GAME_WIDTH / towerIds.length;
+  /** 카테고리 탭 생성 (1회 호출) */
+  _renderTowerTabs() {
+    const categories = [
+      { id: 'attack', label: '공격' },
+      { id: 'support', label: '지원' },
+    ];
+    const tabY = TOWER_BAR_Y + 8;
 
-    this.towerButtons = [];
-    towerIds.forEach((id, i) => {
+    categories.forEach((cat, i) => {
+      const cx = 30 + i * 58;
+      const bg = this.add.rectangle(cx, tabY, 54, 14,
+        cat.id === this._activeTowerCategory ? 0x885500 : 0x333355
+      ).setDepth(101).setInteractive({ useHandCursor: true });
+
+      const label = this.add.text(cx, tabY, cat.label, {
+        fontSize: '10px', color: '#ffffff',
+      }).setOrigin(0.5).setDepth(102);
+
+      bg.on('pointerdown', () => {
+        if (this._activeTowerCategory === cat.id) return;
+        this._activeTowerCategory = cat.id;
+        this.selectedTowerType = null;
+        this._renderTowerButtons();
+        this._updateTabHighlight();
+      });
+
+      this._towerTabObjects.push({ bg, label, category: cat.id });
+    });
+  }
+
+  /** 탭 활성화 색상 갱신 */
+  _updateTabHighlight() {
+    this._towerTabObjects.forEach(tab => {
+      tab.bg.setFillStyle(
+        tab.category === this._activeTowerCategory ? 0x885500 : 0x333355
+      );
+    });
+  }
+
+  /** 현재 카테고리에 맞는 타워 버튼 렌더링 (탭 전환 시 재호출) */
+  _renderTowerButtons() {
+    // 기존 버튼 제거
+    this._towerBarButtons.forEach(obj => obj.container.destroy());
+    this._towerBarButtons = [];
+
+    // 스테이지 허용 타워 필터
+    const allowed = this.stageData?.availableTowers ?? Object.keys(TOWER_TYPES);
+    const filtered = allowed.filter(id => TOWER_TYPES[id]?.category === this._activeTowerCategory);
+
+    if (filtered.length === 0) return;
+
+    const btnWidth = GAME_WIDTH / filtered.length;
+    const btnY = TOWER_BAR_Y + 16 + 17; // 버튼 영역 중심
+
+    filtered.forEach((id, i) => {
       const tower = TOWER_TYPES[id];
       const cx = btnWidth * i + btnWidth / 2;
-      const cy = TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2;
 
-      const bg = this.add.rectangle(cx, cy, btnWidth - 4, TOWER_BAR_HEIGHT - 6, 0x333355)
-        .setDepth(101).setInteractive();
+      const bg = this.add.rectangle(cx, btnY, btnWidth - 4, 30, 0x333355)
+        .setDepth(101).setInteractive({ useHandCursor: true });
 
-      this.add.text(cx, cy - 6, tower.nameKo, {
+      const name = this.add.text(cx, btnY - 5, tower.nameKo, {
         fontSize: '11px', color: '#ffffff',
       }).setOrigin(0.5).setDepth(102);
 
-      this.add.text(cx, cy + 10, `${tower.cost}g`, {
+      const cost = this.add.text(cx, btnY + 8, `${tower.cost}g`, {
         fontSize: '10px', color: '#ffd700',
       }).setOrigin(0.5).setDepth(102);
 
@@ -201,12 +262,16 @@ export class GameScene extends Phaser.Scene {
         if (this._tutorialStep === 1 && this.selectedTowerType) this._advanceTutorial();
       });
 
-      this.towerButtons.push({ bg, id });
+      // 컨테이너로 묶어 한 번에 destroy 가능
+      const container = this.add.container(0, 0, [bg, name, cost]).setDepth(100);
+      this._towerBarButtons.push({ container, bg, id });
     });
+
+    this._updateTowerBarSelection();
   }
 
   _updateTowerBarSelection() {
-    this.towerButtons.forEach(btn => {
+    this._towerBarButtons.forEach(btn => {
       btn.bg.setFillStyle(btn.id === this.selectedTowerType ? 0x885500 : 0x333355);
     });
   }

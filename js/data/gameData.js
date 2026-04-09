@@ -68,6 +68,7 @@ export const TOWER_TYPES = {
     fireRate: 1000,
     projectileSpeed: 200,
     color: 0xc0c0c0,
+    category: 'attack',
   },
   salt: {
     id: 'salt',
@@ -80,6 +81,7 @@ export const TOWER_TYPES = {
     slowFactor: 0.5,
     slowDuration: 2000,
     color: 0x87ceeb,
+    category: 'attack',
   },
   grill: {
     id: 'grill',
@@ -93,6 +95,7 @@ export const TOWER_TYPES = {
     burnDuration: 3000,
     burnInterval: 500,
     color: 0xff4500,
+    category: 'attack',
   },
   delivery: {
     id: 'delivery',
@@ -105,6 +108,7 @@ export const TOWER_TYPES = {
     collectRadius: 110,
     collectInterval: 2000,
     color: 0x00cc88,
+    category: 'support',
   },
   freezer: {
     id: 'freezer',
@@ -117,6 +121,7 @@ export const TOWER_TYPES = {
     freezeDuration: 1500,       // 1.5초 빙결
     canTargetInvisible: true,   // 투명 적 타겟 가능
     color: 0x00bfff,
+    category: 'attack',
   },
   soup_pot: {
     id: 'soup_pot',
@@ -129,6 +134,7 @@ export const TOWER_TYPES = {
     auraInterval: 3000,         // 3초마다 버프
     auraEffect: 0.15,           // 공격속도 +15%
     color: 0x32cd32,
+    category: 'support',
   },
 };
 

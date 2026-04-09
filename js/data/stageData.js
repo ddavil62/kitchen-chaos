@@ -11,6 +11,7 @@ export const STAGES = {
     id: '1-1',
     nameKo: '파스타 가게 앞마당',
     theme: 'pasta',
+    availableTowers: ['pan', 'delivery', 'salt'],
     gridCols: 9,
     gridRows: 8,
     // L자 경로: 위→아래 → 왼쪽→오른쪽 → 위→아래
@@ -115,6 +116,7 @@ export const STAGES = {
     id: '1-2',
     nameKo: '주방 뒷골목',
     theme: 'pasta',
+    availableTowers: ['pan', 'salt', 'grill', 'delivery'],
     gridCols: 9,
     gridRows: 8,
     // S자 경로
@@ -238,6 +240,7 @@ export const STAGES = {
     id: '1-3',
     nameKo: '와인 저장고',
     theme: 'pasta',
+    availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
     gridRows: 8,
     // 지그재그 경로
