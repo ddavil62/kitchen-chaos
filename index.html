@@ -10,6 +10,20 @@
 </head>
 <body>
   <div id="game-container"></div>
+  <!-- JS 에러 발생 시 화면에 빨간 텍스트로 표시 (Android 디버깅용) -->
+  <div id="error-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;background:#ff0000cc;color:#fff;font-size:12px;padding:8px;z-index:9999;word-break:break-all;"></div>
+  <script>
+    window.onerror = function(msg, src, line, col, err) {
+      var el = document.getElementById('error-overlay');
+      el.style.display = 'block';
+      el.textContent = '[JS ERROR] ' + msg + '\n' + (src || '') + ':' + line;
+    };
+    window.addEventListener('unhandledrejection', function(e) {
+      var el = document.getElementById('error-overlay');
+      el.style.display = 'block';
+      el.textContent = '[PROMISE] ' + (e.reason && e.reason.message || e.reason);
+    });
+  </script>
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>

@@ -16,7 +16,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from './config.js';
  * @type {Phaser.Types.Core.GameConfig}
  */
 const config = {
-  type: Phaser.AUTO,
+  type: Phaser.CANVAS,  // Android WebView WebGL 실패 방지 — Canvas2D 강제
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   parent: 'game-container',
