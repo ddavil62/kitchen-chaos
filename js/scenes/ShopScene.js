@@ -836,6 +836,13 @@ export class ShopScene extends Phaser.Scene {
   }
 
   /**
+   * 하드웨어 뒤로가기 핸들러. 메뉴 화면으로 복귀한다.
+   */
+  _onBack() {
+    this._fadeToScene('MenuScene');
+  }
+
+  /**
    * 페이드 아웃 후 씬 전환.
    * @param {string} sceneKey
    */

@@ -243,4 +243,20 @@ export class RecipeCollectionScene extends Phaser.Scene {
 
     this._detailContainer = container;
   }
+
+  /**
+   * 하드웨어 뒤로가기 핸들러.
+   * 상세 패널이 열려있으면 닫고, 아니면 메뉴로 복귀한다.
+   */
+  _onBack() {
+    if (this._detailContainer) {
+      this._detailContainer.destroy();
+      this._detailContainer = null;
+      return;
+    }
+    this.cameras.main.fadeOut(300, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start('MenuScene');
+    });
+  }
 }

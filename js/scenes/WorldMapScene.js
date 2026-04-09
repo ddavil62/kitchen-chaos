@@ -76,6 +76,24 @@ export class WorldMapScene extends Phaser.Scene {
     this._panelContainer = null;
   }
 
+  // ── 하드웨어 백버튼 (Phase 12) ──────────────────────────────────
+
+  /**
+   * 하드웨어 뒤로가기 핸들러.
+   * 스테이지 패널이 열려있으면 닫고, 아니면 메뉴로 복귀한다.
+   */
+  _onBack() {
+    if (this._panelContainer) {
+      this._closeStagePanel();
+      return;
+    }
+    SoundManager.playSFX('sfx_ui_tap');
+    this.cameras.main.fadeOut(300, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start('MenuScene');
+    });
+  }
+
   // ── 챕터 상태 계산 ──────────────────────────────────────────────
 
   /**

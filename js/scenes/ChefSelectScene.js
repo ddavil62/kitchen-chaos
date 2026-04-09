@@ -92,12 +92,25 @@ export class ChefSelectScene extends Phaser.Scene {
     backBtn.on('pointerdown', () => {
       this.cameras.main.fadeOut(300, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        // Phase 11-1: 엔드리스에서 뒤로가기 시 메뉴로 복귀
-        this.scene.start(this._isEndless ? 'MenuScene' : 'StageSelectScene');
+        // Phase 11-1: 엔드리스에서 뒤로가기 시 메뉴로, 일반은 월드맵으로 복귀
+        this.scene.start(this._isEndless ? 'MenuScene' : 'WorldMapScene');
       });
     });
     backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
     backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
+  }
+
+  // ── 하드웨어 백버튼 (Phase 12) ──────────────────────────────────
+
+  /**
+   * 하드웨어 뒤로가기 핸들러.
+   * 엔드리스 모드에서는 메뉴로, 일반 모드에서는 월드맵으로 복귀한다.
+   */
+  _onBack() {
+    this.cameras.main.fadeOut(300, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start(this._isEndless ? 'MenuScene' : 'WorldMapScene');
+    });
   }
 
   /**

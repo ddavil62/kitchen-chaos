@@ -424,4 +424,11 @@ export class ResultScene extends Phaser.Scene {
       this.scene.start(sceneKey, data);
     });
   }
+
+  /**
+   * 하드웨어 뒤로가기 핸들러. 메뉴 화면으로 복귀한다.
+   */
+  _onBack() {
+    this._fadeToScene('MenuScene');
+  }
 }

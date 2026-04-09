@@ -5,6 +5,7 @@
  * Phase 10-6: 저장된 사운드 설정 복원 추가.
  * Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms).
  * Phase 11-3d: 초기화 시 세이브 데이터 크기 콘솔 로깅.
+ * Phase 12: Android 하드웨어 백버튼 글로벌 리스너 등록.
  */
 
 import Phaser from 'phaser';
@@ -63,7 +64,35 @@ export class BootScene extends Phaser.Scene {
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
+    // ── Android 하드웨어 백버튼 리스너 (Phase 12) ──
+    this._setupHardwareBackButton();
+
     this._startGame();
+  }
+
+  /**
+   * Android 하드웨어 백버튼 글로벌 리스너를 등록한다.
+   * 현재 활성 씬의 _onBack() 메서드를 호출한다.
+   * @private
+   */
+  _setupHardwareBackButton() {
+    const Capacitor = window.Capacitor;
+    if (!Capacitor || !Capacitor.isNativePlatform()) return;
+
+    try {
+      Capacitor.Plugins.App.addListener('backButton', () => {
+        const scenes = this.scene.manager.getScenes(true);
+        // 가장 위에 있는 활성 씬의 _onBack 호출
+        for (const scene of scenes) {
+          if (scene._onBack && scene.scene.key !== 'BootScene') {
+            scene._onBack();
+            return;
+          }
+        }
+      });
+    } catch (e) {
+      // 리스너 등록 실패 — 무시 (브라우저 환경)
+    }
   }
 
   /**
