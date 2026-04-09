@@ -38,7 +38,7 @@ kitchen-chaos/
       ShopScene.js           # 상점 (업그레이드/레시피/테이블/인테리어/직원)
       RecipeCollectionScene.js # 레시피 도감
     managers/
-      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v7)
+      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v8)
       WaveManager.js         # 웨이브 적 스폰 관리
       EndlessWaveGenerator.js # 엔드리스 무한 웨이브 생성기
       RecipeManager.js       # 레시피 해금/조리 관리
@@ -64,7 +64,7 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 데일리 스페셜 보상 |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v7 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v8 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
 
@@ -93,7 +93,7 @@ kitchen-chaos/
 | 튜토리얼 개선 | 영업/상점/엔드리스 안내, 개별 플래그 | 완료 |
 | UI/UX 폴리시 | 씬 전환, 버튼 스타일, 터치 피드백 통일 | 완료 |
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
-| 출시 준비 | 버전 표기, Capacitor 빌드, 에러 오버레이 제거 | 미착수 |
+| 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -105,18 +105,17 @@ kitchen-chaos/
 | 레시피 | 106종 (서빙 86 + 버프 20) |
 | 스테이지 | 30개 (6장) |
 | 셰프 | 3종 |
-| 세이브 버전 | v7 |
+| 세이브 버전 | v8 |
 
 ## 알려진 제약사항
 
 - WaveManager에 공식 override API가 없어 EndlessScene이 MonkeyPatch로 연동 (WaveManager 변경 시 동기화 필요)
 - 온라인 랭킹 미구현 (엔드리스는 로컬 기록만)
 - 엔드리스 ServiceScene은 1장(stageId='1-1') 기준 config 사용
-- 튜토리얼이 1-1 전투만 존재 (영업/상점/엔드리스 튜토리얼 미구현)
 - WorldMapScene HUD 레시피 수집률 텍스트가 3자리 수("100/106")일 때 우측 끝 미세 클리핑 (LOW)
 - StageSelectScene.js는 레거시로 유지 중 (WorldMapScene으로 교체됨, 삭제 예정 미정)
 
 ## 향후 계획
 
-- Phase 11-3d: 출시 준비 (버전 표기, Capacitor 빌드, 에러 오버레이)
+- Phase 11 전체 완료. v1.0.0 출시 준비 상태.
 - 상세: `docs/ROADMAP.md` 참조

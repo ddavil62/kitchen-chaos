@@ -4,6 +4,13 @@ test-results/
 playwright-report/
 .env
 
+# 압축 파일
+*.zip
+
+# OS 생성 파일
+.DS_Store
+Thumbs.db
+
 # Android 빌드 산출물 (keystore는 추적)
 android/app/build/
 android/.gradle/

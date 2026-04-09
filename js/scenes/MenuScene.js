@@ -4,10 +4,11 @@
  * Phase 10-6: 사운드 설정 UI(기어 버튼 + 설정 패널) 추가.
  * Phase 11-2: "게임 시작" -> WorldMapScene 전환.
  * Phase 11-3b: fadeIn 300ms 통일, 도감 버튼 Secondary 팔레트 적용.
+ * Phase 11-3d: 하단 버전 표기(APP_VERSION) 추가.
  */
 
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
@@ -171,11 +172,17 @@ export class MenuScene extends Phaser.Scene {
       fontSize: '12px', color: '#aaaaaa',
     }).setOrigin(0.5);
 
-    // 하단 설명 (Phase 11-1: y 620으로 이동)
-    this.add.text(GAME_WIDTH / 2, 620, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
+    // 하단 설명 (Phase 11-1: y 614으로 조정)
+    this.add.text(GAME_WIDTH / 2, 614, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
       fontSize: '12px',
       color: '#777777',
       align: 'center',
+    }).setOrigin(0.5);
+
+    // ── 버전 표기 (Phase 11-3d) ──
+    this.add.text(GAME_WIDTH / 2, 632, `v${APP_VERSION}`, {
+      fontSize: '10px',
+      color: '#555555',
     }).setOrigin(0.5);
 
     // ── 설정 버튼 (Phase 10-6) ──

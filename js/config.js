@@ -194,6 +194,9 @@ export function buildWaypointsFromSegments(segments) {
   ];
 }
 
+// ── 앱 버전 (Phase 11-3d) ──
+export const APP_VERSION = '1.0.0';
+
 // ── 게임 규칙 상수 ──
 export const STARTING_GOLD = 120;
 export const STARTING_LIVES = 15;

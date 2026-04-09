@@ -1,5 +1,85 @@
 # Changelog
 
+## [2026-04-10] - Phase 11-3d 출시 준비
+
+### 추가
+
+- **APP_VERSION 상수** (`js/config.js`, +3줄)
+  - `export const APP_VERSION = '1.0.0'` 전역 버전 상수 추가
+  - MenuScene, WorldMapScene에서 참조
+
+- **MenuScene 버전 표기** (`js/scenes/MenuScene.js`, +5줄)
+  - 화면 하단(y=632)에 `v1.0.0` 텍스트 표시 (10px, #555555)
+
+- **전역 에러 핸들러** (`js/main.js`, +25줄)
+  - `window.onerror`: 프로덕션에서 에러를 콘솔 로깅만 수행, 브라우저 에러 표시 억제
+  - `window.onunhandledrejection`: 미처리 Promise 거부를 콘솔 로깅, 프로덕션에서 preventDefault
+
+- **localStorage 용량 체크** (`js/managers/SaveManager.js`, +16줄)
+  - `getStorageSize()` 유틸리티 메서드: 세이브 데이터 크기를 bytes/KB로 반환
+  - BootScene 초기화 시 콘솔에 세이브 데이터 크기 로깅
+
+### 변경
+
+- **WorldMapScene** (`js/scenes/WorldMapScene.js`, +2줄)
+  - 하드코딩 'v1.0.0' -> `APP_VERSION` 상수 참조로 변경
+
+- **BootScene** (`js/scenes/BootScene.js`, +3줄)
+  - create()에서 `SaveManager.getStorageSize()` 호출, 크기 콘솔 로깅
+
+- **.gitignore** (`kitchen-chaos/.gitignore`, +5줄)
+  - `*.zip`, `.DS_Store`, `Thumbs.db` 패턴 추가
+
+### 문서
+
+- **ROADMAP.md** — Phase 11 전체 완료 표시, 타임라인 갱신
+- **CHANGELOG.md** — Phase 11-3b/3c/3d 변경이력 추가
+- **PROJECT.md** — 출시 준비 "완료" 상태, 세이브 v8 반영
+
+---
+
+## [2026-04-10] - Phase 11-3c 성능 최적화
+
+### 추가
+
+- **ObjectPool** (`js/managers/ObjectPool.js`, 신규)
+  - 범용 오브젝트 풀 클래스 (acquire/release/releaseAll/clear API)
+
+### 변경
+
+- **VFXManager** — ObjectPool 기반 Circle/Star 파티클 재활용, TTL 자동 정리
+- **MarketScene** — 화면 밖 적 update 스킵 (y < -50 or y > 700), shutdown 시 tweens/timer 정리
+- **ServiceScene** — 빈 테이블 _isEmpty 플래그로 중복 렌더 생략, shutdown 정리
+- **GameScene, RestaurantScene** — shutdown 시 tweens/timer 정리 추가
+
+---
+
+## [2026-04-10] - Phase 11-3b UI/UX 통합 점검
+
+### 변경
+
+- 모든 씬에 fadeIn/fadeOut 300ms 일관 적용
+- 도감 버튼 Secondary 팔레트(#886600) 적용
+- 터치 피드백 pointerover/pointerout 색상 변경 통일
+
+---
+
+## [2026-04-10] - Phase 11-3a 튜토리얼 개선
+
+### 추가
+
+- **TutorialManager** (`js/managers/TutorialManager.js`, 신규) — 공용 오버레이 렌더링, 스텝 관리, 스킵 기능
+
+### 변경
+
+- **SaveManager** — v7->v8 마이그레이션: tutorialBattle/Service/Shop/Endless 4개 개별 플래그
+- **MarketScene** — TutorialManager 위임으로 인라인 튜토리얼 교체
+- **ServiceScene** — 영업 튜토리얼 4단계 추가
+- **ShopScene** — 상점 튜토리얼 3단계 추가
+- **EndlessScene** — 엔드리스 튜토리얼 3단계 추가
+
+---
+
 ## [2026-04-10] - Phase 11-2 스테이지 월드맵
 
 ### 추가

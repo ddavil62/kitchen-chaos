@@ -4,10 +4,11 @@
  * 6개 챕터를 2열 3행 지그재그 노드 그래프로 표현한다.
  * 노드 터치 -> 슬라이드업 패널 -> 스테이지 선택 -> ChefSelectScene.
  * Phase 11-3b: fadeIn 300ms 통일.
+ * Phase 11-3d: 버전 표기 APP_VERSION 참조로 변경.
  */
 
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
 import { STAGES } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
@@ -357,8 +358,8 @@ export class WorldMapScene extends Phaser.Scene {
       }).setOrigin(0.5);
     }
 
-    // 푸터 버전
-    this.add.text(180, 625, 'v1.0.0', {
+    // 푸터 버전 (Phase 11-3d: APP_VERSION 참조)
+    this.add.text(180, 625, `v${APP_VERSION}`, {
       fontSize: '10px',
       color: '#555555',
     }).setOrigin(0.5);

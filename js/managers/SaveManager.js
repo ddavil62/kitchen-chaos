@@ -486,6 +486,25 @@ export class SaveManager {
     SaveManager.save(data);
   }
 
+  // ── localStorage 용량 체크 (Phase 11-3d) ──
+
+  /**
+   * 현재 세이브 데이터의 localStorage 점유 크기를 바이트 단위로 반환한다.
+   * JavaScript 문자열은 UTF-16이므로 문자 수 x 2 바이트로 산출한다.
+   * @returns {{ bytes: number, kb: string }} bytes와 KB 문자열
+   */
+  static getStorageSize() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return { bytes: 0, kb: '0.00' };
+      // UTF-16 인코딩 기준: 1문자 = 2바이트
+      const bytes = raw.length * 2;
+      return { bytes, kb: (bytes / 1024).toFixed(2) };
+    } catch {
+      return { bytes: 0, kb: '0.00' };
+    }
+  }
+
   /** 세이브 초기화 */
   static reset() {
     localStorage.removeItem(SAVE_KEY);

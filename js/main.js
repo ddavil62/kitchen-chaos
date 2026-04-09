@@ -1,6 +1,7 @@
 /**
  * @fileoverview Kitchen Chaos Defense 게임 진입점(Entry Point).
  * Phaser.Game 인스턴스를 생성하고 모든 씬을 등록한다.
+ * Phase 11-3d: 프로덕션 전역 에러 핸들러 추가.
  */
 
 import Phaser from 'phaser';
@@ -47,3 +48,33 @@ const game = new Phaser.Game(config);
 
 // Playwright 테스트에서 게임 인스턴스 접근용
 window.__game = game;
+
+// ── 전역 에러 핸들러 (Phase 11-3d) ──
+// 프로덕션에서는 에러를 콘솔에만 로깅하고 사용자에게 노출하지 않는다.
+
+/**
+ * 동기 에러 핸들러. 프로덕션에서는 조용히 로깅만 수행한다.
+ * @param {string} message
+ * @param {string} source
+ * @param {number} lineno
+ * @param {number} colno
+ * @param {Error} error
+ * @returns {boolean} 프로덕션에서 true 반환으로 브라우저 기본 에러 표시 억제
+ */
+window.onerror = (message, source, lineno, colno, error) => {
+  console.error('[KitchenChaos]', message, { source, lineno, colno, error });
+  // 프로덕션에서는 에러 오버레이 억제, 개발 환경에서는 기본 동작 유지
+  if (import.meta.env.PROD) return true;
+  return false;
+};
+
+/**
+ * 비동기 Promise 거부 핸들러. 프로덕션에서는 조용히 로깅만 수행한다.
+ * @param {PromiseRejectionEvent} event
+ */
+window.onunhandledrejection = (event) => {
+  console.error('[KitchenChaos] Unhandled rejection:', event.reason);
+  if (import.meta.env.PROD) {
+    event.preventDefault();
+  }
+};
