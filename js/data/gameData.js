@@ -1,6 +1,6 @@
 /**
  * @fileoverview Kitchen Chaos Defense 게임 데이터 정의.
- * Phase 3: 적 5종, 타워 4종, 재료 5종, 레시피 12종, 8 웨이브.
+ * Phase 8: 적 16종(일반 13 + 보스 3), 타워 6종, 재료 13종, 레시피 12종, 15 스테이지.
  */
 
 // ── 적 타입 정의 ──
@@ -131,6 +131,49 @@ export const ENEMY_TYPES = {
     enrageHpThreshold: 0.4,
     bossReward: 150,
     bossDebuff: { speedReduction: 0.30, duration: 15000 },  // HP 40% 이하 시 전체 타워 공격속도 -30%, 15초, 1회
+  },
+  // ── Phase 8 신규 적 ──
+  shrimp_samurai: {
+    id: 'shrimp_samurai',
+    nameKo: '새우 사무라이',
+    hp: 160,
+    speed: 70,
+    ingredient: 'shrimp',
+    bodyColor: 0xff6347,
+    dodgeChance: 0.20,  // 20% 확률 공격 회피
+  },
+  tomato_bomber: {
+    id: 'tomato_bomber',
+    nameKo: '토마토 폭격수',
+    hp: 100,
+    speed: 55,
+    ingredient: 'tomato',
+    bodyColor: 0xff4433,
+    deathDebuff: { speedReduction: 0.30, duration: 3000, radius: 80 },  // 사망 시 주변 타워 디버프
+  },
+  butter_ghost: {
+    id: 'butter_ghost',
+    nameKo: '버터 유령',
+    hp: 80,
+    speed: 85,
+    ingredient: 'butter',
+    bodyColor: 0xffd700,
+    slideChance: 0.30,  // 피격 시 30% 확률 1칸 앞으로 순간이동
+  },
+  // Phase 8 보스
+  seafood_kraken: {
+    id: 'seafood_kraken',
+    nameKo: '해물탕 크라켄',
+    hp: 4000,
+    speed: 18,
+    ingredient: null,
+    bodyColor: 0x8b008b,
+    isBoss: true,
+    summonInterval: 3000,
+    summonType: 'shrimp_samurai',
+    enrageHpThreshold: 0.3,
+    bossReward: 200,
+    inkDebuff: { rangeReduction: 0.50, duration: 3000 },  // HP 30% 이하 시 전체 타워 사거리 -50%, 3초, 1회
   },
 };
 
@@ -278,6 +321,25 @@ export const INGREDIENT_TYPES = {
     nameKo: '치즈',
     color: 0xffcc33,
     icon: '🧀',
+  },
+  // ── Phase 8 신규 재료 ──
+  shrimp: {
+    id: 'shrimp',
+    nameKo: '새우',
+    color: 0xff6347,
+    icon: '🦐',
+  },
+  tomato: {
+    id: 'tomato',
+    nameKo: '토마토',
+    color: 0xff4433,
+    icon: '🍅',
+  },
+  butter: {
+    id: 'butter',
+    nameKo: '버터',
+    color: 0xffd700,
+    icon: '🧈',
   },
 };
 

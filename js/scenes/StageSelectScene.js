@@ -2,6 +2,7 @@
  * @fileoverview 스테이지 선택 씬.
  * Phase 4: 스테이지 리스트, 별점 표시, 잠금/해금.
  * Phase 6: 2장 동양 요리 식당 추가, 스크롤 지원.
+ * Phase 8: 3장 바닷가 씨푸드 바 추가.
  */
 
 import Phaser from 'phaser';
@@ -24,6 +25,13 @@ const CHAPTERS = [
     titleColor: '#88ccff',
     strokeColor: '#224488',
     stages: ['2-1', '2-2', '2-3'],
+  },
+  {
+    id: 'ch3',
+    nameKo: '3장: 바닷가 씨푸드 바',
+    titleColor: '#66eeff',
+    strokeColor: '#1a6688',
+    stages: ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6'],
   },
 ];
 
