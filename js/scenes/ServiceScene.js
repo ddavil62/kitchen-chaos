@@ -2,6 +2,7 @@
  * @fileoverview 영업 타이쿤 씬 (ServiceScene).
  * Phase 7-2: 장보기(MarketScene)에서 수집한 재료로 레스토랑을 영업한다.
  * Phase 8-3: 동적 테이블 석수, 테이블 등급, 인테리어 글로벌 버프 반영.
+ * Phase 8-4: 직원 시스템 — 세척 대기시간, 자동 서빙, 직원 아이콘 표시.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -10,7 +11,7 @@
  *   280~340  조리 슬롯 (2개)
  *   340~440  재료 재고 표시
  *   440~570  레시피 퀵슬롯
- *   570~640  하단 바 (셰프 스킬, 일시정지)
+ *   570~640  하단 바 (셰프 스킬, 직원 아이콘, 일시정지)
  */
 
 import Phaser from 'phaser';
@@ -22,6 +23,7 @@ import { RecipeManager } from '../managers/RecipeManager.js';
 import { ChefManager } from '../managers/ChefManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import InventoryManager from '../managers/InventoryManager.js';
+import { STAFF_TYPES } from '../data/staffData.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -42,6 +44,12 @@ const TABLE_ROWS = 2;
 
 // 조리 슬롯 수
 const MAX_COOKING_SLOTS = 2;
+
+// ── 세척/자동서빙 상수 (Phase 8-4) ──
+/** 세척 대기시간 (ms) */
+const WASH_TIME_MS = 2000;
+/** 자동 서빙 딜레이 (ms) */
+const AUTO_SERVE_DELAY_MS = 3000;
 
 // ── 테이블 등급별 설정 (Phase 8-3) ──
 
@@ -138,12 +146,18 @@ export class ServiceScene extends Phaser.Scene {
     this.customerSpawnTimer = 0;
     this.customersSpawned = 0;
 
-    // ── 조리 슬롯 ──
-    /** @type {{ recipe: object|null, timeLeft: number, totalTime: number, ready: boolean }[]} */
+    // ── 조리 슬롯 (Phase 8-4: washing 상태 추가) ──
+    /** @type {{ recipe: object|null, timeLeft: number, totalTime: number, ready: boolean, washing: boolean, washTimeLeft: number }[]} */
     this.cookingSlots = [];
     for (let i = 0; i < MAX_COOKING_SLOTS; i++) {
-      this.cookingSlots.push({ recipe: null, timeLeft: 0, totalTime: 0, ready: false });
+      this.cookingSlots.push({ recipe: null, timeLeft: 0, totalTime: 0, ready: false, washing: false, washTimeLeft: 0 });
     }
+
+    // ── Phase 8-4: 직원 상태 ──
+    this.hasWaiter = SaveManager.isStaffHired('waiter');
+    this.hasDishwasher = SaveManager.isStaffHired('dishwasher');
+    /** 자동 서빙 타이머 (ms) — ready 요리가 있으면 카운트다운 */
+    this.autoServeTimer = 0;
 
     // ── 해금된 서빙 레시피 목록 ──
     this.availableRecipes = ALL_SERVING_RECIPES.filter(r => RecipeManager.isUnlocked(r.id));
@@ -412,6 +426,7 @@ export class ServiceScene extends Phaser.Scene {
 
   /**
    * 조리 슬롯 UI 업데이트.
+   * Phase 8-4: 세척 중 상태 UI 추가.
    * @param {number} idx
    * @private
    */
@@ -421,6 +436,15 @@ export class ServiceScene extends Phaser.Scene {
     const label = container.getData('label');
     const progFill = container.getData('progFill');
     const progWidth = container.getData('progWidth');
+
+    // 세척 중 상태
+    if (slot.washing) {
+      const remain = Math.ceil(slot.washTimeLeft / 1000);
+      label.setText(`\uC138\uCC99\uC911... ${remain}\uCD08`).setColor('#aaaaaa');
+      const ratio = 1 - (slot.washTimeLeft / WASH_TIME_MS);
+      progFill.setScale(Math.max(0, ratio), 1).setFillStyle(0x888888);
+      return;
+    }
 
     if (!slot.recipe) {
       label.setText('\uBE48 \uC2AC\uB86F').setColor('#888888');
@@ -561,9 +585,12 @@ export class ServiceScene extends Phaser.Scene {
       const passiveName = this._getServicePassiveDesc(chefData.id);
       chefLabel = `${chefData.icon} ${passiveName}`;
     }
-    this.add.text(20, BOTTOM_Y + BOTTOM_H / 2, chefLabel, {
-      fontSize: '12px', color: '#aaddff',
+    this.add.text(20, BOTTOM_Y + 14, chefLabel, {
+      fontSize: '11px', color: '#aaddff',
     }).setOrigin(0, 0.5).setDepth(101);
+
+    // ── Phase 8-4: 직원 아이콘 표시 ──
+    this._createStaffIcons();
 
     // 일시정지 버튼
     const pauseBtn = this.add.rectangle(GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, 80, 36, 0x444466)
@@ -575,6 +602,40 @@ export class ServiceScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(102);
 
     pauseBtn.on('pointerdown', () => this._togglePause());
+  }
+
+  /**
+   * 직원 아이콘 생성 (하단 바).
+   * 고용된 직원은 아이콘 표시, 미고용은 잠금 아이콘.
+   * @private
+   */
+  _createStaffIcons() {
+    const staffList = [
+      { id: 'waiter', icon: STAFF_TYPES.waiter.icon, lockIcon: '\uD83D\uDD12' },
+      { id: 'dishwasher', icon: STAFF_TYPES.dishwasher.icon, lockIcon: '\uD83D\uDD12' },
+    ];
+
+    const iconStartX = 20;
+    const iconY = BOTTOM_Y + 48;
+
+    staffList.forEach((s, i) => {
+      const x = iconStartX + i * 36;
+      const hired = SaveManager.isStaffHired(s.id);
+      const displayIcon = hired ? s.icon : s.lockIcon;
+      const color = hired ? '#ffffff' : '#555555';
+
+      const iconText = this.add.text(x, iconY, displayIcon, {
+        fontSize: '18px', color: color,
+      }).setOrigin(0, 0.5).setDepth(101);
+
+      // 참조 저장 (자동 서빙 애니메이션용)
+      if (s.id === 'waiter') {
+        this._waiterIcon = iconText;
+      }
+      if (s.id === 'dishwasher') {
+        this._dishwasherIcon = iconText;
+      }
+    });
   }
 
   /**
@@ -628,8 +689,13 @@ export class ServiceScene extends Phaser.Scene {
     // 조리 진행
     this._updateCooking(delta);
 
-    // 재료 소진 체크
-    if (this._isAllStockEmpty() && !this._hasCookingInProgress() && !this._hasReadyDish()) {
+    // Phase 8-4: 자동 서빙 처리
+    if (this.hasWaiter) {
+      this._updateAutoServe(delta);
+    }
+
+    // 재료 소진 체크 — Phase 8-4: 세척 중인 슬롯도 "진행 중"으로 간주
+    if (this._isAllStockEmpty() && !this._hasCookingInProgress() && !this._hasReadyDish() && !this._hasWashingSlot()) {
       this._endService('stock');
       return;
     }
@@ -746,12 +812,25 @@ export class ServiceScene extends Phaser.Scene {
   // ── 조리 진행 ─────────────────────────────────────────────────────
 
   /**
+   * 조리 진행 + 세척 카운트다운 (Phase 8-4).
    * @param {number} delta - ms
    * @private
    */
   _updateCooking(delta) {
     for (let i = 0; i < this.cookingSlots.length; i++) {
       const slot = this.cookingSlots[i];
+
+      // Phase 8-4: 세척 중인 슬롯 카운트다운
+      if (slot.washing) {
+        slot.washTimeLeft -= delta;
+        if (slot.washTimeLeft <= 0) {
+          slot.washing = false;
+          slot.washTimeLeft = 0;
+        }
+        this._updateCookSlotUI(i);
+        continue;
+      }
+
       if (!slot.recipe || slot.ready) {
         this._updateCookSlotUI(i);
         continue;
@@ -782,8 +861,8 @@ export class ServiceScene extends Phaser.Scene {
       return;
     }
 
-    // 빈 조리 슬롯 확인
-    const emptySlot = this.cookingSlots.findIndex(s => !s.recipe);
+    // 빈 조리 슬롯 확인 — Phase 8-4: 세척 중인 슬롯도 사용 불가
+    const emptySlot = this.cookingSlots.findIndex(s => !s.recipe && !s.washing);
     if (emptySlot === -1) {
       this._showMessage('\uC870\uB9AC \uC2AC\uB86F\uC774 \uAC00\uB4DD \uCC3C\uC2B5\uB2C8\uB2E4!');
       return;
@@ -803,6 +882,8 @@ export class ServiceScene extends Phaser.Scene {
       timeLeft: totalTime,
       totalTime: totalTime,
       ready: false,
+      washing: false,
+      washTimeLeft: 0,
     };
     this._updateCookSlotUI(emptySlot);
   }
@@ -827,21 +908,33 @@ export class ServiceScene extends Phaser.Scene {
     );
 
     if (readySlotIdx === -1) {
-      // 완성된 요리가 없거나 주문과 불일치
-      // 다른 요리라도 완성된 게 있으면 오서빙 처리는 하지 않는다 (스펙에서는 Phase 7 기본 구조)
       this._showMessage('\uC8FC\uBB38\uACFC \uC77C\uCE58\uD558\uB294 \uC694\uB9AC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4');
       return;
     }
 
-    // 서빙 성공
-    const slot = this.cookingSlots[readySlotIdx];
+    this._serveToCustomer(tableIdx, readySlotIdx);
+  }
+
+  /**
+   * 서빙 로직 (수동/자동 공통).
+   * Phase 8-4: 서빙 완료 후 세척 대기시간 시작.
+   * @param {number} tableIdx - 테이블 인덱스
+   * @param {number} slotIdx - 조리 슬롯 인덱스
+   * @param {boolean} [isAutoServe=false] - 자동 서빙 여부 (아이콘 애니메이션용)
+   * @private
+   */
+  _serveToCustomer(tableIdx, slotIdx, isAutoServe = false) {
+    const cust = this.tables[tableIdx];
+    if (!cust) return;
+
+    const slot = this.cookingSlots[slotIdx];
     const recipe = slot.recipe;
 
     // 팁 계산
     const patienceRatio = cust.patience / cust.maxPatience;
     let tipGrade;
     if (patienceRatio >= 0.5) {
-      tipGrade = cust.tipMultiplier;  // 빠른 서빙 보너스
+      tipGrade = cust.tipMultiplier;
     } else if (patienceRatio >= 0.3) {
       tipGrade = 1.0;
     } else {
@@ -887,9 +980,22 @@ export class ServiceScene extends Phaser.Scene {
       this.maxCombo = this.comboCount;
     }
 
-    // 조리 슬롯 비우기
-    this.cookingSlots[readySlotIdx] = { recipe: null, timeLeft: 0, totalTime: 0, ready: false };
-    this._updateCookSlotUI(readySlotIdx);
+    // ── Phase 8-4: 서빙 후 세척 대기시간 시작 ──
+    const washTime = this.hasDishwasher ? 0 : WASH_TIME_MS;
+    if (washTime > 0) {
+      // 세척 대기시간 발생 — 슬롯이 세척 상태로 전환
+      this.cookingSlots[slotIdx] = {
+        recipe: null, timeLeft: 0, totalTime: 0, ready: false,
+        washing: true, washTimeLeft: washTime,
+      };
+    } else {
+      // 세척 도우미 보유 — 즉시 빈 슬롯
+      this.cookingSlots[slotIdx] = {
+        recipe: null, timeLeft: 0, totalTime: 0, ready: false,
+        washing: false, washTimeLeft: 0,
+      };
+    }
+    this._updateCookSlotUI(slotIdx);
 
     // 테이블 비우기
     this.tables[tableIdx] = null;
@@ -902,6 +1008,17 @@ export class ServiceScene extends Phaser.Scene {
       `+${totalGold}G${tipStr}`,
       '#ffd700'
     );
+
+    // 자동 서빙 시 직원 아이콘 반짝 애니메이션
+    if (isAutoServe && this._waiterIcon) {
+      this.tweens.add({
+        targets: this._waiterIcon,
+        alpha: { from: 0.5, to: 1.0 },
+        duration: 300,
+        yoyo: true,
+        ease: 'Sine.easeInOut',
+      });
+    }
 
     // 레시피 슬롯 갱신
     this._updateRecipeQuickSlots();
@@ -974,6 +1091,78 @@ export class ServiceScene extends Phaser.Scene {
     });
   }
 
+  // ── Phase 8-4: 자동 서빙 ─────────────────────────────────────────
+
+  /**
+   * 자동 서빙 업데이트.
+   * 조리 완료 요리가 있고, 해당 주문 손님이 있으면 3초 딜레이 후 자동 서빙.
+   * 가장 오래 기다린 손님 우선.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateAutoServe(delta) {
+    // 완성된 요리 슬롯 찾기
+    const readySlots = [];
+    for (let i = 0; i < this.cookingSlots.length; i++) {
+      const s = this.cookingSlots[i];
+      if (s.recipe && s.ready) readySlots.push(i);
+    }
+    if (readySlots.length === 0) {
+      this.autoServeTimer = 0;
+      return;
+    }
+
+    // 해당 요리를 주문한 손님이 있는지 확인
+    let matchFound = false;
+    for (const slotIdx of readySlots) {
+      const dishId = this.cookingSlots[slotIdx].recipe.id;
+      for (let t = 0; t < this.tableCount; t++) {
+        if (this.tables[t] && this.tables[t].dish === dishId) {
+          matchFound = true;
+          break;
+        }
+      }
+      if (matchFound) break;
+    }
+
+    if (!matchFound) {
+      this.autoServeTimer = 0;
+      return;
+    }
+
+    // 딜레이 카운트다운
+    this.autoServeTimer += delta;
+    if (this.autoServeTimer < AUTO_SERVE_DELAY_MS) return;
+
+    // 3초 경과 — 자동 서빙 실행
+    this.autoServeTimer = 0;
+
+    // 가장 오래 기다린 손님 (인내심이 가장 많이 소진된 = maxPatience - patience가 가장 큰) 우선
+    for (const slotIdx of readySlots) {
+      const dishId = this.cookingSlots[slotIdx].recipe.id;
+
+      // 해당 주문 손님 중 가장 오래 기다린 손님 찾기
+      let bestTableIdx = -1;
+      let bestWaitTime = -1;
+
+      for (let t = 0; t < this.tableCount; t++) {
+        const c = this.tables[t];
+        if (c && c.dish === dishId) {
+          const waited = c.maxPatience - c.patience;
+          if (waited > bestWaitTime) {
+            bestWaitTime = waited;
+            bestTableIdx = t;
+          }
+        }
+      }
+
+      if (bestTableIdx !== -1) {
+        this._serveToCustomer(bestTableIdx, slotIdx, true);
+        break; // 한 번에 1건만 자동 서빙
+      }
+    }
+  }
+
   // ── 유틸리티 ──────────────────────────────────────────────────────
 
   /**
@@ -1001,6 +1190,15 @@ export class ServiceScene extends Phaser.Scene {
    */
   _hasReadyDish() {
     return this.cookingSlots.some(s => s.recipe && s.ready);
+  }
+
+  /**
+   * 세척 중인 슬롯이 있는지 확인 (Phase 8-4).
+   * @returns {boolean}
+   * @private
+   */
+  _hasWashingSlot() {
+    return this.cookingSlots.some(s => s.washing);
   }
 
   /**

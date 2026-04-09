@@ -2,6 +2,7 @@
  * @fileoverview 통합 상점 씬.
  * Phase 5: 업그레이드 탭 + 레시피 해금 탭.
  * Phase 8-3: 테이블 탭, 인테리어 탭, 직원 탭 추가.
+ * Phase 8-4: 직원 탭 구현 (서빙/세척 도우미 구매, IAP 추상화).
  */
 
 import Phaser from 'phaser';
@@ -11,6 +12,7 @@ import { ALL_SERVING_RECIPES, ALL_BUFF_RECIPES, TIER_COLORS, TIER_NAMES, RECIPE_
 import { SaveManager } from '../managers/SaveManager.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
+import { STAFF_TYPES } from '../data/staffData.js';
 
 // ── Phase 8-3: 테이블/인테리어 상수 ──
 
@@ -678,66 +680,121 @@ export class ShopScene extends Phaser.Scene {
     });
   }
 
-  // ── 직원 탭 (Phase 8-3 — 빈 탭, 8-4에서 구현) ──
+  // ── 직원 탭 (Phase 8-4) ──
 
   /**
-   * 직원 탭. Phase 8-4에서 서빙/세척 도우미 구현 예정.
+   * 직원 탭 — 서빙/세척 도우미 카드 + 구매 로직.
+   * staffData.js의 purchaseType에 따라 코인/IAP 분기 (현재는 코인만).
    * @private
    */
   _renderStaffShop() {
-    const centerX = GAME_WIDTH / 2;
-    const centerY = GAME_HEIGHT / 2 - 40;
+    const startY = 90;
+    const cardH = 90;
+    const coins = SaveManager.getCoins();
 
-    // 준비 중 안내
+    // 섹션 헤더
     this._contentContainer.add(
-      this.add.text(centerX, centerY - 30, '🤵 직원 고용', {
-        fontSize: '18px', fontStyle: 'bold', color: '#ffd700',
-      }).setOrigin(0.5)
+      this.add.text(20, startY, '\uD83E\uDDD1\u200D\uD83C\uDF73 \uC9C1\uC6D0 \uACE0\uC6A9', {
+        fontSize: '14px', fontStyle: 'bold', color: '#ffd700',
+      })
     );
 
-    this._contentContainer.add(
-      this.add.text(centerX, centerY + 10, '준비 중', {
-        fontSize: '16px', color: '#888888',
-      }).setOrigin(0.5)
-    );
+    const staffIds = Object.keys(STAFF_TYPES);
 
-    this._contentContainer.add(
-      this.add.text(centerX, centerY + 40, '서빙 도우미, 세척 도우미 등\n다음 업데이트에서 만나보세요!', {
-        fontSize: '12px', color: '#666666', align: 'center',
-      }).setOrigin(0.5)
-    );
+    staffIds.forEach((staffId, i) => {
+      const staffType = STAFF_TYPES[staffId];
+      const hired = SaveManager.isStaffHired(staffId);
+      const y = startY + 28 + i * cardH;
 
-    // 미리보기 슬롯 2개
-    const slots = [
-      { icon: '🤵', name: '서빙 도우미', desc: '조리 완료 자동 서빙' },
-      { icon: '🧹', name: '세척 도우미', desc: '세척 대기시간 제거' },
-    ];
+      // 카드 배경
+      const bgColor = hired ? 0x1a2a1a : 0x2a1a0a;
+      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, bgColor)
+        .setStrokeStyle(1, hired ? 0x44aa44 : 0x555533);
+      this._contentContainer.add(cardBg);
 
-    slots.forEach((slot, i) => {
-      const y = centerY + 90 + i * 60;
-
-      const bg = this.add.rectangle(centerX, y, 280, 48, 0x222222)
-        .setStrokeStyle(1, 0x444444);
-      this._contentContainer.add(bg);
-
+      // 아이콘 + 이름
       this._contentContainer.add(
-        this.add.text(centerX - 120, y - 8, `${slot.icon} ${slot.name}`, {
-          fontSize: '13px', fontStyle: 'bold', color: '#555555',
+        this.add.text(20, y + 10, `${staffType.icon} ${staffType.nameKo}`, {
+          fontSize: '15px', fontStyle: 'bold', color: hired ? '#88ff88' : '#ffffff',
         })
       );
 
+      // 설명
       this._contentContainer.add(
-        this.add.text(centerX - 120, y + 10, slot.desc, {
-          fontSize: '10px', color: '#444444',
+        this.add.text(20, y + 32, staffType.desc, {
+          fontSize: '11px', color: '#aaaaaa',
         })
       );
 
-      this._contentContainer.add(
-        this.add.text(centerX + 110, y, '🔒', {
-          fontSize: '18px', color: '#444444',
-        }).setOrigin(0.5)
-      );
+      if (hired) {
+        // 이미 고용됨
+        this._contentContainer.add(
+          this.add.text(GAME_WIDTH - 30, y + cardH / 2, '\uACE0\uC6A9\uB428 \u2705', {
+            fontSize: '14px', fontStyle: 'bold', color: '#44ff44',
+          }).setOrigin(1, 0.5)
+        );
+      } else {
+        // 가격 표시 + 구매 버튼
+        if (staffType.purchaseType === 'coin') {
+          const canBuy = coins >= staffType.price;
+          const btnX = GAME_WIDTH - 55;
+          const btnY = y + 55;
+
+          const btn = this.add.rectangle(btnX, btnY, 80, 26, canBuy ? 0x886600 : 0x333333)
+            .setInteractive({ useHandCursor: canBuy });
+          this._contentContainer.add(btn);
+
+          this._contentContainer.add(
+            this.add.text(btnX, btnY, `${staffType.price} \uD83E\uDE99`, {
+              fontSize: '13px', fontStyle: 'bold',
+              color: canBuy ? '#ffcc00' : '#666666',
+            }).setOrigin(0.5)
+          );
+
+          // 가격 설명
+          this._contentContainer.add(
+            this.add.text(20, y + 52, `\uC601\uAD6C \uD574\uAE08 \u2014 ${staffType.price}\uCF54\uC778`, {
+              fontSize: '10px', color: '#888888',
+            })
+          );
+
+          if (canBuy) {
+            btn.on('pointerdown', () => {
+              if (SaveManager.spendCoins(staffType.price)) {
+                SaveManager.hireStaff(staffId);
+                this._updateCoinDisplay();
+                this._renderContent();
+              }
+            });
+          }
+        } else if (staffType.purchaseType === 'iap') {
+          // IAP 미구현 — 잠금 표시
+          this._contentContainer.add(
+            this.add.text(GAME_WIDTH - 30, y + cardH / 2, '\uD83D\uDD12 IAP', {
+              fontSize: '13px', color: '#555555',
+            }).setOrigin(1, 0.5)
+          );
+        }
+      }
     });
+
+    // ── 빈 슬롯: 향후 추가 직원 예정 ──
+    const emptyY = startY + 28 + staffIds.length * cardH;
+    const emptyBg = this.add.rectangle(GAME_WIDTH / 2, emptyY + 30, 340, 48, 0x1a1a1a)
+      .setStrokeStyle(1, 0x333333);
+    this._contentContainer.add(emptyBg);
+
+    this._contentContainer.add(
+      this.add.text(GAME_WIDTH / 2, emptyY + 22, '\uD5A5\uD6C4 \uCD94\uAC00 \uC9C1\uC6D0 \uC608\uC815', {
+        fontSize: '12px', color: '#555555',
+      }).setOrigin(0.5)
+    );
+
+    this._contentContainer.add(
+      this.add.text(GAME_WIDTH / 2, emptyY + 38, '\uB2E4\uC74C \uC5C5\uB370\uC774\uD2B8\uC5D0\uC11C \uB9CC\uB098\uBCF4\uC138\uC694!', {
+        fontSize: '10px', color: '#444444',
+      }).setOrigin(0.5)
+    );
   }
 
   /**

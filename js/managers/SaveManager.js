@@ -4,6 +4,7 @@
  * Phase 6: v3 마이그레이션 — selectedChef, completedOrders 추가.
  * Phase 7-3: v4 마이그레이션 — cookingSlots, bestSatisfaction 추가.
  * Phase 8-3: v5 마이그레이션 — tableUpgrades, unlockedTables, interiors, staff 추가.
+ * Phase 8-4: isStaffHired, hireStaff 메서드 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
@@ -266,6 +267,29 @@ export class SaveManager {
     data.interiors[type] = (data.interiors[type] || 0) + 1;
     SaveManager.save(data);
     return true;
+  }
+
+  // ── 직원 (Phase 8-4) ──
+
+  /**
+   * 직원 고용 여부 확인.
+   * @param {'waiter'|'dishwasher'} staffId
+   * @returns {boolean}
+   */
+  static isStaffHired(staffId) {
+    const data = SaveManager.load();
+    return !!(data.staff || {})[staffId];
+  }
+
+  /**
+   * 직원 영구 고용 처리. staff[staffId] = true로 설정하고 저장.
+   * @param {'waiter'|'dishwasher'} staffId
+   */
+  static hireStaff(staffId) {
+    const data = SaveManager.load();
+    if (!data.staff) data.staff = { waiter: false, dishwasher: false };
+    data.staff[staffId] = true;
+    SaveManager.save(data);
   }
 
   // ── 기존 메서드 ──
