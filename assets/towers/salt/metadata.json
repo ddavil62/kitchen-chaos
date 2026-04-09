@@ -1,0 +1,26 @@
+{
+  "character": {
+    "id": "c8240cf6-3817-4438-99eb-85fa229f3fcb",
+    "name": "Salt Tower",
+    "prompt": "salt shaker dispenser tower, white salt sprayer machine on pedestal, crystal blue particles, kitchen defense",
+    "size": {
+      "width": 68,
+      "height": 68
+    },
+    "template_id": "mannequin",
+    "directions": 4,
+    "view": "side",
+    "created_at": "2026-04-09T11:31:23.048914+00:00"
+  },
+  "frames": {
+    "rotations": {
+      "south": "rotations/south.png",
+      "west": "rotations/west.png",
+      "east": "rotations/east.png",
+      "north": "rotations/north.png"
+    },
+    "animations": {}
+  },
+  "export_version": "2.0",
+  "export_date": "2026-04-09T11:50:08.147654"
+}

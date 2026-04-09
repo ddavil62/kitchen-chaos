@@ -35,8 +35,8 @@ const config = {
     activePointers: 1,
   },
   render: {
-    pixelArt: false,
-    antialias: true,
+    pixelArt: true,    // Phase 9-4: 픽셀 아트 스프라이트 선명도 유지
+    antialias: false,
   },
 };
 

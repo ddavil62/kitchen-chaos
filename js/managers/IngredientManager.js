@@ -2,12 +2,14 @@
  * @fileoverview 재료 매니저.
  * GameScene 소속. 적 처치 시 재료 드롭, 신선도 보너스, 인벤토리를 관리한다.
  * 인벤토리 변동 시 GameEventBus로 RestaurantScene에 알린다.
+ * Phase 9-4: 드롭 아이콘을 스프라이트 이미지로 교체 (fallback 유지).
  */
 
 import { FRESHNESS_WINDOW_MS } from '../config.js';
 import { INGREDIENT_TYPES } from '../data/gameData.js';
 import { GameEventBus } from '../events/GameEventBus.js';
 import { UpgradeManager } from './UpgradeManager.js';
+import { SpriteLoader } from './SpriteLoader.js';
 
 // 드롭 아이템 자동 수거 대기 시간 (ms)
 const AUTO_COLLECT_DELAY = 8000;
@@ -53,6 +55,7 @@ export class IngredientManager {
 
   /**
    * 바닥 드롭 오브젝트 생성.
+   * Phase 9-4: 스프라이트가 있으면 이미지, 없으면 색상 원 fallback.
    * @private
    */
   _createDrop(x, y, type, count, isFreshBonus) {
@@ -60,8 +63,17 @@ export class IngredientManager {
     const container = this.scene.add.container(x, y);
     container.setDepth(12);
 
-    const icon = this.scene.add.circle(0, 0, 10, data.color);
-    container.add(icon);
+    // 재료 아이콘: 스프라이트 우선, fallback은 색상 원
+    const spriteKey = `ingredient_${type}`;
+    if (SpriteLoader.hasTexture(this.scene, spriteKey)) {
+      const icon = this.scene.add.image(0, 0, spriteKey);
+      // 32x32 → 20px 표시 크기
+      icon.setScale(20 / icon.width);
+      container.add(icon);
+    } else {
+      const icon = this.scene.add.circle(0, 0, 10, data.color);
+      container.add(icon);
+    }
 
     const label = this.scene.add.text(0, 14, `×${count}`, {
       fontSize: '10px', color: '#ffffff',

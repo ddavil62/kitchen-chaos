@@ -11,6 +11,7 @@ import { CHEF_TYPES, CHEF_ORDER } from '../data/chefData.js';
 import { ChefManager } from '../managers/ChefManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { STAGES } from '../data/stageData.js';
+import { SpriteLoader } from '../managers/SpriteLoader.js';
 
 export class ChefSelectScene extends Phaser.Scene {
   constructor() {
@@ -111,9 +112,17 @@ export class ChefSelectScene extends Phaser.Scene {
 
     // 아이콘 + 이름
     const leftX = cx - cardW / 2 + 20;
-    this.add.text(leftX, cy - 48, chef.icon, {
-      fontSize: '28px',
-    }).setOrigin(0, 0.5);
+    const chefSpriteKey = `chef_${chef.id}`;
+    if (SpriteLoader.hasTexture(this, chefSpriteKey)) {
+      // 스프라이트 이미지 (80x80 → 40px)
+      const chefImg = this.add.image(leftX + 14, cy - 48, chefSpriteKey);
+      chefImg.setScale(40 / chefImg.width);
+    } else {
+      // 이모지 fallback
+      this.add.text(leftX, cy - 48, chef.icon, {
+        fontSize: '28px',
+      }).setOrigin(0, 0.5);
+    }
 
     // 셰프 색상을 CSS hex 색상으로 변환
     const r = (chef.color >> 16) & 0xff;

@@ -2,12 +2,14 @@
  * @fileoverview 타워 엔티티 클래스.
  * Phase 3: 배달 타워 비주얼 + 사거리/화상/둔화 버프 지원.
  * Phase 4: 냉동고(빙결) + 수프 솥(오라) 타워.
+ * Phase 9-4: 도형 → 스프라이트 이미지 교체 (fallback 유지).
  */
 
 import Phaser from 'phaser';
 import { Projectile } from './Projectile.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { ChefManager } from '../managers/ChefManager.js';
+import { SpriteLoader } from '../managers/SpriteLoader.js';
 
 export class Tower extends Phaser.GameObjects.Container {
   /**
@@ -43,9 +45,48 @@ export class Tower extends Phaser.GameObjects.Container {
     this.setDepth(5);
   }
 
-  /** @private */
+  /**
+   * 타워 비주얼 생성.
+   * Phase 9-4: 스프라이트 이미지가 있으면 사용, 없으면 도형 fallback.
+   * @private
+   */
   _buildVisual(data) {
-    // 아이소메트릭에 맞게 약간 납작한 형태
+    const spriteKey = `tower_${data.id}`;
+    const hasSprite = SpriteLoader.hasTexture(this.scene, spriteKey);
+
+    if (hasSprite) {
+      // ── 스프라이트 이미지 사용 ──
+      const sprite = this.scene.add.image(0, 0, spriteKey);
+      // 타워: 68x68 → 32px
+      const targetSize = 32;
+      const scale = targetSize / sprite.width;
+      sprite.setScale(scale);
+      this.add(sprite);
+      this._bodySprite = sprite;
+    } else {
+      // ── 도형 fallback ──
+      this._buildShapeFallback(data);
+    }
+
+    // 범위 표시 원 (기본 숨김)
+    this.rangeCircle = this.scene.add.circle(0, 0, this.range, 0xffffff, 0.08);
+    this.rangeCircle.setVisible(false);
+    this.add(this.rangeCircle);
+
+    // 이름 텍스트
+    const label = this.scene.add.text(0, 18, data.nameKo, {
+      fontSize: '7px', color: '#ffffff',
+      stroke: '#000000', strokeThickness: 1,
+    }).setOrigin(0.5, 0);
+    this.add(label);
+  }
+
+  /**
+   * 도형 기반 fallback 비주얼 (스프라이트 미로드 시).
+   * @param {object} data
+   * @private
+   */
+  _buildShapeFallback(data) {
     const body = this.scene.add.rectangle(0, 0, 28, 24, data.color);
     this.add(body);
 
@@ -67,7 +108,6 @@ export class Tower extends Phaser.GameObjects.Container {
       this.add(flame1);
       this.add(flame2);
     } else if (data.id === 'delivery') {
-      // 배달 로봇: 초록 원 + 바퀴
       const botBody = this.scene.add.circle(0, -2, 10, 0x00cc88);
       const wheel1 = this.scene.add.circle(-8, 8, 4, 0x333333);
       const wheel2 = this.scene.add.circle(8, 8, 4, 0x333333);
@@ -77,33 +117,12 @@ export class Tower extends Phaser.GameObjects.Container {
       this.add(botBody);
       this.add(antenna);
     } else if (data.id === 'freezer') {
-      // 냉동고: 파란 사각형 + 눈꽃 무늬
       const box = this.scene.add.rectangle(0, 0, 22, 22, 0x00bfff);
-      const snowflake = this.scene.add.text(0, -2, '❄', {
-        fontSize: '12px',
-      }).setOrigin(0.5);
       this.add(box);
-      this.add(snowflake);
     } else if (data.id === 'soup_pot') {
-      // 수프 솥: 초록 원 + 김 이모지
       const pot = this.scene.add.circle(0, 2, 12, 0x32cd32);
-      const steam = this.scene.add.text(0, -12, '♨', {
-        fontSize: '10px', color: '#aaffaa',
-      }).setOrigin(0.5);
       this.add(pot);
-      this.add(steam);
     }
-
-    // 범위 표시 원 (기본 숨김)
-    this.rangeCircle = this.scene.add.circle(0, 0, this.range, 0xffffff, 0.08);
-    this.rangeCircle.setVisible(false);
-    this.add(this.rangeCircle);
-
-    // 이름 텍스트
-    const label = this.scene.add.text(0, 14, data.nameKo, {
-      fontSize: '7px', color: '#ffffff',
-    }).setOrigin(0.5, 0);
-    this.add(label);
   }
 
   /**

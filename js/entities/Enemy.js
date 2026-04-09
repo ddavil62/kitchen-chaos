@@ -3,10 +3,12 @@
  * 웨이포인트를 따라 이동하며 신선도 보너스 타이머를 관리한다.
  * Phase 3: 5종 적 비주얼 + 치즈 골렘 재생 + 아이소메트릭 depth.
  * Phase 4: 밀가루 유령(투명) + 빙결 상태이상.
+ * Phase 9-4: 도형 → 스프라이트 이미지 교체 (fallback 유지).
  */
 
 import Phaser from 'phaser';
 import { PATH_WAYPOINTS, FRESHNESS_WINDOW_MS } from '../config.js';
+import { SpriteLoader } from '../managers/SpriteLoader.js';
 
 export class Enemy extends Phaser.GameObjects.Container {
   /**
@@ -81,35 +83,73 @@ export class Enemy extends Phaser.GameObjects.Container {
 
   /**
    * 적 타입별 비주얼 생성.
+   * Phase 9-4: 스프라이트 이미지가 로드되어 있으면 사용, 아니면 도형 fallback.
    * @private
    */
   _buildVisual(data) {
     const color = data.bodyColor || 0xff6b35;
     const id = data.id;
 
+    // ── 스프라이트 키 결정 (보스/일반) ──
+    const isBoss = !!data.isBoss;
+    const spriteKey = isBoss ? `boss_${id}` : `enemy_${id}`;
+    const hasSprite = SpriteLoader.hasTexture(this.scene, spriteKey);
+
+    if (hasSprite) {
+      // ── 스프라이트 이미지 사용 ──
+      const sprite = this.scene.add.image(0, 0, spriteKey);
+      // 적: 48x48 → 28px, 보스: 84x84 → 40px
+      const targetSize = isBoss ? 40 : 28;
+      const texW = sprite.width;
+      const scale = targetSize / texW;
+      sprite.setScale(scale);
+      this.add(sprite);
+      this._bodySprite = sprite;
+    } else {
+      // ── 도형 fallback ──
+      this._buildShapeFallback(data, color, id);
+    }
+
+    // HP 바 (스프라이트/도형 공통)
+    const hpBarY = isBoss ? -24 : -18;
+    this.hpBarBg = this.scene.add.rectangle(0, hpBarY, 26, 3, 0x333333);
+    this.add(this.hpBarBg);
+    this.hpBar = this.scene.add.rectangle(-13, hpBarY, 26, 3, 0x44ff44);
+    this.hpBar.setOrigin(0, 0.5);
+    this.add(this.hpBar);
+
+    // 신선도 바
+    const freshBarY = hpBarY - 5;
+    this.freshBg = this.scene.add.rectangle(0, freshBarY, 26, 2, 0x222222);
+    this.add(this.freshBg);
+    this.freshBar = this.scene.add.rectangle(-13, freshBarY, 26, 2, 0x00ff88);
+    this.freshBar.setOrigin(0, 0.5);
+    this.add(this.freshBar);
+  }
+
+  /**
+   * 도형 기반 fallback 비주얼 (스프라이트 미로드 시).
+   * @param {object} data
+   * @param {number} color
+   * @param {string} id
+   * @private
+   */
+  _buildShapeFallback(data, color, id) {
     // 몸체
-    if (id === 'pasta_boss' || id === 'dragon_ramen') {
-      // 보스: 40×40 사각형
+    if (id === 'pasta_boss' || id === 'dragon_ramen'
+        || id === 'seafood_kraken' || id === 'lava_dessert_golem') {
       const body = this.scene.add.rectangle(0, 0, 40, 40, color);
       this.add(body);
     } else if (id === 'cheese_golem') {
-      // 골렘: 큰 사각형
       const body = this.scene.add.rectangle(0, 0, 28, 28, color);
       this.add(body);
     } else if (id === 'fish_knight') {
-      // 생선 기사: 파란색 사각형 몸(26x26)
       const body = this.scene.add.rectangle(0, 0, 26, 26, color);
       this.add(body);
-    } else if (id === 'mushroom_scout') {
-      // 버섯 정찰병: 갈색 작은 원
-      const body = this.scene.add.circle(0, 0, 10, color);
-      this.add(body);
-    } else if (id === 'cheese_rat') {
-      // 치즈 쥐: 작은 몸
+    } else if (id === 'mushroom_scout' || id === 'cheese_rat') {
       const body = this.scene.add.circle(0, 0, 10, color);
       this.add(body);
     } else {
-      // 기본: 원형
       const body = this.scene.add.circle(0, 0, id === 'meat_ogre' ? 18 : 14, color);
       this.add(body);
     }
@@ -119,113 +159,6 @@ export class Enemy extends Phaser.GameObjects.Container {
     const eye2 = this.scene.add.circle(4, -3, 2.5, 0xffffff);
     this.add(eye1);
     this.add(eye2);
-
-    // 타입별 장식
-    if (id === 'carrot_goblin') {
-      const leaf = this.scene.add.triangle(0, -18, -4, 0, 4, 0, 0, -8, 0x228b22);
-      this.add(leaf);
-    } else if (id === 'octopus_mage') {
-      // 촉수 3개
-      for (let i = -1; i <= 1; i++) {
-        const t = this.scene.add.rectangle(i * 6, 12, 3, 8, 0x7b68ee);
-        this.add(t);
-      }
-      // 마법사 모자
-      const hat = this.scene.add.triangle(0, -18, -6, 0, 6, 0, 0, -10, 0x4b0082);
-      this.add(hat);
-    } else if (id === 'chili_demon') {
-      // 뿔 2개
-      const horn1 = this.scene.add.triangle(-6, -16, -2, 0, 2, 0, 0, -8, 0xff0000);
-      const horn2 = this.scene.add.triangle(6, -16, -2, 0, 2, 0, 0, -8, 0xff0000);
-      this.add(horn1);
-      this.add(horn2);
-    } else if (id === 'cheese_golem') {
-      // 치즈 구멍 표시
-      const hole1 = this.scene.add.circle(-4, 2, 3, 0xdaa520);
-      const hole2 = this.scene.add.circle(6, -4, 2, 0xdaa520);
-      this.add(hole1);
-      this.add(hole2);
-    } else if (id === 'flour_ghost') {
-      // 유령 꼬리 (아래쪽 물결)
-      const tail1 = this.scene.add.triangle(-5, 14, -3, 0, 3, 0, 0, 6, 0xfaebd7);
-      const tail2 = this.scene.add.triangle(5, 14, -3, 0, 3, 0, 0, 6, 0xfaebd7);
-      this.add(tail1);
-      this.add(tail2);
-    } else if (id === 'egg_sprite') {
-      // 달걀 요정: 날개 + 후광
-      const wing1 = this.scene.add.triangle(-12, -4, 0, -5, 0, 5, -8, 0, 0xffffcc);
-      const wing2 = this.scene.add.triangle(12, -4, 0, -5, 0, 5, 8, 0, 0xffffcc);
-      this.add(wing1);
-      this.add(wing2);
-    } else if (id === 'rice_slime') {
-      // 밥 슬라임: 반짝이는 입자 표시
-      const grain1 = this.scene.add.circle(-3, 5, 2, 0xeeeeee);
-      const grain2 = this.scene.add.circle(4, 3, 2, 0xeeeeee);
-      const grain3 = this.scene.add.circle(0, 8, 2, 0xeeeeee);
-      this.add(grain1);
-      this.add(grain2);
-      this.add(grain3);
-    } else if (id === 'pasta_boss') {
-      // 보스: 면발 장식
-      for (let i = -2; i <= 2; i++) {
-        const noodle = this.scene.add.rectangle(i * 6, 20, 2, 12, 0xffd700);
-        this.add(noodle);
-      }
-      const crown = this.scene.add.triangle(0, -24, -8, 0, 8, 0, 0, -10, 0xffaa00);
-      this.add(crown);
-    } else if (id === 'fish_knight') {
-      // 생선 기사: 전면 방패 (좌측 작은 사각형)
-      const shield = this.scene.add.rectangle(-16, 0, 6, 20, 0x2266aa);
-      this.add(shield);
-      // 꼬리 지느러미
-      const fin = this.scene.add.triangle(14, -2, 0, -6, 0, 6, 8, 0, 0x66aadd);
-      this.add(fin);
-    } else if (id === 'mushroom_scout') {
-      // 버섯 정찰병: 버섯 갓 (반원 표현 = 넓은 삼각형)
-      const cap = this.scene.add.triangle(0, -12, -12, 0, 12, 0, 0, -10, 0x5a3d0a);
-      this.add(cap);
-      // 포자 점
-      const sp1 = this.scene.add.circle(-4, -10, 1.5, 0xccaa44);
-      const sp2 = this.scene.add.circle(3, -8, 1.5, 0xccaa44);
-      this.add(sp1);
-      this.add(sp2);
-    } else if (id === 'cheese_rat') {
-      // 치즈 쥐: 삼각형 귀 2개
-      const ear1 = this.scene.add.triangle(-6, -12, -3, 0, 3, 0, 0, -7, 0xffdd66);
-      const ear2 = this.scene.add.triangle(6, -12, -3, 0, 3, 0, 0, -7, 0xffdd66);
-      this.add(ear1);
-      this.add(ear2);
-      // 꼬리
-      const tail = this.scene.add.rectangle(0, 14, 2, 10, 0xffaa22);
-      this.add(tail);
-    } else if (id === 'dragon_ramen') {
-      // 용 라멘 보스: 면발 장식 + 왕관
-      for (let i = -2; i <= 2; i++) {
-        const noodle = this.scene.add.rectangle(i * 7, 22, 3, 14, 0xffcc88);
-        this.add(noodle);
-      }
-      const dragonCrown = this.scene.add.triangle(0, -26, -10, 0, 10, 0, 0, -12, 0xffaa00);
-      this.add(dragonCrown);
-      // 뿔 2개 (용)
-      const dhorn1 = this.scene.add.triangle(-10, -22, -2, 0, 2, 0, 0, -10, 0xcc2222);
-      const dhorn2 = this.scene.add.triangle(10, -22, -2, 0, 2, 0, 0, -10, 0xcc2222);
-      this.add(dhorn1);
-      this.add(dhorn2);
-    }
-
-    // HP 바
-    this.hpBarBg = this.scene.add.rectangle(0, -22, 26, 3, 0x333333);
-    this.add(this.hpBarBg);
-    this.hpBar = this.scene.add.rectangle(-13, -22, 26, 3, 0x44ff44);
-    this.hpBar.setOrigin(0, 0.5);
-    this.add(this.hpBar);
-
-    // 신선도 바
-    this.freshBg = this.scene.add.rectangle(0, -27, 26, 2, 0x222222);
-    this.add(this.freshBg);
-    this.freshBar = this.scene.add.rectangle(-13, -27, 26, 2, 0x00ff88);
-    this.freshBar.setOrigin(0, 0.5);
-    this.add(this.freshBar);
   }
 
   /**

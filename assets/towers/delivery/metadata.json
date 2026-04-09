@@ -1,0 +1,26 @@
+{
+  "character": {
+    "id": "e614df62-ed99-48e5-8c65-f0106c700fe1",
+    "name": "Delivery Tower",
+    "prompt": "delivery robot, cute green wheeled robot with tray, food carrier helper, friendly kitchen assistant",
+    "size": {
+      "width": 68,
+      "height": 68
+    },
+    "template_id": "mannequin",
+    "directions": 4,
+    "view": "side",
+    "created_at": "2026-04-09T11:31:27.168991+00:00"
+  },
+  "frames": {
+    "rotations": {
+      "south": "rotations/south.png",
+      "west": "rotations/west.png",
+      "east": "rotations/east.png",
+      "north": "rotations/north.png"
+    },
+    "animations": {}
+  },
+  "export_version": "2.0",
+  "export_date": "2026-04-09T11:50:12.549171"
+}
