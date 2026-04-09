@@ -16,6 +16,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    open: true,
+    host: true,  // 0.0.0.0 바인딩 — 로컬 네트워크 외부 접근 허용
+    open: false,
   },
 });

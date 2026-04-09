@@ -3,3 +3,8 @@ dist/
 test-results/
 playwright-report/
 .env
+
+# Android 빌드 산출물 (keystore는 추적)
+android/app/build/
+android/.gradle/
+android/build/

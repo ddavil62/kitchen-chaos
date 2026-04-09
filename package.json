@@ -7,12 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "playwright test"
+    "test": "playwright test",
+    "cap:sync": "cap sync",
+    "cap:android": "cap open android"
   },
   "dependencies": {
     "phaser": "^3.87.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
     "@playwright/test": "^1.58.2",
     "vite": "^6.1.0"
   }

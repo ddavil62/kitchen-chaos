@@ -1,0 +1,70 @@
+name: Build APK & AAB
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:  # 수동 실행 가능
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Verify keystore
+        run: keytool -list -keystore android/release.keystore -storepass kitchenchaos123 -alias kitchenchaos 2>&1 | head -3
+
+      - name: Build release APK & AAB
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleRelease bundleRelease
+
+      - name: Upload APK & AAB to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dev-${{ github.run_number }}
+          name: "Dev Build #${{ github.run_number }}"
+          body: |
+            자동 빌드 - `${{ github.sha }}` 커밋
+            ```
+            ${{ github.event.head_commit.message }}
+            ```
+          files: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/bundle/release/app-release.aab
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Telegram (build success)
+        if: success() && env.TELEGRAM_BOT_TOKEN != ''
+        run: |
+          COMMIT_MSG=$(echo '${{ github.event.head_commit.message }}' | head -1 | sed 's/[\"\\]//g')
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{\"chat_id\":\"${TELEGRAM_CHAT_ID}\",\"text\":\"🍳 <b>kitchen-chaos</b> 빌드 성공! (Dev #${{ github.run_number }})\n📝 ${COMMIT_MSG}\",\"parse_mode\":\"HTML\"}"
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
