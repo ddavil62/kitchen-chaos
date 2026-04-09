@@ -3,10 +3,11 @@
  * Phase 7-2: 장보기(MarketScene)에서 수집한 재료로 레스토랑을 영업한다.
  * Phase 8-3: 동적 테이블 석수, 테이블 등급, 인테리어 글로벌 버프 반영.
  * Phase 8-4: 직원 시스템 — 세척 대기시간, 자동 서빙, 직원 아이콘 표시.
+ * Phase 8-5: 특수 손님 5종(일반/VIP/미식가/급한/단체) + 영업 이벤트 4종.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
- *   0~40     HUD (골드, 영업시간, 만족도)
+ *   0~40     HUD (골드, 영업시간, 만족도, 활성 이벤트)
  *   40~280   홀 영역 (테이블 4~8석, 동적 2행 x 2~4열)
  *   280~340  조리 슬롯 (2개)
  *   340~440  재료 재고 표시
@@ -72,6 +73,93 @@ const FLOWER_PATIENCE_BONUS = [0, 0.05, 0.10, 0.16, 0.22, 0.30];
 const KITCHEN_COOK_BONUS = [0, 0.05, 0.10, 0.16, 0.22, 0.30];
 /** 고급 조명: 팁 보너스 (Lv0~5) */
 const LIGHTING_TIP_BONUS = [0, 0.08, 0.16, 0.25, 0.35, 0.50];
+
+// ── 특수 손님 설정 (Phase 8-5) ──
+
+/** 손님 유형별 아이콘 */
+const CUSTOMER_TYPE_ICONS = {
+  normal: '\uD83D\uDE0A',   // 😊
+  vip: '\uD83D\uDC51',      // 👑
+  gourmet: '\uD83E\uDDD0',  // 🧐
+  rushed: '\uD83D\uDE30',   // 😰
+  group: '\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67\u200D\uD83D\uDC66', // 👨‍👩‍👧‍👦
+};
+
+/** 손님 유형별 인내심 배율 */
+const CUSTOMER_PATIENCE_MULT = {
+  normal: 1.0,
+  vip: 0.7,
+  gourmet: 1.0,
+  rushed: 0.4,
+  group: 1.2,
+};
+
+/** 손님 유형별 보상 배율 */
+const CUSTOMER_REWARD_MULT = {
+  normal: 1.0,
+  vip: 1.8,
+  gourmet: 1.8,
+  rushed: 2.5,
+  group: 2.0,
+};
+
+/**
+ * 장(chapter)별 특수 손님 출현 확률.
+ * 키: 장 번호(1~3), 값: { type: 확률 }
+ * 확률은 순서대로 적용 (앞 유형에 해당되면 뒤 유형은 스킵)
+ */
+const SPECIAL_CUSTOMER_RATES = {
+  1: { vip: 0.10, gourmet: 0, rushed: 0, group: 0 },
+  2: { vip: 0.15, gourmet: 0.05, rushed: 0.05, group: 0 },
+  3: { vip: 0.15, gourmet: 0.10, rushed: 0.08, group: 0.05 },
+};
+
+// ── 영업 이벤트 설정 (Phase 8-5) ──
+
+/** 이벤트 유형 정의 */
+const SERVICE_EVENT_TYPES = {
+  happy_hour: {
+    type: 'happy_hour',
+    icon: '\uD83C\uDF89',   // 🎉
+    nameKo: '해피아워',
+    messageKo: '\uD83C\uDF89 해피아워! 손님이 몰려옵니다!',
+    bannerColor: 0xddaa00,
+    duration: 30,
+  },
+  rainy_day: {
+    type: 'rainy_day',
+    icon: '\uD83C\uDF27\uFE0F', // 🌧️
+    nameKo: '비 오는 날',
+    messageKo: '\uD83C\uDF27\uFE0F 비 오는 날... 한가하지만 여유롭게',
+    bannerColor: 0x3366aa,
+    duration: 45,
+  },
+  food_review: {
+    type: 'food_review',
+    icon: '\u2B50',          // ⭐
+    nameKo: '맛집 리뷰',
+    messageKo: '\u2B50 맛집 리뷰 게재! VIP가 몰려옵니다!',
+    bannerColor: 0x8844aa,
+    duration: -1, // 시간이 아닌 서빙 5명 카운트 기반
+  },
+  kitchen_accident: {
+    type: 'kitchen_accident',
+    icon: '\uD83D\uDD25',   // 🔥
+    nameKo: '주방 사고',
+    messageKo: '\uD83D\uDD25 주방 사고! 조리 슬롯 1개 사용 불가!',
+    bannerColor: 0xcc2222,
+    duration: 30,
+  },
+};
+
+/** 이벤트 최초 발생 대기시간 (초) */
+const EVENT_START_DELAY = 60;
+/** 이벤트 발생 최소 간격 (초) */
+const EVENT_MIN_INTERVAL = 45;
+/** 영업 중 최대 이벤트 발생 횟수 */
+const EVENT_MAX_COUNT = 2;
+/** 이벤트 배너 표시 시간 (초) */
+const EVENT_BANNER_DURATION = 3;
 
 export class ServiceScene extends Phaser.Scene {
   constructor() {
@@ -159,6 +247,26 @@ export class ServiceScene extends Phaser.Scene {
     /** 자동 서빙 타이머 (ms) — ready 요리가 있으면 카운트다운 */
     this.autoServeTimer = 0;
 
+    // ── Phase 8-5: 특수 손님 시스템 ──
+    /** 현재 장 번호 (stageId '1-1' → 1, '3-4' → 3) */
+    this.chapter = parseInt(this.stageId.split('-')[0], 10) || 1;
+    /** 장별 특수 손님 출현 확률 테이블 */
+    this.specialRates = SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[1];
+
+    // ── Phase 8-5: 영업 이벤트 시스템 ──
+    /** @type {{ type: string, timeLeft: number, data: object }|null} */
+    this.activeEvent = null;
+    /** 이벤트 발생 횟수 */
+    this.eventCount = 0;
+    /** 다음 이벤트 발생까지 남은 시간 (초) */
+    this.eventCooldown = 0;
+    /** 최초 이벤트 발생 대기시간 (초) */
+    this.eventStartDelay = EVENT_START_DELAY;
+    /** 맛집 리뷰 이벤트 시 남은 VIP 강제 수 */
+    this.foodReviewRemaining = 0;
+    /** 주방 사고로 비활성화된 조리 슬롯 인덱스 (-1이면 없음) */
+    this.accidentSlotIdx = -1;
+
     // ── 해금된 서빙 레시피 목록 ──
     this.availableRecipes = ALL_SERVING_RECIPES.filter(r => RecipeManager.isUnlocked(r.id));
 
@@ -199,6 +307,11 @@ export class ServiceScene extends Phaser.Scene {
     this.comboText = this.add.text(GAME_WIDTH / 2, 26, '', {
       fontSize: '11px', color: '#ffcc00', fontStyle: 'bold',
     }).setOrigin(0.5, 0).setDepth(101);
+
+    // Phase 8-5: 활성 이벤트 아이콘 + 남은 시간 표시
+    this.eventHudText = this.add.text(GAME_WIDTH - 10, 26, '', {
+      fontSize: '10px', color: '#ffffff', fontStyle: 'bold',
+    }).setOrigin(1, 0).setDepth(101);
   }
 
   /** @private */
@@ -212,6 +325,19 @@ export class ServiceScene extends Phaser.Scene {
       this.comboText.setText(`\uCF64\uBCF4 x${this.comboCount}`);
     } else {
       this.comboText.setText('');
+    }
+
+    // Phase 8-5: 활성 이벤트 HUD 표시
+    if (this.activeEvent) {
+      const evtDef = SERVICE_EVENT_TYPES[this.activeEvent.type];
+      if (this.activeEvent.type === 'food_review') {
+        this.eventHudText.setText(`${evtDef.icon} ${this.foodReviewRemaining}\uBA85`);
+      } else {
+        const remain = Math.ceil(this.activeEvent.timeLeft);
+        this.eventHudText.setText(`${evtDef.icon} ${remain}\uCD08`);
+      }
+    } else {
+      this.eventHudText.setText('');
     }
   }
 
@@ -357,8 +483,11 @@ export class ServiceScene extends Phaser.Scene {
 
     statusText.setVisible(false);
 
-    // 손님 아이콘
-    custIcon.setText(cust.vip ? '\uD83D\uDC51' : '\uD83D\uDE0A').setVisible(true);
+    // 손님 아이콘 — Phase 8-5: customerType 기반
+    const typeIcon = CUSTOMER_TYPE_ICONS[cust.customerType] || CUSTOMER_TYPE_ICONS.normal;
+    // 단체 손님 부분 서빙 완료 시 체크마크 표시
+    const servedMark = (cust.customerType === 'group' && cust.groupServed) ? '\u2705' : '';
+    custIcon.setText(servedMark || typeIcon).setVisible(true);
 
     // 말풍선 — 요리 이름
     const recipe = RECIPE_MAP[cust.dish];
@@ -436,6 +565,13 @@ export class ServiceScene extends Phaser.Scene {
     const label = container.getData('label');
     const progFill = container.getData('progFill');
     const progWidth = container.getData('progWidth');
+
+    // Phase 8-5: 주방 사고로 비활성화된 슬롯
+    if (idx === this.accidentSlotIdx) {
+      label.setText('\uD83D\uDD25 \uC0AC\uC6A9 \uBD88\uAC00').setColor('#ff4444');
+      progFill.setScale(0, 1).setFillStyle(0xff4444);
+      return;
+    }
 
     // 세척 중 상태
     if (slot.washing) {
@@ -694,6 +830,9 @@ export class ServiceScene extends Phaser.Scene {
       this._updateAutoServe(delta);
     }
 
+    // Phase 8-5: 영업 이벤트 시스템 업데이트
+    this._updateEvents(dt);
+
     // 재료 소진 체크 — Phase 8-4: 세척 중인 슬롯도 "진행 중"으로 간주
     if (this._isAllStockEmpty() && !this._hasCookingInProgress() && !this._hasReadyDish() && !this._hasWashingSlot()) {
       this._endService('stock');
@@ -707,6 +846,8 @@ export class ServiceScene extends Phaser.Scene {
   // ── 손님 스폰 ─────────────────────────────────────────────────────
 
   /**
+   * 손님 스폰 타이머 관리.
+   * Phase 8-5: 해피아워(간격 /2), 비 오는 날(간격 ×2) 이벤트 반영.
    * @param {number} dt - 초
    * @private
    */
@@ -714,39 +855,110 @@ export class ServiceScene extends Phaser.Scene {
     if (this.customersSpawned >= this.serviceConfig.maxCustomers) return;
 
     this.customerSpawnTimer += dt;
-    if (this.customerSpawnTimer >= this.serviceConfig.customerInterval) {
-      this.customerSpawnTimer -= this.serviceConfig.customerInterval;
+
+    // Phase 8-5: 이벤트에 따른 스폰 간격 조정
+    let interval = this.serviceConfig.customerInterval;
+    if (this.activeEvent) {
+      if (this.activeEvent.type === 'happy_hour') {
+        interval /= 2; // 2배 빈도
+      } else if (this.activeEvent.type === 'rainy_day') {
+        interval *= 2; // 50% 감소
+      }
+    }
+
+    if (this.customerSpawnTimer >= interval) {
+      this.customerSpawnTimer -= interval;
       this._spawnCustomer();
     }
   }
 
-  /** @private */
+  /**
+   * 손님 생성.
+   * Phase 8-5: 특수 손님 시스템 (normal/vip/gourmet/rushed/group).
+   * @private
+   */
   _spawnCustomer() {
-    // 빈 테이블 찾기
-    const emptyIdx = this.tables.findIndex(t => t === null);
-    if (emptyIdx === -1) return; // 만석
+    // 빈 테이블 목록 수집
+    const emptyIndices = [];
+    for (let i = 0; i < this.tableCount; i++) {
+      if (this.tables[i] === null) emptyIndices.push(i);
+    }
+    if (emptyIndices.length === 0) return; // 만석
 
-    // 주문 메뉴 결정: 해금된 서빙 레시피 중 현재 재고로 만들 수 있는 것 우선
-    const possibleRecipes = this.availableRecipes.filter(r =>
-      this.inventoryManager.hasEnough(r.ingredients)
-    );
+    // ── Phase 8-5: 손님 유형 결정 ──
+    let customerType = this._determineCustomerType(emptyIndices);
 
-    // 재고로 만들 수 있는 게 없으면 해금된 레시피 중 아무거나 (손님은 재고 무관하게 주문함)
-    const pool = possibleRecipes.length > 0 ? possibleRecipes : this.availableRecipes;
-    if (pool.length === 0) return;
+    // 단체 손님: 빈 테이블 2개 이상 필요
+    if (customerType === 'group' && emptyIndices.length < 2) {
+      customerType = 'normal';
+    }
 
-    const recipe = pool[Math.floor(Math.random() * pool.length)];
+    // 단체 손님 처리
+    if (customerType === 'group') {
+      this._spawnGroupCustomer(emptyIndices);
+      return;
+    }
 
-    // ── Phase 8-3: 인내심 계산에 테이블 등급 + 인테리어 보너스 적용 ──
+    // 일반/VIP/미식가/급한 손님 공통 스폰
+    const emptyIdx = emptyIndices[0];
+    this._spawnSingleCustomer(emptyIdx, customerType);
+  }
+
+  /**
+   * 손님 유형 결정 (장별 확률 기반).
+   * 맛집 리뷰 이벤트 활성 시 VIP 강제.
+   * @param {number[]} emptyIndices - 빈 테이블 인덱스 목록
+   * @returns {string} customerType
+   * @private
+   */
+  _determineCustomerType(emptyIndices) {
+    // 맛집 리뷰 이벤트: 남은 VIP 강제 카운트가 있으면 VIP
+    if (this.foodReviewRemaining > 0) {
+      return 'vip';
+    }
+
+    const roll = Math.random();
+    let threshold = 0;
+
+    // 순서: vip → gourmet → rushed → group
+    threshold += this.specialRates.vip;
+    if (roll < threshold) return 'vip';
+
+    threshold += this.specialRates.gourmet;
+    if (roll < threshold) return 'gourmet';
+
+    threshold += this.specialRates.rushed;
+    if (roll < threshold) return 'rushed';
+
+    threshold += this.specialRates.group;
+    if (roll < threshold && emptyIndices.length >= 2) return 'group';
+
+    return 'normal';
+  }
+
+  /**
+   * 단일 손님 스폰 (일반/VIP/미식가/급한).
+   * @param {number} tableIdx - 배정할 테이블 인덱스
+   * @param {string} customerType - 손님 유형
+   * @private
+   */
+  _spawnSingleCustomer(tableIdx, customerType) {
+    // 레시피 풀 결정
+    const recipe = this._pickRecipeForType(customerType);
+    if (!recipe) return;
+
+    // ── 인내심 계산: 기본 * 셰프 * (1 + 테이블 + 인테리어) * 유형 배율 * 이벤트 ──
     const chefPatienceBonus = ChefManager.getPatienceBonus();
-    const tableGrade = this.tableUpgrades[emptyIdx] || 0;
+    const tableGrade = this.tableUpgrades[tableIdx] || 0;
     const tablePatienceBonus = TABLE_PATIENCE_BONUS[tableGrade];
     const interiorPatienceBonus = FLOWER_PATIENCE_BONUS[this.interiorFlower] || 0;
     const basePat = this.serviceConfig.customerPatience * 1000; // ms
-    const isVip = Math.random() < 0.15; // 15% VIP 확률
+    const typeMult = CUSTOMER_PATIENCE_MULT[customerType] || 1.0;
 
-    // 인내심 = 기본 * 셰프보너스 * (1 + 테이블보너스 + 인테리어보너스) * VIP감소
-    const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * (isVip ? 0.7 : 1);
+    // 비 오는 날 이벤트: 인내심 +50%
+    const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
+
+    const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * typeMult * eventPatienceMult;
 
     const customer = {
       dish: recipe.id,
@@ -755,18 +967,131 @@ export class ServiceScene extends Phaser.Scene {
       maxPatience: totalPatience,
       baseReward: recipe.baseReward,
       tipMultiplier: 1.5,
-      vip: isVip,
-      tableIdx: emptyIdx,  // 배정된 테이블 인덱스 저장
+      vip: customerType === 'vip',
+      customerType: customerType,
+      tableIdx: tableIdx,
+      groupPairIdx: -1, // 단체가 아니면 -1
     };
 
-    this.tables[emptyIdx] = customer;
+    this.tables[tableIdx] = customer;
     this.customersSpawned++;
     this.totalCustomers++;
 
-    this._updateTableUI(emptyIdx);
+    // 맛집 리뷰 VIP 카운트 감소
+    if (this.foodReviewRemaining > 0 && customerType === 'vip') {
+      this.foodReviewRemaining--;
+      if (this.foodReviewRemaining <= 0) {
+        this._endEvent();
+      }
+    }
 
-    // 입장 이펙트
-    const cont = this.tableContainers[emptyIdx];
+    this._updateTableUI(tableIdx);
+    this._playEntranceEffect(tableIdx);
+  }
+
+  /**
+   * 단체 손님 스폰 (테이블 2석 점유, 주문 2개 동시).
+   * @param {number[]} emptyIndices - 빈 테이블 인덱스 목록 (2개 이상 보장)
+   * @private
+   */
+  _spawnGroupCustomer(emptyIndices) {
+    const idx1 = emptyIndices[0];
+    const idx2 = emptyIndices[1];
+
+    // 각각 다른 레시피 주문
+    const recipe1 = this._pickRecipeForType('group');
+    let recipe2 = this._pickRecipeForType('group');
+    // 가능하면 다른 레시피 (3번까지 시도)
+    for (let attempt = 0; attempt < 3 && recipe2 && recipe2.id === recipe1.id; attempt++) {
+      recipe2 = this._pickRecipeForType('group');
+    }
+    if (!recipe1 || !recipe2) return;
+
+    // 인내심 계산 (두 테이블 중 낮은 등급 기준, 배율 ×1.2)
+    const chefPatienceBonus = ChefManager.getPatienceBonus();
+    const grade1 = this.tableUpgrades[idx1] || 0;
+    const grade2 = this.tableUpgrades[idx2] || 0;
+    const minGrade = Math.min(grade1, grade2);
+    const tablePatienceBonus = TABLE_PATIENCE_BONUS[minGrade];
+    const interiorPatienceBonus = FLOWER_PATIENCE_BONUS[this.interiorFlower] || 0;
+    const basePat = this.serviceConfig.customerPatience * 1000;
+    const typeMult = CUSTOMER_PATIENCE_MULT.group;
+    const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
+
+    const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * typeMult * eventPatienceMult;
+
+    // 두 손님이 인내심을 공유 (동일 참조)
+    const sharedPatience = { value: totalPatience, max: totalPatience };
+
+    const createGroupMember = (tableIdx, recipe, pairIdx) => ({
+      dish: recipe.id,
+      recipe: recipe,
+      patience: totalPatience,
+      maxPatience: totalPatience,
+      baseReward: recipe.baseReward,
+      tipMultiplier: 1.5,
+      vip: false,
+      customerType: 'group',
+      tableIdx: tableIdx,
+      groupPairIdx: pairIdx,
+      groupServed: false,      // 이 좌석의 서빙 완료 여부
+      sharedPatience: sharedPatience, // 인내심 공유 참조
+    });
+
+    this.tables[idx1] = createGroupMember(idx1, recipe1, idx2);
+    this.tables[idx2] = createGroupMember(idx2, recipe2, idx1);
+
+    this.customersSpawned += 2;
+    this.totalCustomers += 2;
+
+    this._updateTableUI(idx1);
+    this._updateTableUI(idx2);
+    this._playEntranceEffect(idx1);
+    this._playEntranceEffect(idx2);
+  }
+
+  /**
+   * 손님 유형에 맞는 레시피 선택.
+   * 미식가: tier >= 3인 레시피만.
+   * @param {string} customerType
+   * @returns {object|null}
+   * @private
+   */
+  _pickRecipeForType(customerType) {
+    let pool;
+
+    if (customerType === 'gourmet') {
+      // 미식가: ★★★ 이상만 주문
+      const highTierAll = this.availableRecipes.filter(r => r.tier >= 3);
+      if (highTierAll.length === 0) {
+        // tier 3 이상 레시피가 없으면 일반 풀 사용
+        pool = this.availableRecipes;
+      } else {
+        // 재고로 만들 수 있는 것 우선
+        const highTierPossible = highTierAll.filter(r =>
+          this.inventoryManager.hasEnough(r.ingredients)
+        );
+        pool = highTierPossible.length > 0 ? highTierPossible : highTierAll;
+      }
+    } else {
+      // 일반/VIP/급한/단체: 재고 가능한 것 우선, 없으면 아무거나
+      const possibleRecipes = this.availableRecipes.filter(r =>
+        this.inventoryManager.hasEnough(r.ingredients)
+      );
+      pool = possibleRecipes.length > 0 ? possibleRecipes : this.availableRecipes;
+    }
+
+    if (pool.length === 0) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  /**
+   * 손님 입장 이펙트.
+   * @param {number} tableIdx
+   * @private
+   */
+  _playEntranceEffect(tableIdx) {
+    const cont = this.tableContainers[tableIdx];
     this.tweens.add({
       targets: cont,
       scaleX: { from: 0.8, to: 1 },
@@ -779,26 +1104,60 @@ export class ServiceScene extends Phaser.Scene {
   // ── 손님 인내심 ───────────────────────────────────────────────────
 
   /**
+   * 손님 인내심 감소 처리.
+   * Phase 8-5: 단체 손님 인내심 공유 + 급한 손님 퇴장 시 추가 페널티.
    * @param {number} delta - ms
    * @private
    */
   _updateCustomerPatience(delta) {
+    // 단체 손님 인내심 공유: sharedPatience.value를 한 번만 감소시키기 위해 처리된 쌍 추적
+    const processedGroupPairs = new Set();
+
     for (let i = 0; i < this.tableCount; i++) {
       const cust = this.tables[i];
       if (!cust) continue;
 
-      cust.patience -= delta;
+      // 단체 손님: sharedPatience 한 번만 감소
+      if (cust.customerType === 'group' && cust.sharedPatience) {
+        const pairKey = Math.min(i, cust.groupPairIdx) + '-' + Math.max(i, cust.groupPairIdx);
+        if (!processedGroupPairs.has(pairKey)) {
+          processedGroupPairs.add(pairKey);
+          cust.sharedPatience.value -= delta;
+        }
+        // 공유 인내심 값을 각 멤버에 동기화
+        cust.patience = cust.sharedPatience.value;
+      } else {
+        cust.patience -= delta;
+      }
+
       this._updateTableUI(i);
 
       if (cust.patience <= 0) {
-        // 손님 퇴장
+        // 기본 만족도 감소
+        let satPenalty = 15;
+
+        // 급한 손님 추가 페널티: -10% 추가
+        if (cust.customerType === 'rushed') {
+          satPenalty += 10;
+        }
+
+        // 단체 손님 퇴장: 짝 테이블도 동시 비우기
+        if (cust.customerType === 'group' && cust.groupPairIdx >= 0) {
+          const pairIdx = cust.groupPairIdx;
+          if (this.tables[pairIdx]) {
+            this.tables[pairIdx] = null;
+            this._updateTableUI(pairIdx);
+            this._showFloatingText(this.tableContainers[pairIdx], '\uD83D\uDE21 퇴장', '#ff4444');
+          }
+        }
+
         this.tables[i] = null;
-        this.satisfaction = Math.max(0, this.satisfaction - 15);
+        this.satisfaction = Math.max(0, this.satisfaction - satPenalty);
         this.comboCount = 0;
         this._updateTableUI(i);
 
         // 퇴장 이펙트
-        this._showFloatingText(this.tableContainers[i], '\uD83D\uDE21 -15%', '#ff4444');
+        this._showFloatingText(this.tableContainers[i], `\uD83D\uDE21 -${satPenalty}%`, '#ff4444');
 
         // 만족도 0% 체크
         if (this.satisfaction <= 0) {
@@ -861,8 +1220,8 @@ export class ServiceScene extends Phaser.Scene {
       return;
     }
 
-    // 빈 조리 슬롯 확인 — Phase 8-4: 세척 중인 슬롯도 사용 불가
-    const emptySlot = this.cookingSlots.findIndex(s => !s.recipe && !s.washing);
+    // 빈 조리 슬롯 확인 — Phase 8-4: 세척 중, Phase 8-5: 사고 슬롯도 사용 불가
+    const emptySlot = this.cookingSlots.findIndex((s, idx) => !s.recipe && !s.washing && idx !== this.accidentSlotIdx);
     if (emptySlot === -1) {
       this._showMessage('\uC870\uB9AC \uC2AC\uB86F\uC774 \uAC00\uB4DD \uCC3C\uC2B5\uB2C8\uB2E4!');
       return;
@@ -902,6 +1261,12 @@ export class ServiceScene extends Phaser.Scene {
     const cust = this.tables[tableIdx];
     if (!cust) return;
 
+    // Phase 8-5: 단체 손님 이미 서빙 완료된 좌석이면 무시
+    if (cust.customerType === 'group' && cust.groupServed) {
+      this._showMessage('\uC774\uBBF8 \uC11C\uBE59 \uC644\uB8CC\uB41C \uC88C\uC11D\uC785\uB2C8\uB2E4');
+      return;
+    }
+
     // 완성된 요리 슬롯 찾기 (해당 주문과 일치)
     const readySlotIdx = this.cookingSlots.findIndex(
       s => s.recipe && s.ready && s.recipe.id === cust.dish
@@ -918,6 +1283,7 @@ export class ServiceScene extends Phaser.Scene {
   /**
    * 서빙 로직 (수동/자동 공통).
    * Phase 8-4: 서빙 완료 후 세척 대기시간 시작.
+   * Phase 8-5: 특수 손님 보상 배율, 미식가 만족도 보너스, 단체 부분 서빙.
    * @param {number} tableIdx - 테이블 인덱스
    * @param {number} slotIdx - 조리 슬롯 인덱스
    * @param {boolean} [isAutoServe=false] - 자동 서빙 여부 (아이콘 애니메이션용)
@@ -945,8 +1311,8 @@ export class ServiceScene extends Phaser.Scene {
     this.comboCount++;
     const comboMult = this._getComboMultiplier();
 
-    // VIP 2배
-    const vipMult = cust.vip ? 2.0 : 1.0;
+    // Phase 8-5: 특수 손님 보상 배율 (VIP 기존 2.0 → customerType 기반)
+    const typeMult = CUSTOMER_REWARD_MULT[cust.customerType] || 1.0;
 
     // 그릴 카테고리 보너스
     const grillBonus = (recipe.category === 'grill') ? ChefManager.getGrillRewardBonus() : 1.0;
@@ -959,14 +1325,19 @@ export class ServiceScene extends Phaser.Scene {
       this.satisfaction = Math.min(100, this.satisfaction + satGain);
     }
 
+    // Phase 8-5: 미식가 서빙 성공 시 만족도 +5% 추가 보너스
+    if (cust.customerType === 'gourmet') {
+      this.satisfaction = Math.min(100, this.satisfaction + 5);
+    }
+
     // ── Phase 8-3: 테이블 팁 배율 + 인테리어 조명 팁 보너스 적용 ──
     const tableGrade = this.tableUpgrades[tableIdx] || 0;
     const tableTipMult = TABLE_TIP_MULTIPLIERS[tableGrade];
     const interiorTipBonus = LIGHTING_TIP_BONUS[this.interiorLighting] || 0;
 
-    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * VIP * 그릴
+    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * 유형배율 * 그릴
     const baseGold = cust.baseReward;
-    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * vipMult * grillBonus);
+    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * typeMult * grillBonus);
 
     this.totalGold += totalGold;
     this.servedCount++;
@@ -983,13 +1354,11 @@ export class ServiceScene extends Phaser.Scene {
     // ── Phase 8-4: 서빙 후 세척 대기시간 시작 ──
     const washTime = this.hasDishwasher ? 0 : WASH_TIME_MS;
     if (washTime > 0) {
-      // 세척 대기시간 발생 — 슬롯이 세척 상태로 전환
       this.cookingSlots[slotIdx] = {
         recipe: null, timeLeft: 0, totalTime: 0, ready: false,
         washing: true, washTimeLeft: washTime,
       };
     } else {
-      // 세척 도우미 보유 — 즉시 빈 슬롯
       this.cookingSlots[slotIdx] = {
         recipe: null, timeLeft: 0, totalTime: 0, ready: false,
         washing: false, washTimeLeft: 0,
@@ -997,9 +1366,26 @@ export class ServiceScene extends Phaser.Scene {
     }
     this._updateCookSlotUI(slotIdx);
 
-    // 테이블 비우기
-    this.tables[tableIdx] = null;
-    this._updateTableUI(tableIdx);
+    // ── Phase 8-5: 단체 손님 부분 서빙 처리 ──
+    if (cust.customerType === 'group' && cust.groupPairIdx >= 0) {
+      cust.groupServed = true;
+      const pairCust = this.tables[cust.groupPairIdx];
+
+      if (pairCust && pairCust.groupServed) {
+        // 짝도 서빙 완료 → 두 테이블 모두 비우기
+        this.tables[tableIdx] = null;
+        this.tables[cust.groupPairIdx] = null;
+        this._updateTableUI(tableIdx);
+        this._updateTableUI(cust.groupPairIdx);
+      } else {
+        // 짝 아직 미서빙 → 이 좌석만 서빙 완료 표시, 테이블은 유지
+        this._updateTableUI(tableIdx);
+      }
+    } else {
+      // 일반/VIP/미식가/급한: 테이블 즉시 비우기
+      this.tables[tableIdx] = null;
+      this._updateTableUI(tableIdx);
+    }
 
     // 서빙 이펙트
     const tipStr = tipGrade > 1 ? ' +\uD301!' : '';
@@ -1112,12 +1498,13 @@ export class ServiceScene extends Phaser.Scene {
       return;
     }
 
-    // 해당 요리를 주문한 손님이 있는지 확인
+    // 해당 요리를 주문한 손님이 있는지 확인 (Phase 8-5: 이미 서빙된 단체 좌석 제외)
     let matchFound = false;
     for (const slotIdx of readySlots) {
       const dishId = this.cookingSlots[slotIdx].recipe.id;
       for (let t = 0; t < this.tableCount; t++) {
-        if (this.tables[t] && this.tables[t].dish === dishId) {
+        const c = this.tables[t];
+        if (c && c.dish === dishId && !(c.customerType === 'group' && c.groupServed)) {
           matchFound = true;
           break;
         }
@@ -1147,7 +1534,8 @@ export class ServiceScene extends Phaser.Scene {
 
       for (let t = 0; t < this.tableCount; t++) {
         const c = this.tables[t];
-        if (c && c.dish === dishId) {
+        // Phase 8-5: 이미 서빙된 단체 좌석 제외
+        if (c && c.dish === dishId && !(c.customerType === 'group' && c.groupServed)) {
           const waited = c.maxPatience - c.patience;
           if (waited > bestWaitTime) {
             bestWaitTime = waited;
@@ -1161,6 +1549,152 @@ export class ServiceScene extends Phaser.Scene {
         break; // 한 번에 1건만 자동 서빙
       }
     }
+  }
+
+  // ── Phase 8-5: 영업 이벤트 시스템 ────────────────────────────────
+
+  /**
+   * 이벤트 시스템 업데이트 (매 프레임).
+   * - eventStartDelay 카운트다운
+   * - eventCooldown 카운트다운
+   * - 조건 충족 시 랜덤 이벤트 발생
+   * - 활성 이벤트 timeLeft 감소, 만료 시 해제
+   * @param {number} dt - 초 단위
+   * @private
+   */
+  _updateEvents(dt) {
+    // 최초 발생 대기시간 카운트다운
+    if (this.eventStartDelay > 0) {
+      this.eventStartDelay -= dt;
+      return;
+    }
+
+    // 활성 이벤트 진행 중
+    if (this.activeEvent) {
+      // 시간 기반 이벤트 카운트다운 (food_review는 서빙 카운트 기반이므로 제외)
+      if (this.activeEvent.type !== 'food_review') {
+        this.activeEvent.timeLeft -= dt;
+        if (this.activeEvent.timeLeft <= 0) {
+          this._endEvent();
+        }
+      }
+      return; // 이벤트 활성 중에는 새 이벤트 발생하지 않음
+    }
+
+    // 쿨다운 카운트다운
+    if (this.eventCooldown > 0) {
+      this.eventCooldown -= dt;
+      return;
+    }
+
+    // 최대 발생 횟수 체크
+    if (this.eventCount >= EVENT_MAX_COUNT) return;
+
+    // 랜덤 이벤트 발생 (매 프레임 5% 확률 — 약 평균 0.33초에 1번 체크)
+    if (Math.random() < 0.05 * dt) {
+      this._triggerRandomEvent();
+    }
+  }
+
+  /**
+   * 랜덤 이벤트 발생.
+   * @private
+   */
+  _triggerRandomEvent() {
+    const types = Object.keys(SERVICE_EVENT_TYPES);
+    const chosen = types[Math.floor(Math.random() * types.length)];
+    const evtDef = SERVICE_EVENT_TYPES[chosen];
+
+    this.eventCount++;
+    this.eventCooldown = EVENT_MIN_INTERVAL;
+
+    // 이벤트 활성화
+    this.activeEvent = {
+      type: chosen,
+      timeLeft: evtDef.duration > 0 ? evtDef.duration : 9999,
+      data: {},
+    };
+
+    // 이벤트별 초기화
+    switch (chosen) {
+      case 'food_review':
+        this.foodReviewRemaining = 5;
+        break;
+      case 'kitchen_accident':
+        this._activateKitchenAccident();
+        break;
+    }
+
+    // 이벤트 배너 표시
+    this._showEventBanner(evtDef);
+  }
+
+  /**
+   * 주방 사고 이벤트: 빈 조리 슬롯 1개를 사용 불가로 설정.
+   * @private
+   */
+  _activateKitchenAccident() {
+    // 빈 슬롯 중 하나를 비활성화 (없으면 첫 번째 슬롯)
+    let targetIdx = this.cookingSlots.findIndex(s => !s.recipe && !s.washing);
+    if (targetIdx === -1) targetIdx = 0;
+    this.accidentSlotIdx = targetIdx;
+  }
+
+  /**
+   * 활성 이벤트 종료 및 효과 해제.
+   * @private
+   */
+  _endEvent() {
+    if (!this.activeEvent) return;
+
+    // 이벤트별 정리
+    switch (this.activeEvent.type) {
+      case 'food_review':
+        this.foodReviewRemaining = 0;
+        break;
+      case 'kitchen_accident':
+        this.accidentSlotIdx = -1;
+        break;
+    }
+
+    this.activeEvent = null;
+  }
+
+  /**
+   * 이벤트 배너 팝업 표시.
+   * 화면 중앙 상단에 배경색 + 아이콘 + 텍스트, 3초 후 페이드아웃.
+   * @param {object} evtDef - SERVICE_EVENT_TYPES 항목
+   * @private
+   */
+  _showEventBanner(evtDef) {
+    const bannerW = GAME_WIDTH - 40;
+    const bannerH = 36;
+    const bannerX = GAME_WIDTH / 2;
+    const bannerY = HUD_H + 30;
+
+    // 배너 배경
+    const bg = this.add.rectangle(bannerX, bannerY, bannerW, bannerH, evtDef.bannerColor, 0.9)
+      .setStrokeStyle(1, 0xffffff)
+      .setDepth(250);
+
+    // 배너 텍스트
+    const text = this.add.text(bannerX, bannerY, evtDef.messageKo, {
+      fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(251);
+
+    // 3초 후 페이드아웃
+    this.time.delayedCall(EVENT_BANNER_DURATION * 1000, () => {
+      this.tweens.add({
+        targets: [bg, text],
+        alpha: 0,
+        duration: 500,
+        onComplete: () => {
+          bg.destroy();
+          text.destroy();
+        },
+      });
+    });
   }
 
   // ── 유틸리티 ──────────────────────────────────────────────────────
@@ -1256,5 +1790,9 @@ export class ServiceScene extends Phaser.Scene {
     this.recipeButtons = [];
     this.tableContainers = [];
     this.cookSlotContainers = [];
+    // Phase 8-5: 이벤트 정리
+    this.activeEvent = null;
+    this.accidentSlotIdx = -1;
+    this.foodReviewRemaining = 0;
   }
 }
