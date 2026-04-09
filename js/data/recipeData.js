@@ -1,10 +1,11 @@
 /**
  * @fileoverview 레시피 컬렉션 데이터.
- * Phase 6: 스타터 12종 + Phase 5 12종 + Phase 6 18종 = 42종. 향후 120종까지 확장 예정.
+ * Phase 8: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 = 66종.
+ * 향후 120종까지 확장 예정.
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
- * - category: 수프, 구이, 볶음, 면파스타, 디저트, 특선
+ * - category: 수프, 구이, 볶음, 면파스타, 디저트, 특선, 버프
  * - tier: 1~5 (★ ~ ★★★★★)
  */
 
@@ -17,6 +18,7 @@ export const RECIPE_CATEGORIES = [
   { id: 'noodle', nameKo: '면', icon: '🍝' },
   { id: 'dessert', nameKo: '디저트', icon: '🍰' },
   { id: 'special', nameKo: '특선', icon: '🌟' },
+  { id: 'buff', nameKo: '버프', icon: '✨' },
 ];
 
 // ── 등급별 테두리 색상 ──
@@ -208,6 +210,118 @@ export const ALL_SERVING_RECIPES = [
     tier: 4, ingredients: { fish: 1, squid: 1, cheese: 1, mushroom: 1 }, baseReward: 120, cookTime: 10000,
     unlockCost: 130, gateStage: '2-3',
   },
+
+  // ── Phase 8 신규 서빙 20종 (3장: 바닷가 씨푸드 바) ──
+
+  // ★ 1성 (4종)
+  {
+    id: 'shrimp_tempura', nameKo: '새우튀김', icon: '🦐', category: 'grill',
+    tier: 1, ingredients: { shrimp: 1 }, baseReward: 22, cookTime: 3000,
+    unlockCost: 12, gateStage: '3-1',
+  },
+  {
+    id: 'tomato_soup', nameKo: '토마토 수프', icon: '🍅', category: 'soup',
+    tier: 1, ingredients: { tomato: 1 }, baseReward: 20, cookTime: 3000,
+    unlockCost: 10, gateStage: '3-1',
+  },
+  {
+    id: 'butter_toast', nameKo: '버터 토스트', icon: '🧈', category: 'dessert',
+    tier: 1, ingredients: { butter: 1, flour: 1 }, baseReward: 25, cookTime: 3000,
+    unlockCost: 14, gateStage: '3-1',
+  },
+  {
+    id: 'tomato_salad', nameKo: '토마토 샐러드', icon: '🍅', category: 'special',
+    tier: 1, ingredients: { tomato: 1, carrot: 1 }, baseReward: 24, cookTime: 3000,
+    unlockCost: 14, gateStage: '3-1',
+  },
+
+  // ★★ 2성 (6종)
+  {
+    id: 'shrimp_fried_rice', nameKo: '새우 볶음밥', icon: '🦐', category: 'fry',
+    tier: 2, ingredients: { shrimp: 1, rice: 1 }, baseReward: 40, cookTime: 4000,
+    unlockCost: 30, gateStage: '3-2',
+  },
+  {
+    id: 'tomato_pasta', nameKo: '토마토 파스타', icon: '🍅', category: 'noodle',
+    tier: 2, ingredients: { tomato: 1, flour: 1 }, baseReward: 42, cookTime: 5000,
+    unlockCost: 32, gateStage: '3-2',
+  },
+  {
+    id: 'butter_shrimp', nameKo: '버터 구이 새우', icon: '🧈', category: 'grill',
+    tier: 2, ingredients: { butter: 1, shrimp: 1 }, baseReward: 45, cookTime: 4000,
+    unlockCost: 35, gateStage: '3-2',
+  },
+  {
+    id: 'tomato_omelette', nameKo: '토마토 오믈렛', icon: '🍅', category: 'fry',
+    tier: 2, ingredients: { tomato: 1, egg: 1 }, baseReward: 38, cookTime: 4000,
+    unlockCost: 28, gateStage: '3-2',
+  },
+  {
+    id: 'butter_mushroom', nameKo: '버터 머쉬룸', icon: '🧈', category: 'grill',
+    tier: 2, ingredients: { butter: 1, mushroom: 1 }, baseReward: 40, cookTime: 4000,
+    unlockCost: 30, gateStage: '3-3',
+  },
+  {
+    id: 'shrimp_sushi', nameKo: '새우 초밥', icon: '🦐', category: 'special',
+    tier: 2, ingredients: { shrimp: 1, rice: 1, fish: 1 }, baseReward: 48, cookTime: 5000,
+    unlockCost: 38, gateStage: '3-3',
+  },
+
+  // ★★★ 3성 (5종)
+  {
+    id: 'seafood_risotto', nameKo: '해산물 리조또', icon: '🦐', category: 'special',
+    tier: 3, ingredients: { shrimp: 1, rice: 1, cheese: 1 }, baseReward: 65, cookTime: 6000,
+    unlockCost: 55, gateStage: '3-4',
+  },
+  {
+    id: 'margherita', nameKo: '마르게리타', icon: '🍅', category: 'special',
+    tier: 3, ingredients: { tomato: 1, cheese: 1, flour: 1 }, baseReward: 60, cookTime: 6000,
+    unlockCost: 50, gateStage: '3-4',
+  },
+  {
+    id: 'butter_cream_pasta', nameKo: '버터 크림 파스타', icon: '🧈', category: 'noodle',
+    tier: 3, ingredients: { butter: 1, flour: 1, cheese: 1 }, baseReward: 62, cookTime: 7000,
+    unlockCost: 55, gateStage: '3-4',
+  },
+  {
+    id: 'tomato_steak', nameKo: '토마토 스테이크', icon: '🍅', category: 'grill',
+    tier: 3, ingredients: { tomato: 1, meat: 1, butter: 1 }, baseReward: 70, cookTime: 7000,
+    unlockCost: 60, gateStage: '3-4',
+  },
+  {
+    id: 'shrimp_gratin', nameKo: '새우 그라탕', icon: '🦐', category: 'grill',
+    tier: 3, ingredients: { shrimp: 1, cheese: 1, butter: 1 }, baseReward: 68, cookTime: 7000,
+    unlockCost: 58, gateStage: '3-5',
+  },
+
+  // ★★★★ 4성 (4종)
+  {
+    id: 'bouillabaisse', nameKo: '부야베스', icon: '🦐', category: 'soup',
+    tier: 4, ingredients: { shrimp: 1, fish: 1, tomato: 1, butter: 1 }, baseReward: 95, cookTime: 9000,
+    unlockCost: 100, gateStage: '3-5',
+  },
+  {
+    id: 'lobster_thermidor', nameKo: '랍스터 테르미도르', icon: '🦐', category: 'special',
+    tier: 4, ingredients: { shrimp: 2, butter: 1, cheese: 1 }, baseReward: 100, cookTime: 10000,
+    unlockCost: 110, gateStage: '3-5',
+  },
+  {
+    id: 'beef_wellington', nameKo: '웰링턴 스테이크', icon: '🥩', category: 'grill',
+    tier: 4, ingredients: { meat: 2, butter: 1, flour: 1 }, baseReward: 105, cookTime: 10000,
+    unlockCost: 115, gateStage: '3-6',
+  },
+  {
+    id: 'seafood_hotpot', nameKo: '해물 전골', icon: '🍲', category: 'soup',
+    tier: 4, ingredients: { shrimp: 1, fish: 1, squid: 1, tomato: 1 }, baseReward: 110, cookTime: 10000,
+    unlockCost: 120, gateStage: '3-6',
+  },
+
+  // ★★★★★ 5성 (1종)
+  {
+    id: 'legendary_fullcourse', nameKo: '전설의 풀코스', icon: '🌟', category: 'special',
+    tier: 5, ingredients: { shrimp: 1, tomato: 1, butter: 1, meat: 1, cheese: 1 }, baseReward: 160, cookTime: 12000,
+    unlockCost: 200, gateStage: '3-6',
+  },
 ];
 
 /**
@@ -284,6 +398,32 @@ export const ALL_BUFF_RECIPES = [
     tier: 2, ingredients: { fish: 2 },
     effectDesc: '공격속도 +35% (50초)', effectType: 'buff_speed', effectValue: 0.35,
     duration: 50000, unlockCost: 50, gateStage: '2-1',
+  },
+
+  // ── Phase 8 신규 버프 4종 (3장: 바닷가 씨푸드 바) ──
+  {
+    id: 'tomato_vitality', nameKo: '토마토 활력 주스', icon: '🍅', category: 'buff',
+    tier: 2, ingredients: { tomato: 1 },
+    effectDesc: '전체 타워 공격속도 +20% (1웨이브)', effectType: 'buff_speed', effectValue: 0.20,
+    duration: 1, durationUnit: 'wave', unlockCost: 35, gateStage: '3-1',
+  },
+  {
+    id: 'shrimp_reflect', nameKo: '새우 반사 소스', icon: '🦐', category: 'buff',
+    tier: 2, ingredients: { shrimp: 1 },
+    effectDesc: '피격 적 반사 피해 15% (1웨이브)', effectType: 'buff_reflect', effectValue: 0.15,
+    duration: 1, durationUnit: 'wave', unlockCost: 40, gateStage: '3-1',
+  },
+  {
+    id: 'butter_lubricant', nameKo: '버터 윤활유', icon: '🧈', category: 'buff',
+    tier: 3, ingredients: { butter: 1, flour: 1 },
+    effectDesc: '배달 로봇 수집 속도 +40% (2웨이브)', effectType: 'buff_collect', effectValue: 0.40,
+    duration: 2, durationUnit: 'wave', unlockCost: 55, gateStage: '3-3',
+  },
+  {
+    id: 'cream_barrier', nameKo: '크림 결계', icon: '🧈', category: 'buff',
+    tier: 3, ingredients: { butter: 1, cheese: 1 },
+    effectDesc: '생명력 -1 방어 (1회)', effectType: 'buff_barrier', effectValue: 1,
+    duration: 1, durationUnit: 'use', unlockCost: 60, gateStage: '3-4',
   },
 ];
 
