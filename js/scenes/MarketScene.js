@@ -951,10 +951,16 @@ export class MarketScene extends Phaser.Scene {
 
     this.cameras.main.fadeOut(600, 100, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('GameOverScene', {
-        score: this.score, isVictory: false,
-        stageId: this.stageId, lives: this.lives,
-        starThresholds: this.stageData?.starThresholds,
+      // 장보기 실패 → ResultScene으로 직접 전환 (영업 건너뜀)
+      this.scene.start('ResultScene', {
+        stageId: this.stageId,
+        marketResult: {
+          totalIngredients: this.inventoryManager.getTotal(),
+          livesRemaining: 0,
+          livesMax: STARTING_LIVES,
+        },
+        serviceResult: null,
+        isMarketFailed: true,
       });
     });
   }
@@ -974,14 +980,20 @@ export class MarketScene extends Phaser.Scene {
     this._showMessage(`\uD83C\uDF89 \uC7AC\uB8CC \uC785\uACE0 \uC644\uB8CC!\n${summary || '\uC7AC\uB8CC \uC5C6\uC74C'}\n\uCD1D ${total}\uAC1C \uC218\uC9D1`, 3000);
 
     this.time.delayedCall(3200, () => {
-      this.cameras.main.fadeOut(600, 0, 100, 0);
+      // 페이드 아웃 전환 연출
+      this.cameras.main.fadeOut(500, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        // Phase 7-2: ServiceScene으로 전환
+        // ServiceScene으로 전환 (marketResult 포함)
         this.scene.start('ServiceScene', {
           inventory: this.inventoryManager.getAll(),
           stageId: this.stageId,
           gold: this.gold,
           lives: this.lives,
+          marketResult: {
+            totalIngredients: total,
+            livesRemaining: this.lives,
+            livesMax: STARTING_LIVES,
+          },
         });
       });
     });

@@ -68,11 +68,20 @@ export class ServiceScene extends Phaser.Scene {
 
     this.marketGold = data.gold || 0;
     this.marketLives = data.lives || 0;
+
+    // 장보기 결과 (ResultScene 전달용)
+    this.marketResult = data.marketResult || {
+      totalIngredients: 0,
+      livesRemaining: this.marketLives,
+      livesMax: 15,
+    };
   }
 
   create() {
     // ── 게임 상태 ──
     this.totalGold = 0;
+    this.tipTotal = 0;
+    this.maxCombo = 0;
     this.satisfaction = 100;
     this.servedCount = 0;
     this.totalCustomers = 0;
@@ -788,6 +797,15 @@ export class ServiceScene extends Phaser.Scene {
     this.totalGold += totalGold;
     this.servedCount++;
 
+    // 팁 추적 (기본 보상 초과분이 팁)
+    const tipAmount = Math.max(0, totalGold - baseGold);
+    this.tipTotal += tipAmount;
+
+    // 최대 콤보 추적
+    if (this.comboCount > this.maxCombo) {
+      this.maxCombo = this.comboCount;
+    }
+
     // 조리 슬롯 비우기
     this.cookingSlots[readySlotIdx] = { recipe: null, timeLeft: 0, totalTime: 0, ready: false };
     this._updateCookSlotUI(readySlotIdx);
@@ -857,19 +875,19 @@ export class ServiceScene extends Phaser.Scene {
     this.time.delayedCall(2500, () => {
       this.cameras.main.fadeOut(600, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        // Phase 7-3에서 ResultScene으로 전환 예정
-        // 현재는 GameOverScene에 결과 데이터 전달
-        this.scene.start('GameOverScene', {
-          isVictory: isVictory,
+        // ResultScene으로 전환 (장보기 + 영업 결과 통합)
+        this.scene.start('ResultScene', {
           stageId: this.stageId,
-          score: this.servedCount,
-          lives: this.marketLives,
-          starThresholds: this.stageData?.starThresholds,
-          // 영업 결과 추가 데이터 (Phase 7-3에서 활용)
-          gold: this.totalGold,
-          satisfaction: this.satisfaction,
-          servedCount: this.servedCount,
-          totalCustomers: this.totalCustomers,
+          marketResult: this.marketResult,
+          serviceResult: {
+            servedCount: this.servedCount,
+            totalCustomers: this.totalCustomers,
+            goldEarned: this.totalGold,
+            tipEarned: this.tipTotal,
+            maxCombo: this.maxCombo,
+            satisfaction: this.satisfaction,
+          },
+          isMarketFailed: false,
         });
       });
     });
