@@ -1,27 +1,31 @@
 /**
  * @fileoverview Kitchen Chaos Defense 전역 설정 상수.
- * Phase 3: 아이소메트릭 다이아몬드 그리드, 듀얼 씬 레이아웃.
+ * Phase 7: MarketScene 풀스크린 레이아웃.
  *
  * 화면 레이아웃 (360×640):
- *   0~50    HUD (GameScene)
- *   50~370  아이소메트릭 맵 그리드 (GameScene) — 다이아몬드 9×8
- *   370~420 타워 선택 바 (GameScene)
- *   420~520 손님 대기존 (RestaurantScene)
- *   520~640 주방 패널 (RestaurantScene)
+ *   0~40    HUD (MarketScene)
+ *   40~480  아이소메트릭 맵 그리드 (MarketScene) — 다이아몬드 9×8, 440px
+ *   480~540 타워 선택 바 (MarketScene)
+ *   540~590 재료 수집 현황 바 (MarketScene)
+ *   590~640 웨이브 컨트롤 (MarketScene)
  */
 
 // ── 화면 크기 ──
 export const GAME_WIDTH = 360;
 export const GAME_HEIGHT = 640;
 
-// ── GameScene 레이아웃 ──
-export const HUD_HEIGHT = 50;
-export const GAME_AREA_Y = HUD_HEIGHT;
-export const GAME_AREA_HEIGHT = 320;
-export const TOWER_BAR_Y = HUD_HEIGHT + GAME_AREA_HEIGHT;  // 370
-export const TOWER_BAR_HEIGHT = 50;
+// ── MarketScene 레이아웃 (Phase 7) ──
+export const HUD_HEIGHT = 40;
+export const GAME_AREA_Y = HUD_HEIGHT;                     // 40
+export const GAME_AREA_HEIGHT = 440;                        // 440px (기존 320 → 440)
+export const TOWER_BAR_Y = HUD_HEIGHT + GAME_AREA_HEIGHT;  // 480
+export const TOWER_BAR_HEIGHT = 60;
+export const INGREDIENT_BAR_Y = TOWER_BAR_Y + TOWER_BAR_HEIGHT; // 540
+export const INGREDIENT_BAR_HEIGHT = 50;                         // 540~590
+export const WAVE_CONTROL_Y = INGREDIENT_BAR_Y + INGREDIENT_BAR_HEIGHT; // 590
+export const WAVE_CONTROL_HEIGHT = 50;                                    // 590~640
 
-// ── RestaurantScene 레이아웃 ──
+// ── RestaurantScene 레이아웃 (하위 호환용, Phase 7-2에서 제거 예정) ──
 export const RESTAURANT_Y = 420;
 export const RESTAURANT_HEIGHT = 220;
 export const CUSTOMER_ZONE_HEIGHT = 100;
@@ -38,8 +42,9 @@ export const HALF_H = CELL_H / 2;   // 12
 
 // 아이소메트릭 원점: 다이아몬드 그리드의 (0,0) 셀 중심
 // 그리드 가로 범위: ORIGIN_X ± max(cols,rows)*HALF_W → 360px에 꽉 맞춤
+// Phase 7: 맵 영역 확대(40~480px=440px)에 맞춰 ORIGIN_Y를 내려 맵 중앙 정렬
 export const ORIGIN_X = 168;
-export const ORIGIN_Y = 120;
+export const ORIGIN_Y = 160;
 
 // 하위 호환: 일부 코드에서 CELL_SIZE를 참조할 수 있음
 export const CELL_SIZE = CELL_W;

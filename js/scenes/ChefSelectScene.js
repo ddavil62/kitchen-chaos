@@ -1,6 +1,7 @@
 /**
  * @fileoverview 셰프 선택 씬.
  * Phase 6: 스테이지 선택 후, 게임 시작 전에 셰프를 고르는 화면.
+ * Phase 7: GameScene → MarketScene 전환에 따라 씬 키 변경.
  * 360x640 레이아웃: 3장의 세로 배치 카드 + "셰프 없이 시작" 버튼.
  */
 
@@ -185,7 +186,7 @@ export class ChefSelectScene extends Phaser.Scene {
 
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('GameScene', { stageId: this.stageId });
+      this.scene.start('MarketScene', { stageId: this.stageId });
     });
   }
 }

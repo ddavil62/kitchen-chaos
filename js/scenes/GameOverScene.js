@@ -90,7 +90,7 @@ export class GameOverScene extends Phaser.Scene {
 
     // 다시하기 버튼
     this._createButton(btnY, '다시 하기', 0xff6b35, () => {
-      this._fadeToScene('GameScene', { stageId: this.stageId });
+      this._fadeToScene('MarketScene', { stageId: this.stageId });
     });
     btnY += 70;
 
@@ -99,7 +99,7 @@ export class GameOverScene extends Phaser.Scene {
       const nextStageId = this._getNextStageId();
       if (nextStageId) {
         this._createButton(btnY, '다음 스테이지 ▶', 0x22aa44, () => {
-          this._fadeToScene('GameScene', { stageId: nextStageId });
+          this._fadeToScene('MarketScene', { stageId: nextStageId });
         });
         btnY += 70;
       }
