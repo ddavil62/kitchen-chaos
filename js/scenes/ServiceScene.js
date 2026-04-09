@@ -197,6 +197,13 @@ export class ServiceScene extends Phaser.Scene {
       livesRemaining: this.marketLives,
       livesMax: 15,
     };
+
+    // ── Phase 11-1: 엔드리스 모드 상태 ──
+    this.isEndless = data.isEndless || false;
+    this.endlessWave = data.endlessWave || 0;
+    this.endlessScore = data.endlessScore || 0;
+    this.endlessMaxCombo = data.endlessMaxCombo || 0;
+    this.dailySpecials = data.dailySpecials || [];
   }
 
   create() {
@@ -302,6 +309,11 @@ export class ServiceScene extends Phaser.Scene {
 
     // 페이드 인
     this.cameras.main.fadeIn(400, 0, 0, 0);
+
+    // ── Phase 11-1: 스페셜 레시피 팝업 표시 (엔드리스 모드) ──
+    if (this.isEndless && this.dailySpecials.length > 0) {
+      this.time.delayedCall(500, () => this._showDailySpecialsPopup());
+    }
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this._shutdown, this);
@@ -1508,9 +1520,13 @@ export class ServiceScene extends Phaser.Scene {
     const tableTipMult = TABLE_TIP_MULTIPLIERS[tableGrade];
     const interiorTipBonus = LIGHTING_TIP_BONUS[this.interiorLighting] || 0;
 
-    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * 유형배율 * 그릴
+    // ── Phase 11-1: 엔드리스 스페셜 레시피 보상 배율 ──
+    const isSpecial = this.isEndless && this.dailySpecials.includes(recipe.id);
+    const specialMultiplier = isSpecial ? 2.0 : 1.0;
+
+    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * 유형배율 * 그릴 * 스페셜
     const baseGold = cust.baseReward;
-    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * typeMult * grillBonus);
+    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * typeMult * grillBonus * specialMultiplier);
 
     this.totalGold += totalGold;
     this.servedCount++;
@@ -1569,6 +1585,14 @@ export class ServiceScene extends Phaser.Scene {
       '#ffd700'
     );
 
+    // Phase 11-1: 스페셜 레시피 서빙 시 추가 VFX
+    if (isSpecial) {
+      const tblCont = this.tableContainers[tableIdx];
+      if (tblCont && this.vfx) {
+        this.vfx.floatingText(tblCont.x, tblCont.y - 30, `\uD83C\uDF1F \uC2A4\uD398\uC15C! +${totalGold}g`, '#ffd700', 18);
+      }
+    }
+
     // VFX: 서빙 성공 반짝이 + 손님 만족 이모지 (Phase 10-5)
     const tblContainer = this.tableContainers[tableIdx];
     if (tblContainer) {
@@ -1614,6 +1638,79 @@ export class ServiceScene extends Phaser.Scene {
     return 1.0;
   }
 
+  // ── Phase 11-1: 데일리 스페셜 팝업 ──────────────────────────────
+
+  /**
+   * 오늘의 스페셜 레시피 3종을 안내하는 팝업을 표시한다.
+   * 팝업은 4초 후 자동으로 닫힌다. 탭으로도 닫힌다.
+   * @private
+   */
+  _showDailySpecialsPopup() {
+    const cx = GAME_WIDTH / 2;  // 180
+    const panelW = 280;
+    const panelH = 200;
+    const panelCy = 220;
+
+    const container = this.add.container(0, 0).setDepth(2000);
+
+    // 반투명 오버레이
+    const overlay = this.add.rectangle(cx, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5)
+      .setInteractive();
+    container.add(overlay);
+
+    // 팝업 배경
+    const bg = this.add.rectangle(cx, panelCy, panelW, panelH, 0x1a0000)
+      .setStrokeStyle(2, 0xffd700);
+    container.add(bg);
+
+    // 제목
+    const title = this.add.text(cx, 160, '\uD83C\uDF1F \uC624\uB298\uC758 \uC2A4\uD398\uC15C \uB808\uC2DC\uD53C!', {
+      fontSize: '16px', fontStyle: 'bold', color: '#ffd700',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(title);
+
+    // 레시피 3종 리스트
+    const recipeYStart = 185;
+    this.dailySpecials.forEach((recipeId, i) => {
+      const recipe = RECIPE_MAP[recipeId];
+      if (!recipe) return;
+      const txt = this.add.text(cx, recipeYStart + i * 20, `${recipe.icon || '\uD83C\uDF73'} ${recipe.nameKo}`, {
+        fontSize: '14px', color: '#ffffff',
+      }).setOrigin(0.5);
+      container.add(txt);
+    });
+
+    // 보상 안내
+    const bonusText = this.add.text(cx, 250, '\uC11C\uBE59 \uC2DC \uBCF4\uC0C1 \u00D72.0 \uD83C\uDF89', {
+      fontSize: '14px', fontStyle: 'bold', color: '#ff6b35',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(bonusText);
+
+    // 확인 버튼
+    const okBtn = this.add.rectangle(cx, 278, 120, 36, 0xff6b35)
+      .setInteractive({ useHandCursor: true });
+    container.add(okBtn);
+    const okText = this.add.text(cx, 278, '\uD655\uC778', {
+      fontSize: '14px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(okText);
+
+    /** 팝업 닫기 */
+    const closePopup = () => {
+      if (autoCloseTimer) autoCloseTimer.remove();
+      container.destroy();
+    };
+
+    okBtn.on('pointerdown', closePopup);
+    overlay.on('pointerdown', closePopup);
+
+    // 4초 자동 닫기
+    const autoCloseTimer = this.time.delayedCall(4000, closePopup);
+  }
+
   // ── 영업 종료 ─────────────────────────────────────────────────────
 
   /**
@@ -1650,6 +1747,24 @@ export class ServiceScene extends Phaser.Scene {
     this.time.delayedCall(2500, () => {
       this.cameras.main.fadeOut(600, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
+        // ── Phase 11-1: 엔드리스 모드 시 EndlessScene으로 복귀 ──
+        if (this.isEndless) {
+          const updatedMaxCombo = Math.max(this.endlessMaxCombo, this.maxCombo);
+          const updatedScore = this.endlessScore + this.totalGold + this.tipTotal;
+
+          this.scene.start('EndlessScene', {
+            stageId: '1-1',
+            gold: this.marketGold + this.totalGold + this.tipTotal,
+            lives: this.marketLives,
+            endlessWave: this.endlessWave,
+            endlessScore: updatedScore,
+            endlessMaxCombo: updatedMaxCombo,
+            dailySpecials: this.dailySpecials,
+            inventory: {},  // 영업 후 인벤토리 초기화
+          });
+          return;
+        }
+
         // ResultScene으로 전환 (장보기 + 영업 결과 통합)
         this.scene.start('ResultScene', {
           stageId: this.stageId,

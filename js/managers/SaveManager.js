@@ -6,12 +6,13 @@
  * Phase 8-3: v5 마이그레이션 — tableUpgrades, unlockedTables, interiors, staff 추가.
  * Phase 8-4: isStaffHired, hireStaff 메서드 추가.
  * Phase 10-6: v6 마이그레이션 — soundSettings 추가.
+ * Phase 11-1: v7 마이그레이션 — endless 엔드리스 기록 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaos_save';
-const SAVE_VERSION = 6;
+const SAVE_VERSION = 7;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -52,6 +53,14 @@ function createDefault() {
       bgmVolume: 0.7,             // BGM 볼륨 (0.0~1.0)
       sfxVolume: 0.8,             // SFX 볼륨 (0.0~1.0)
       muted: false,               // 전체 음소거 여부
+    },
+    // ── Phase 11-1 추가 ──
+    endless: {
+      unlocked: false,            // 6-3 클리어 시 true
+      bestWave: 0,                // 최고 도달 웨이브
+      bestScore: 0,               // 최고 누적 골드
+      bestCombo: 0,               // 최고 연속 콤보
+      lastDailySeed: 0,           // 마지막 플레이한 데일리 시드
     },
   };
 }
@@ -113,6 +122,12 @@ export class SaveManager {
     } else {
       // 재클리어: 별점 기반 소량 보상
       coinsEarned = Math.max(1, Math.floor((coinByStars[stars] || 0) * 0.2));
+    }
+
+    // ── Phase 11-1: 6-3 클리어 시 엔드리스 해금 ──
+    if (stageId === '6-3' && stars > 0) {
+      data.endless = data.endless || { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
+      data.endless.unlocked = true;
     }
 
     data.kitchenCoins = (data.kitchenCoins || 0) + coinsEarned;
@@ -332,6 +347,68 @@ export class SaveManager {
     SaveManager.save(data);
   }
 
+  // ── 엔드리스 모드 (Phase 11-1) ──
+
+  /**
+   * 엔드리스 모드 해금 여부 확인.
+   * @returns {boolean}
+   */
+  static isEndlessUnlocked() {
+    const data = SaveManager.load();
+    return !!(data.endless?.unlocked);
+  }
+
+  /**
+   * 엔드리스 모드 해금 기록. 6-3 클리어 시 clearStage에서 자동 호출됨.
+   */
+  static unlockEndless() {
+    const data = SaveManager.load();
+    if (!data.endless) data.endless = { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
+    data.endless.unlocked = true;
+    SaveManager.save(data);
+  }
+
+  /**
+   * 엔드리스 기록 저장. 기존 최고 기록보다 높을 때만 갱신.
+   * @param {{ wave: number, score: number, combo: number }} record
+   * @returns {{ newBestWave: boolean, newBestScore: boolean, newBestCombo: boolean }}
+   */
+  static saveEndlessRecord({ wave, score, combo }) {
+    const data = SaveManager.load();
+    if (!data.endless) data.endless = { unlocked: true, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
+
+    const result = { newBestWave: false, newBestScore: false, newBestCombo: false };
+
+    if (wave > data.endless.bestWave) {
+      data.endless.bestWave = wave;
+      result.newBestWave = true;
+    }
+    if (score > data.endless.bestScore) {
+      data.endless.bestScore = score;
+      result.newBestScore = true;
+    }
+    if (combo > data.endless.bestCombo) {
+      data.endless.bestCombo = combo;
+      result.newBestCombo = true;
+    }
+    data.endless.lastDailySeed = Math.floor(Date.now() / 86400000);
+    SaveManager.save(data);
+    return result;
+  }
+
+  /**
+   * 엔드리스 최고 기록 조회.
+   * @returns {{ bestWave: number, bestScore: number, bestCombo: number }}
+   */
+  static getEndlessRecord() {
+    const data = SaveManager.load();
+    return {
+      bestWave: data.endless?.bestWave || 0,
+      bestScore: data.endless?.bestScore || 0,
+      bestCombo: data.endless?.bestCombo || 0,
+    };
+  }
+
   // ── 기존 메서드 ──
 
   /**
@@ -443,6 +520,22 @@ export class SaveManager {
         muted: false,
       };
       data.version = 6;
+    }
+
+    // v6 → v7: 엔드리스 모드 기록 추가
+    if (data.version < 7) {
+      data.endless = data.endless || {
+        unlocked: false,
+        bestWave: 0,
+        bestScore: 0,
+        bestCombo: 0,
+        lastDailySeed: 0,
+      };
+      // 이미 6-3을 클리어한 플레이어는 자동 해금
+      if (data.stages?.['6-3']?.cleared) {
+        data.endless.unlocked = true;
+      }
+      data.version = 7;
     }
 
     return data;

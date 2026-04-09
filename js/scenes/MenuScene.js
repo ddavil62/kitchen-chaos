@@ -61,11 +61,11 @@ export class MenuScene extends Phaser.Scene {
       color: '#cccccc',
     }).setOrigin(0.5);
 
-    // 게임 시작 버튼
-    const btn = this.add.rectangle(GAME_WIDTH / 2, 420, 200, 60, 0xff6b35)
+    // 게임 시작 버튼 (Phase 11-1: y 390으로 이동)
+    const btn = this.add.rectangle(GAME_WIDTH / 2, 390, 200, 60, 0xff6b35)
       .setInteractive({ useHandCursor: true });
 
-    this.add.text(GAME_WIDTH / 2, 420, '▶ 게임 시작', {
+    this.add.text(GAME_WIDTH / 2, 390, '\u25B6 \uAC8C\uC784 \uC2DC\uC791', {
       fontSize: '22px',
       fontStyle: 'bold',
       color: '#ffffff',
@@ -94,10 +94,10 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.InOut',
     });
 
-    // 상점 버튼
-    const shopBtn = this.add.rectangle(GAME_WIDTH / 2, 490, 160, 40, 0x886600)
+    // 상점 버튼 (Phase 11-1: y 450으로 이동)
+    const shopBtn = this.add.rectangle(GAME_WIDTH / 2, 450, 160, 40, 0x886600)
       .setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 490, '🪙 주방 상점', {
+    this.add.text(GAME_WIDTH / 2, 450, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
       fontSize: '16px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -110,10 +110,10 @@ export class MenuScene extends Phaser.Scene {
     shopBtn.on('pointerover', () => shopBtn.setFillStyle(0xaa8800));
     shopBtn.on('pointerout', () => shopBtn.setFillStyle(0x886600));
 
-    // 도감 버튼
-    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 540, 160, 36, 0x336644)
+    // 도감 버튼 (Phase 11-1: y 500으로 이동)
+    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 500, 160, 36, 0x336644)
       .setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 540, '📖 레시피 도감', {
+    this.add.text(GAME_WIDTH / 2, 500, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
       fontSize: '14px', fontStyle: 'bold', color: '#88ffaa',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -126,19 +126,54 @@ export class MenuScene extends Phaser.Scene {
     bookBtn.on('pointerover', () => bookBtn.setFillStyle(0x448855));
     bookBtn.on('pointerout', () => bookBtn.setFillStyle(0x336644));
 
-    // 평판 + 수집률
+    // ── 엔드리스 모드 버튼 (Phase 11-1) ──
+    const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
+    const endlessRecord = SaveManager.getEndlessRecord();
+
+    const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x444444;
+    const endlessBtn = this.add.rectangle(GAME_WIDTH / 2, 550, 180, 40, endlessColor)
+      .setInteractive({ useHandCursor: isEndlessUnlocked });
+
+    const endlessLabel = isEndlessUnlocked
+      ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC'
+      : '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (6-3 \uD074\uB9AC\uC5B4 \uD544\uC694)';
+    const endlessLabelColor = isEndlessUnlocked ? '#cc88ff' : '#666666';
+
+    this.add.text(GAME_WIDTH / 2, 550, endlessLabel, {
+      fontSize: '14px', fontStyle: 'bold', color: endlessLabelColor,
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    if (isEndlessUnlocked) {
+      endlessBtn.on('pointerdown', () => {
+        this.cameras.main.fadeOut(300, 0, 0, 0);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+          this.scene.start('ChefSelectScene', { stageId: 'endless' });
+        });
+      });
+      endlessBtn.on('pointerover', () => endlessBtn.setFillStyle(0x8833ee));
+      endlessBtn.on('pointerout', () => endlessBtn.setFillStyle(0x6622cc));
+    }
+
+    // 엔드리스 베스트 기록 표시
+    if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
+      this.add.text(GAME_WIDTH / 2, 574, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
+        fontSize: '11px', color: '#aa88cc',
+      }).setOrigin(0.5);
+    }
+
+    // 평판 + 수집률 (Phase 11-1: y 598로 이동)
     const { current, max } = SaveManager.getTotalStars();
     const { unlocked, total, percent } = RecipeManager.getCollectionProgress();
-    this.add.text(GAME_WIDTH / 2, 578, `⭐ ${current}/${max}    📖 ${unlocked}/${total} (${percent}%)`, {
+    this.add.text(GAME_WIDTH / 2, 598, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
       fontSize: '12px', color: '#aaaaaa',
     }).setOrigin(0.5);
 
-    // 하단 설명
-    this.add.text(GAME_WIDTH / 2, 610, '적을 처치하면 재료가 드롭됩니다\n재료를 모아 요리하면 타워가 강해집니다', {
+    // 하단 설명 (Phase 11-1: y 620으로 이동)
+    this.add.text(GAME_WIDTH / 2, 620, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
       fontSize: '12px',
       color: '#777777',
       align: 'center',
-      lineSpacing: 4,
     }).setOrigin(0.5);
 
     // ── 설정 버튼 (Phase 10-6) ──

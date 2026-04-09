@@ -3,6 +3,7 @@
  * Phase 7-3: 장보기 + 영업 결과를 종합하여 별점, 코인 보상을 표시한다.
  * 기존 GameOverScene을 대체한다.
  * Phase 10-4: BGM 재생 추가.
+ * Phase 11-1: 엔드리스 모드 결과 화면 분기 추가.
  *
  * 화면 구성:
  *   타이틀 → 장보기 결과 → 영업 결과 → 평가(별점) → 보상 → 버튼
@@ -32,6 +33,15 @@ export class ResultScene extends Phaser.Scene {
     this.marketResult = data.marketResult || { totalIngredients: 0, livesRemaining: 0, livesMax: 15 };
     this.serviceResult = data.serviceResult || null;
     this.isMarketFailed = data.isMarketFailed || false;
+
+    // ── Phase 11-1: 엔드리스 결과 ──
+    this.isEndless = data.isEndless || false;
+    this.endlessWave = data.endlessWave || 0;
+    this.endlessScore = data.endlessScore || 0;
+    this.endlessMaxCombo = data.endlessMaxCombo || 0;
+    this.newBestWave = data.newBestWave || false;
+    this.newBestScore = data.newBestScore || false;
+    this.newBestCombo = data.newBestCombo || false;
   }
 
   create() {
@@ -40,15 +50,103 @@ export class ResultScene extends Phaser.Scene {
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_result');
 
-    // 배경
-    const bgColor = this.isMarketFailed ? 0x330000 : 0x001a00;
+    // 배경 — 엔드리스 모드 게임오버는 짙은 보라 배경
+    const bgColor = this.isEndless ? 0x0a0020 : (this.isMarketFailed ? 0x330000 : 0x001a00);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, bgColor);
 
-    if (this.isMarketFailed) {
+    if (this.isEndless) {
+      this._createEndlessResultView();
+    } else if (this.isMarketFailed) {
       this._createMarketFailedView();
     } else {
       this._createResultView();
     }
+  }
+
+  // ── 엔드리스 결과 화면 (Phase 11-1) ──────────────────────────────
+
+  /**
+   * 엔드리스 모드 게임오버 결과 화면을 생성한다.
+   * 도달 웨이브/점수/콤보 + 역대 최고 기록을 표시한다.
+   * @private
+   */
+  _createEndlessResultView() {
+    const bestRecord = SaveManager.getEndlessRecord();
+
+    // 타이틀
+    this.add.text(GAME_WIDTH / 2, 40, '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uAC8C\uC784\uC624\uBC84', {
+      fontSize: '26px', fontStyle: 'bold', color: '#cc88ff',
+      stroke: '#000000', strokeThickness: 4,
+    }).setOrigin(0.5);
+
+    this.add.text(GAME_WIDTH / 2, 80, '\uCD5C\uC120\uC744 \uB2E4\uD588\uC2B5\uB2C8\uB2E4!', {
+      fontSize: '16px', color: '#ffffff',
+    }).setOrigin(0.5);
+
+    // 구분선
+    this.add.rectangle(GAME_WIDTH / 2, 110, GAME_WIDTH - 40, 1, 0x444444);
+
+    // 섹션: 이번 도전 결과
+    this.add.text(GAME_WIDTH / 2, 125, '\uD83D\uDCCA \uC774\uBC88 \uB3C4\uC804 \uACB0\uACFC', {
+      fontSize: '16px', fontStyle: 'bold', color: '#88ccff',
+    }).setOrigin(0.5);
+
+    // 도달 웨이브
+    const waveColor = this.newBestWave ? '#ffd700' : '#ffffff';
+    const waveNewText = this.newBestWave ? '  \u2605 NEW!' : '';
+    this.add.text(GAME_WIDTH / 2, 150, `\uD83C\uDF0A \uC6E8\uC774\uBE0C ${this.endlessWave}${waveNewText}`, {
+      fontSize: '16px', color: waveColor,
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    // 누적 점수
+    const scoreColor = this.newBestScore ? '#ffd700' : '#ffffff';
+    const scoreNewText = this.newBestScore ? '  \u2605 NEW!' : '';
+    this.add.text(GAME_WIDTH / 2, 175, `\uD83D\uDCB0 ${this.endlessScore} \uACE8\uB4DC${scoreNewText}`, {
+      fontSize: '16px', color: scoreColor,
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    // 최고 콤보
+    const comboColor = this.newBestCombo ? '#ffd700' : '#ffffff';
+    const comboNewText = this.newBestCombo ? '  \u2605 NEW!' : '';
+    this.add.text(GAME_WIDTH / 2, 200, `\uD83D\uDD25 ${this.endlessMaxCombo}\uC5F0\uC18D \uCF64\uBCF4${comboNewText}`, {
+      fontSize: '16px', color: comboColor,
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    // 구분선
+    this.add.rectangle(GAME_WIDTH / 2, 230, GAME_WIDTH - 40, 1, 0x444444);
+
+    // 섹션: 역대 최고 기록
+    this.add.text(GAME_WIDTH / 2, 245, '\uD83C\uDFC6 \uC5ED\uB300 \uCD5C\uACE0 \uAE30\uB85D', {
+      fontSize: '16px', fontStyle: 'bold', color: '#ffdd44',
+    }).setOrigin(0.5);
+
+    this.add.text(GAME_WIDTH / 2, 268, `\uD83C\uDF0A \uC6E8\uC774\uBE0C ${bestRecord.bestWave}`, {
+      fontSize: '14px', color: '#cccccc',
+    }).setOrigin(0.5);
+
+    this.add.text(GAME_WIDTH / 2, 288, `\uD83D\uDCB0 ${bestRecord.bestScore} \uACE8\uB4DC`, {
+      fontSize: '14px', color: '#cccccc',
+    }).setOrigin(0.5);
+
+    this.add.text(GAME_WIDTH / 2, 308, `\uD83D\uDD25 ${bestRecord.bestCombo}\uC5F0\uC18D`, {
+      fontSize: '14px', color: '#cccccc',
+    }).setOrigin(0.5);
+
+    // 구분선
+    this.add.rectangle(GAME_WIDTH / 2, 340, GAME_WIDTH - 40, 1, 0x444444);
+
+    // 버튼: 다시 도전
+    this._createButton(365, '\uB2E4\uC2DC \uB3C4\uC804!', 0x6622cc, () => {
+      this._fadeToScene('ChefSelectScene', { stageId: 'endless' });
+    });
+
+    // 버튼: 메인 메뉴
+    this._createButton(425, '\uBA54\uC778 \uBA54\uB274', 0x444444, () => {
+      this._fadeToScene('MenuScene');
+    });
   }
 
   // ── 장보기 실패 화면 ──────────────────────────────────────────────

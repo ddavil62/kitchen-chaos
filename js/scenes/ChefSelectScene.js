@@ -2,6 +2,7 @@
  * @fileoverview 셰프 선택 씬.
  * Phase 6: 스테이지 선택 후, 게임 시작 전에 셰프를 고르는 화면.
  * Phase 7: GameScene → MarketScene 전환에 따라 씬 키 변경.
+ * Phase 11-1: stageId='endless' 시 EndlessScene으로 전환.
  * 360x640 레이아웃: 3장의 세로 배치 카드 + "셰프 없이 시작" 버튼.
  */
 
@@ -23,8 +24,10 @@ export class ChefSelectScene extends Phaser.Scene {
    */
   create(data) {
     this.stageId = data?.stageId || '1-1';
-    const stageData = STAGES[this.stageId];
-    const stageName = stageData?.nameKo || this.stageId;
+    // Phase 11-1: 엔드리스 모드 여부 판별
+    this._isEndless = this.stageId === 'endless';
+    const stageData = this._isEndless ? null : STAGES[this.stageId];
+    const stageName = this._isEndless ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC' : (stageData?.nameKo || this.stageId);
 
     this.cameras.main.fadeIn(400, 0, 0, 0);
 
@@ -37,8 +40,11 @@ export class ChefSelectScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 3,
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 55, `스테이지: ${this.stageId} ${stageName}`, {
-      fontSize: '13px', color: '#aaaaaa',
+    const subTitle = this._isEndless
+      ? `${stageName}`
+      : `\uC2A4\uD14C\uC774\uC9C0: ${this.stageId} ${stageName}`;
+    this.add.text(GAME_WIDTH / 2, 55, subTitle, {
+      fontSize: '13px', color: this._isEndless ? '#cc88ff' : '#aaaaaa',
     }).setOrigin(0.5);
 
     // ── 셰프 카드 3장 (세로 배치) ──
@@ -83,7 +89,8 @@ export class ChefSelectScene extends Phaser.Scene {
     backBtn.on('pointerdown', () => {
       this.cameras.main.fadeOut(300, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start('StageSelectScene');
+        // Phase 11-1: 엔드리스에서 뒤로가기 시 메뉴로 복귀
+        this.scene.start(this._isEndless ? 'MenuScene' : 'StageSelectScene');
       });
     });
     backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
@@ -195,7 +202,10 @@ export class ChefSelectScene extends Phaser.Scene {
 
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('MarketScene', { stageId: this.stageId });
+      // Phase 11-1: 엔드리스 모드 분기
+      const targetScene = this._isEndless ? 'EndlessScene' : 'MarketScene';
+      const targetStageId = this._isEndless ? '1-1' : this.stageId;
+      this.scene.start(targetScene, { stageId: targetStageId });
     });
   }
 }
