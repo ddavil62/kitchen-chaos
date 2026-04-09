@@ -217,5 +217,9 @@ export class RestaurantScene extends Phaser.Scene {
     this.customerManager?.destroy();
     this.customerZoneUI?.destroy();
     this.kitchenPanelUI?.destroy();
+
+    // Phase 11-3c: 씬 전환 시 Tween/Timer 명시적 정리
+    this.tweens.killAll();
+    this.time.removeAllEvents();
   }
 }

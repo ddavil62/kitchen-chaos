@@ -6,6 +6,7 @@
  * Phase 10-4: SoundManager BGM + 씬 이벤트 SFX 추가.
  * Phase 10-5: VFXManager 연동 (파티클, 화면 효과, 플로팅 텍스트).
  * Phase 11-3b: fadeIn 300ms 통일, 보스 웨이브 BGM 전환 추가.
+ * Phase 11-3c: 화면 밖 적 업데이트 스킵, VFX 파티클 TTL 정리, 씬 Tween/Timer 정리.
  */
 
 import Phaser from 'phaser';
@@ -1285,6 +1286,8 @@ export class MarketScene extends Phaser.Scene {
 
     this.enemies.getChildren().forEach(enemy => {
       if (enemy.active) {
+        // Phase 11-3c: 화면 밖 적 업데이트 스킵 (y < -50 or y > 700)
+        if (enemy.y < -50 || enemy.y > 700) return;
         enemy.update(time, delta);
         // 아이소메트릭 depth sorting: Y 좌표 기반
         enemy.setDepth(10 + Math.floor(enemy.y));
@@ -1320,6 +1323,9 @@ export class MarketScene extends Phaser.Scene {
 
     // 오더 HUD 갱신
     this._updateOrderHUD();
+
+    // Phase 11-3c: VFX 파티클 TTL 초과 자동 정리
+    this.vfx?.cleanupExpiredParticles();
   }
 
   // ── 수프 솥 오라 버프 ──────────────────────────────────────────
@@ -1376,5 +1382,9 @@ export class MarketScene extends Phaser.Scene {
     this.ingredientManager?.destroy();
     this.vfx?.destroy();
     this._tutorial?.end?.();
+
+    // Phase 11-3c: 씬 전환 시 Tween/Timer 명시적 정리
+    this.tweens.killAll();
+    this.time.removeAllEvents();
   }
 }

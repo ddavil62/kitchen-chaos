@@ -1225,5 +1225,9 @@ export class GameScene extends Phaser.Scene {
     GameEventBus.off('buff_expired', this._onBuffExpired, this);
     GameEventBus.off('serve_success', this._onServeSuccess, this);
     this.ingredientManager?.destroy();
+
+    // Phase 11-3c: 씬 전환 시 Tween/Timer 명시적 정리
+    this.tweens.killAll();
+    this.time.removeAllEvents();
   }
 }

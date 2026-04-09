@@ -6,6 +6,7 @@
  * Phase 8-5: 특수 손님 5종(일반/VIP/미식가/급한/단체) + 영업 이벤트 4종.
  * Phase 8-6: 셰프 영업 액티브 스킬 (특급 서비스 / 화염 조리 / 시간 동결).
  * Phase 10-5: VFXManager 연동 (서빙 반짝이, 골드 플로팅, 콤보, 손님 이모지).
+ * Phase 11-3c: 비활성 테이블 렌더 최적화, 씬 Tween/Timer 정리.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -523,6 +524,9 @@ export class ServiceScene extends Phaser.Scene {
     const custIcon = container.getData('custIcon');
 
     if (!cust) {
+      // Phase 11-3c: 빈 테이블이 이미 빈 상태면 렌더 상태 변경 생략
+      if (container.getData('_isEmpty')) return;
+      container.setData('_isEmpty', true);
       // 빈 테이블
       statusText.setText('\uBE48 \uD14C\uC774\uBE14').setVisible(true);
       bubble.setVisible(false);
@@ -532,6 +536,9 @@ export class ServiceScene extends Phaser.Scene {
       custIcon.setVisible(false);
       return;
     }
+
+    // 손님이 앉으면 빈 상태 플래그 해제
+    container.setData('_isEmpty', false);
 
     statusText.setVisible(false);
 
@@ -2177,5 +2184,9 @@ export class ServiceScene extends Phaser.Scene {
     this.skillBtnText = null;
     // Phase 11-3a: 튜토리얼 정리
     this._tutorial?.end?.();
+
+    // Phase 11-3c: 씬 전환 시 Tween/Timer 명시적 정리
+    this.tweens.killAll();
+    this.time.removeAllEvents();
   }
 }
