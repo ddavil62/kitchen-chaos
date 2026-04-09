@@ -190,13 +190,21 @@ export class Enemy extends Phaser.GameObjects.Container {
   }
 
   /**
-   * 슬로우 상태 적용.
-   * @param {number} factor - 속도 배율 (0~1)
+   * 슬로우 상태 적용. 매 적중 시 갱신 (강한 쪽 우선, 타이머 리셋).
+   * @param {number} factor - 속도 배율 (0~1, 낮을수록 강함)
    * @param {number} duration - ms
    */
   applySlow(factor, duration) {
-    this.slowFactor = Math.min(this.slowFactor, factor);
-    this.slowTimer = Math.max(this.slowTimer, duration);
+    // 더 강한(낮은) 슬로우이거나 기존 슬로우와 같으면 타이머 리셋
+    if (factor <= this.slowFactor) {
+      this.slowFactor = factor;
+      this.slowTimer = duration;
+    } else if (this.slowTimer <= 0) {
+      // 기존 슬로우가 만료됐으면 약한 슬로우라도 적용
+      this.slowFactor = factor;
+      this.slowTimer = duration;
+    }
+    // 기존에 더 강한 슬로우가 남아있으면 무시
   }
 
   /**

@@ -34,11 +34,20 @@ export class Projectile extends Phaser.GameObjects.Arc {
   }
 
   /**
+   * 타겟이 유효한지(존재 + 생존 + 미파괴) 확인.
+   * @private
+   * @returns {boolean}
+   */
+  _isTargetValid() {
+    return this.target && !this.target.isDead && this.target.active && this.target.scene;
+  }
+
+  /**
    * 매 프레임 업데이트 - 목표 추적 이동.
    * @param {number} delta - ms
    */
   update(delta) {
-    if (!this.active || !this.target || this.target.isDead || !this.target.active) {
+    if (!this.active || !this._isTargetValid()) {
       this.destroy();
       return;
     }
@@ -49,7 +58,6 @@ export class Projectile extends Phaser.GameObjects.Arc {
     const moveAmount = this.speed * (delta / 1000);
 
     if (dist <= moveAmount + 5) {
-      // 명중
       this._hit();
     } else {
       this.x += (dx / dist) * moveAmount;
@@ -62,18 +70,19 @@ export class Projectile extends Phaser.GameObjects.Arc {
    * @private
    */
   _hit() {
-    if (!this.target || this.target.isDead) {
+    if (!this._isTargetValid()) {
       this.destroy();
       return;
     }
 
     this.target.takeDamage(this.damage);
 
-    if (this.slowFactor && !this.target.isDead) {
+    // takeDamage로 적이 죽었을 수 있으므로 재확인
+    if (this.slowFactor && this._isTargetValid()) {
       this.target.applySlow(this.slowFactor, this.slowDuration);
     }
 
-    if (this.burnDamage && !this.target.isDead) {
+    if (this.burnDamage && this._isTargetValid()) {
       this.target.applyBurn(this.burnDamage, this.burnDuration, this.burnInterval);
     }
 

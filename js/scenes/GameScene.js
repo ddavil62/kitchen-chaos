@@ -58,10 +58,7 @@ export class GameScene extends Phaser.Scene {
     // ── 이벤트 ──
     this.events.on('enemy_died', this._onEnemyDied, this);
     this.events.on('enemy_reached_base', this._onEnemyReachedBase, this);
-    this.events.on('wave_started', (n) => {
-      this.gameUI.setWave(n, this.waveManager.totalWaves);
-      this.waitingForNextWave = false;
-    });
+    this.events.on('wave_started', this._onWaveStarted, this);
 
     // ── 첫 웨이브 시작 메시지 ──
     this._showMessage('웨이브 1 준비!\n화면을 탭해서 타워를 배치하세요', 2500);
@@ -203,6 +200,16 @@ export class GameScene extends Phaser.Scene {
   // ── 이벤트 핸들러 ─────────────────────────────────────────
 
   /**
+   * 웨이브 시작 이벤트 핸들러.
+   * @private
+   * @param {number} waveNum
+   */
+  _onWaveStarted(waveNum) {
+    this.gameUI.setWave(waveNum, this.waveManager.totalWaves);
+    this.waitingForNextWave = false;
+  }
+
+  /**
    * 적 처치 이벤트 핸들러.
    * @private
    */
@@ -225,6 +232,9 @@ export class GameScene extends Phaser.Scene {
       duration: 900,
       onComplete: () => goldPopup.destroy(),
     });
+
+    // 웨이브 클리어 확인 (이벤트 기반)
+    this._checkWaveProgress();
   }
 
   /**
@@ -241,6 +251,9 @@ export class GameScene extends Phaser.Scene {
     if (this.lives <= 0) {
       this._triggerGameOver();
     }
+
+    // 웨이브 클리어 확인 (이벤트 기반)
+    this._checkWaveProgress();
   }
 
   /**
@@ -322,8 +335,15 @@ export class GameScene extends Phaser.Scene {
    * @param {number} duration - ms
    */
   _showMessage(message, duration) {
-    const existing = this._messagePopup;
-    if (existing) existing.destroy();
+    // 기존 팝업의 트윈 취소 후 즉시 파괴
+    if (this._messageTween) {
+      this._messageTween.stop();
+      this._messageTween = null;
+    }
+    if (this._messagePopup) {
+      this._messagePopup.destroy();
+      this._messagePopup = null;
+    }
 
     const bg = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, 280, 80, 0x000000, 0.8)
       .setDepth(50);
@@ -336,13 +356,14 @@ export class GameScene extends Phaser.Scene {
 
     this.time.delayedCall(duration, () => {
       if (this._messagePopup) {
-        this.tweens.add({
+        this._messageTween = this.tweens.add({
           targets: this._messagePopup,
           alpha: 0,
           duration: 300,
           onComplete: () => {
             this._messagePopup?.destroy();
             this._messagePopup = null;
+            this._messageTween = null;
           },
         });
       }
@@ -381,11 +402,6 @@ export class GameScene extends Phaser.Scene {
 
     // 조리소 버프 타이머
     this.cookingStation.update(delta);
-
-    // 웨이브 진행 체크
-    if (this.waveManager.isActive) {
-      this._checkWaveProgress();
-    }
   }
 
   /**
@@ -394,6 +410,7 @@ export class GameScene extends Phaser.Scene {
   shutdown() {
     this.events.off('enemy_died', this._onEnemyDied, this);
     this.events.off('enemy_reached_base', this._onEnemyReachedBase, this);
+    this.events.off('wave_started', this._onWaveStarted, this);
     this.ingredientManager?.destroy();
     this.gameUI?.destroy();
   }
