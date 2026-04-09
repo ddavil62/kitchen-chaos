@@ -127,6 +127,8 @@ export class IngredientManager {
 
     // 씬 내부 이벤트
     this.scene.events.emit('inventory_changed', this.inventory);
+    // 오더 추적용 씬 이벤트 (수거 1건)
+    this.scene.events.emit('ingredient_collected_for_order');
     // 크로스 씬 이벤트 (RestaurantScene에 알림)
     GameEventBus.emit('ingredient_collected', {
       type: drop.type,

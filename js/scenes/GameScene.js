@@ -21,6 +21,7 @@ import { IngredientManager } from '../managers/IngredientManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { ChefManager } from '../managers/ChefManager.js';
+import { OrderManager } from '../managers/OrderManager.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -67,6 +68,9 @@ export class GameScene extends Phaser.Scene {
       waypoints: this.stageWaypoints,
     });
 
+    // ── 오더 매니저 ──
+    this.orderManager = new OrderManager();
+
     // ── 셰프 스킬 상태 ──
     this._chefData = ChefManager.getChefData();
     this._skillCooldownTimer = 0;
@@ -100,6 +104,10 @@ export class GameScene extends Phaser.Scene {
     GameEventBus.on('combo_changed', this._onComboChanged, this);
     GameEventBus.on('buff_activated', this._onBuffActivated, this);
     GameEventBus.on('buff_expired', this._onBuffExpired, this);
+    GameEventBus.on('serve_success', this._onServeSuccess, this);
+
+    // ── 오더 추적용 씬 이벤트 ──
+    this.events.on('ingredient_collected_for_order', this._onIngredientCollectedForOrder, this);
 
     // ── RestaurantScene 병렬 실행 ──
     this.scene.launch('RestaurantScene', {
@@ -501,10 +509,18 @@ export class GameScene extends Phaser.Scene {
     this.waitingForNextWave = false;
     this._setWaveButtonEnabled(false);
     GameEventBus.emit('wave_started', { waveNum });
+
+    // ── 오더 생성 시도 ──
+    const order = this.orderManager.tryGenerateOrder(waveNum);
+    this._updateOrderHUD();
+    if (order) {
+      this._showMessage(`[오더] ${order.descKo}`, 2000);
+    }
   }
 
   _onEnemyDied(enemy) {
     this.score++;
+    this.orderManager.addProgress('kill_count');
     this._checkWaveProgress();
   }
 
@@ -512,6 +528,7 @@ export class GameScene extends Phaser.Scene {
     this.lives--;
     this._updateHUD();
     this.cameras.main.shake(200, 0.008);
+    this.orderManager.addProgress('enemy_leaked');
 
     if (this.lives <= 0) {
       this._triggerGameOver();
@@ -725,6 +742,16 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  /** 서빙 성공 시 오더 진행도 갱신 */
+  _onServeSuccess() {
+    this.orderManager.addProgress('serve_count');
+  }
+
+  /** 재료 수거 시 오더 진행도 갱신 */
+  _onIngredientCollectedForOrder() {
+    this.orderManager.addProgress('collect_count');
+  }
+
   /**
    * 개별 타워에 버프 적용.
    * @param {Tower} tower
@@ -776,6 +803,9 @@ export class GameScene extends Phaser.Scene {
   _checkWaveProgress() {
     if (this.waitingForNextWave) return;
     if (!this.waveManager.isWaveCleared()) return;
+
+    // ── 오더 판정 ──
+    this._resolveOrderOnWaveClear();
 
     if (this.waveManager.isLastWave()) {
       this._triggerVictory();
@@ -966,6 +996,101 @@ export class GameScene extends Phaser.Scene {
     SaveManager.completeTutorial();
   }
 
+  // ── 오더 HUD ──────────────────────────────────────────────────
+
+  /**
+   * 오더 HUD 갱신.
+   * waveText 아래(HUD 영역)에 오더 바를 표시한다.
+   * @private
+   */
+  _updateOrderHUD() {
+    const status = this.orderManager.getStatus();
+
+    if (!status) {
+      // 오더 없음 — HUD 숨김
+      if (this._orderContainer) {
+        this._orderContainer.setVisible(false);
+      }
+      return;
+    }
+
+    // 최초 생성
+    if (!this._orderContainer) {
+      this._orderBg = this.add.rectangle(GAME_WIDTH / 2, 44, 280, 16, 0x222244, 0.85)
+        .setDepth(101);
+      this._orderLabel = this.add.text(GAME_WIDTH / 2, 44, '', {
+        fontSize: '10px', color: '#ffffff',
+        stroke: '#000000', strokeThickness: 1,
+      }).setOrigin(0.5).setDepth(102);
+      this._orderContainer = this.add.container(0, 0, [this._orderBg, this._orderLabel])
+        .setDepth(101);
+    }
+
+    this._orderContainer.setVisible(true);
+
+    // 진행률 텍스트 구성
+    let progressText;
+    if (status.type === 'no_leak') {
+      progressText = status.failed ? '[실패]' : (status.completed ? '[달성!]' : '[유지 중]');
+    } else {
+      progressText = `${status.progress}/${status.target}`;
+    }
+
+    let displayText = `[오더] ${status.descKo} ${progressText}`;
+
+    // 상태 색상
+    if (status.completed) {
+      this._orderBg.setFillStyle(0x225522, 0.85);
+      this._orderLabel.setColor('#44ff44');
+    } else if (status.failed) {
+      this._orderBg.setFillStyle(0x552222, 0.85);
+      this._orderLabel.setColor('#ff4444');
+    } else {
+      this._orderBg.setFillStyle(0x222244, 0.85);
+      this._orderLabel.setColor('#ffffff');
+    }
+
+    this._orderLabel.setText(displayText);
+  }
+
+  /**
+   * 웨이브 종료 시 오더 판정 + 보상 지급.
+   * @private
+   */
+  _resolveOrderOnWaveClear() {
+    const reward = this.orderManager.resolveOrder();
+    this._updateOrderHUD();
+
+    if (reward) {
+      // 골드 지급
+      this.gold += reward.gold;
+      this._updateHUD();
+
+      // 코인 지급 (SaveManager 경유)
+      if (reward.coin > 0) {
+        const data = SaveManager.load();
+        data.kitchenCoins = (data.kitchenCoins || 0) + reward.coin;
+        // 완료 오더 기록
+        if (!data.completedOrders) data.completedOrders = [];
+        data.completedOrders.push(this.orderManager.currentOrder?.id || 'unknown');
+        SaveManager.save(data);
+      }
+
+      // 보상 팝업
+      const popupText = `[오더 달성!] +${reward.gold}g +${reward.coin}c`;
+      const popup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 50, popupText, {
+        fontSize: '14px', color: '#ffd700', fontStyle: 'bold',
+        stroke: '#000000', strokeThickness: 3,
+      }).setOrigin(0.5).setDepth(115);
+
+      this.tweens.add({
+        targets: popup, y: popup.y - 50, alpha: 0,
+        duration: 2000,
+        onComplete: () => popup.destroy(),
+      });
+    }
+  }
+
   // ── 유틸리티 ────────────────────────────────────────────────────
 
   _showMessage(message, duration) {
@@ -1035,6 +1160,9 @@ export class GameScene extends Phaser.Scene {
 
     // 셰프 스킬 쿨다운
     this._updateChefSkillCooldown(delta);
+
+    // 오더 HUD 갱신
+    this._updateOrderHUD();
   }
 
   // ── 수프 솥 오라 버프 ──────────────────────────────────────────
@@ -1089,10 +1217,12 @@ export class GameScene extends Phaser.Scene {
     this.events.off('spore_debuff', this._onSporeDebuff, this);
     this.events.off('boss_debuff', this._onBossDebuff, this);
     this.events.off('wave_started', this._onWaveStarted, this);
+    this.events.off('ingredient_collected_for_order', this._onIngredientCollectedForOrder, this);
     GameEventBus.off('gold_earned', this._onGoldEarned, this);
     GameEventBus.off('combo_changed', this._onComboChanged, this);
     GameEventBus.off('buff_activated', this._onBuffActivated, this);
     GameEventBus.off('buff_expired', this._onBuffExpired, this);
+    GameEventBus.off('serve_success', this._onServeSuccess, this);
     this.ingredientManager?.destroy();
   }
 }

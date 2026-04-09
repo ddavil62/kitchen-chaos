@@ -125,6 +125,7 @@ export class RestaurantScene extends Phaser.Scene {
     if (result.success) {
       GameEventBus.emit('gold_earned', { amount: result.totalGold, source: 'serving' });
       GameEventBus.emit('combo_changed', { count: this.customerManager.comboCount });
+      GameEventBus.emit('serve_success');
       this._showGoldPopup(result.totalGold, result.tip, result.comboBonus);
     }
 

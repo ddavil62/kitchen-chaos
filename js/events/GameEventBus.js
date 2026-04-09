@@ -17,5 +17,6 @@ import Phaser from 'phaser';
  * - buff_activated        { effectType, effectValue, duration }  Restaurant → Game
  * - buff_expired          {}                         Restaurant → Game
  * - combo_changed         { count }                  Restaurant → Game
+ * - serve_success         {}                         Restaurant → Game
  */
 export const GameEventBus = new Phaser.Events.EventEmitter();
