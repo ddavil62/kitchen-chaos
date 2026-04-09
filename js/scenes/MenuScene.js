@@ -2,6 +2,7 @@
  * @fileoverview 메뉴 씬. 타이틀 화면과 게임 시작 버튼을 표시한다.
  */
 
+import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 
 export class MenuScene extends Phaser.Scene {

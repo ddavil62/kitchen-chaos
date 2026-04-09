@@ -3,6 +3,7 @@
  * 웨이포인트를 따라 이동하며 신선도 보너스 타이머를 관리한다.
  */
 
+import Phaser from 'phaser';
 import { PATH_WAYPOINTS, FRESHNESS_WINDOW_MS } from '../config.js';
 
 export class Enemy extends Phaser.GameObjects.Container {

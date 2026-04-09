@@ -2,6 +2,7 @@
  * @fileoverview 게임 오버 / 클리어 씬.
  */
 
+import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 
 export class GameOverScene extends Phaser.Scene {

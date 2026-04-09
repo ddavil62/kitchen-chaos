@@ -3,6 +3,7 @@
  * 범위 내 가장 앞선 적을 조준하고 발사체를 발사한다.
  */
 
+import Phaser from 'phaser';
 import { Projectile } from './Projectile.js';
 
 export class Tower extends Phaser.GameObjects.Container {

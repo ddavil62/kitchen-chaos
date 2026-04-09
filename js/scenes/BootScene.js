@@ -3,6 +3,8 @@
  * Phase 1은 PixelLab 에셋 없이 기하 도형으로 모든 오브젝트를 표현한다.
  */
 
+import Phaser from 'phaser';
+
 export class BootScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BootScene' });

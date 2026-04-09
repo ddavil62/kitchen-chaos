@@ -4,6 +4,7 @@
  * 재료 드롭/수거, 조리소 시스템을 통합한다.
  */
 
+import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, CELL_SIZE, GRID_COLS, GRID_ROWS,
          GAME_AREA_Y, BOTTOM_UI_HEIGHT, PATH_CELLS, isPathCell,
          cellToWorld, worldToCell, STARTING_GOLD, STARTING_LIVES } from '../config.js';

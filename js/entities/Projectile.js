@@ -3,6 +3,8 @@
  * 목표 적을 추적하여 이동하고 명중 시 피해를 입힌다.
  */
 
+import Phaser from 'phaser';
+
 export class Projectile extends Phaser.GameObjects.Circle {
   /**
    * @param {Phaser.Scene} scene
