@@ -11,17 +11,22 @@
 <body>
   <div id="game-container"></div>
   <!-- JS 에러 발생 시 화면에 빨간 텍스트로 표시 (Android 디버깅용) -->
-  <div id="error-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;background:#ff0000cc;color:#fff;font-size:12px;padding:8px;z-index:9999;word-break:break-all;"></div>
+  <div id="error-overlay" style="display:none;position:fixed;top:60px;left:0;right:0;max-height:50vh;overflow-y:auto;background:#cc0000ee;color:#fff;font-size:11px;padding:10px;z-index:9999;word-break:break-all;white-space:pre-wrap;font-family:monospace;border-bottom:2px solid #ff6666;"></div>
   <script>
-    window.onerror = function(msg, src, line, col, err) {
+    function showError(text) {
       var el = document.getElementById('error-overlay');
       el.style.display = 'block';
-      el.textContent = '[JS ERROR] ' + msg + '\n' + (src || '') + ':' + line;
+      el.textContent += text + '\n---\n';
+    }
+    window.onerror = function(msg, src, line, col, err) {
+      var file = (src || '').replace(/.*\//, '');
+      showError('[ERROR] ' + msg + '\n@ ' + file + ':' + line + (err && err.stack ? '\n' + err.stack.split('\n').slice(0,4).join('\n') : ''));
     };
     window.addEventListener('unhandledrejection', function(e) {
-      var el = document.getElementById('error-overlay');
-      el.style.display = 'block';
-      el.textContent = '[PROMISE] ' + (e.reason && e.reason.message || e.reason);
+      var reason = e.reason;
+      var msg = reason && reason.message ? reason.message : String(reason);
+      var stack = reason && reason.stack ? '\n' + reason.stack.split('\n').slice(0,4).join('\n') : '';
+      showError('[PROMISE] ' + msg + stack);
     });
   </script>
   <script type="module" src="./js/main.js"></script>
