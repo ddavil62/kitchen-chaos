@@ -16,9 +16,9 @@ export const STAGES = {
     gridRows: 10,
     // L자 경로: 위→아래 → 왼쪽→오른쪽 → 위→아래
     pathSegments: [
-      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 3, rowEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
     ],
     waves: [
       {
@@ -126,13 +126,13 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery'],
     gridCols: 9,
     gridRows: 10,
-    // S자 경로
+    // S자 경로: 10행 확장
     pathSegments: [
-      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 2 },
-      { type: 'horizontal', row: 2, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 6, rowStart: 2, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 2, rowStart: 5, rowEnd: 7 },
+      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 6, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 2, rowStart: 6, rowEnd: 9 },
     ],
     waves: [
       {
@@ -257,13 +257,13 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
     gridRows: 10,
-    // 지그재그 경로
+    // 지그재그 경로: 10행 확장
     pathSegments: [
       { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
       { type: 'horizontal', row: 3, colStart: 0, colEnd: 4 },
-      { type: 'vertical', col: 4, rowStart: 3, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 4, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 5, rowEnd: 7 },
+      { type: 'vertical', col: 4, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 4, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 6, rowEnd: 9 },
     ],
     waves: [
       {
@@ -415,11 +415,11 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'soup_pot'],
     gridCols: 9,
     gridRows: 10,
-    // U자 경로
+    // U자 경로: 10행 확장
     pathSegments: [
-      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 0, rowEnd: 6 },
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 8 },
+      { type: 'horizontal', row: 8, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 0, rowEnd: 8 },
     ],
     waves: [
       { wave: 1, enemies: [
@@ -513,11 +513,11 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
     gridRows: 10,
-    // 십자(+) 경로
+    // 십자(+) 경로: 10행 확장
     pathSegments: [
-      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 0, colEnd: 8 },
-      { type: 'vertical', col: 4, rowStart: 3, rowEnd: 7 },
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 4, rowEnd: 9 },
     ],
     waves: [
       { wave: 1, enemies: [
@@ -627,14 +627,14 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
     gridRows: 10,
-    // 나선 경로
+    // 나선 경로: 10행 확장
     pathSegments: [
       { type: 'horizontal', row: 0, colStart: 0, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 0, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 2, colEnd: 8 },
-      { type: 'vertical', col: 2, rowStart: 3, rowEnd: 6 },
-      { type: 'horizontal', row: 3, colStart: 2, colEnd: 5 },
-      { type: 'vertical', col: 5, rowStart: 3, rowEnd: 5 },
+      { type: 'vertical', col: 8, rowStart: 0, rowEnd: 8 },
+      { type: 'horizontal', row: 8, colStart: 2, colEnd: 8 },
+      { type: 'vertical', col: 2, rowStart: 4, rowEnd: 8 },
+      { type: 'horizontal', row: 4, colStart: 2, colEnd: 5 },
+      { type: 'vertical', col: 5, rowStart: 4, rowEnd: 6 },
     ],
     waves: [
       { wave: 1, enemies: [
@@ -754,11 +754,11 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery'],
     gridCols: 9,
     gridRows: 10,
-    // 직선 + 분기 경로
+    // 직선 + 분기 경로: 10행 확장
     pathSegments: [
-      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 7 },
-      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 0, rowEnd: 4 },
+      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 9 },
+      { type: 'horizontal', row: 5, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 0, rowEnd: 5 },
     ],
     waves: [
       { wave: 1, enemies: [
@@ -852,13 +852,13 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'soup_pot'],
     gridCols: 9,
     gridRows: 10,
-    // 지그재그 경로
+    // 지그재그 경로: 10행 확장
     pathSegments: [
       { type: 'horizontal', row: 1, colStart: 0, colEnd: 6 },
-      { type: 'vertical', col: 6, rowStart: 1, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 2, rowStart: 3, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 2, colEnd: 8 },
+      { type: 'vertical', col: 6, rowStart: 1, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 2, rowStart: 4, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 2, colEnd: 8 },
     ],
     waves: [
       { wave: 1, enemies: [
@@ -966,13 +966,13 @@ export const STAGES = {
     availableTowers: ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'],
     gridCols: 9,
     gridRows: 10,
-    // 나선 경로
+    // 나선 경로: 10행 확장
     pathSegments: [
       { type: 'horizontal', row: 0, colStart: 0, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 0, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 2, colEnd: 7 },
-      { type: 'vertical', col: 2, rowStart: 3, rowEnd: 6 },
-      { type: 'horizontal', row: 3, colStart: 2, colEnd: 5 },
+      { type: 'vertical', col: 7, rowStart: 0, rowEnd: 8 },
+      { type: 'horizontal', row: 8, colStart: 2, colEnd: 7 },
+      { type: 'vertical', col: 2, rowStart: 4, rowEnd: 8 },
+      { type: 'horizontal', row: 4, colStart: 2, colEnd: 5 },
     ],
     waves: [
       { wave: 1, enemies: [
