@@ -1,0 +1,963 @@
+/**
+ * @fileoverview 영업 타이쿤 씬 (ServiceScene).
+ * Phase 7-2: 장보기(MarketScene)에서 수집한 재료로 레스토랑을 영업한다.
+ * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
+ *
+ * 화면 구성 (360x640):
+ *   0~40     HUD (골드, 영업시간, 만족도)
+ *   40~280   홀 영역 (테이블 6석, 2행x3열)
+ *   280~340  조리 슬롯 (2개)
+ *   340~440  재료 재고 표시
+ *   440~570  레시피 퀵슬롯
+ *   570~640  하단 바 (셰프 스킬, 일시정지)
+ */
+
+import Phaser from 'phaser';
+import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { STAGES } from '../data/stageData.js';
+import { ALL_SERVING_RECIPES, RECIPE_MAP } from '../data/recipeData.js';
+import { INGREDIENT_TYPES } from '../data/gameData.js';
+import { RecipeManager } from '../managers/RecipeManager.js';
+import { ChefManager } from '../managers/ChefManager.js';
+import InventoryManager from '../managers/InventoryManager.js';
+
+// ── 레이아웃 상수 ──
+const HUD_Y = 0;
+const HUD_H = 40;
+const HALL_Y = 40;
+const HALL_H = 240;
+const COOK_Y = 280;
+const COOK_H = 60;
+const STOCK_Y = 340;
+const STOCK_H = 100;
+const RECIPE_Y = 440;
+const RECIPE_H = 130;
+const BOTTOM_Y = 570;
+const BOTTOM_H = 70;
+
+// 테이블 그리드 (2행 x 3열)
+const TABLE_ROWS = 2;
+const TABLE_COLS = 3;
+const TABLE_COUNT = TABLE_ROWS * TABLE_COLS;
+
+// 조리 슬롯 수
+const MAX_COOKING_SLOTS = 2;
+
+export class ServiceScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'ServiceScene' });
+  }
+
+  /**
+   * MarketScene에서 전달받는 데이터.
+   * @param {{ inventory: Object, stageId: string, gold: number, lives: number }} data
+   */
+  init(data) {
+    this.inventoryManager = new InventoryManager();
+    // 전달받은 인벤토리 데이터를 복원
+    const inv = data.inventory || {};
+    for (const [type, amount] of Object.entries(inv)) {
+      if (amount > 0) this.inventoryManager.add(type, amount);
+    }
+
+    this.stageId = data.stageId || '1-1';
+    this.stageData = STAGES[this.stageId];
+    this.serviceConfig = this.stageData?.service || {
+      duration: 180, customerInterval: 6, maxCustomers: 15, customerPatience: 50,
+    };
+
+    this.marketGold = data.gold || 0;
+    this.marketLives = data.lives || 0;
+  }
+
+  create() {
+    // ── 게임 상태 ──
+    this.totalGold = 0;
+    this.satisfaction = 100;
+    this.servedCount = 0;
+    this.totalCustomers = 0;
+    this.comboCount = 0;
+    this.serviceTimeLeft = this.serviceConfig.duration;
+    this.isPaused = false;
+    this.isServiceOver = false;
+
+    // ── 손님 시스템 ──
+    /** @type {(object|null)[]} 테이블 6석 */
+    this.tables = new Array(TABLE_COUNT).fill(null);
+    this.customerSpawnTimer = 0;
+    this.customersSpawned = 0;
+
+    // ── 조리 슬롯 ──
+    /** @type {{ recipe: object|null, timeLeft: number, totalTime: number, ready: boolean }[]} */
+    this.cookingSlots = [];
+    for (let i = 0; i < MAX_COOKING_SLOTS; i++) {
+      this.cookingSlots.push({ recipe: null, timeLeft: 0, totalTime: 0, ready: false });
+    }
+
+    // ── 해금된 서빙 레시피 목록 ──
+    this.availableRecipes = ALL_SERVING_RECIPES.filter(r => RecipeManager.isUnlocked(r.id));
+
+    // ── UI 생성 ──
+    this._createHUD();
+    this._createTables();
+    this._createCookingSlots();
+    this._createInventoryPanel();
+    this._createRecipeQuickSlots();
+    this._createBottomBar();
+
+    // 페이드 인
+    this.cameras.main.fadeIn(400, 0, 0, 0);
+
+    // 씬 종료 시 정리
+    this.events.once('shutdown', this._shutdown, this);
+  }
+
+  // ── HUD (상단 40px) ──────────────────────────────────────────────
+
+  /** @private */
+  _createHUD() {
+    this.add.rectangle(GAME_WIDTH / 2, HUD_H / 2, GAME_WIDTH, HUD_H, 0x1a1a2e)
+      .setDepth(100);
+
+    this.goldText = this.add.text(10, 10, `\uD83E\uDE99 ${this.totalGold}`, {
+      fontSize: '14px', color: '#ffd700', fontStyle: 'bold',
+    }).setDepth(101);
+
+    this.timeText = this.add.text(GAME_WIDTH / 2, 10, this._formatTime(this.serviceTimeLeft), {
+      fontSize: '14px', color: '#ffffff', fontStyle: 'bold',
+    }).setOrigin(0.5, 0).setDepth(101);
+
+    this.satText = this.add.text(GAME_WIDTH - 10, 10, `\u2B50 ${this.satisfaction}%`, {
+      fontSize: '14px', color: '#ffcc00', fontStyle: 'bold',
+    }).setOrigin(1, 0).setDepth(101);
+
+    this.comboText = this.add.text(GAME_WIDTH / 2, 26, '', {
+      fontSize: '11px', color: '#ffcc00', fontStyle: 'bold',
+    }).setOrigin(0.5, 0).setDepth(101);
+  }
+
+  /** @private */
+  _updateHUD() {
+    this.goldText.setText(`\uD83E\uDE99 ${this.totalGold}`);
+    this.timeText.setText(this._formatTime(this.serviceTimeLeft));
+    this.satText.setText(`\u2B50 ${Math.round(this.satisfaction)}%`);
+
+    // 콤보 표시
+    if (this.comboCount >= 3) {
+      this.comboText.setText(`\uCF64\uBCF4 x${this.comboCount}`);
+    } else {
+      this.comboText.setText('');
+    }
+  }
+
+  /**
+   * 초 단위를 m:ss 형식으로 변환.
+   * @param {number} sec
+   * @returns {string}
+   * @private
+   */
+  _formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `\uC601\uC5C5\uC2DC\uAC04 ${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  // ── 테이블 6석 (홀 영역 40~280px) ────────────────────────────────
+
+  /** @private */
+  _createTables() {
+    this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0x1a1a2e)
+      .setDepth(0);
+
+    /** @type {Phaser.GameObjects.Container[]} */
+    this.tableContainers = [];
+
+    const cellW = GAME_WIDTH / TABLE_COLS;
+    const cellH = HALL_H / TABLE_ROWS;
+
+    for (let row = 0; row < TABLE_ROWS; row++) {
+      for (let col = 0; col < TABLE_COLS; col++) {
+        const idx = row * TABLE_COLS + col;
+        const cx = cellW * col + cellW / 2;
+        const cy = HALL_Y + cellH * row + cellH / 2;
+
+        const container = this.add.container(cx, cy).setDepth(10);
+
+        // 테이블 배경 (갈색 사각형)
+        const tableBg = this.add.rectangle(0, 0, 90, 80, 0x8b4513, 0.6)
+          .setStrokeStyle(1, 0x5a2d0c);
+        container.add(tableBg);
+
+        // 의자 (작은 원 2개)
+        const chair1 = this.add.circle(-30, 0, 8, 0x654321);
+        const chair2 = this.add.circle(30, 0, 8, 0x654321);
+        container.add([chair1, chair2]);
+
+        // "빈 테이블" 텍스트
+        const statusText = this.add.text(0, -20, '\uBE48 \uD14C\uC774\uBE14', {
+          fontSize: '10px', color: '#888888',
+        }).setOrigin(0.5);
+        container.add(statusText);
+
+        // 말풍선 (숨겨짐)
+        const bubble = this.add.rectangle(0, -45, 80, 22, 0xffffff, 0.9)
+          .setStrokeStyle(1, 0x000000).setVisible(false);
+        container.add(bubble);
+        const bubbleText = this.add.text(0, -45, '', {
+          fontSize: '9px', color: '#333333',
+        }).setOrigin(0.5).setVisible(false);
+        container.add(bubbleText);
+
+        // 인내심 바 (숨겨짐)
+        const pBarBg = this.add.rectangle(0, 30, 60, 6, 0x333333).setVisible(false);
+        container.add(pBarBg);
+        const pBarFill = this.add.rectangle(-30, 30, 60, 6, 0x00ff00)
+          .setOrigin(0, 0.5).setVisible(false);
+        container.add(pBarFill);
+
+        // 손님 아이콘 (숨겨짐)
+        const custIcon = this.add.text(0, -5, '', {
+          fontSize: '24px',
+        }).setOrigin(0.5).setVisible(false);
+        container.add(custIcon);
+
+        // 터치 영역
+        const hitArea = this.add.rectangle(0, 0, 100, 90, 0x000000, 0)
+          .setInteractive({ useHandCursor: true });
+        container.add(hitArea);
+        hitArea.on('pointerdown', () => this._onTableTap(idx));
+
+        this.tableContainers.push(container);
+
+        // UI 참조 저장
+        container.setData('statusText', statusText);
+        container.setData('bubble', bubble);
+        container.setData('bubbleText', bubbleText);
+        container.setData('pBarBg', pBarBg);
+        container.setData('pBarFill', pBarFill);
+        container.setData('custIcon', custIcon);
+      }
+    }
+  }
+
+  /**
+   * 테이블 UI 업데이트.
+   * @param {number} idx - 테이블 인덱스
+   * @private
+   */
+  _updateTableUI(idx) {
+    const container = this.tableContainers[idx];
+    const cust = this.tables[idx];
+    const statusText = container.getData('statusText');
+    const bubble = container.getData('bubble');
+    const bubbleText = container.getData('bubbleText');
+    const pBarBg = container.getData('pBarBg');
+    const pBarFill = container.getData('pBarFill');
+    const custIcon = container.getData('custIcon');
+
+    if (!cust) {
+      // 빈 테이블
+      statusText.setText('\uBE48 \uD14C\uC774\uBE14').setVisible(true);
+      bubble.setVisible(false);
+      bubbleText.setVisible(false);
+      pBarBg.setVisible(false);
+      pBarFill.setVisible(false);
+      custIcon.setVisible(false);
+      return;
+    }
+
+    statusText.setVisible(false);
+
+    // 손님 아이콘
+    custIcon.setText(cust.vip ? '\uD83D\uDC51' : '\uD83D\uDE0A').setVisible(true);
+
+    // 말풍선 — 요리 이름
+    const recipe = RECIPE_MAP[cust.dish];
+    const dishName = recipe?.nameKo || cust.dish;
+    bubble.setVisible(true);
+    bubbleText.setText(dishName).setVisible(true);
+
+    // 인내심 바
+    pBarBg.setVisible(true);
+    pBarFill.setVisible(true);
+    const ratio = Math.max(0, cust.patience / cust.maxPatience);
+    pBarFill.setScale(ratio, 1);
+
+    // 색상 변경
+    let pColor = 0x00ff00;
+    if (ratio < 0.3) pColor = 0xff0000;
+    else if (ratio < 0.6) pColor = 0xffcc00;
+    pBarFill.setFillStyle(pColor);
+  }
+
+  // ── 조리 슬롯 (280~340px) ────────────────────────────────────────
+
+  /** @private */
+  _createCookingSlots() {
+    this.add.rectangle(GAME_WIDTH / 2, COOK_Y + COOK_H / 2, GAME_WIDTH, COOK_H, 0x222233)
+      .setDepth(0);
+
+    /** @type {Phaser.GameObjects.Container[]} */
+    this.cookSlotContainers = [];
+    const slotW = GAME_WIDTH / MAX_COOKING_SLOTS;
+
+    for (let i = 0; i < MAX_COOKING_SLOTS; i++) {
+      const cx = slotW * i + slotW / 2;
+      const cy = COOK_Y + COOK_H / 2;
+
+      const container = this.add.container(cx, cy).setDepth(10);
+
+      // 슬롯 배경
+      const bg = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x333344)
+        .setStrokeStyle(1, 0x555566);
+      container.add(bg);
+
+      // 라벨
+      const label = this.add.text(0, -12, '\uBE48 \uC2AC\uB86F', {
+        fontSize: '11px', color: '#888888',
+      }).setOrigin(0.5);
+      container.add(label);
+
+      // 진행 바 배경
+      const progBg = this.add.rectangle(0, 10, slotW - 30, 8, 0x444455);
+      container.add(progBg);
+      // 진행 바
+      const progFill = this.add.rectangle(-(slotW - 30) / 2, 10, slotW - 30, 8, 0x44aaff)
+        .setOrigin(0, 0.5);
+      container.add(progFill);
+
+      container.setData('label', label);
+      container.setData('progBg', progBg);
+      container.setData('progFill', progFill);
+      container.setData('progWidth', slotW - 30);
+
+      this.cookSlotContainers.push(container);
+    }
+  }
+
+  /**
+   * 조리 슬롯 UI 업데이트.
+   * @param {number} idx
+   * @private
+   */
+  _updateCookSlotUI(idx) {
+    const container = this.cookSlotContainers[idx];
+    const slot = this.cookingSlots[idx];
+    const label = container.getData('label');
+    const progFill = container.getData('progFill');
+    const progWidth = container.getData('progWidth');
+
+    if (!slot.recipe) {
+      label.setText('\uBE48 \uC2AC\uB86F').setColor('#888888');
+      progFill.setScale(0, 1);
+      return;
+    }
+
+    if (slot.ready) {
+      label.setText(`\u2705 ${slot.recipe.nameKo}`).setColor('#44ff44');
+      progFill.setScale(1, 1).setFillStyle(0x44ff44);
+    } else {
+      const remain = Math.ceil(slot.timeLeft / 1000);
+      label.setText(`\uC870\uB9AC\uC911: ${slot.recipe.nameKo} ${remain}\uCD08`).setColor('#ffffff');
+      const ratio = 1 - (slot.timeLeft / slot.totalTime);
+      progFill.setScale(Math.max(0, ratio), 1).setFillStyle(0x44aaff);
+    }
+  }
+
+  // ── 재료 재고 패널 (340~440px) ────────────────────────────────────
+
+  /** @private */
+  _createInventoryPanel() {
+    this.add.rectangle(GAME_WIDTH / 2, STOCK_Y + STOCK_H / 2, GAME_WIDTH, STOCK_H, 0x1a1a2e)
+      .setDepth(0);
+
+    this.add.text(10, STOCK_Y + 5, '\uC7AC\uB8CC \uC7AC\uACE0', {
+      fontSize: '11px', color: '#aaaaaa', fontStyle: 'bold',
+    }).setDepth(10);
+
+    /** @type {Object<string, Phaser.GameObjects.Text>} */
+    this.stockTexts = {};
+
+    const allTypes = Object.keys(INGREDIENT_TYPES);
+    const cols = 5;
+    const cellW = GAME_WIDTH / cols;
+    const startY = STOCK_Y + 22;
+
+    allTypes.forEach((type, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = cellW * col + 10;
+      const y = startY + row * 28;
+
+      const info = INGREDIENT_TYPES[type];
+      const qty = this.inventoryManager.inventory[type] || 0;
+      const txt = this.add.text(x, y, `${info.icon}\u00D7${qty}`, {
+        fontSize: '13px', color: qty > 0 ? '#ffffff' : '#555555',
+      }).setDepth(10);
+      this.stockTexts[type] = txt;
+    });
+  }
+
+  /** @private */
+  _updateInventoryPanel() {
+    for (const [type, txt] of Object.entries(this.stockTexts)) {
+      const qty = this.inventoryManager.inventory[type] || 0;
+      const info = INGREDIENT_TYPES[type];
+      txt.setText(`${info.icon}\u00D7${qty}`);
+      txt.setColor(qty > 0 ? '#ffffff' : '#555555');
+    }
+  }
+
+  // ── 레시피 퀵슬롯 (440~570px) ────────────────────────────────────
+
+  /** @private */
+  _createRecipeQuickSlots() {
+    this.add.rectangle(GAME_WIDTH / 2, RECIPE_Y + RECIPE_H / 2, GAME_WIDTH, RECIPE_H, 0x111122)
+      .setDepth(0);
+
+    this.add.text(10, RECIPE_Y + 5, '\uB808\uC2DC\uD53C', {
+      fontSize: '11px', color: '#aaaaaa', fontStyle: 'bold',
+    }).setDepth(10);
+
+    /** @type {{ btn: Phaser.GameObjects.Rectangle, text: Phaser.GameObjects.Text, recipe: object }[]} */
+    this.recipeButtons = [];
+
+    const startY = RECIPE_Y + 22;
+    const cols = 3;
+    const btnW = 110;
+    const btnH = 48;
+    const gapX = (GAME_WIDTH - cols * btnW) / (cols + 1);
+    const gapY = 6;
+
+    this.availableRecipes.forEach((recipe, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = gapX + col * (btnW + gapX) + btnW / 2;
+      const y = startY + row * (btnH + gapY) + btnH / 2;
+
+      // 스크롤 영역 밖이면 일단 생성은 하되 클리핑으로 처리
+      const bg = this.add.rectangle(x, y, btnW, btnH, 0x334455)
+        .setStrokeStyle(1, 0x556677)
+        .setInteractive({ useHandCursor: true })
+        .setDepth(10);
+
+      // 레시피 이름 + 재료 요약
+      const ingStr = Object.entries(recipe.ingredients)
+        .map(([t, n]) => `${INGREDIENT_TYPES[t]?.icon || t}${n}`)
+        .join('');
+      const label = this.add.text(x, y - 6, recipe.nameKo, {
+        fontSize: '10px', color: '#ffffff', fontStyle: 'bold',
+      }).setOrigin(0.5).setDepth(11);
+      const subLabel = this.add.text(x, y + 10, ingStr, {
+        fontSize: '10px', color: '#cccccc',
+      }).setOrigin(0.5).setDepth(11);
+
+      bg.on('pointerdown', () => this._onRecipeTap(recipe));
+
+      this.recipeButtons.push({ btn: bg, text: label, subText: subLabel, recipe });
+    });
+  }
+
+  /** 레시피 퀵슬롯 활성/비활성 갱신 */
+  _updateRecipeQuickSlots() {
+    for (const entry of this.recipeButtons) {
+      const canMake = this.inventoryManager.hasEnough(entry.recipe.ingredients);
+      if (canMake) {
+        entry.btn.setFillStyle(0x334455).setAlpha(1);
+        entry.text.setColor('#ffffff');
+      } else {
+        entry.btn.setFillStyle(0x222233).setAlpha(0.5);
+        entry.text.setColor('#666666');
+      }
+    }
+  }
+
+  // ── 하단 바 (570~640px) ───────────────────────────────────────────
+
+  /** @private */
+  _createBottomBar() {
+    this.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_H / 2, GAME_WIDTH, BOTTOM_H, 0x0d0d1a)
+      .setDepth(100);
+
+    // 셰프 스킬 버튼 (영업 패시브 표시용)
+    const chefData = ChefManager.getChefData();
+    let chefLabel = '\uC158\uD504 \uC5C6\uC74C';
+    if (chefData) {
+      const passiveName = this._getServicePassiveDesc(chefData.id);
+      chefLabel = `${chefData.icon} ${passiveName}`;
+    }
+    this.add.text(20, BOTTOM_Y + BOTTOM_H / 2, chefLabel, {
+      fontSize: '12px', color: '#aaddff',
+    }).setOrigin(0, 0.5).setDepth(101);
+
+    // 일시정지 버튼
+    const pauseBtn = this.add.rectangle(GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, 80, 36, 0x444466)
+      .setStrokeStyle(1, 0x6666aa)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(101);
+    this.pauseLabel = this.add.text(GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, '\u23F8 \uC77C\uC2DC\uC815\uC9C0', {
+      fontSize: '11px', color: '#ffffff',
+    }).setOrigin(0.5).setDepth(102);
+
+    pauseBtn.on('pointerdown', () => this._togglePause());
+  }
+
+  /**
+   * 셰프 영업 패시브 설명 텍스트.
+   * @param {string} chefId
+   * @returns {string}
+   * @private
+   */
+  _getServicePassiveDesc(chefId) {
+    switch (chefId) {
+      case 'petit_chef': return '\uC870\uB9AC\uC2DC\uAC04 -15%';
+      case 'flame_chef': return '\uAD6C\uC774 \uBCF4\uC0C1 +25%';
+      case 'ice_chef': return '\uC778\uB0B4\uC2EC +20%';
+      default: return '';
+    }
+  }
+
+  // ── 일시정지 ──────────────────────────────────────────────────────
+
+  /** @private */
+  _togglePause() {
+    this.isPaused = !this.isPaused;
+    this.pauseLabel.setText(this.isPaused ? '\u25B6 \uC7AC\uAC1C' : '\u23F8 \uC77C\uC2DC\uC815\uC9C0');
+  }
+
+  // ── 메인 업데이트 루프 ────────────────────────────────────────────
+
+  /**
+   * @param {number} time
+   * @param {number} delta - ms
+   */
+  update(time, delta) {
+    if (this.isPaused || this.isServiceOver) return;
+
+    const dt = delta / 1000; // 초 단위
+
+    // 영업 시간 감소
+    this.serviceTimeLeft -= dt;
+    if (this.serviceTimeLeft <= 0) {
+      this.serviceTimeLeft = 0;
+      this._endService('time');
+      return;
+    }
+
+    // 손님 스폰
+    this._updateCustomerSpawn(dt);
+
+    // 손님 인내심 감소
+    this._updateCustomerPatience(delta);
+
+    // 조리 진행
+    this._updateCooking(delta);
+
+    // 재료 소진 체크
+    if (this._isAllStockEmpty() && !this._hasCookingInProgress() && !this._hasReadyDish()) {
+      this._endService('stock');
+      return;
+    }
+
+    // HUD 갱신
+    this._updateHUD();
+  }
+
+  // ── 손님 스폰 ─────────────────────────────────────────────────────
+
+  /**
+   * @param {number} dt - 초
+   * @private
+   */
+  _updateCustomerSpawn(dt) {
+    if (this.customersSpawned >= this.serviceConfig.maxCustomers) return;
+
+    this.customerSpawnTimer += dt;
+    if (this.customerSpawnTimer >= this.serviceConfig.customerInterval) {
+      this.customerSpawnTimer -= this.serviceConfig.customerInterval;
+      this._spawnCustomer();
+    }
+  }
+
+  /** @private */
+  _spawnCustomer() {
+    // 빈 테이블 찾기
+    const emptyIdx = this.tables.findIndex(t => t === null);
+    if (emptyIdx === -1) return; // 만석
+
+    // 주문 메뉴 결정: 해금된 서빙 레시피 중 현재 재고로 만들 수 있는 것 우선
+    const possibleRecipes = this.availableRecipes.filter(r =>
+      this.inventoryManager.hasEnough(r.ingredients)
+    );
+
+    // 재고로 만들 수 있는 게 없으면 해금된 레시피 중 아무거나 (손님은 재고 무관하게 주문함)
+    const pool = possibleRecipes.length > 0 ? possibleRecipes : this.availableRecipes;
+    if (pool.length === 0) return;
+
+    const recipe = pool[Math.floor(Math.random() * pool.length)];
+    const patienceBonus = ChefManager.getPatienceBonus();
+    const basePat = this.serviceConfig.customerPatience * 1000; // ms
+    const isVip = Math.random() < 0.15; // 15% VIP 확률
+
+    const customer = {
+      dish: recipe.id,
+      recipe: recipe,
+      patience: basePat * patienceBonus * (isVip ? 0.7 : 1),
+      maxPatience: basePat * patienceBonus * (isVip ? 0.7 : 1),
+      baseReward: recipe.baseReward,
+      tipMultiplier: 1.5,
+      vip: isVip,
+    };
+
+    this.tables[emptyIdx] = customer;
+    this.customersSpawned++;
+    this.totalCustomers++;
+
+    this._updateTableUI(emptyIdx);
+
+    // 입장 이펙트
+    const cont = this.tableContainers[emptyIdx];
+    this.tweens.add({
+      targets: cont,
+      scaleX: { from: 0.8, to: 1 },
+      scaleY: { from: 0.8, to: 1 },
+      duration: 200,
+      ease: 'Back.easeOut',
+    });
+  }
+
+  // ── 손님 인내심 ───────────────────────────────────────────────────
+
+  /**
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateCustomerPatience(delta) {
+    for (let i = 0; i < TABLE_COUNT; i++) {
+      const cust = this.tables[i];
+      if (!cust) continue;
+
+      cust.patience -= delta;
+      this._updateTableUI(i);
+
+      if (cust.patience <= 0) {
+        // 손님 퇴장
+        this.tables[i] = null;
+        this.satisfaction = Math.max(0, this.satisfaction - 15);
+        this.comboCount = 0;
+        this._updateTableUI(i);
+
+        // 퇴장 이펙트
+        this._showFloatingText(this.tableContainers[i], '\uD83D\uDE21 -15%', '#ff4444');
+
+        // 만족도 0% 체크
+        if (this.satisfaction <= 0) {
+          this._endService('satisfaction');
+          return;
+        }
+      }
+    }
+  }
+
+  // ── 조리 진행 ─────────────────────────────────────────────────────
+
+  /**
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateCooking(delta) {
+    for (let i = 0; i < this.cookingSlots.length; i++) {
+      const slot = this.cookingSlots[i];
+      if (!slot.recipe || slot.ready) {
+        this._updateCookSlotUI(i);
+        continue;
+      }
+
+      slot.timeLeft -= delta;
+      if (slot.timeLeft <= 0) {
+        slot.timeLeft = 0;
+        slot.ready = true;
+      }
+      this._updateCookSlotUI(i);
+    }
+  }
+
+  // ── 레시피 탭 → 조리 시작 ─────────────────────────────────────────
+
+  /**
+   * 레시피 퀵슬롯 탭 시 호출.
+   * @param {object} recipe
+   * @private
+   */
+  _onRecipeTap(recipe) {
+    if (this.isServiceOver || this.isPaused) return;
+
+    // 재료 확인
+    if (!this.inventoryManager.hasEnough(recipe.ingredients)) {
+      this._showMessage('\uC7AC\uB8CC \uBD80\uC871!');
+      return;
+    }
+
+    // 빈 조리 슬롯 확인
+    const emptySlot = this.cookingSlots.findIndex(s => !s.recipe);
+    if (emptySlot === -1) {
+      this._showMessage('\uC870\uB9AC \uC2AC\uB86F\uC774 \uAC00\uB4DD \uCC3C\uC2B5\uB2C8\uB2E4!');
+      return;
+    }
+
+    // 재료 소비
+    this.inventoryManager.consumeRecipe(recipe.ingredients);
+    this._updateInventoryPanel();
+    this._updateRecipeQuickSlots();
+
+    // 조리 시작
+    const cookTimeBonus = ChefManager.getCookTimeBonus();
+    const totalTime = recipe.cookTime * cookTimeBonus;
+    this.cookingSlots[emptySlot] = {
+      recipe: recipe,
+      timeLeft: totalTime,
+      totalTime: totalTime,
+      ready: false,
+    };
+    this._updateCookSlotUI(emptySlot);
+  }
+
+  // ── 테이블 탭 → 서빙 ──────────────────────────────────────────────
+
+  /**
+   * 테이블 탭 시 호출.
+   * 완성된 요리가 있고 해당 손님의 주문과 일치하면 서빙.
+   * @param {number} tableIdx
+   * @private
+   */
+  _onTableTap(tableIdx) {
+    if (this.isServiceOver || this.isPaused) return;
+
+    const cust = this.tables[tableIdx];
+    if (!cust) return;
+
+    // 완성된 요리 슬롯 찾기 (해당 주문과 일치)
+    const readySlotIdx = this.cookingSlots.findIndex(
+      s => s.recipe && s.ready && s.recipe.id === cust.dish
+    );
+
+    if (readySlotIdx === -1) {
+      // 완성된 요리가 없거나 주문과 불일치
+      // 다른 요리라도 완성된 게 있으면 오서빙 처리는 하지 않는다 (스펙에서는 Phase 7 기본 구조)
+      this._showMessage('\uC8FC\uBB38\uACFC \uC77C\uCE58\uD558\uB294 \uC694\uB9AC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4');
+      return;
+    }
+
+    // 서빙 성공
+    const slot = this.cookingSlots[readySlotIdx];
+    const recipe = slot.recipe;
+
+    // 팁 계산
+    const patienceRatio = cust.patience / cust.maxPatience;
+    let tipGrade;
+    if (patienceRatio >= 0.5) {
+      tipGrade = cust.tipMultiplier;  // 빠른 서빙 보너스
+    } else if (patienceRatio >= 0.3) {
+      tipGrade = 1.0;
+    } else {
+      tipGrade = 0.7;
+    }
+
+    // 콤보 보너스
+    this.comboCount++;
+    const comboMult = this._getComboMultiplier();
+
+    // VIP 2배
+    const vipMult = cust.vip ? 2.0 : 1.0;
+
+    // 그릴 카테고리 보너스
+    const grillBonus = (recipe.category === 'grill') ? ChefManager.getGrillRewardBonus() : 1.0;
+
+    // 만족도 상승
+    const satGain = 5 + (recipe.tier - 1) * 3;
+    if (patienceRatio > 0.5) {
+      this.satisfaction = Math.min(100, this.satisfaction + satGain + 5);
+    } else {
+      this.satisfaction = Math.min(100, this.satisfaction + satGain);
+    }
+
+    // 골드 계산
+    const baseGold = cust.baseReward;
+    const totalGold = Math.floor(baseGold * tipGrade * comboMult * vipMult * grillBonus);
+
+    this.totalGold += totalGold;
+    this.servedCount++;
+
+    // 조리 슬롯 비우기
+    this.cookingSlots[readySlotIdx] = { recipe: null, timeLeft: 0, totalTime: 0, ready: false };
+    this._updateCookSlotUI(readySlotIdx);
+
+    // 테이블 비우기
+    this.tables[tableIdx] = null;
+    this._updateTableUI(tableIdx);
+
+    // 서빙 이펙트
+    const tipStr = tipGrade > 1 ? ' +\uD301!' : '';
+    this._showFloatingText(
+      this.tableContainers[tableIdx],
+      `+${totalGold}G${tipStr}`,
+      '#ffd700'
+    );
+
+    // 레시피 슬롯 갱신
+    this._updateRecipeQuickSlots();
+    this._updateHUD();
+  }
+
+  /**
+   * 콤보 보너스 배율.
+   * @returns {number}
+   * @private
+   */
+  _getComboMultiplier() {
+    if (this.comboCount >= 8) return 1.50;
+    if (this.comboCount >= 5) return 1.25;
+    if (this.comboCount >= 3) return 1.10;
+    return 1.0;
+  }
+
+  // ── 영업 종료 ─────────────────────────────────────────────────────
+
+  /**
+   * 영업 종료 처리.
+   * @param {'time'|'stock'|'satisfaction'} reason
+   * @private
+   */
+  _endService(reason) {
+    if (this.isServiceOver) return;
+    this.isServiceOver = true;
+
+    let message;
+    let isVictory = true;
+    switch (reason) {
+      case 'time':
+        message = '\uC601\uC5C5 \uC2DC\uAC04 \uC885\uB8CC!';
+        break;
+      case 'stock':
+        message = '\uC7AC\uB8CC \uC18C\uC9C4! \uC601\uC5C5 \uC885\uB8CC';
+        break;
+      case 'satisfaction':
+        message = '\uB808\uC2A4\uD1A0\uB791 \uD3D0\uC1C4!';
+        isVictory = true; // 보상 50% 감소이지만 실패는 아님
+        break;
+    }
+
+    // 만족도 0이면 보상 50% 감소
+    if (this.satisfaction <= 0) {
+      this.totalGold = Math.floor(this.totalGold * 0.5);
+    }
+
+    this._showMessage(message, 2000);
+
+    this.time.delayedCall(2500, () => {
+      this.cameras.main.fadeOut(600, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        // Phase 7-3에서 ResultScene으로 전환 예정
+        // 현재는 GameOverScene에 결과 데이터 전달
+        this.scene.start('GameOverScene', {
+          isVictory: isVictory,
+          stageId: this.stageId,
+          score: this.servedCount,
+          lives: this.marketLives,
+          starThresholds: this.stageData?.starThresholds,
+          // 영업 결과 추가 데이터 (Phase 7-3에서 활용)
+          gold: this.totalGold,
+          satisfaction: this.satisfaction,
+          servedCount: this.servedCount,
+          totalCustomers: this.totalCustomers,
+        });
+      });
+    });
+  }
+
+  // ── 유틸리티 ──────────────────────────────────────────────────────
+
+  /**
+   * 재고가 전부 비었는지 확인.
+   * @returns {boolean}
+   * @private
+   */
+  _isAllStockEmpty() {
+    return this.inventoryManager.getTotal() === 0;
+  }
+
+  /**
+   * 조리 중인 슬롯이 있는지 확인.
+   * @returns {boolean}
+   * @private
+   */
+  _hasCookingInProgress() {
+    return this.cookingSlots.some(s => s.recipe && !s.ready);
+  }
+
+  /**
+   * 완성된 요리가 있는지 확인.
+   * @returns {boolean}
+   * @private
+   */
+  _hasReadyDish() {
+    return this.cookingSlots.some(s => s.recipe && s.ready);
+  }
+
+  /**
+   * 플로팅 텍스트 이펙트.
+   * @param {Phaser.GameObjects.Container} target - 기준 컨테이너
+   * @param {string} text
+   * @param {string} color
+   * @private
+   */
+  _showFloatingText(target, text, color) {
+    const fx = this.add.text(target.x, target.y - 20, text, {
+      fontSize: '14px', fontStyle: 'bold', color: color,
+      stroke: '#000000', strokeThickness: 3,
+    }).setOrigin(0.5).setDepth(200);
+
+    this.tweens.add({
+      targets: fx,
+      y: fx.y - 40,
+      alpha: 0,
+      duration: 1200,
+      ease: 'Power2',
+      onComplete: () => fx.destroy(),
+    });
+  }
+
+  /**
+   * 화면 중앙에 메시지 표시.
+   * @param {string} text
+   * @param {number} [duration=1500]
+   * @private
+   */
+  _showMessage(text, duration = 1500) {
+    const msg = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 40, text, {
+      fontSize: '18px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000000', strokeThickness: 4,
+      backgroundColor: '#000000aa',
+      padding: { x: 16, y: 8 },
+      align: 'center',
+    }).setOrigin(0.5).setDepth(300);
+
+    this.time.delayedCall(duration, () => {
+      this.tweens.add({
+        targets: msg,
+        alpha: 0,
+        duration: 300,
+        onComplete: () => msg.destroy(),
+      });
+    });
+  }
+
+  /** 씬 종료 시 정리 */
+  _shutdown() {
+    this.tables = [];
+    this.cookingSlots = [];
+    this.recipeButtons = [];
+    this.tableContainers = [];
+    this.cookSlotContainers = [];
+  }
+}

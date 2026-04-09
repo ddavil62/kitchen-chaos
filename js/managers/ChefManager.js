@@ -1,5 +1,6 @@
 /**
  * @fileoverview 셰프 관리자. 선택, 패시브 조회, 스킬 발동.
+ * Phase 7-2: 영업 패시브 메서드 추가 (조리시간, 그릴보상, 인내심).
  */
 
 import { CHEF_TYPES } from '../data/chefData.js';
@@ -64,5 +65,34 @@ export class ChefManager {
    */
   static getCCDurationBonus() {
     return 1 + ChefManager.getPassiveValue('cc_duration');
+  }
+
+  // ── 영업 패시브 (Phase 7-2) ──
+
+  /**
+   * 조리 시간 배율 (petit_chef 선택 시 -15%).
+   * @returns {number} 0.85 또는 1.0
+   */
+  static getCookTimeBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'petit_chef' ? 0.85 : 1.0;
+  }
+
+  /**
+   * 그릴 카테고리 요리 보상 배율 (flame_chef 선택 시 +25%).
+   * @returns {number} 1.25 또는 1.0
+   */
+  static getGrillRewardBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'flame_chef' ? 1.25 : 1.0;
+  }
+
+  /**
+   * 손님 인내심 배율 (ice_chef 선택 시 +20%).
+   * @returns {number} 1.20 또는 1.0
+   */
+  static getPatienceBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'ice_chef' ? 1.20 : 1.0;
   }
 }

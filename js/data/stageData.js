@@ -110,6 +110,13 @@ export const STAGES = {
       },
     ],
     starThresholds: { three: 12, two: 8 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 180,         // 영업 시간 (초)
+      customerInterval: 6,   // 손님 입장 간격 (초)
+      maxCustomers: 15,      // 최대 손님 수
+      customerPatience: 50,  // 기본 인내심 (초)
+    },
   },
 
   '1-2': {
@@ -234,6 +241,13 @@ export const STAGES = {
       },
     ],
     starThresholds: { three: 13, two: 9 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 180,
+      customerInterval: 5.5,
+      maxCustomers: 18,
+      customerPatience: 48,
+    },
   },
 
   '1-3': {
@@ -383,6 +397,13 @@ export const STAGES = {
       },
     ],
     starThresholds: { three: 11, two: 7 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 200,
+      customerInterval: 5,
+      maxCustomers: 20,
+      customerPatience: 45,
+    },
   },
 
   // ── Phase 5 신규 스테이지 ──
@@ -476,6 +497,13 @@ export const STAGES = {
       ]},
     ],
     starThresholds: { three: 12, two: 8 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 200,
+      customerInterval: 5,
+      maxCustomers: 20,
+      customerPatience: 42,
+    },
   },
 
   '1-5': {
@@ -583,6 +611,13 @@ export const STAGES = {
       ]},
     ],
     starThresholds: { three: 13, two: 9 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 220,
+      customerInterval: 4.5,
+      maxCustomers: 22,
+      customerPatience: 40,
+    },
   },
 
   '1-6': {
@@ -701,6 +736,13 @@ export const STAGES = {
       ]},
     ],
     starThresholds: { three: 14, two: 10 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 240,
+      customerInterval: 4,
+      maxCustomers: 25,
+      customerPatience: 38,
+    },
   },
 
   // ── Phase 6 2장: 동양 요리 식당 ──
@@ -794,6 +836,13 @@ export const STAGES = {
       ]},
     ],
     starThresholds: { three: 12, two: 8 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 240,
+      customerInterval: 4,
+      maxCustomers: 25,
+      customerPatience: 38,
+    },
   },
 
   '2-2': {
@@ -901,6 +950,13 @@ export const STAGES = {
       ]},
     ],
     starThresholds: { three: 14, two: 10 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 260,
+      customerInterval: 3.5,
+      maxCustomers: 28,
+      customerPatience: 35,
+    },
   },
 
   '2-3': {
@@ -1018,6 +1074,13 @@ export const STAGES = {
       ]},
     ],
     starThresholds: { three: 16, two: 11 },
+    // ── Phase 7-2: 영업 설정 ──
+    service: {
+      duration: 280,
+      customerInterval: 3,
+      maxCustomers: 30,
+      customerPatience: 32,
+    },
   },
 };
 

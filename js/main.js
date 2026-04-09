@@ -10,6 +10,7 @@ import { MenuScene } from './scenes/MenuScene.js';
 import { StageSelectScene } from './scenes/StageSelectScene.js';
 import { ChefSelectScene } from './scenes/ChefSelectScene.js';
 import { MarketScene } from './scenes/MarketScene.js';
+import { ServiceScene } from './scenes/ServiceScene.js';
 import { RestaurantScene } from './scenes/RestaurantScene.js';
 import { GameOverScene } from './scenes/GameOverScene.js';
 import { ShopScene } from './scenes/ShopScene.js';
@@ -30,7 +31,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, StageSelectScene, ChefSelectScene, MarketScene, RestaurantScene, GameOverScene, ShopScene, RecipeCollectionScene],
+  scene: [BootScene, MenuScene, StageSelectScene, ChefSelectScene, MarketScene, ServiceScene, RestaurantScene, GameOverScene, ShopScene, RecipeCollectionScene],
   input: {
     activePointers: 1,
   },

@@ -2,7 +2,7 @@
  * @fileoverview 장보기 씬 (풀스크린 TD).
  * Phase 7: GameScene을 리팩토링하여 풀스크린 TD로 전환.
  * 적 처치 → 재료 드롭 → 인벤토리 누적.
- * 전 웨이브 클리어 시 ServiceScene으로 전환 (7-2에서 구현, 현재는 임시 GameOverScene).
+ * 전 웨이브 클리어 시 ServiceScene으로 전환.
  */
 
 import Phaser from 'phaser';
@@ -976,13 +976,12 @@ export class MarketScene extends Phaser.Scene {
     this.time.delayedCall(3200, () => {
       this.cameras.main.fadeOut(600, 0, 100, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        // Phase 7-2에서 ServiceScene으로 전환 예정
-        // 현재는 임시로 GameOverScene 승리 화면으로 이동
-        this.scene.start('GameOverScene', {
-          score: this.score, isVictory: true,
-          stageId: this.stageId, lives: this.lives,
-          starThresholds: this.stageData?.starThresholds,
+        // Phase 7-2: ServiceScene으로 전환
+        this.scene.start('ServiceScene', {
           inventory: this.inventoryManager.getAll(),
+          stageId: this.stageId,
+          gold: this.gold,
+          lives: this.lives,
         });
       });
     });
