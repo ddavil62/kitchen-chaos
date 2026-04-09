@@ -1,6 +1,7 @@
 /**
  * @fileoverview 통합 상점 씬.
  * Phase 5: 업그레이드 탭 + 레시피 해금 탭.
+ * Phase 8-3: 테이블 탭, 인테리어 탭, 직원 탭 추가.
  */
 
 import Phaser from 'phaser';
@@ -11,6 +12,54 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 
+// ── Phase 8-3: 테이블/인테리어 상수 ──
+
+/** 테이블 업그레이드 비용 (Lv0->1, 1->2, 2->3, 3->4) */
+const TABLE_UPGRADE_COSTS = [20, 45, 80, 130];
+
+/** 테이블 해금 비용 (5번, 6번, 7번, 8번) */
+const TABLE_UNLOCK_COSTS = [40, 40, 70, 70];
+
+/** 테이블 등급 이름 */
+const TABLE_GRADE_NAMES = ['나무 탁자', '깔끔한 테이블', '고급 테이블', 'VIP 테이블', '프리미엄 스위트'];
+
+/** 테이블 등급별 팁 배율 */
+const TABLE_TIP_MULTS = [1.0, 1.1, 1.25, 1.4, 1.6];
+
+/** 테이블 등급별 인내심 보너스 (%) */
+const TABLE_PATIENCE_PCTS = [0, 5, 10, 18, 25];
+
+/** 인테리어 정의 */
+const INTERIOR_DEFS = [
+  {
+    type: 'flower',
+    nameKo: '꽃병',
+    icon: '🌸',
+    desc: '손님 인내심',
+    effectPcts: [0, 5, 10, 16, 22, 30],
+    costs: [15, 30, 50, 80, 120],
+  },
+  {
+    type: 'kitchen',
+    nameKo: '오픈 키친',
+    icon: '🍳',
+    desc: '조리 속도',
+    effectPcts: [0, 5, 10, 16, 22, 30],
+    costs: [20, 40, 65, 100, 150],
+  },
+  {
+    type: 'lighting',
+    nameKo: '고급 조명',
+    icon: '💡',
+    desc: '팁 보너스',
+    effectPcts: [0, 8, 16, 25, 35, 50],
+    costs: [15, 35, 55, 85, 130],
+  },
+];
+
+/** 모든 탭 키 목록 */
+const ALL_TABS = ['upgrade', 'recipe', 'table', 'interior', 'staff'];
+
 export class ShopScene extends Phaser.Scene {
   constructor() {
     super({ key: 'ShopScene' });
@@ -19,7 +68,7 @@ export class ShopScene extends Phaser.Scene {
   create() {
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
-    /** @type {'upgrade'|'recipe'} */
+    /** @type {'upgrade'|'recipe'|'table'|'interior'|'staff'} */
     this._activeTab = 'upgrade';
     /** @type {string} */
     this._recipeFilter = 'all';
@@ -69,20 +118,26 @@ export class ShopScene extends Phaser.Scene {
     const tabY = 60;
     const tabs = [
       { key: 'upgrade', label: '업그레이드' },
-      { key: 'recipe', label: '레시피 해금' },
+      { key: 'recipe', label: '레시피' },
+      { key: 'table', label: '테이블' },
+      { key: 'interior', label: '인테리어' },
+      { key: 'staff', label: '직원' },
     ];
 
     this._tabBgs = {};
     this._tabTexts = {};
 
-    tabs.forEach((tab, i) => {
-      const x = 10 + i * (GAME_WIDTH / 2);
-      const w = GAME_WIDTH / 2 - 10;
+    const tabCount = tabs.length;
+    const tabW = Math.floor((GAME_WIDTH - 10) / tabCount);
 
-      const bg = this.add.rectangle(x + w / 2, tabY, w, 30, 0x333333)
+    tabs.forEach((tab, i) => {
+      const x = 5 + i * tabW;
+      const w = tabW - 2;
+
+      const bg = this.add.rectangle(x + w / 2, tabY, w, 28, 0x333333)
         .setInteractive({ useHandCursor: true });
       const txt = this.add.text(x + w / 2, tabY, tab.label, {
-        fontSize: '14px', fontStyle: 'bold', color: '#aaaaaa',
+        fontSize: '11px', fontStyle: 'bold', color: '#aaaaaa',
       }).setOrigin(0.5);
 
       bg.on('pointerdown', () => {
@@ -100,7 +155,7 @@ export class ShopScene extends Phaser.Scene {
   }
 
   _updateTabHighlight() {
-    for (const key of ['upgrade', 'recipe']) {
+    for (const key of ALL_TABS) {
       const active = key === this._activeTab;
       this._tabBgs[key].setFillStyle(active ? 0x553300 : 0x333333);
       this._tabTexts[key].setColor(active ? '#ffd700' : '#aaaaaa');
@@ -113,10 +168,22 @@ export class ShopScene extends Phaser.Scene {
     if (this._contentContainer) this._contentContainer.destroy();
     this._contentContainer = this.add.container(0, 0);
 
-    if (this._activeTab === 'upgrade') {
-      this._renderUpgrades();
-    } else {
-      this._renderRecipeShop();
+    switch (this._activeTab) {
+      case 'upgrade':
+        this._renderUpgrades();
+        break;
+      case 'recipe':
+        this._renderRecipeShop();
+        break;
+      case 'table':
+        this._renderTableShop();
+        break;
+      case 'interior':
+        this._renderInteriorShop();
+        break;
+      case 'staff':
+        this._renderStaffShop();
+        break;
     }
   }
 
@@ -332,6 +399,345 @@ export class ShopScene extends Phaser.Scene {
         }).setOrigin(0.5)
       );
     }
+  }
+
+  // ── 테이블 탭 (Phase 8-3) ──
+
+  /**
+   * 테이블 업그레이드/해금 상점 렌더링.
+   * 해금된 테이블은 현재 등급 + 업그레이드 버튼,
+   * 미해금 테이블은 해금 버튼 표시.
+   * @private
+   */
+  _renderTableShop() {
+    const startY = 90;
+    const cardH = 65;
+    const unlockedCount = SaveManager.getUnlockedTables();
+    const maxTables = 8;
+    const coins = SaveManager.getCoins();
+
+    // 섹션 헤더: 해금된 테이블
+    this._contentContainer.add(
+      this.add.text(20, startY, '테이블 업그레이드', {
+        fontSize: '13px', fontStyle: 'bold', color: '#ffd700',
+      })
+    );
+
+    let y = startY + 24;
+
+    // 해금된 테이블 목록
+    for (let i = 0; i < unlockedCount; i++) {
+      const grade = SaveManager.getTableUpgrade(i);
+      const isMax = grade >= 4;
+      const gradeName = TABLE_GRADE_NAMES[grade];
+      const nextGradeName = isMax ? '' : TABLE_GRADE_NAMES[grade + 1];
+      const cost = isMax ? 0 : TABLE_UPGRADE_COSTS[grade];
+
+      // 카드 배경
+      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, 0x2a1a0a)
+        .setStrokeStyle(1, 0x555533);
+      this._contentContainer.add(cardBg);
+
+      // 테이블 번호 + 현재 등급
+      this._contentContainer.add(
+        this.add.text(20, y + 8, `#${i + 1} ${gradeName}`, {
+          fontSize: '14px', fontStyle: 'bold', color: '#ffffff',
+        })
+      );
+
+      // 레벨 표시
+      const lvlStr = isMax ? 'MAX' : `Lv.${grade}/4`;
+      this._contentContainer.add(
+        this.add.text(GAME_WIDTH - 20, y + 8, lvlStr, {
+          fontSize: '12px', color: isMax ? '#44ff44' : '#ffcc00',
+        }).setOrigin(1, 0)
+      );
+
+      // 현재 효과
+      this._contentContainer.add(
+        this.add.text(20, y + 28, `팁 x${TABLE_TIP_MULTS[grade]}  인내심 +${TABLE_PATIENCE_PCTS[grade]}%`, {
+          fontSize: '10px', color: '#aaaaaa',
+        })
+      );
+
+      // 업그레이드 버튼
+      if (!isMax) {
+        const canBuy = coins >= cost;
+        const btnX = GAME_WIDTH - 55;
+        const btnY = y + 38;
+
+        const btn = this.add.rectangle(btnX, btnY, 70, 22, canBuy ? 0x886600 : 0x333333)
+          .setInteractive({ useHandCursor: canBuy });
+        this._contentContainer.add(btn);
+
+        this._contentContainer.add(
+          this.add.text(btnX, btnY, `${cost} 🪙`, {
+            fontSize: '11px', fontStyle: 'bold',
+            color: canBuy ? '#ffcc00' : '#666666',
+          }).setOrigin(0.5)
+        );
+
+        // 다음 등급 효과 미리보기
+        this._contentContainer.add(
+          this.add.text(20, y + 42, `→ ${nextGradeName} (팁 x${TABLE_TIP_MULTS[grade + 1]}, 인내심 +${TABLE_PATIENCE_PCTS[grade + 1]}%)`, {
+            fontSize: '9px', color: '#888888',
+          })
+        );
+
+        if (canBuy) {
+          btn.on('pointerdown', () => {
+            if (SaveManager.spendCoins(cost)) {
+              SaveManager.upgradeTable(i);
+              this._updateCoinDisplay();
+              this._renderContent();
+            }
+          });
+        }
+      }
+
+      y += cardH;
+    }
+
+    // 미해금 테이블 섹션
+    if (unlockedCount < maxTables) {
+      y += 10;
+      this._contentContainer.add(
+        this.add.text(20, y, '테이블 해금', {
+          fontSize: '13px', fontStyle: 'bold', color: '#ffd700',
+        })
+      );
+      y += 24;
+
+      for (let i = unlockedCount; i < maxTables; i++) {
+        const unlockCost = TABLE_UNLOCK_COSTS[i - 4]; // 5~8번 → 인덱스 0~3
+        const canBuy = coins >= unlockCost;
+        // 이전 테이블이 해금되어야 다음 해금 가능
+        const isNext = i === unlockedCount;
+
+        const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + 28, 340, 44, 0x1a1a1a)
+          .setStrokeStyle(1, 0x444444);
+        this._contentContainer.add(cardBg);
+
+        // 잠김 표시
+        const lockColor = isNext ? '#ffffff' : '#555555';
+        this._contentContainer.add(
+          this.add.text(20, y + 14, `🔒 #${i + 1}번 테이블`, {
+            fontSize: '14px', fontStyle: 'bold', color: lockColor,
+          })
+        );
+
+        // 레이아웃 힌트
+        const layoutHint = (i + 1) <= 6 ? '2x3' : '2x4';
+        this._contentContainer.add(
+          this.add.text(20, y + 34, `레이아웃: ${layoutHint}`, {
+            fontSize: '10px', color: '#666666',
+          })
+        );
+
+        // 해금 버튼 (순서대로만 해금 가능)
+        if (isNext) {
+          const btnX = GAME_WIDTH - 55;
+          const btnY = y + 28;
+
+          const btn = this.add.rectangle(btnX, btnY, 70, 24, canBuy ? 0x886600 : 0x333333)
+            .setInteractive({ useHandCursor: canBuy });
+          this._contentContainer.add(btn);
+
+          this._contentContainer.add(
+            this.add.text(btnX, btnY, `${unlockCost} 🪙`, {
+              fontSize: '12px', fontStyle: 'bold',
+              color: canBuy ? '#ffcc00' : '#666666',
+            }).setOrigin(0.5)
+          );
+
+          if (canBuy) {
+            btn.on('pointerdown', () => {
+              if (SaveManager.spendCoins(unlockCost)) {
+                SaveManager.unlockTable();
+                this._updateCoinDisplay();
+                this._renderContent();
+              }
+            });
+          }
+        }
+
+        y += 50;
+      }
+    }
+  }
+
+  // ── 인테리어 탭 (Phase 8-3) ──
+
+  /**
+   * 인테리어 3종 업그레이드 상점 렌더링.
+   * @private
+   */
+  _renderInteriorShop() {
+    const startY = 90;
+    const cardH = 90;
+    const coins = SaveManager.getCoins();
+
+    // 섹션 헤더
+    this._contentContainer.add(
+      this.add.text(20, startY, '인테리어 업그레이드', {
+        fontSize: '13px', fontStyle: 'bold', color: '#ffd700',
+      })
+    );
+
+    INTERIOR_DEFS.forEach((def, i) => {
+      const y = startY + 24 + i * cardH;
+      const level = SaveManager.getInteriorLevel(def.type);
+      const isMax = level >= 5;
+      const cost = isMax ? 0 : def.costs[level];
+
+      // 카드 배경
+      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, 0x2a1a0a)
+        .setStrokeStyle(1, 0x555533);
+      this._contentContainer.add(cardBg);
+
+      // 이름 + 아이콘
+      this._contentContainer.add(
+        this.add.text(20, y + 8, `${def.icon} ${def.nameKo}`, {
+          fontSize: '15px', fontStyle: 'bold', color: '#ffffff',
+        })
+      );
+
+      // 레벨 표시
+      const lvlStr = isMax ? 'MAX' : `Lv.${level}/5`;
+      this._contentContainer.add(
+        this.add.text(GAME_WIDTH - 20, y + 8, lvlStr, {
+          fontSize: '13px', color: isMax ? '#44ff44' : '#ffcc00',
+        }).setOrigin(1, 0)
+      );
+
+      // 현재 효과
+      this._contentContainer.add(
+        this.add.text(20, y + 30, `${def.desc} +${def.effectPcts[level]}%`, {
+          fontSize: '12px', color: '#aaaaaa',
+        })
+      );
+
+      // 레벨 게이지 바
+      const barX = 20;
+      const barY = y + 50;
+      const barW = 200;
+      const barH = 8;
+      const barBg = this.add.rectangle(barX + barW / 2, barY, barW, barH, 0x333333);
+      this._contentContainer.add(barBg);
+      if (level > 0) {
+        const fillW = Math.floor(barW * (level / 5));
+        const barFill = this.add.rectangle(barX + fillW / 2, barY, fillW, barH, 0x44aa44)
+          .setOrigin(0.5, 0.5);
+        this._contentContainer.add(barFill);
+      }
+      // 레벨 점 표시 (5단계)
+      for (let lv = 0; lv < 5; lv++) {
+        const dotX = barX + Math.floor(barW * ((lv + 0.5) / 5));
+        const dotColor = lv < level ? '#44ff44' : '#555555';
+        this._contentContainer.add(
+          this.add.text(dotX, barY, '●', {
+            fontSize: '8px', color: dotColor,
+          }).setOrigin(0.5)
+        );
+      }
+
+      // 업그레이드 버튼
+      if (!isMax) {
+        const canBuy = coins >= cost;
+        const btnX = GAME_WIDTH - 55;
+        const btnY2 = y + 62;
+
+        const btn = this.add.rectangle(btnX, btnY2, 70, 24, canBuy ? 0x886600 : 0x333333)
+          .setInteractive({ useHandCursor: canBuy });
+        this._contentContainer.add(btn);
+
+        this._contentContainer.add(
+          this.add.text(btnX, btnY2, `${cost} 🪙`, {
+            fontSize: '12px', fontStyle: 'bold',
+            color: canBuy ? '#ffcc00' : '#666666',
+          }).setOrigin(0.5)
+        );
+
+        // 다음 효과 미리보기
+        this._contentContainer.add(
+          this.add.text(20, y + 65, `→ Lv.${level + 1}: ${def.desc} +${def.effectPcts[level + 1]}%`, {
+            fontSize: '9px', color: '#888888',
+          })
+        );
+
+        if (canBuy) {
+          btn.on('pointerdown', () => {
+            if (SaveManager.spendCoins(cost)) {
+              SaveManager.upgradeInterior(def.type);
+              this._updateCoinDisplay();
+              this._renderContent();
+            }
+          });
+        }
+      }
+    });
+  }
+
+  // ── 직원 탭 (Phase 8-3 — 빈 탭, 8-4에서 구현) ──
+
+  /**
+   * 직원 탭. Phase 8-4에서 서빙/세척 도우미 구현 예정.
+   * @private
+   */
+  _renderStaffShop() {
+    const centerX = GAME_WIDTH / 2;
+    const centerY = GAME_HEIGHT / 2 - 40;
+
+    // 준비 중 안내
+    this._contentContainer.add(
+      this.add.text(centerX, centerY - 30, '🤵 직원 고용', {
+        fontSize: '18px', fontStyle: 'bold', color: '#ffd700',
+      }).setOrigin(0.5)
+    );
+
+    this._contentContainer.add(
+      this.add.text(centerX, centerY + 10, '준비 중', {
+        fontSize: '16px', color: '#888888',
+      }).setOrigin(0.5)
+    );
+
+    this._contentContainer.add(
+      this.add.text(centerX, centerY + 40, '서빙 도우미, 세척 도우미 등\n다음 업데이트에서 만나보세요!', {
+        fontSize: '12px', color: '#666666', align: 'center',
+      }).setOrigin(0.5)
+    );
+
+    // 미리보기 슬롯 2개
+    const slots = [
+      { icon: '🤵', name: '서빙 도우미', desc: '조리 완료 자동 서빙' },
+      { icon: '🧹', name: '세척 도우미', desc: '세척 대기시간 제거' },
+    ];
+
+    slots.forEach((slot, i) => {
+      const y = centerY + 90 + i * 60;
+
+      const bg = this.add.rectangle(centerX, y, 280, 48, 0x222222)
+        .setStrokeStyle(1, 0x444444);
+      this._contentContainer.add(bg);
+
+      this._contentContainer.add(
+        this.add.text(centerX - 120, y - 8, `${slot.icon} ${slot.name}`, {
+          fontSize: '13px', fontStyle: 'bold', color: '#555555',
+        })
+      );
+
+      this._contentContainer.add(
+        this.add.text(centerX - 120, y + 10, slot.desc, {
+          fontSize: '10px', color: '#444444',
+        })
+      );
+
+      this._contentContainer.add(
+        this.add.text(centerX + 110, y, '🔒', {
+          fontSize: '18px', color: '#444444',
+        }).setOrigin(0.5)
+      );
+    });
   }
 
   /**

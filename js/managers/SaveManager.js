@@ -3,12 +3,13 @@
  * Phase 5: v2 마이그레이션 — kitchenCoins, upgrades, unlockedRecipes 추가.
  * Phase 6: v3 마이그레이션 — selectedChef, completedOrders 추가.
  * Phase 7-3: v4 마이그레이션 — cookingSlots, bestSatisfaction 추가.
+ * Phase 8-3: v5 마이그레이션 — tableUpgrades, unlockedTables, interiors, staff 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaos_save';
-const SAVE_VERSION = 4;
+const SAVE_VERSION = 5;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -32,6 +33,18 @@ function createDefault() {
     // ── Phase 7-3 추가 ──
     cookingSlots: 2,          // 동시 조리 슬롯 수 (기본 2)
     bestSatisfaction: {},     // { stageId: 최고 만족도 % }
+    // ── Phase 8-3 추가 ──
+    tableUpgrades: [0, 0, 0, 0],  // 테이블별 등급 Lv0~4 (초기 4석)
+    unlockedTables: 4,             // 해금된 테이블 수 (기본 4, 최대 8)
+    interiors: {
+      flower: 0,                   // 꽃병 Lv0~5
+      kitchen: 0,                  // 오픈 키친 Lv0~5
+      lighting: 0,                 // 고급 조명 Lv0~5
+    },
+    staff: {
+      waiter: false,               // 서빙 도우미 영구 해금 여부
+      dishwasher: false,           // 세척 도우미 영구 해금 여부
+    },
   };
 }
 
@@ -180,6 +193,81 @@ export class SaveManager {
     return SaveManager.load().unlockedRecipes || [];
   }
 
+  // ── 테이블 업그레이드 (Phase 8-3) ──
+
+  /**
+   * 테이블 등급 반환.
+   * @param {number} idx - 테이블 인덱스 (0-based)
+   * @returns {number} 0~4
+   */
+  static getTableUpgrade(idx) {
+    const data = SaveManager.load();
+    return (data.tableUpgrades || [])[idx] || 0;
+  }
+
+  /**
+   * 테이블 등급 +1 업그레이드 (최대 4).
+   * @param {number} idx - 테이블 인덱스
+   * @returns {boolean} 성공 여부
+   */
+  static upgradeTable(idx) {
+    const data = SaveManager.load();
+    if (!data.tableUpgrades) data.tableUpgrades = [0, 0, 0, 0];
+    if (idx < 0 || idx >= data.tableUpgrades.length) return false;
+    if (data.tableUpgrades[idx] >= 4) return false;
+    data.tableUpgrades[idx]++;
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
+   * 해금된 테이블 수 반환.
+   * @returns {number} 4~8
+   */
+  static getUnlockedTables() {
+    return SaveManager.load().unlockedTables || 4;
+  }
+
+  /**
+   * 테이블 +1 해금 (최대 8). tableUpgrades에 0을 push한다.
+   * @returns {boolean} 성공 여부
+   */
+  static unlockTable() {
+    const data = SaveManager.load();
+    if ((data.unlockedTables || 4) >= 8) return false;
+    data.unlockedTables = (data.unlockedTables || 4) + 1;
+    if (!data.tableUpgrades) data.tableUpgrades = [0, 0, 0, 0];
+    data.tableUpgrades.push(0);
+    SaveManager.save(data);
+    return true;
+  }
+
+  // ── 인테리어 (Phase 8-3) ──
+
+  /**
+   * 인테리어 레벨 반환.
+   * @param {'flower'|'kitchen'|'lighting'} type
+   * @returns {number} 0~5
+   */
+  static getInteriorLevel(type) {
+    const data = SaveManager.load();
+    return (data.interiors || {})[type] || 0;
+  }
+
+  /**
+   * 인테리어 레벨 +1 업그레이드 (최대 5).
+   * @param {'flower'|'kitchen'|'lighting'} type
+   * @returns {boolean} 성공 여부
+   */
+  static upgradeInterior(type) {
+    const data = SaveManager.load();
+    if (!data.interiors) data.interiors = { flower: 0, kitchen: 0, lighting: 0 };
+    if ((data.interiors[type] || 0) >= 5) return false;
+    data.interiors[type] = (data.interiors[type] || 0) + 1;
+    SaveManager.save(data);
+    return true;
+  }
+
   // ── 기존 메서드 ──
 
   /**
@@ -272,6 +360,15 @@ export class SaveManager {
       data.cookingSlots = data.cookingSlots || 2;
       data.bestSatisfaction = data.bestSatisfaction || {};
       data.version = 4;
+    }
+
+    // v4 → v5: 테이블 업그레이드, 인테리어, 직원 추가
+    if (data.version < 5) {
+      data.tableUpgrades = data.tableUpgrades || [0, 0, 0, 0];
+      data.unlockedTables = data.unlockedTables || 4;
+      data.interiors = data.interiors || { flower: 0, kitchen: 0, lighting: 0 };
+      data.staff = data.staff || { waiter: false, dishwasher: false };
+      data.version = 5;
     }
 
     return data;

@@ -1,11 +1,12 @@
 /**
  * @fileoverview 영업 타이쿤 씬 (ServiceScene).
  * Phase 7-2: 장보기(MarketScene)에서 수집한 재료로 레스토랑을 영업한다.
+ * Phase 8-3: 동적 테이블 석수, 테이블 등급, 인테리어 글로벌 버프 반영.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
  *   0~40     HUD (골드, 영업시간, 만족도)
- *   40~280   홀 영역 (테이블 6석, 2행x3열)
+ *   40~280   홀 영역 (테이블 4~8석, 동적 2행 x 2~4열)
  *   280~340  조리 슬롯 (2개)
  *   340~440  재료 재고 표시
  *   440~570  레시피 퀵슬롯
@@ -19,6 +20,7 @@ import { ALL_SERVING_RECIPES, RECIPE_MAP } from '../data/recipeData.js';
 import { INGREDIENT_TYPES } from '../data/gameData.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { ChefManager } from '../managers/ChefManager.js';
+import { SaveManager } from '../managers/SaveManager.js';
 import InventoryManager from '../managers/InventoryManager.js';
 
 // ── 레이아웃 상수 ──
@@ -35,13 +37,33 @@ const RECIPE_H = 130;
 const BOTTOM_Y = 570;
 const BOTTOM_H = 70;
 
-// 테이블 그리드 (2행 x 3열)
+// 테이블 그리드 — Phase 8-3: 동적 석수 (2행 x 2~4열)
 const TABLE_ROWS = 2;
-const TABLE_COLS = 3;
-const TABLE_COUNT = TABLE_ROWS * TABLE_COLS;
 
 // 조리 슬롯 수
 const MAX_COOKING_SLOTS = 2;
+
+// ── 테이블 등급별 설정 (Phase 8-3) ──
+
+/** 등급별 팁 배율 (Lv0~4) */
+const TABLE_TIP_MULTIPLIERS = [1.0, 1.1, 1.25, 1.4, 1.6];
+/** 등급별 인내심 보너스 (Lv0~4) */
+const TABLE_PATIENCE_BONUS = [0, 0.05, 0.10, 0.18, 0.25];
+/** 등급별 테이블 배경색 */
+const TABLE_COLORS = [0x8b4513, 0xa0622d, 0xccbbaa, 0xd4a017, 0xffd700];
+/** 등급별 테이블 스트로크 두께 */
+const TABLE_STROKE_WIDTH = [1, 1, 1, 2, 2];
+/** 등급별 테이블 스트로크 색상 */
+const TABLE_STROKE_COLOR = [0x5a2d0c, 0x7a4a1d, 0x998877, 0xd4a017, 0xffd700];
+
+// ── 인테리어 효과값 배열 (Phase 8-3) ──
+
+/** 꽃병: 인내심 보너스 (Lv0~5) */
+const FLOWER_PATIENCE_BONUS = [0, 0.05, 0.10, 0.16, 0.22, 0.30];
+/** 오픈 키친: 조리속도 보너스 (Lv0~5) */
+const KITCHEN_COOK_BONUS = [0, 0.05, 0.10, 0.16, 0.22, 0.30];
+/** 고급 조명: 팁 보너스 (Lv0~5) */
+const LIGHTING_TIP_BONUS = [0, 0.08, 0.16, 0.25, 0.35, 0.50];
 
 export class ServiceScene extends Phaser.Scene {
   constructor() {
@@ -90,9 +112,29 @@ export class ServiceScene extends Phaser.Scene {
     this.isPaused = false;
     this.isServiceOver = false;
 
+    // ── Phase 8-3: 동적 테이블 수 결정 ──
+    this.unlockedTables = SaveManager.getUnlockedTables();
+    this.tableCols = Math.ceil(this.unlockedTables / TABLE_ROWS);
+    this.tableCount = this.unlockedTables;
+
+    // 테이블 등급 배열 로드
+    this.tableUpgrades = [];
+    for (let i = 0; i < this.tableCount; i++) {
+      this.tableUpgrades.push(SaveManager.getTableUpgrade(i));
+    }
+
+    // 인테리어 레벨 로드
+    this.interiorFlower = SaveManager.getInteriorLevel('flower');
+    this.interiorKitchen = SaveManager.getInteriorLevel('kitchen');
+    this.interiorLighting = SaveManager.getInteriorLevel('lighting');
+
+    // 테이블 크기: 4~6석 90x80, 8석 75x70
+    this.tableW = this.tableCount >= 7 ? 75 : 90;
+    this.tableH = this.tableCount >= 7 ? 70 : 80;
+
     // ── 손님 시스템 ──
-    /** @type {(object|null)[]} 테이블 6석 */
-    this.tables = new Array(TABLE_COUNT).fill(null);
+    /** @type {(object|null)[]} 동적 테이블 (4~8석) */
+    this.tables = new Array(this.tableCount).fill(null);
     this.customerSpawnTimer = 0;
     this.customersSpawned = 0;
 
@@ -171,35 +213,59 @@ export class ServiceScene extends Phaser.Scene {
     return `\uC601\uC5C5\uC2DC\uAC04 ${m}:${s.toString().padStart(2, '0')}`;
   }
 
-  // ── 테이블 6석 (홀 영역 40~280px) ────────────────────────────────
+  // ── 테이블 동적 석수 (홀 영역 40~280px) ──────────────────────────
 
   /** @private */
   _createTables() {
-    this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0x1a1a2e)
+    // 홀 배경 — 인테리어 Lv3 이상 시 약간 밝은 배경
+    const hallBgColor = (this.interiorFlower >= 3 || this.interiorLighting >= 3) ? 0x222240 : 0x1a1a2e;
+    this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, hallBgColor)
       .setDepth(0);
 
     /** @type {Phaser.GameObjects.Container[]} */
     this.tableContainers = [];
 
-    const cellW = GAME_WIDTH / TABLE_COLS;
+    const cellW = GAME_WIDTH / this.tableCols;
     const cellH = HALL_H / TABLE_ROWS;
+    const tw = this.tableW;
+    const th = this.tableH;
+    const chairOffset = Math.floor(tw / 2.5);
 
     for (let row = 0; row < TABLE_ROWS; row++) {
-      for (let col = 0; col < TABLE_COLS; col++) {
-        const idx = row * TABLE_COLS + col;
+      for (let col = 0; col < this.tableCols; col++) {
+        const idx = row * this.tableCols + col;
+        if (idx >= this.tableCount) break;
+
         const cx = cellW * col + cellW / 2;
         const cy = HALL_Y + cellH * row + cellH / 2;
+        const grade = this.tableUpgrades[idx] || 0;
 
         const container = this.add.container(cx, cy).setDepth(10);
 
-        // 테이블 배경 (갈색 사각형)
-        const tableBg = this.add.rectangle(0, 0, 90, 80, 0x8b4513, 0.6)
-          .setStrokeStyle(1, 0x5a2d0c);
+        // 테이블 배경 — 등급별 색상
+        const tableBg = this.add.rectangle(0, 0, tw, th, TABLE_COLORS[grade], 0.6)
+          .setStrokeStyle(TABLE_STROKE_WIDTH[grade], TABLE_STROKE_COLOR[grade]);
         container.add(tableBg);
 
+        // Lv1: 테이블보 (가운데 작은 밝은 사각형)
+        if (grade >= 1) {
+          const cloth = this.add.rectangle(0, 0, tw - 16, th - 16, 0xffffff, 0.15);
+          container.add(cloth);
+        }
+
+        // Lv4: VIP 뱃지 텍스트
+        if (grade >= 4) {
+          const vipBadge = this.add.text(tw / 2 - 4, -th / 2 + 4, 'VIP', {
+            fontSize: '7px', fontStyle: 'bold', color: '#ffd700',
+            backgroundColor: '#000000aa',
+            padding: { x: 2, y: 1 },
+          }).setOrigin(1, 0);
+          container.add(vipBadge);
+        }
+
         // 의자 (작은 원 2개)
-        const chair1 = this.add.circle(-30, 0, 8, 0x654321);
-        const chair2 = this.add.circle(30, 0, 8, 0x654321);
+        const chair1 = this.add.circle(-chairOffset, 0, 8, 0x654321);
+        const chair2 = this.add.circle(chairOffset, 0, 8, 0x654321);
         container.add([chair1, chair2]);
 
         // "빈 테이블" 텍스트
@@ -231,7 +297,7 @@ export class ServiceScene extends Phaser.Scene {
         container.add(custIcon);
 
         // 터치 영역
-        const hitArea = this.add.rectangle(0, 0, 100, 90, 0x000000, 0)
+        const hitArea = this.add.rectangle(0, 0, tw + 10, th + 10, 0x000000, 0)
           .setInteractive({ useHandCursor: true });
         container.add(hitArea);
         hitArea.on('pointerdown', () => this._onTableTap(idx));
@@ -604,18 +670,27 @@ export class ServiceScene extends Phaser.Scene {
     if (pool.length === 0) return;
 
     const recipe = pool[Math.floor(Math.random() * pool.length)];
-    const patienceBonus = ChefManager.getPatienceBonus();
+
+    // ── Phase 8-3: 인내심 계산에 테이블 등급 + 인테리어 보너스 적용 ──
+    const chefPatienceBonus = ChefManager.getPatienceBonus();
+    const tableGrade = this.tableUpgrades[emptyIdx] || 0;
+    const tablePatienceBonus = TABLE_PATIENCE_BONUS[tableGrade];
+    const interiorPatienceBonus = FLOWER_PATIENCE_BONUS[this.interiorFlower] || 0;
     const basePat = this.serviceConfig.customerPatience * 1000; // ms
     const isVip = Math.random() < 0.15; // 15% VIP 확률
+
+    // 인내심 = 기본 * 셰프보너스 * (1 + 테이블보너스 + 인테리어보너스) * VIP감소
+    const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * (isVip ? 0.7 : 1);
 
     const customer = {
       dish: recipe.id,
       recipe: recipe,
-      patience: basePat * patienceBonus * (isVip ? 0.7 : 1),
-      maxPatience: basePat * patienceBonus * (isVip ? 0.7 : 1),
+      patience: totalPatience,
+      maxPatience: totalPatience,
       baseReward: recipe.baseReward,
       tipMultiplier: 1.5,
       vip: isVip,
+      tableIdx: emptyIdx,  // 배정된 테이블 인덱스 저장
     };
 
     this.tables[emptyIdx] = customer;
@@ -642,7 +717,7 @@ export class ServiceScene extends Phaser.Scene {
    * @private
    */
   _updateCustomerPatience(delta) {
-    for (let i = 0; i < TABLE_COUNT; i++) {
+    for (let i = 0; i < this.tableCount; i++) {
       const cust = this.tables[i];
       if (!cust) continue;
 
@@ -719,9 +794,10 @@ export class ServiceScene extends Phaser.Scene {
     this._updateInventoryPanel();
     this._updateRecipeQuickSlots();
 
-    // 조리 시작
+    // 조리 시작 — Phase 8-3: 인테리어 오픈키친 보너스 적용
     const cookTimeBonus = ChefManager.getCookTimeBonus();
-    const totalTime = recipe.cookTime * cookTimeBonus;
+    const kitchenBonus = KITCHEN_COOK_BONUS[this.interiorKitchen] || 0;
+    const totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus);
     this.cookingSlots[emptySlot] = {
       recipe: recipe,
       timeLeft: totalTime,
@@ -790,9 +866,14 @@ export class ServiceScene extends Phaser.Scene {
       this.satisfaction = Math.min(100, this.satisfaction + satGain);
     }
 
-    // 골드 계산
+    // ── Phase 8-3: 테이블 팁 배율 + 인테리어 조명 팁 보너스 적용 ──
+    const tableGrade = this.tableUpgrades[tableIdx] || 0;
+    const tableTipMult = TABLE_TIP_MULTIPLIERS[tableGrade];
+    const interiorTipBonus = LIGHTING_TIP_BONUS[this.interiorLighting] || 0;
+
+    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * VIP * 그릴
     const baseGold = cust.baseReward;
-    const totalGold = Math.floor(baseGold * tipGrade * comboMult * vipMult * grillBonus);
+    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * vipMult * grillBonus);
 
     this.totalGold += totalGold;
     this.servedCount++;
