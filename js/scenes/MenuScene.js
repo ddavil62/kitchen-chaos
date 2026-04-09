@@ -2,6 +2,7 @@
  * @fileoverview 메뉴 씬. 타이틀 화면과 게임 시작 버튼을 표시한다.
  * Phase 10-4: BGM 재생 추가.
  * Phase 10-6: 사운드 설정 UI(기어 버튼 + 설정 패널) 추가.
+ * Phase 11-2: "게임 시작" -> WorldMapScene 전환.
  */
 
 import Phaser from 'phaser';
@@ -76,7 +77,7 @@ export class MenuScene extends Phaser.Scene {
     btn.on('pointerdown', () => {
       this.cameras.main.fadeOut(300, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start('StageSelectScene');
+        this.scene.start('WorldMapScene');
       });
     });
 
