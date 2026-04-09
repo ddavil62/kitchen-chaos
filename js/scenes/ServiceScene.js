@@ -5,6 +5,7 @@
  * Phase 8-4: 직원 시스템 — 세척 대기시간, 자동 서빙, 직원 아이콘 표시.
  * Phase 8-5: 특수 손님 5종(일반/VIP/미식가/급한/단체) + 영업 이벤트 4종.
  * Phase 8-6: 셰프 영업 액티브 스킬 (특급 서비스 / 화염 조리 / 시간 동결).
+ * Phase 10-5: VFXManager 연동 (서빙 반짝이, 골드 플로팅, 콤보, 손님 이모지).
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -26,6 +27,8 @@ import { ChefManager } from '../managers/ChefManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import InventoryManager from '../managers/InventoryManager.js';
 import { STAFF_TYPES } from '../data/staffData.js';
+import { SoundManager } from '../managers/SoundManager.js';
+import { VFXManager } from '../managers/VFXManager.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -197,6 +200,12 @@ export class ServiceScene extends Phaser.Scene {
   }
 
   create() {
+    // ── BGM 재생 (Phase 10-4) ──
+    SoundManager.playBGM('bgm_service');
+
+    // ── VFX 매니저 (Phase 10-5) ──
+    this.vfx = new VFXManager(this);
+
     // ── 게임 상태 ──
     this.totalGold = 0;
     this.tipTotal = 0;
@@ -1126,6 +1135,7 @@ export class ServiceScene extends Phaser.Scene {
 
     this._updateTableUI(tableIdx);
     this._playEntranceEffect(tableIdx);
+    SoundManager.playSFX('sfx_customer_in');
   }
 
   /**
@@ -1313,9 +1323,14 @@ export class ServiceScene extends Phaser.Scene {
         this.satisfaction = Math.max(0, this.satisfaction - satPenalty);
         this.comboCount = 0;
         this._updateTableUI(i);
+        SoundManager.playSFX('sfx_customer_out');
 
         // 퇴장 이펙트
         this._showFloatingText(this.tableContainers[i], `\uD83D\uDE21 -${satPenalty}%`, '#ff4444');
+        // VFX: 불만 이모지 (Phase 10-5)
+        if (this.tableContainers[i]) {
+          this.vfx.customerEmoji(this.tableContainers[i].x, this.tableContainers[i].y - 20, false);
+        }
 
         // 만족도 0% 체크
         if (this.satisfaction <= 0) {
@@ -1499,6 +1514,7 @@ export class ServiceScene extends Phaser.Scene {
 
     this.totalGold += totalGold;
     this.servedCount++;
+    SoundManager.playSFX('sfx_serve');
 
     // 팁 추적 (기본 보상 초과분이 팁)
     const tipAmount = Math.max(0, totalGold - baseGold);
@@ -1552,6 +1568,23 @@ export class ServiceScene extends Phaser.Scene {
       `+${totalGold}G${tipStr}`,
       '#ffd700'
     );
+
+    // VFX: 서빙 성공 반짝이 + 손님 만족 이모지 (Phase 10-5)
+    const tblContainer = this.tableContainers[tableIdx];
+    if (tblContainer) {
+      this.vfx.serveSuccess(tblContainer.x, tblContainer.y);
+      this.vfx.customerEmoji(tblContainer.x, tblContainer.y - 20, true);
+    }
+
+    // VFX: 콤보 텍스트 (3콤보 이상)
+    if (this.comboCount >= 3) {
+      this.vfx.comboPopup(this.comboCount);
+      SoundManager.playSFX('sfx_combo');
+    }
+    // VFX: 5콤보 이상 시 콤보 폭발
+    if (this.comboCount >= 5) {
+      this.vfx.comboBurst(GAME_WIDTH / 2, 320);
+    }
 
     // 자동 서빙 시 직원 아이콘 반짝 애니메이션
     if (isAutoServe && this._waiterIcon) {

@@ -2,6 +2,7 @@
  * @fileoverview 정산 씬 (ResultScene).
  * Phase 7-3: 장보기 + 영업 결과를 종합하여 별점, 코인 보상을 표시한다.
  * 기존 GameOverScene을 대체한다.
+ * Phase 10-4: BGM 재생 추가.
  *
  * 화면 구성:
  *   타이틀 → 장보기 결과 → 영업 결과 → 평가(별점) → 보상 → 버튼
@@ -11,6 +12,7 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { STAGES, STAGE_ORDER } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
+import { SoundManager } from '../managers/SoundManager.js';
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -34,6 +36,9 @@ export class ResultScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.fadeIn(500, 0, 0, 0);
+
+    // ── BGM 재생 (Phase 10-4) ──
+    SoundManager.playBGM('bgm_result');
 
     // 배경
     const bgColor = this.isMarketFailed ? 0x330000 : 0x001a00;

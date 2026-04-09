@@ -3,6 +3,8 @@
  * Phase 7: GameScene을 리팩토링하여 풀스크린 TD로 전환.
  * 적 처치 → 재료 드롭 → 인벤토리 누적.
  * 전 웨이브 클리어 시 ServiceScene으로 전환.
+ * Phase 10-4: SoundManager BGM + 씬 이벤트 SFX 추가.
+ * Phase 10-5: VFXManager 연동 (파티클, 화면 효과, 플로팅 텍스트).
  */
 
 import Phaser from 'phaser';
@@ -24,6 +26,8 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { ChefManager } from '../managers/ChefManager.js';
 import { OrderManager } from '../managers/OrderManager.js';
+import { SoundManager } from '../managers/SoundManager.js';
+import { VFXManager } from '../managers/VFXManager.js';
 
 export class MarketScene extends Phaser.Scene {
   constructor() {
@@ -32,6 +36,12 @@ export class MarketScene extends Phaser.Scene {
 
   /** @param {{ stageId?: string }} data */
   create(data) {
+    // ── BGM 재생 (Phase 10-4) ──
+    SoundManager.playBGM('bgm_battle');
+
+    // ── VFX 매니저 (Phase 10-5) ──
+    this.vfx = new VFXManager(this);
+
     // ── 스테이지 데이터 로딩 ──
     this.stageId = data?.stageId || '1-1';
     this.stageData = STAGES[this.stageId];
@@ -113,6 +123,9 @@ export class MarketScene extends Phaser.Scene {
 
     // ── 오더 추적용 씬 이벤트 ──
     this.events.on('ingredient_collected_for_order', this._onIngredientCollectedForOrder, this);
+
+    // ── VFX용 재료 수거 위치 이벤트 (Phase 10-5) ──
+    this.events.on('ingredient_collected_at', this._onIngredientCollectedAt, this);
 
     // ── 웨이브 시작 버튼 ──
     this._createWaveButton();
@@ -496,6 +509,9 @@ export class MarketScene extends Phaser.Scene {
 
     this._showMessage(`${recipe.nameKo} \uBC84\uD504 \uBC1C\uB3D9!`, 1500);
     this._updateIngredientBar();
+    // VFX: 버프 활성화 오라 (화면 중앙)
+    this.vfx.buffActivate(GAME_WIDTH / 2, GAME_AREA_Y + GAME_AREA_HEIGHT / 2);
+    SoundManager.playSFX('sfx_buff_on');
 
     // 버프 탭이 활성화 상태면 버튼 갱신
     if (this._activeTowerCategory === 'buff') {
@@ -654,6 +670,10 @@ export class MarketScene extends Phaser.Scene {
     this.waveText.setText(`\uC6E8\uC774\uBE0C ${waveNum}/${this.waveManager.totalWaves}`);
     this.waitingForNextWave = false;
     this._setWaveButtonEnabled(false);
+    SoundManager.playSFX('sfx_wave_start');
+    // VFX: 웨이브 시작 알림 + 흰 플래시
+    this.vfx.waveAnnounce(waveNum);
+    this.vfx.screenFlash(0xffffff, 0.3, 200);
 
     // ── 오더 생성 시도 ──
     const order = this.orderManager.tryGenerateOrder(waveNum);
@@ -666,14 +686,23 @@ export class MarketScene extends Phaser.Scene {
   _onEnemyDied(enemy) {
     this.score++;
     this.orderManager.addProgress('kill_count');
+    SoundManager.playSFX('sfx_enemy_death');
+    // VFX: 적 사망 파티클
+    if (enemy && enemy.x !== undefined) {
+      const isBoss = !!enemy.data_?.isBoss;
+      const color = enemy.data_?.bodyColor || 0xffffff;
+      this.vfx.enemyDeath(enemy.x, enemy.y, color, isBoss);
+    }
     this._checkWaveProgress();
   }
 
   _onEnemyReachedBase(enemy) {
     this.lives--;
     this._updateHUD();
-    this.cameras.main.shake(200, 0.008);
     this.orderManager.addProgress('enemy_leaked');
+    SoundManager.playSFX('sfx_enemy_base');
+    // VFX: 화면 흔들림 (기존 cameras.main.shake 대체)
+    this.vfx.screenShake(3, 200);
 
     if (this.lives <= 0) {
       this._triggerGameOver();
@@ -773,6 +802,9 @@ export class MarketScene extends Phaser.Scene {
   _onBossKilled({ reward }) {
     this.gold += reward;
     this._updateHUD();
+    SoundManager.playSFX('sfx_boss_death');
+    // VFX: 보스 처치 연출
+    this.vfx.bossAnnounce();
 
     const popup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 60, `\uD83C\uDFC6 \uBCF4\uC2A4 \uCC98\uCE58! +${reward}g`, {
       fontSize: '16px', color: '#ffd700', fontStyle: 'bold',
@@ -832,6 +864,8 @@ export class MarketScene extends Phaser.Scene {
       if (tower.data_?.id === 'delivery' || tower.data_?.id === 'soup_pot') return;
       if (tower.applyBuff) tower.applyBuff('speed', -speedReduction);
     });
+    // VFX: 강한 화면 흔들림 (보스 디버프)
+    this.vfx.screenShake(6, 500);
 
     const popup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 80, '\uD83D\uDC09 \uC6A9\uC758 \uD3EC\uD6A8! \uACF5\uACA9\uC18D\uB3C4 \uAC10\uC18C!', {
       fontSize: '14px', color: '#ff4444', fontStyle: 'bold',
@@ -948,6 +982,8 @@ export class MarketScene extends Phaser.Scene {
   _triggerGameOver() {
     if (this.isGameOver) return;
     this.isGameOver = true;
+    // VFX: 패배 빨강 플래시
+    this.vfx.screenFlash(0xff0000, 0.5, 300);
 
     this.cameras.main.fadeOut(600, 100, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
@@ -968,6 +1004,8 @@ export class MarketScene extends Phaser.Scene {
   _triggerVictory() {
     if (this.isVictory) return;
     this.isVictory = true;
+    // VFX: 클리어 연출
+    this.vfx.clearAnnounce();
 
     // 인벤토리 집계 메시지
     const total = this.inventoryManager.getTotal();
@@ -1221,6 +1259,15 @@ export class MarketScene extends Phaser.Scene {
     this.orderManager.addProgress('collect_count');
   }
 
+  /**
+   * 재료 수거 VFX - 수거 위치에 반짝이 파티클.
+   * @param {{ x: number, y: number }} data
+   * @private
+   */
+  _onIngredientCollectedAt({ x, y }) {
+    this.vfx.ingredientCollect(x, y);
+  }
+
   // ── 유틸리티 ────────────────────────────────────────────────────
 
   _showMessage(message, duration) {
@@ -1353,6 +1400,8 @@ export class MarketScene extends Phaser.Scene {
     this.events.off('wave_started', this._onWaveStarted, this);
     this.events.off('inventory_changed', this._onInventoryChanged, this);
     this.events.off('ingredient_collected_for_order', this._onIngredientCollectedForOrder, this);
+    this.events.off('ingredient_collected_at', this._onIngredientCollectedAt, this);
     this.ingredientManager?.destroy();
+    this.vfx?.destroy();
   }
 }

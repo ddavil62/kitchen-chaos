@@ -129,6 +129,10 @@ export class IngredientManager {
     const current = this.inventory[drop.type] || 0;
     this.inventory[drop.type] = Math.min(current + drop.count, max);
 
+    // 수거 위치 기록 (VFX용, container 파괴 전)
+    const collectX = drop.container.x;
+    const collectY = drop.container.y;
+
     // 수거 연출
     this.scene.tweens.add({
       targets: drop.container,
@@ -141,6 +145,8 @@ export class IngredientManager {
     this.scene.events.emit('inventory_changed', this.inventory);
     // 오더 추적용 씬 이벤트 (수거 1건)
     this.scene.events.emit('ingredient_collected_for_order');
+    // VFX용 위치 이벤트 (Phase 10-5)
+    this.scene.events.emit('ingredient_collected_at', { x: collectX, y: collectY });
     // 크로스 씬 이벤트 (RestaurantScene에 알림)
     GameEventBus.emit('ingredient_collected', {
       type: drop.type,

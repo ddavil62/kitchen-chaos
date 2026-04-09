@@ -1,12 +1,14 @@
 /**
  * @fileoverview 게임 오버 / 클리어 씬.
  * Phase 4: 별점, 통계, 스테이지 네비게이션.
+ * Phase 10-4: BGM 재생 추가.
  */
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { STAGES, STAGE_ORDER } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
+import { SoundManager } from '../managers/SoundManager.js';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -26,6 +28,9 @@ export class GameOverScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.fadeIn(500, 0, 0, 0);
+
+    // ── BGM 재생 (Phase 10-4) ──
+    SoundManager.playBGM('bgm_result');
 
     // 배경
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT,

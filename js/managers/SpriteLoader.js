@@ -23,9 +23,10 @@ const ENEMY_IDS = [
   'tomato_bomber', 'butter_ghost', 'sugar_fairy', 'milk_phantom',
 ];
 
-// ── 보스 ID 목록 (4종) ──
+// ── 보스 ID 목록 (6종) ──
 const BOSS_IDS = [
   'pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem',
+  'master_patissier', 'cuisine_god',
 ];
 
 // ── 타워 ID 목록 (6종) ──
@@ -57,9 +58,10 @@ const INGREDIENT_FILE_MAP = {
 // ── 재료 ID 목록 (15종, 게임 내 ID 기준) ──
 const INGREDIENT_IDS = Object.keys(INGREDIENT_FILE_MAP);
 
-// ── 타일셋 ID 목록 (4종) ──
+// ── 타일셋 ID 목록 (6종) ──
 const TILESET_IDS = [
   'pasta_field', 'oriental_bamboo', 'seafood_beach', 'volcano_lava',
+  'dessert_cafe', 'grand_finale',
 ];
 
 export class SpriteLoader {

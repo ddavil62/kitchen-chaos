@@ -3,6 +3,7 @@
  * Phase 3: 배달 타워 비주얼 + 사거리/화상/둔화 버프 지원.
  * Phase 4: 냉동고(빙결) + 수프 솥(오라) 타워.
  * Phase 9-4: 도형 → 스프라이트 이미지 교체 (fallback 유지).
+ * Phase 10-4: 타워별 발사음 SFX 추가.
  */
 
 import Phaser from 'phaser';
@@ -10,6 +11,7 @@ import { Projectile } from './Projectile.js';
 import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { ChefManager } from '../managers/ChefManager.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
+import { SoundManager } from '../managers/SoundManager.js';
 
 export class Tower extends Phaser.GameObjects.Container {
   /**
@@ -178,6 +180,10 @@ export class Tower extends Phaser.GameObjects.Container {
 
   /** @private */
   _shoot(target) {
+    // ── 타워별 발사음 (Phase 10-4) ──
+    const sfxId = `sfx_tower_${this.data_.id}`;
+    SoundManager.playSFX(sfxId);
+
     const projData = {
       ...this.data_,
       damage: Math.round(this.baseDamage * this.damageMultiplier),
