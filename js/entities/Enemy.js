@@ -22,7 +22,7 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.hp = enemyData.hp;
     this.maxHp = enemyData.hp;
     this.speed = enemyData.speed;
-    this.goldReward = enemyData.goldReward;
+    this.goldReward = enemyData.goldReward || 0;
     this.ingredientType = enemyData.ingredient;
 
     // ── 이동 상태 ──

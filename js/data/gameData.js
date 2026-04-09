@@ -1,9 +1,10 @@
 /**
  * @fileoverview Kitchen Chaos Defense 게임 데이터 정의.
- * 적, 타워, 재료, 레시피 데이터를 상수로 관리한다.
+ * 적, 타워, 재료, 레시피(서빙/버프), 손님 웨이브 데이터를 상수로 관리한다.
  */
 
 // ── 적 타입 정의 ──
+// Phase 2: goldReward 제거 — 골드는 서빙으로만 획득
 export const ENEMY_TYPES = {
   carrot_goblin: {
     id: 'carrot_goblin',
@@ -11,7 +12,6 @@ export const ENEMY_TYPES = {
     texture: 'enemy_carrot',
     hp: 80,
     speed: 90,        // px/s
-    goldReward: 5,
     ingredient: 'carrot',
   },
   meat_ogre: {
@@ -20,7 +20,6 @@ export const ENEMY_TYPES = {
     texture: 'enemy_meat',
     hp: 220,
     speed: 45,        // px/s
-    goldReward: 12,
     ingredient: 'meat',
   },
 };
@@ -47,8 +46,8 @@ export const TOWER_TYPES = {
     range: 120,
     fireRate: 600,
     projectileSpeed: 180,
-    slowFactor: 0.5,  // 적 속도를 50%로 감소
-    slowDuration: 2000, // ms
+    slowFactor: 0.5,
+    slowDuration: 2000,
     color: 0x87ceeb,
   },
   grill: {
@@ -60,9 +59,9 @@ export const TOWER_TYPES = {
     range: 90,
     fireRate: 800,
     projectileSpeed: 220,
-    burnDamage: 5,    // 화상 틱당 피해
-    burnDuration: 3000, // ms
-    burnInterval: 500,  // ms
+    burnDamage: 5,
+    burnDuration: 3000,
+    burnInterval: 500,
     color: 0xff4500,
   },
 };
@@ -74,19 +73,52 @@ export const INGREDIENT_TYPES = {
     nameKo: '당근',
     texture: 'ingredient_carrot',
     color: 0xff6b35,
+    icon: '🥕',
   },
   meat: {
     id: 'meat',
     nameKo: '고기',
     texture: 'ingredient_meat',
     color: 0xdc143c,
+    icon: '🥩',
   },
 };
 
-// ── 레시피 정의 ──
-// ingredients: { [ingredientId]: count } 형식
-// effect: 적용 효과 함수 (CookingStation에서 처리)
-export const RECIPES = [
+// ── 서빙 레시피 (손님 주문용) ──
+export const SERVING_RECIPES = [
+  {
+    id: 'carrot_soup',
+    nameKo: '당근 수프',
+    ingredients: { carrot: 1 },
+    baseReward: 20,
+    icon: '🍲',
+    color: 0xffa500,
+  },
+  {
+    id: 'steak_plate',
+    nameKo: '스테이크 정식',
+    ingredients: { meat: 2 },
+    baseReward: 50,
+    icon: '🥩',
+    color: 0x8b0000,
+  },
+  {
+    id: 'mixed_platter',
+    nameKo: '혼합 플래터',
+    ingredients: { carrot: 2, meat: 1 },
+    baseReward: 65,
+    icon: '🍽️',
+    color: 0xcd853f,
+  },
+];
+
+/** 서빙 레시피를 ID로 빠르게 조회하기 위한 맵 */
+export const SERVING_RECIPE_MAP = Object.fromEntries(
+  SERVING_RECIPES.map(r => [r.id, r])
+);
+
+// ── 버프 레시피 (타워 강화용, 기존 RECIPES) ──
+export const BUFF_RECIPES = [
   {
     id: 'carrot_stew',
     nameKo: '당근 스튜',
@@ -119,8 +151,50 @@ export const RECIPES = [
   },
 ];
 
+// 하위 호환: 기존 코드에서 RECIPES를 참조하는 곳 대응
+export const RECIPES = BUFF_RECIPES;
+
+// ── 웨이브별 손님 데이터 ──
+export const WAVE_CUSTOMERS = [
+  {
+    wave: 1,
+    customers: [
+      { dish: 'carrot_soup', patience: 35000, baseReward: 25, tipMultiplier: 1.5 },
+    ],
+  },
+  {
+    wave: 2,
+    customers: [
+      { dish: 'carrot_soup', patience: 30000, baseReward: 25, tipMultiplier: 1.5 },
+      { dish: 'steak_plate', patience: 35000, baseReward: 55, tipMultiplier: 1.5 },
+    ],
+  },
+  {
+    wave: 3,
+    customers: [
+      { dish: 'steak_plate', patience: 28000, baseReward: 55, tipMultiplier: 1.5 },
+      { dish: 'carrot_soup', patience: 25000, baseReward: 25, tipMultiplier: 1.3 },
+    ],
+  },
+  {
+    wave: 4,
+    customers: [
+      { dish: 'carrot_soup', patience: 22000, baseReward: 30, tipMultiplier: 1.3 },
+      { dish: 'mixed_platter', patience: 30000, baseReward: 70, tipMultiplier: 1.5 },
+      { dish: 'steak_plate', patience: 25000, baseReward: 55, tipMultiplier: 1.3 },
+    ],
+  },
+  {
+    wave: 5,
+    customers: [
+      { dish: 'mixed_platter', patience: 25000, baseReward: 70, tipMultiplier: 1.5 },
+      { dish: 'steak_plate', patience: 20000, baseReward: 55, tipMultiplier: 1.3 },
+      { dish: 'carrot_soup', patience: 18000, baseReward: 30, tipMultiplier: 1.3 },
+    ],
+  },
+];
+
 // ── 웨이브 정의 ──
-// { type: string, count: number, interval: ms }
 export const WAVES = [
   {
     wave: 1,

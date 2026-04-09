@@ -1,19 +1,19 @@
 /**
- * @fileoverview 메인 게임 씬.
- * 타워 디펜스 코어 루프: 맵 렌더링, 타워 배치, 웨이브 관리,
- * 재료 드롭/수거, 조리소 시스템을 통합한다.
+ * @fileoverview 메인 게임 씬 (전투).
+ * Phase 2: 화면 상단 420px 영역을 소유한다 (HUD + 맵 + 타워바).
+ * RestaurantScene과 병렬 실행, GameEventBus로 통신한다.
  */
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, CELL_SIZE, GRID_COLS, GRID_ROWS,
-         GAME_AREA_Y, BOTTOM_UI_HEIGHT, PATH_CELLS, isPathCell,
-         cellToWorld, worldToCell, STARTING_GOLD, STARTING_LIVES } from '../config.js';
+         HUD_HEIGHT, GAME_AREA_Y, GAME_AREA_HEIGHT, TOWER_BAR_Y, TOWER_BAR_HEIGHT,
+         PATH_CELLS, isPathCell, cellToWorld, worldToCell,
+         STARTING_GOLD, STARTING_LIVES, WAVE_CLEAR_BONUS } from '../config.js';
 import { TOWER_TYPES } from '../data/gameData.js';
+import { GameEventBus } from '../events/GameEventBus.js';
 import { Tower } from '../entities/Tower.js';
 import { WaveManager } from '../managers/WaveManager.js';
 import { IngredientManager } from '../managers/IngredientManager.js';
-import { CookingStation } from '../managers/CookingStation.js';
-import { GameUI } from '../ui/GameUI.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -29,6 +29,7 @@ export class GameScene extends Phaser.Scene {
     this.isGameOver = false;
     this.isVictory = false;
     this.waitingForNextWave = false;
+    this.comboCount = 0;
 
     // ── 그룹 ──
     this.enemies = this.add.group();
@@ -40,40 +41,42 @@ export class GameScene extends Phaser.Scene {
 
     // ── 매니저 ──
     this.ingredientManager = new IngredientManager(this);
-    this.cookingStation = new CookingStation(this, this.ingredientManager);
     this.waveManager = new WaveManager(this, this.enemies);
 
-    // ── UI ──
-    this.gameUI = new GameUI(this, {
-      onTowerSelected: (typeId) => { this.selectedTowerType = typeId; },
-      onCook: (recipeId) => this._onCook(recipeId),
-    });
-    this.gameUI.setGold(this.gold);
-    this.gameUI.setLives(this.lives);
-    this.gameUI.setWave(0, this.waveManager.totalWaves);
+    // ── HUD ──
+    this._createHUD();
+
+    // ── 타워 선택 바 ──
+    this._createTowerBar();
 
     // ── 입력 ──
     this._setupInput();
 
-    // ── 이벤트 ──
+    // ── 씬 내부 이벤트 ──
     this.events.on('enemy_died', this._onEnemyDied, this);
     this.events.on('enemy_reached_base', this._onEnemyReachedBase, this);
     this.events.on('wave_started', this._onWaveStarted, this);
 
-    // ── 첫 웨이브 시작 메시지 ──
-    this._showMessage('웨이브 1 준비!\n화면을 탭해서 타워를 배치하세요', 2500);
+    // ── GameEventBus 이벤트 수신 ──
+    GameEventBus.on('gold_earned', this._onGoldEarned, this);
+    GameEventBus.on('combo_changed', this._onComboChanged, this);
+    GameEventBus.on('buff_activated', this._onBuffActivated, this);
+    GameEventBus.on('buff_expired', this._onBuffExpired, this);
+
+    // ── RestaurantScene 병렬 실행 ──
+    this.scene.launch('RestaurantScene', {
+      ingredientManager: this.ingredientManager,
+    });
+
+    // ── 첫 웨이브 메시지 ──
+    this._showMessage('웨이브 1 준비!\n타워를 배치하세요', 2500);
     this.time.delayedCall(2600, () => this.waveManager.startNextWave());
 
-    // 페이드인
     this.cameras.main.fadeIn(400, 0, 0, 0);
   }
 
   // ── 맵 그리기 ────────────────────────────────────────────
 
-  /**
-   * 그리드와 경로를 그린다.
-   * @private
-   */
   _drawMap() {
     const mapGraphics = this.add.graphics();
     mapGraphics.setDepth(0);
@@ -85,13 +88,11 @@ export class GameScene extends Phaser.Scene {
         const onPath = isPathCell(col, row);
 
         if (onPath) {
-          // 경로 셀: 모래색
           mapGraphics.fillStyle(0xc8a46e);
           mapGraphics.fillRect(x, y, CELL_SIZE, CELL_SIZE);
           mapGraphics.lineStyle(1, 0x8b6914, 0.3);
           mapGraphics.strokeRect(x, y, CELL_SIZE, CELL_SIZE);
         } else {
-          // 일반 셀: 녹색 잔디
           mapGraphics.fillStyle(0x2d5a1b);
           mapGraphics.fillRect(x, y, CELL_SIZE, CELL_SIZE);
           mapGraphics.lineStyle(1, 0x1e3d12, 0.4);
@@ -100,9 +101,9 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // 주방 아이콘 (경로 끝)
-    const kitchen = this.add.text(60, GAME_AREA_Y + 10 * CELL_SIZE + 20, '🍳', {
-      fontSize: '24px',
+    // 주방 아이콘 (경로 끝, 중앙 하단)
+    this.add.text(180, GAME_AREA_Y + GAME_AREA_HEIGHT - 10, '🍳', {
+      fontSize: '20px',
     }).setOrigin(0.5).setDepth(1);
 
     // 진입로 화살표
@@ -111,14 +112,86 @@ export class GameScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(1);
   }
 
+  // ── HUD (상단 50px) ────────────────────────────────────────
+
+  _createHUD() {
+    const hudBg = this.add.rectangle(GAME_WIDTH / 2, HUD_HEIGHT / 2, GAME_WIDTH, HUD_HEIGHT, 0x1a1a2e);
+    hudBg.setDepth(20);
+
+    this.goldText = this.add.text(10, 15, `🪙 ${this.gold}`, {
+      fontSize: '16px', color: '#ffd700', fontStyle: 'bold',
+    }).setDepth(21);
+
+    this.waveText = this.add.text(GAME_WIDTH / 2, 15, '웨이브 0/5', {
+      fontSize: '14px', color: '#ffffff',
+    }).setOrigin(0.5, 0).setDepth(21);
+
+    this.livesText = this.add.text(GAME_WIDTH - 10, 15, `❤️ ${this.lives}`, {
+      fontSize: '16px', color: '#ff4444',
+    }).setOrigin(1, 0).setDepth(21);
+
+    this.comboText = this.add.text(GAME_WIDTH / 2, 34, '', {
+      fontSize: '12px', color: '#ffcc00', fontStyle: 'bold',
+    }).setOrigin(0.5, 0).setDepth(21);
+  }
+
+  _updateHUD() {
+    this.goldText.setText(`🪙 ${this.gold}`);
+    this.livesText.setText(`❤️ ${this.lives}`);
+  }
+
+  // ── 타워 선택 바 (370~420px) ────────────────────────────────
+
+  _createTowerBar() {
+    // 배경
+    this.add.rectangle(
+      GAME_WIDTH / 2, TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2,
+      GAME_WIDTH, TOWER_BAR_HEIGHT, 0x111122
+    ).setDepth(20);
+
+    const towerIds = Object.keys(TOWER_TYPES);
+    const btnWidth = GAME_WIDTH / towerIds.length;
+
+    this.towerButtons = [];
+    towerIds.forEach((id, i) => {
+      const tower = TOWER_TYPES[id];
+      const cx = btnWidth * i + btnWidth / 2;
+      const cy = TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2;
+
+      const bg = this.add.rectangle(cx, cy, btnWidth - 4, TOWER_BAR_HEIGHT - 6, 0x333355)
+        .setDepth(21).setInteractive();
+
+      const label = this.add.text(cx, cy - 6, tower.nameKo, {
+        fontSize: '12px', color: '#ffffff',
+      }).setOrigin(0.5).setDepth(22);
+
+      const costLabel = this.add.text(cx, cy + 10, `${tower.cost}g`, {
+        fontSize: '10px', color: '#ffd700',
+      }).setOrigin(0.5).setDepth(22);
+
+      bg.on('pointerdown', () => {
+        // 토글 선택
+        if (this.selectedTowerType === id) {
+          this.selectedTowerType = null;
+        } else {
+          this.selectedTowerType = id;
+        }
+        this._updateTowerBarSelection();
+      });
+
+      this.towerButtons.push({ bg, id });
+    });
+  }
+
+  _updateTowerBarSelection() {
+    this.towerButtons.forEach(btn => {
+      btn.bg.setFillStyle(btn.id === this.selectedTowerType ? 0x885500 : 0x333355);
+    });
+  }
+
   // ── 입력 처리 ─────────────────────────────────────────────
 
-  /**
-   * 그리드 탭 입력 셋업.
-   * @private
-   */
   _setupInput() {
-    // 게임 영역(맵 그리드) 전체에 인터랙티브 영역 설정
     const hitArea = this.add.rectangle(
       GAME_WIDTH / 2,
       GAME_AREA_Y + (GRID_ROWS * CELL_SIZE) / 2,
@@ -136,22 +209,14 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  /**
-   * 셀 탭 처리 - 타워 배치 또는 취소.
-   * @private
-   * @param {number} col
-   * @param {number} row
-   */
   _onCellTap(col, row) {
     if (!this.selectedTowerType) return;
 
-    // 경로 위 배치 불가
     if (isPathCell(col, row)) {
       this._showMessage('경로 위에는 배치할 수 없습니다', 1000);
       return;
     }
 
-    // 이미 타워가 있는지 확인
     const key = `${col},${row}`;
     const exists = this.towers.getChildren().some(t => t._cellKey === key);
     if (exists) {
@@ -159,21 +224,15 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // 골드 확인
     const towerData = TOWER_TYPES[this.selectedTowerType];
     if (this.gold < towerData.cost) {
-      this._showMessage(`골드가 부족합니다 (필요: ${towerData.cost}g)`, 1200);
+      this._showMessage(`골드 부족 (필요: ${towerData.cost}g)`, 1200);
       return;
     }
 
-    // 타워 배치
     this._placeTower(col, row, this.selectedTowerType);
   }
 
-  /**
-   * 타워 배치 실행.
-   * @private
-   */
   _placeTower(col, row, typeId) {
     const towerData = TOWER_TYPES[typeId];
     const { x, y } = cellToWorld(col, row);
@@ -182,14 +241,14 @@ export class GameScene extends Phaser.Scene {
     tower._cellKey = `${col},${row}`;
     this.towers.add(tower);
 
-    // 현재 활성 버프 즉시 적용
-    this.cookingStation.applyBuffToNewTower(tower);
+    // 현재 버프 적용 (GameEventBus에서 받은 버프)
+    if (this._currentBuff) {
+      this._applyBuffToTower(tower, this._currentBuff);
+    }
 
-    // 골드 차감
     this.gold -= towerData.cost;
-    this.gameUI.setGold(this.gold);
+    this._updateHUD();
 
-    // 배치 이펙트
     this.tweens.add({
       targets: tower,
       scaleX: 1.2, scaleY: 1.2,
@@ -197,85 +256,94 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  // ── 이벤트 핸들러 ─────────────────────────────────────────
+  // ── 이벤트 핸들러 (씬 내부) ────────────────────────────────
 
-  /**
-   * 웨이브 시작 이벤트 핸들러.
-   * @private
-   * @param {number} waveNum
-   */
   _onWaveStarted(waveNum) {
-    this.gameUI.setWave(waveNum, this.waveManager.totalWaves);
+    this.waveText.setText(`웨이브 ${waveNum}/${this.waveManager.totalWaves}`);
     this.waitingForNextWave = false;
+    // RestaurantScene에 알림
+    GameEventBus.emit('wave_started', { waveNum });
   }
 
-  /**
-   * 적 처치 이벤트 핸들러.
-   * @private
-   */
   _onEnemyDied(enemy) {
-    // 골드 획득
-    this.gold += enemy.goldReward;
-    this.gameUI.setGold(this.gold);
+    // Phase 2: 골드 직접 지급 없음 — 재료 드롭만 (IngredientManager 처리)
     this.score++;
-
-    // 처치 이펙트 (골드 팝업)
-    const goldPopup = this.add.text(enemy.x, enemy.y - 10, `+${enemy.goldReward}g`, {
-      fontSize: '14px', color: '#ffd700',
-      stroke: '#000000', strokeThickness: 2,
-    }).setOrigin(0.5).setDepth(30);
-
-    this.tweens.add({
-      targets: goldPopup,
-      y: enemy.y - 50,
-      alpha: 0,
-      duration: 900,
-      onComplete: () => goldPopup.destroy(),
-    });
-
-    // 웨이브 클리어 확인 (이벤트 기반)
     this._checkWaveProgress();
   }
 
-  /**
-   * 적 주방 도달 이벤트 핸들러.
-   * @private
-   */
   _onEnemyReachedBase(enemy) {
     this.lives--;
-    this.gameUI.setLives(this.lives);
-
-    // 화면 흔들기
+    this._updateHUD();
     this.cameras.main.shake(200, 0.008);
 
     if (this.lives <= 0) {
       this._triggerGameOver();
     }
-
-    // 웨이브 클리어 확인 (이벤트 기반)
     this._checkWaveProgress();
   }
 
+  // ── GameEventBus 핸들러 ────────────────────────────────────
+
+  /** RestaurantScene에서 서빙으로 골드 획득 */
+  _onGoldEarned({ amount }) {
+    this.gold += amount;
+    this._updateHUD();
+
+    // 골드 팝업 (HUD 옆)
+    const popup = this.add.text(90, 10, `+${amount}g`, {
+      fontSize: '14px', color: '#ffd700',
+      stroke: '#000000', strokeThickness: 2,
+    }).setDepth(30);
+
+    this.tweens.add({
+      targets: popup,
+      y: -10, alpha: 0,
+      duration: 800,
+      onComplete: () => popup.destroy(),
+    });
+  }
+
+  /** 콤보 카운터 갱신 */
+  _onComboChanged({ count }) {
+    this.comboCount = count;
+    if (count >= 3) {
+      this.comboText.setText(`🔥 ×${count} 콤보!`);
+    } else {
+      this.comboText.setText('');
+    }
+  }
+
+  /** RestaurantScene에서 버프 활성화 */
+  _onBuffActivated({ effectType, effectValue, duration }) {
+    this._currentBuff = { effectType, effectValue, duration };
+    this.towers.getChildren().forEach(tower => {
+      this._applyBuffToTower(tower, this._currentBuff);
+    });
+  }
+
+  /** 버프 만료 */
+  _onBuffExpired() {
+    this._currentBuff = null;
+    this.towers.getChildren().forEach(tower => {
+      if (tower.removeBuff) tower.removeBuff();
+    });
+  }
+
   /**
-   * 요리 버튼 클릭 처리.
+   * 개별 타워에 버프 적용.
+   * @param {Tower} tower
+   * @param {{ effectType: string, effectValue: number }} buff
    * @private
    */
-  _onCook(recipeId) {
-    const success = this.cookingStation.cook(recipeId);
-    if (success) {
-      const name = this.cookingStation.getBuffName();
-      this._showMessage(`🍳 ${name} 완성!\n타워 버프가 활성화됩니다`, 2000);
-    } else {
-      this._showMessage('재료가 부족합니다', 1000);
-    }
+  _applyBuffToTower(tower, buff) {
+    if (!tower.applyBuff) return;
+    if (buff.effectType === 'buff_speed') tower.applyBuff('speed', buff.effectValue);
+    else if (buff.effectType === 'buff_damage') tower.applyBuff('damage', buff.effectValue);
+    else if (buff.effectType === 'buff_both') tower.applyBuff('both', buff.effectValue);
   }
 
   // ── 웨이브 관리 ───────────────────────────────────────────
 
-  /**
-   * 웨이브 완료 확인 및 다음 웨이브 준비.
-   * @private
-   */
   _checkWaveProgress() {
     if (this.waitingForNextWave) return;
     if (!this.waveManager.isWaveCleared()) return;
@@ -285,10 +353,24 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // 다음 웨이브 준비
+    // 웨이브 클리어 보너스
+    this.gold += WAVE_CLEAR_BONUS;
+    this._updateHUD();
+
+    const popup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 20, `웨이브 클리어! +${WAVE_CLEAR_BONUS}g`, {
+      fontSize: '14px', color: '#44ff44',
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(30);
+
+    this.tweens.add({
+      targets: popup, y: popup.y - 30, alpha: 0,
+      duration: 1200,
+      onComplete: () => popup.destroy(),
+    });
+
     this.waitingForNextWave = true;
     const nextWave = this.waveManager.currentWave + 1;
-    this._showMessage(`웨이브 ${nextWave - 1} 클리어! 다음 웨이브 준비...`, 2000);
+    this._showMessage(`웨이브 ${nextWave - 1} 클리어! 다음 준비...`, 2000);
     this.time.delayedCall(2200, () => {
       this.waveManager.startNextWave();
     });
@@ -296,32 +378,30 @@ export class GameScene extends Phaser.Scene {
 
   // ── 게임 종료 ─────────────────────────────────────────────
 
-  /**
-   * 게임 오버 트리거.
-   * @private
-   */
   _triggerGameOver() {
     if (this.isGameOver) return;
     this.isGameOver = true;
 
+    GameEventBus.emit('game_over', { isVictory: false, score: this.score });
+
     this.cameras.main.fadeOut(600, 100, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.stop('RestaurantScene');
       this.scene.start('GameOverScene', { score: this.score, isVictory: false });
     });
   }
 
-  /**
-   * 승리 트리거.
-   * @private
-   */
   _triggerVictory() {
     if (this.isVictory) return;
     this.isVictory = true;
+
+    GameEventBus.emit('game_over', { isVictory: true, score: this.score });
 
     this._showMessage('🎉 모든 웨이브 클리어!\n주방을 지켰습니다!', 3000);
     this.time.delayedCall(3200, () => {
       this.cameras.main.fadeOut(600, 0, 100, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.stop('RestaurantScene');
         this.scene.start('GameOverScene', { score: this.score, isVictory: true });
       });
     });
@@ -329,13 +409,7 @@ export class GameScene extends Phaser.Scene {
 
   // ── 유틸리티 ─────────────────────────────────────────────
 
-  /**
-   * 화면 중앙에 메시지 팝업 표시.
-   * @param {string} message
-   * @param {number} duration - ms
-   */
   _showMessage(message, duration) {
-    // 기존 팝업의 트윈 취소 후 즉시 파괴
     if (this._messageTween) {
       this._messageTween.stop();
       this._messageTween = null;
@@ -345,10 +419,11 @@ export class GameScene extends Phaser.Scene {
       this._messagePopup = null;
     }
 
-    const bg = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, 280, 80, 0x000000, 0.8)
+    const msgY = GAME_AREA_Y + GAME_AREA_HEIGHT / 2;
+    const bg = this.add.rectangle(GAME_WIDTH / 2, msgY, 280, 70, 0x000000, 0.8)
       .setDepth(50);
-    const text = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, message, {
-      fontSize: '16px', color: '#ffffff', align: 'center', lineSpacing: 6,
+    const text = this.add.text(GAME_WIDTH / 2, msgY, message, {
+      fontSize: '15px', color: '#ffffff', align: 'center', lineSpacing: 5,
       stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(51);
 
@@ -358,8 +433,7 @@ export class GameScene extends Phaser.Scene {
       if (this._messagePopup) {
         this._messageTween = this.tweens.add({
           targets: this._messagePopup,
-          alpha: 0,
-          duration: 300,
+          alpha: 0, duration: 300,
           onComplete: () => {
             this._messagePopup?.destroy();
             this._messagePopup = null;
@@ -372,46 +446,37 @@ export class GameScene extends Phaser.Scene {
 
   // ── 메인 루프 ─────────────────────────────────────────────
 
-  /**
-   * @param {number} time
-   * @param {number} delta - ms
-   */
   update(time, delta) {
     if (this.isGameOver || this.isVictory) return;
 
-    // 웨이브 매니저 업데이트 (적 스폰)
     this.waveManager.update(delta);
 
-    // 적 업데이트
     this.enemies.getChildren().forEach(enemy => {
       if (enemy.active) enemy.update(time, delta);
     });
 
-    // 타워 업데이트 (조준 + 발사)
     this.towers.getChildren().forEach(tower => {
       if (tower.active) tower.update(time, delta, this.enemies);
     });
 
-    // 발사체 업데이트
     this.projectiles.getChildren().forEach(proj => {
       if (proj.active) proj.update(delta);
     });
 
-    // 재료 드롭 자동 수거 타이머
     this.ingredientManager.update(delta);
-
-    // 조리소 버프 타이머
-    this.cookingStation.update(delta);
   }
 
-  /**
-   * 씬 종료 시 정리.
-   */
   shutdown() {
+    // 씬 내부 이벤트
     this.events.off('enemy_died', this._onEnemyDied, this);
     this.events.off('enemy_reached_base', this._onEnemyReachedBase, this);
     this.events.off('wave_started', this._onWaveStarted, this);
+    // GameEventBus 이벤트
+    GameEventBus.off('gold_earned', this._onGoldEarned, this);
+    GameEventBus.off('combo_changed', this._onComboChanged, this);
+    GameEventBus.off('buff_activated', this._onBuffActivated, this);
+    GameEventBus.off('buff_expired', this._onBuffExpired, this);
+
     this.ingredientManager?.destroy();
-    this.gameUI?.destroy();
   }
 }
