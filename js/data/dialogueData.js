@@ -3,6 +3,7 @@
  * Phase 14-1: JSON 형태의 대화 스크립트를 export한다.
  * Phase 14-2b: portraitKey 필드 추가, CHARACTERS 확장 (린/메이지).
  * Phase 14-2c: 신규 대화 스크립트 10개 추가.
+ * Phase 15: 신규 대화 스크립트 13개 추가 (챕터 2~6 메인 시나리오 + 사이드).
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -216,6 +217,196 @@ export const DIALOGUES = {
       { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '누군가, 혹은 무언가가 미력을 의도적으로 증폭시키고 있을 가능성이...' },
       { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '아직 가설 단계이지만, 정화를 계속하면서 데이터를 더 모아야 해요.' },
       { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '미미 씨의 정화 활동이 큰 도움이 되고 있어요. 감사합니다.' },
+    ]
+  },
+
+  // ── 신규 13종 (Phase 15) ──
+
+  chapter2_clear: {
+    id: 'chapter2_clear',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '스시 쇼군 해치웠다! 동양 식란 정화 완료!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '정화된 스시 재료... 특상급이야! 오늘 메뉴에 올려!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '(나타나며) ...그 보스를 혼자 정화했다고?' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '보고 있었으면 도와줄 것이지!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '도울 필요가 없었으니까. 하지만... 인정해. 넌 생각보다 강해.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '방금... 칭찬했어?' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '착각이야! 다음엔 내가 먼저 정화한다!' },
+      { speaker: 'narrator', portrait: '', text: '한편, 해변가 연구소에서 누군가 미력 데이터를 기록하고 있었다...' },
+    ]
+  },
+  chapter3_clear: {
+    id: 'chapter3_clear',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '크라켄 정화 완료! 다리가 너무 많아서 힘들었어!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '마지막 결정타는 내 화염이었지. 감사는 안 해도 돼.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '둘 다 잘했어~ 정화된 해산물이 이렇게 많다니... 씨푸드 뷔페 하자!' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '(등장) 잠깐, 중요한 발견이 있어요.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '크라켄의 미력 잔여물을 분석했는데, 삼각측량이 가능해졌어요.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '식란의 미력이 수렴하는 좌표가... 대략 남서쪽 화산 지대예요.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '화산? ...거기가 미력 근원이라는 거야?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '아직 가설이에요. 하지만 갈수록 확실해지고 있어요.' },
+      { speaker: 'narrator', portrait: '', text: '식란의 실체가 서서히 드러나기 시작했다.' },
+    ]
+  },
+  chapter4_intro: {
+    id: 'chapter4_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '화산 지대. 대기 중 미력 농도가 급격히 상승했다.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '여기... 공기가 달라. 매콤하면서 뜨거운 느낌?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '미력 농도가 이전 구역의 3배예요. 근원지가 가까워지고 있어요.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '불꽃 미력사인 나도 이 정도 열기는 좀 부담인데...' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '화산 지대 식재료는 정화하면 최고급 BBQ 재료야! 기대돼!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '포코, 지금 상황 파악 좀...' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '뭐? 위기와 기회는 한 끗 차이야!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...저 고양이는 정말 대단해. 다른 의미로.' },
+    ]
+  },
+  chapter4_mage_joins: {
+    id: 'chapter4_mage_joins',
+    skippable: true,
+    lines: [
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '미미 씨, 잠깐 기다려 주세요!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '메이지? 여기까지 직접 온 거야?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '연구실에서 데이터만 보는 건 한계가 있어요. 현장에서 직접 확인해야 해요.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '그리고... 저도 디저트 미력사이거든요. 전투도 할 수 있어요.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '연구원이 전투를? ...말은 쉽지.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '(디저트 도구를 꺼내며) 보여드릴까요?' },
+      { speaker: 'narrator', portrait: '', text: '메이지의 도구에서 차가운 미력이 흘러나왔다. 달콤하면서도 날카로운.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...인정. 꽤 하잖아.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '우와! 3인 팀 결성! 이 기념으로 도구 3+1 세트 할인\u2014' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '분위기 좀 살려줘, 포코!!' },
+    ]
+  },
+  chapter4_clear: {
+    id: 'chapter4_clear',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '라바 디저트 골렘... 정화 완료! 엄청 뜨거웠어!' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '잠깐, 골렘 내부에서 뭔가 발견했어요.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '이건... 인공 미력 증폭 장치예요. 자연 식란이 아니에요!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '뭐?! 누군가 일부러 식란을 일으킨다는 거야?' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '그럼 지금까지 우리가 싸운 식란이 전부...' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '누군가가 의도적으로 미력을 증폭시키고 있어요. 이 장치가 증거예요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '...나도 알고 있었어. 네 할머니도 이 정체를 쫓다가 멈췄지.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '포코?! 알고 있었다고?! 왜 말 안 했어!' },
+      { speaker: 'narrator', portrait: '', text: '식란의 이면에 감춰진 진실이 모습을 드러내기 시작했다.' },
+    ]
+  },
+  chapter5_intro: {
+    id: 'chapter5_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '마법사 디저트 카페. 달콤한 미력이 역겹게 폭주한 공간.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '여기가 미력 근원지에 가장 가까운 지점이에요.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '공기가... 달콤한데 무거워. 머리가 어지러워.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '집중해. 여기서 방심하면 위험해.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '어라? 포코는? 분명 같이 왔는데...' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...사라졌어? 그 고양이가?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '미력 반응이 급변했어요. 포코 씨에게 무슨 일이...!' },
+    ]
+  },
+  rin_side_5: {
+    id: 'rin_side_5',
+    skippable: true,
+    lines: [
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...미미. 잠깐 얘기 좀 하자.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '린? 무슨 일이야? 린이 먼저 말 거는 건 처음인데.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '왜 포기 안 하는 거야? 포코도 사라졌고, 식란은 갈수록 강해지는데.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '할머니가 여기서 포기 안 했으니까. 나도 이 식당을 지킬 거야.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...나도 비슷해. 우리 가문이 못 끝낸 싸움이 있거든.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '그래서 여기까지 온 거구나. 린도 지키고 싶은 게 있는 거지?' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '(고개를 돌리며) ...오해하지 마. 전략적 판단이야.' },
+    ]
+  },
+  chapter5_clear: {
+    id: 'chapter5_clear',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '마스터 파티시에 정화 완료! ...포코! 어디 있어?!' },
+      { speaker: 'narrator', portrait: '', text: '무너진 파티시에 뒤편에서 포코가 비틀거리며 나타났다.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '으으... 여기야, 여기...' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '포코! 괜찮아?! 누가 납치한 거야!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '그 놈... 자신을 \'퀴진 갓\'이라고 했어. 요리의 신이라고.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '퀴진 갓? 요리의 신?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '전설에만 나오던... 수백 년 전 미력사들이 봉인한 존재!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '봉인이 풀리고 있어. 식란은 그놈이 부활하려고 일으킨 거야.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '그 퀴진 갓이 할머니도...?' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(고개를 끄덕이며) ...네 할머니의 미완성 싸움이야. 끝내야 해.' },
+    ]
+  },
+  chapter6_intro: {
+    id: 'chapter6_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '그랑 가스트로노미. 세상에서 가장 고귀한 요리의 전당이 식란에 잠식되었다.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '미력 농도 최고치... 이 안에 퀴진 갓이 있어요.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '여기가 끝이야. 다 정리하자.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '이건 내가 갚아야 할 빚이기도 해. 네 할머니한테.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '할머니의 프라이팬이... 전보다 더 뜨겁게 빛나고 있어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '(도구를 꽉 쥐며) 가자. 끝내러.' },
+      { speaker: 'narrator', portrait: '', text: '미력사 미미와 동료들의 최종 결전이 시작된다.' },
+    ]
+  },
+  team_side_6: {
+    id: 'team_side_6',
+    skippable: true,
+    lines: [
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '이 다음이 마지막이야. 각오는 됐어?' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '당연하지. 여기까지 왔잖아.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '지면 죽는다. 이기면... 같이 밥이나 먹자.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '린이 밥 같이 먹자고 하다니... 진짜 최종전이긴 하네.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '승률 계산은 패스할게요. 데이터보다 경험이 중요한 순간이니까.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '이기면 파티 비용은 내가 낸다. 도구 판촉은 내일부터 쉬고!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '포코가 돈을 쓰겠다니... 진짜 진심이구나.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '이 정도는 해야지! ...단, 파티 음식 재료비는 별도야.' },
+    ]
+  },
+  chapter6_final_battle: {
+    id: 'chapter6_final_battle',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '거대한 미력의 소용돌이 속에서 \'무언가\'가 깨어난다.' },
+      { speaker: '퀴진 갓', portrait: '', text: '수백 년이다... 드디어 이 봉인에서 벗어난다.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '당신이 퀴진 갓?! 식란을 일으킨 거야?!' },
+      { speaker: '퀴진 갓', portrait: '', text: '요리의 미력은 신인 내 것이다. 너희 인간이 감히 요리를 즐기다니.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '요리는 모두의 거야! 누군가를 위해 만드는 거라고!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '저놈이... 네 할머니도 막으려 했던 존재야!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '말은 나중에! 먼저 정화한다!' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '전원 미력 집중! 지금이에요!' },
+      { speaker: 'narrator', portrait: '', text: '최후의 식란 정화가 시작된다.' },
+    ]
+  },
+  chapter6_ending: {
+    id: 'chapter6_ending',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '퀴진 갓이 정화되었다. 세상의 식란이 모두 잠잠해졌다.' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '미력 농도가 정상으로 돌아왔어요. 식란 근원이 소멸했습니다.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...해냈어. 진짜로. (작게 웃으며)' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '잘했어. 오해하지 마, 칭찬 아냐.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '완전 칭찬이잖아!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(눈물) 드디어... 네 할머니가 못 끝낸 걸 네가 해냈어, 미미.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '울지 마, 포코! 나도 울잖아!' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '이 연구 결과로 세계 최초의 식란 해명 논문을 쓸 수 있겠어요. 감사합니다.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '고마워, 모두. 혼자였으면 절대 못 했어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '할머니, 식당 지켰어. 앞으로도 여기서, 계속 지킬게.' },
+      { speaker: 'narrator', portrait: '', text: '식란이 사라진 세상. 하지만 미미의 식당에는 오늘도 손님이 찾아온다. 맛있는 요리와 함께.' },
+    ]
+  },
+  poco_side_4: {
+    id: 'poco_side_4',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '화산 지역 재료가 정화되면 질이 최고야! BBQ 메뉴 추가해 봐!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '지금 식당 하나도 바쁜데 BBQ까지?!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '그러니까 화력 좋은 도구가 필요한 거지~ 마그마 강화 프라이팬 어때?' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '마그마 강화?! 그거 안전한 거야?!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '미력사 전용이니까 괜찮아! 일반인이 쓰면... 음, 좀 위험하지.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '그건 안 괜찮은 거잖아!! 다음에 봐, 포코!' },
     ]
   },
 };
