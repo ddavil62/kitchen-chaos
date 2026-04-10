@@ -45,6 +45,9 @@ export class GatheringScene extends Phaser.Scene {
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_battle');
 
+    // ── 전체 화면 배경 (씬 전환 시 이전 씬 잔상 방지) ──
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0a0a1a);
+
     // ── VFX 매니저 (Phase 10-5) ──
     this.vfx = new VFXManager(this);
 
