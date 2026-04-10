@@ -12,7 +12,7 @@
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
-const SAVE_KEY = 'kitchenChaos_save';
+const SAVE_KEY = 'kitchenChaosTycoon_save';
 const SAVE_VERSION = 8;
 
 /** 기본 세이브 데이터 */

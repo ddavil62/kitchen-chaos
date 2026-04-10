@@ -1,6 +1,6 @@
 {
-  "appId": "com.lazyslime.kitchenchaos",
-  "appName": "Kitchen Chaos Defense",
+  "appId": "com.lazyslime.kitchenchaostycoon",
+  "appName": "Kitchen Chaos Tycoon",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

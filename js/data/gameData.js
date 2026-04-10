@@ -1,5 +1,5 @@
 /**
- * @fileoverview Kitchen Chaos Defense 게임 데이터 정의.
+ * @fileoverview Kitchen Chaos Tycoon 게임 데이터 정의.
  * Phase 10: 적 22종(일반 16 + 보스 6), 타워 6종, 재료 15종, 레시피 12종, 30 스테이지.
  */
 

@@ -1,10 +1,10 @@
-# Kitchen Chaos Defense 기획서
+# Kitchen Chaos Tycoon 기획서
 
 > 최종 업데이트: 2026-04-10
 
 ## 프로젝트 개요
 
-모바일 타워 디펜스 + 레스토랑 타이쿤 하이브리드 게임. 적 처치로 재료를 수집하고(TD 페이즈), 수집한 재료로 손님에게 요리를 서빙하여 골드를 획득하는(영업 페이즈) 듀얼 루프 구조. Phaser.js 3 기반 웹 게임, Android 우선 배포.
+모바일 타워 디펜스 + 레스토랑 타이쿤 하이브리드 게임(구 Kitchen Chaos Defense). 적 처치로 재료를 수집하고(TD 페이즈), 수집한 재료로 손님에게 요리를 서빙하여 골드를 획득하는(영업 페이즈) 듀얼 루프 구조. Phaser.js 3 기반 웹 게임, Android 우선 배포.
 
 ## 기술 스택
 
@@ -117,6 +117,6 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 11 완료. Phase 12(도구 시스템 리워크) 진행 중.
-- 장보기 → "재료 채집" 리브랜딩, 타워 → 영구 도구, 행상인 씬 추가
+- Phase 12 완료 (리네이밍: Kitchen Chaos Defense → Kitchen Chaos Tycoon).
+- Phase 13 예정: 도구 시스템 리워크 (장보기→재료 채집, 타워→영구 도구, 행상인 씬)
 - 상세: `docs/ROADMAP.md` 참조

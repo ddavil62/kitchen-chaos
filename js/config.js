@@ -1,5 +1,5 @@
 /**
- * @fileoverview Kitchen Chaos Defense 전역 설정 상수.
+ * @fileoverview Kitchen Chaos Tycoon 전역 설정 상수.
  * Phase 7: MarketScene 풀스크린 레이아웃.
  *
  * 화면 레이아웃 (360×640):

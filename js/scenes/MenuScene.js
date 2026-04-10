@@ -51,7 +51,7 @@ export class MenuScene extends Phaser.Scene {
       strokeThickness: 6,
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 275, 'Defense', {
+    this.add.text(GAME_WIDTH / 2, 275, 'Tycoon', {
       fontSize: '28px',
       color: '#ffffff',
       stroke: '#333333',

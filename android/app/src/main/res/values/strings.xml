@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Kitchen Chaos Defense</string>
-    <string name="title_activity_main">Kitchen Chaos Defense</string>
-    <string name="package_name">com.lazyslime.kitchenchaos</string>
-    <string name="custom_url_scheme">com.lazyslime.kitchenchaos</string>
+    <string name="app_name">Kitchen Chaos Tycoon</string>
+    <string name="title_activity_main">Kitchen Chaos Tycoon</string>
+    <string name="package_name">com.lazyslime.kitchenchaostycoon</string>
+    <string name="custom_url_scheme">com.lazyslime.kitchenchaostycoon</string>
 </resources>

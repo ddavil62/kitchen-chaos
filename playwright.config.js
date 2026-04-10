@@ -1,5 +1,5 @@
 /**
- * @fileoverview Playwright 테스트 설정. Kitchen Chaos Defense 브라우저 테스트용.
+ * @fileoverview Playwright 테스트 설정. Kitchen Chaos Tycoon 브라우저 테스트용.
  */
 import { defineConfig, devices } from '@playwright/test';
 

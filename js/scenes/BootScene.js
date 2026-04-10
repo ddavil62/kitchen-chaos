@@ -63,7 +63,7 @@ export class BootScene extends Phaser.Scene {
 
     // ── 세이브 데이터 크기 로깅 (Phase 11-3d) ──
     const storageInfo = SaveManager.getStorageSize();
-    console.log(`[KitchenChaos] 세이브 데이터 크기: ${storageInfo.kb} KB (${storageInfo.bytes} bytes)`);
+    console.log(`[KitchenChaosTycoon] 세이브 데이터 크기: ${storageInfo.kb} KB (${storageInfo.bytes} bytes)`);
 
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 ──
     this.cameras.main.fadeIn(300, 0, 0, 0);

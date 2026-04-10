@@ -1,5 +1,5 @@
 /**
- * @fileoverview Kitchen Chaos Defense 게임 진입점(Entry Point).
+ * @fileoverview Kitchen Chaos Tycoon 게임 진입점(Entry Point).
  * Phaser.Game 인스턴스를 생성하고 모든 씬을 등록한다.
  * Phase 11-3d: 프로덕션 전역 에러 핸들러 추가.
  */
@@ -71,7 +71,7 @@ window.__game = game;
  * @returns {boolean} 프로덕션에서 true 반환으로 브라우저 기본 에러 표시 억제
  */
 window.onerror = (message, source, lineno, colno, error) => {
-  console.error('[KitchenChaos]', message, { source, lineno, colno, error });
+  console.error('[KitchenChaosTycoon]', message, { source, lineno, colno, error });
   // 프로덕션에서는 에러 오버레이 억제, 개발 환경에서는 기본 동작 유지
   if (import.meta.env.PROD) return true;
   return false;
@@ -82,7 +82,7 @@ window.onerror = (message, source, lineno, colno, error) => {
  * @param {PromiseRejectionEvent} event
  */
 window.onunhandledrejection = (event) => {
-  console.error('[KitchenChaos] Unhandled rejection:', event.reason);
+  console.error('[KitchenChaosTycoon] Unhandled rejection:', event.reason);
   if (import.meta.env.PROD) {
     event.preventDefault();
   }
