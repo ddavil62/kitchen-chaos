@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-10
-> 기준: Phase 13 완료 (도구 시스템 리워크, 행상인, 재료 채집)
+> 기준: Phase 14-1 완료 (대화 엔진)
 
 ---
 
@@ -22,8 +22,9 @@
 | Phase 11 | 엔드리스 모드, 월드맵, 튜토리얼, UI/UX 폴리시, 성능 최적화, 출시 준비 | ✅ 완료 |
 | Phase 12 | 리네이밍 (Kitchen Chaos Defense → Kitchen Chaos Tycoon) | ✅ 완료 |
 | Phase 13 | 도구 시스템 리워크, 행상인 씬, 재료 채집, 엔드리스 적용 | ✅ 완료 |
+| Phase 14-1 | 대화 엔진 (DialogueManager + DialogueScene + dialogueData) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 13 완료
+**현재 구현 완성도**: Phase 14-1 완료
 
 ### 현재 콘텐츠 규모
 
@@ -41,7 +42,7 @@
 | 직원 | 2종 (서빙/세척 도우미, IAP 추상화) |
 | 사운드 | SFX 20종 + BGM 5종 (Web Audio API 프로시저럴) |
 | VFX | 파티클 + 스크린 효과 + 플로팅 텍스트 (Canvas2D) |
-| 세이브 버전 | v9 |
+| 세이브 버전 | v10 |
 
 ### 게임 루프
 
@@ -369,6 +370,85 @@
 
 ---
 
+## ✅ Phase 14-1 — 대화 엔진 (완료)
+
+> 목표: 대화 시스템 기반 인프라 구축 (스크립트 데이터 + 매니저 + 오버레이 씬)
+
+### 핵심 변경
+
+- DialogueManager: 대화 재생 제어 (start/hasSeen/markSeen/getScript/resetAll)
+- DialogueScene: 오버레이 씬, 하단 180px 패널, 타이핑 애니메이션(30ms/글자), 건너뛰기 버튼
+- dialogueData.js: 3개 샘플 스크립트 + CHARACTERS 캐릭터 정의
+- SaveManager v9→v10: seenDialogues 필드 추가
+
+### ✅ 14-1. 대화 엔진 (완료)
+
+- [x] dialogueData.js: 3개 대화 스크립트 (intro_welcome, merchant_first_meet, stage_first_clear)
+- [x] dialogueData.js: CHARACTERS 정의 (mimi, poco, narrator)
+- [x] DialogueManager.js: start, hasSeen, markSeen, getScript, resetAll
+- [x] DialogueScene.js: 하단 180px 패널 (0x1a0a00, alpha 0.88), 구분선 (0xff6b35)
+- [x] DialogueScene.js: 캐릭터 이름 + 이모지 초상화 + 대사 텍스트(타이핑 30ms/글자)
+- [x] DialogueScene.js: 탭 → 타이핑 즉시 완료 / 완료 상태 → 다음 대사
+- [x] DialogueScene.js: 건너뛰기 버튼 (skippable, 터치 타겟 44px) *(AD 검수: hitArea 60x44로 확대)*
+- [x] DialogueScene.js: narrator 스타일 (이탤릭, 이름/초상화 없음)
+- [x] DialogueScene.js: 진행 힌트 "▼" 깜빡임 *(AD 검수: 대사 하단에 근접 배치, 동적 Y좌표)*
+- [x] DialogueScene.js: 딤 오버레이 input 블로킹
+- [x] SaveManager v10: seenDialogues 필드, hasSeenDialogue, markDialogueSeen
+- [x] main.js: DialogueScene 씬 배열 등록
+
+---
+
+## Phase 14 — 스토리 시스템 (진행 예정)
+
+> 목표: 식란 세계관 기반 스토리 콘텐츠 구현, 대화 트리거 연결, 캐릭터 확장
+> 세계관 상세: `docs/PROJECT.md` "세계관 — 식란(食亂)의 세계" 참조
+
+### 14-1. 대화 엔진 ✅ 완료
+
+- [x] DialogueManager + DialogueScene + dialogueData 기반 인프라
+
+### 14-2. 스토리 콘텐츠 + 대화 트리거 (예정)
+
+- [ ] 대화 스크립트 확장 (식란 세계관 반영, 챕터별 스토리 대사)
+- [ ] 기존 씬에 대화 트리거 연결 (WorldMapScene 첫 진입, 행상인 첫 방문, 스테이지 클리어 등)
+- [ ] 캐릭터 확장: 린(🔥, 라이벌), 메이지(🧁, 연구원)
+- [ ] 튜토리얼 대화 (미미+포코의 미력사 각성 시퀀스)
+
+### 14-3. 캐릭터 초상화 교체 (예정)
+
+- [ ] 이모지 → 픽셀 아트 스프라이트 교체 (PixelLab)
+- [ ] DialogueScene portrait 렌더링 업데이트
+
+---
+
+## 시즌별 장기 확장 계획
+
+> "식란(食亂)"은 반복적 자연현상이므로 시즌 단위로 콘텐츠 확장 가능
+
+### 시즌 1 — 첫 번째 대식란 (현재, 챕터 1~6)
+
+- 할머니의 식당 복원, 미력사 각성, 지역 식란 진정
+- 현재 30스테이지, 106레시피, 15재료, 22적 구현 완료
+
+### 시즌 2 — 국제 식란 SOS (챕터 7~12, 미래)
+
+- 해외 미력사 조직의 구원 요청
+- 각국 요리 테마: 일식, 중식, 양식, 인도, 멕시칸, 디저트 월드
+- 신규 재료 ~10종, 레시피 ~60종, 적 ~12종, 도구 ~4종
+
+### 시즌 3 — 극한 환경 식란 (챕터 13~18, 미래)
+
+- 심해/화산/빙하/사막/밀림/우주정거장
+- 극한 환경 전용 재료+도구, 환경 기믹
+- 신규 재료 ~10종, 레시피 ~60종, 적 ~12종, 도구 ~4종
+
+### 엔드리스 확장
+
+- 영구 식란 지대(미력 폭풍의 눈), 끝없는 정화 임무
+- 시즌별 엔드리스 테마 추가
+
+---
+
 ## 요약 타임라인
 
 | Phase | 핵심 키워드 | 레시피 누적 | 재료 | 상태 |
@@ -386,3 +466,4 @@
 | ~~11~~ | ~~엔드리스, 월드맵, 최종 폴리시~~ | 106 | 15 | ✅ 완료 |
 | ~~12~~ | ~~리네이밍 (Kitchen Chaos Tycoon)~~ | 106 | 15 | ✅ 완료 |
 | ~~13~~ | ~~도구 시스템 리워크, 행상인, 재료 채집~~ | 106 | 15 | ✅ 완료 |
+| ~~14-1~~ | ~~대화 엔진 (DialogueManager + DialogueScene)~~ | 106 | 15 | ✅ 완료 |
