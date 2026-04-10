@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-10
-> 기준: Phase 14-3 완료 (StoryManager 트리거 중앙화)
+> 기준: Phase 15 완료 (챕터 2~6 스토리 콘텐츠)
 
 ---
 
@@ -25,8 +25,9 @@
 | Phase 14-1 | 대화 엔진 (DialogueManager + DialogueScene + dialogueData) | ✅ 완료 |
 | Phase 14-2 | 대화 콘텐츠 (초상화 4종 + 스크립트 13종 + 4씬 트리거 연결) | ✅ 완료 |
 | Phase 14-3 | StoryManager 트리거 중앙화, 챕터 진행도 추적, 세이브 v11 | ✅ 완료 |
+| Phase 15 | 챕터 2~6 스토리 콘텐츠 (대화 스크립트 26종, 트리거 24종) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 14-3 완료
+**현재 구현 완성도**: Phase 15 완료
 
 ### 현재 콘텐츠 규모
 
@@ -452,14 +453,19 @@
 
 ---
 
-## Phase 15 — 스토리 콘텐츠 (예정)
+## ✅ Phase 15 — 스토리 콘텐츠 (완료)
 
-> 목표: 챕터 1~6 메인 시나리오 대화 스크립트 작성
+> 목표: 챕터 2~6 메인 시나리오 + 사이드 대화 스크립트 작성
 > StoryManager + storyData.js 기반으로 씬 코드 수정 없이 트리거 추가
 
-- [ ] 챕터 1~3 메인 시나리오 대화 스크립트
-- [ ] 챕터 4~6 메인 시나리오 대화 스크립트
-- [ ] 캐릭터별 사이드 대화 확장
+- [x] 챕터 2~3 클리어 대화 스크립트 (chapter2_clear, chapter3_clear)
+- [x] 챕터 4 인트로 + 메이지 합류 + 클리어 (chapter4_intro, chapter4_mage_joins, chapter4_clear)
+- [x] 챕터 5 인트로 + 린 사이드 + 클리어 (chapter5_intro, rin_side_5, chapter5_clear)
+- [x] 챕터 6 인트로 + 팀 사이드 + 최종 결전 + 엔딩 (chapter6_intro, team_side_6, chapter6_final_battle, chapter6_ending)
+- [x] 포코 사이드 대화 (poco_side_4)
+- [x] STORY_TRIGGERS 13개 추가 (worldmap_enter 3개, merchant_enter 1개, gathering_enter 1개, result_clear 8개)
+- [x] 누적: 대화 스크립트 26종, STORY_TRIGGERS 24항목
+- [x] 씬 코드 수정 없음, SaveManager 버전업 없음
 
 ---
 
@@ -521,5 +527,5 @@
 | ~~14-1~~ | ~~대화 엔진 (DialogueManager + DialogueScene)~~ | 106 | 15 | ✅ 완료 |
 | ~~14-2~~ | ~~초상화 4종, 스크립트 13종, 4씬 트리거~~ | 106 | 15 | ✅ 완료 |
 | ~~14-3~~ | ~~StoryManager 트리거 중앙화, 챕터 진행도~~ | 106 | 15 | ✅ 완료 |
-| 15 | 스토리 콘텐츠 (챕터 1~6 메인 시나리오 대화) | 106 | 15 | 예정 |
+| ~~15~~ | ~~스토리 콘텐츠 (챕터 2~6 시나리오 + 사이드 대화)~~ | 106 | 15 | ✅ 완료 |
 | 16 | 인게임 통합 (튜토리얼/이벤트/NPC 대화) | 106 | 15 | 예정 |

@@ -1,5 +1,52 @@
 # Changelog
 
+## [2026-04-10] - Phase 15 스토리 콘텐츠 (챕터 2~6)
+
+### 추가
+
+- **대화 스크립트 13종 추가** (`js/data/dialogueData.js`, 수정)
+  - chapter2_clear (8줄): 스시 쇼군 격파, 린 라이벌 인정, 메이지 복선
+  - chapter3_clear (9줄): 크라켄 격파, 메이지 삼각측량, 팀플레이 첫 성공
+  - chapter4_intro (8줄): 화산 지대 진입, 미력 농도 3배, 식란 격화
+  - chapter4_mage_joins (10줄): 메이지 현장 합류 선언, 3인 팀 완성
+  - chapter4_clear (9줄): 라바 골렘 격파, 인공 미력 증폭 장치 발견
+  - chapter5_intro (7줄): 디저트 카페 진입, 포코 납치 복선
+  - rin_side_5 (7줄): 린/미미 단둘이 대화, 동기 공유, 우정 진전
+  - chapter5_clear (10줄): 파티시에 격파, 포코 구출, 퀴진 갓 이름 최초 등장
+  - chapter6_intro (7줄): 그랑 가스트로노미 진입, 최종 결전 직전
+  - team_side_6 (8줄): 최종 결전 직전 팀 각오 한 마디씩
+  - chapter6_final_battle (9줄): 퀴진 갓 등장, 봉인 내막 폭로
+  - chapter6_ending (11줄): 식란 종결, 할머니 유지 완성, 엔딩
+  - poco_side_4 (6줄): BBQ 메뉴 제안 + 도구 판촉 코미디
+  - 누적: 대화 스크립트 26종
+  - 퀴진 갓은 CHARACTERS 미등록, narrator 스타일(portrait 빈 문자열, portraitKey 없음)로 처리
+
+- **STORY_TRIGGERS 13항목 추가** (`js/data/storyData.js`, 수정)
+  - worldmap_enter 3개: chapter4_intro (ch>=4), chapter5_intro (ch>=5), chapter6_intro (ch>=6)
+  - merchant_enter 1개: poco_side_4 (ch>=4 + poco_discount_fail 시청 후)
+  - gathering_enter 1개: chapter6_final_battle (stageId === '6-3')
+  - result_clear 8개: chapter2_clear (2-3), chapter3_clear (3-6), chapter4_mage_joins (4-3), chapter4_clear (4-6), rin_side_5 (5-3), chapter5_clear (5-6), team_side_6 (6-2), chapter6_ending (6-3)
+  - 일반 stage_first_clear 제외 목록에 신규 8개 stageId 추가 (2-3, 3-6, 4-3, 4-6, 5-3, 5-6, 6-2, 6-3)
+  - 누적: STORY_TRIGGERS 배열 24항목
+
+### 유지
+
+- 씬 코드 수정 없음 (WorldMapScene, ResultScene, GatheringScene, MerchantScene)
+- SaveManager 버전업 없음 (v11 유지)
+- 기존 13개 스크립트/트리거 변경 없음
+- 새 캐릭터(CHARACTERS) / 새 초상화 에셋 추가 없음
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-10-kitchen-chaos-phase15-spec.md`
+- 리포트: `.claude/specs/2026-04-10-kitchen-chaos-phase15-report.md`
+- QA: `.claude/specs/2026-04-10-kitchen-chaos-phase15-qa.md`
+- visual_change: none
+- 스펙 테이블 헤더에 "12개"로 기재되어 있으나, 요구사항 상세 목록(13개)이 정확하며 구현이 이를 반영
+- 스토리 아크: 미미 미력사 각성(1장) → 린 라이벌 인정(2장) → 팀 결성(3장) → 식란 인공적 원인 폭로(4장) → 포코 납치/구출, 퀴진 갓 최초 언급(5장) → 최종 결전, 식란 종결(6장)
+
+---
+
 ## [2026-04-10] - Phase 14-3 StoryManager 트리거 중앙화
 
 ### 추가

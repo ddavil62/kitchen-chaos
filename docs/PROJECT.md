@@ -108,8 +108,8 @@ kitchen-chaos/
     data/
       gameData.js            # 적/도구(TOOL_DEFS)/재료/스테이지 정의
       recipeData.js          # 레시피 106종 정의
-      dialogueData.js        # 대화 스크립트 13종 + 캐릭터 4종 정의
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 13종
+      dialogueData.js        # 대화 스크립트 26종 + 캐릭터 4종 정의
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 24항목
   assets/                    # 스프라이트/타일셋/아이콘
     portraits/               # 캐릭터 초상화 (64x64 PixelLab)
   tests/                     # Playwright 테스트
@@ -162,9 +162,9 @@ kitchen-chaos/
 | 도구 시스템 | 영구 도구 6종, 구매/판매/업그레이드, ToolManager | 완료 |
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
-| 대화 엔진 | DialogueManager + DialogueScene 오버레이, 13종 스크립트, 세이브 연동 | 완료 |
-| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 스크립트 13종 | 완료 |
-| 스토리 매니저 | StoryManager + storyData 데이터 기반 트리거 중앙화, 챕터 진행도 추적 | 완료 |
+| 대화 엔진 | DialogueManager + DialogueScene 오버레이, 26종 스크립트, 세이브 연동 | 완료 |
+| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 챕터 1~6 메인+사이드 시나리오 | 완료 |
+| 스토리 매니저 | StoryManager + storyData 트리거 24항목, 챕터 진행도 추적, 씬 코드 1줄 연동 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -187,13 +187,12 @@ kitchen-chaos/
 - StageSelectScene.js, MarketScene.js는 레거시로 유지 중 (각각 WorldMapScene, GatheringScene으로 교체됨)
 - config.js의 STARTING_GOLD, WAVE_CLEAR_BONUS는 하위 호환용으로 유지 (GatheringScene/EndlessScene에서 미사용)
 - Tower 엔티티의 hitArea가 Container 기반 Circle(0,0,20)로 설정되어 타워 바디 위치와 미세 불일치 가능 (LOW)
-- 3장 이후(4~6장) 챕터 스토리 대화 미구현 (시즌 1 후반은 후속 Phase)
 - 대화 분기/선택지 미구현 (현재 선형 대화만)
 
 ## 향후 계획
 
-- Phase 14-3 완료 (StoryManager 트리거 중앙화, 챕터 진행도). Phase 14 전체 완료.
-- 후속: Phase 15 스토리 콘텐츠 (챕터 1~6 메인 시나리오), Phase 16 인게임 통합 (튜토리얼/이벤트/NPC 대화).
+- Phase 15 완료 (챕터 2~6 스토리 콘텐츠, 대화 26종 + 트리거 24항목). 시즌 1 메인 시나리오 완성.
+- 후속: Phase 16 인게임 통합 (튜토리얼/이벤트/NPC 대화, 대화 분기/선택지).
 - 대화 분기/선택지 시스템 미구현 (현재 선형 대화만).
 - 시즌별 장기 확장 (80~100시간): 시즌1(현재 1~6장) → 시즌2(국제) → 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조
