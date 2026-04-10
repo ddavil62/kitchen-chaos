@@ -52,6 +52,9 @@ export class BootScene extends Phaser.Scene {
     // 프로그래매틱 텍스처 생성 (맵 타일 등)
     this._createTileTextures();
 
+    // ── 걷기 애니메이션 등록 (Phase 12) ──
+    SpriteLoader.registerWalkAnimations(this);
+
     // ── 사운드 매니저 초기화 (Phase 10-4) ──
     SoundManager.init(this);
 

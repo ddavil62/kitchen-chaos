@@ -1,11 +1,13 @@
 /**
  * @fileoverview 스프라이트 에셋 로더.
  * Phaser preload()에서 호출하여 적/보스/타워/셰프/재료 아이콘을 로드한다.
- * Phase 9-4: south 방향 정지 이미지만 우선 로드 (walk 애니메이션은 추후 확장).
+ * Phase 9-4: south 방향 정지 이미지만 우선 로드.
+ * Phase 12: 적/보스 8방향 걷기 애니메이션 프레임 로드 + Phaser anim 등록.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
  *   보스:   boss_{id}      (예: boss_pasta_boss)
+ *   걷기:   enemy_{id}_walk_{dir}_{frame} (예: enemy_carrot_goblin_walk_south_0)
  *   타워:   tower_{id}     (예: tower_pan)
  *   셰프:   chef_{id}      (예: chef_petit_chef)
  *   재료:   ingredient_{id} (예: ingredient_carrot)
@@ -58,6 +60,40 @@ const INGREDIENT_FILE_MAP = {
 // ── 재료 ID 목록 (15종, 게임 내 ID 기준) ──
 const INGREDIENT_IDS = Object.keys(INGREDIENT_FILE_MAP);
 
+// ── 걷기 애니메이션 폴더 해시 맵 (Phase 12) ──
+const ENEMY_WALK_HASHES = {
+  butter_ghost: 'walking-166fb6f3',
+  carrot_goblin: 'walking-012372c9',
+  cheese_golem: 'walking-e8ab7eac',
+  cheese_rat: 'walking-15884a43',
+  chili_demon: 'walking-98c5d521',
+  egg_sprite: 'walking-53299222',
+  fish_knight: 'walking-32ddc272',
+  flour_ghost: 'walking-dafa8589',
+  meat_ogre: 'walking-dff9d5bc',
+  milk_phantom: 'walking-df77f532',
+  mushroom_scout: 'walking-5e4378eb',
+  octopus_mage: 'walking-c62120db',
+  rice_slime: 'walking-fe48e722',
+  shrimp_samurai: 'walking-52be561d',
+  sugar_fairy: 'walking-83b51e9e',
+  tomato_bomber: 'walking-0dd2efa9',
+};
+
+const BOSS_WALK_HASHES = {
+  cuisine_god: 'walking-84e4ae22',
+  dragon_ramen: 'walking-dcd66668',
+  lava_dessert_golem: 'walking-5514895b',
+  master_patissier: 'walking-b21b062a',
+  pasta_boss: 'walking-49c92768',
+  seafood_kraken: 'walking-f85ec5ca',
+};
+
+/** 걷기 애니메이션 방향 목록 */
+const WALK_DIRS = ['south', 'south-east', 'east', 'north-east', 'north', 'north-west', 'west', 'south-west'];
+/** 걷기 애니메이션 프레임 수 */
+const WALK_FRAME_COUNT = 6;
+
 // ── 타일셋 ID 목록 (6종) ──
 const TILESET_IDS = [
   'pasta_field', 'oriental_bamboo', 'seafood_beach', 'volcano_lava',
@@ -73,6 +109,8 @@ export class SpriteLoader {
   static preload(scene) {
     SpriteLoader._loadEnemies(scene);
     SpriteLoader._loadBosses(scene);
+    SpriteLoader._loadEnemyWalkFrames(scene);
+    SpriteLoader._loadBossWalkFrames(scene);
     SpriteLoader._loadTowers(scene);
     SpriteLoader._loadChefs(scene);
     SpriteLoader._loadIngredients(scene);
@@ -105,6 +143,76 @@ export class SpriteLoader {
         `${SPRITES_ROOT}/bosses/${id}/rotations/south.png`
       );
     }
+  }
+
+  /**
+   * 적 16종 걷기 애니메이션 프레임 로드 (8방향 x 6프레임).
+   * @param {Phaser.Scene} scene
+   * @private
+   */
+  static _loadEnemyWalkFrames(scene) {
+    for (const id of ENEMY_IDS) {
+      const hash = ENEMY_WALK_HASHES[id];
+      if (!hash) continue;
+      for (const dir of WALK_DIRS) {
+        for (let f = 0; f < WALK_FRAME_COUNT; f++) {
+          const key = `enemy_${id}_walk_${dir}_${f}`;
+          const path = `${SPRITES_ROOT}/enemies/${id}/animations/${hash}/${dir}/frame_${String(f).padStart(3, '0')}.png`;
+          scene.load.image(key, path);
+        }
+      }
+    }
+  }
+
+  /**
+   * 보스 6종 걷기 애니메이션 프레임 로드 (8방향 x 6프레임).
+   * @param {Phaser.Scene} scene
+   * @private
+   */
+  static _loadBossWalkFrames(scene) {
+    for (const id of BOSS_IDS) {
+      const hash = BOSS_WALK_HASHES[id];
+      if (!hash) continue;
+      for (const dir of WALK_DIRS) {
+        for (let f = 0; f < WALK_FRAME_COUNT; f++) {
+          const key = `boss_${id}_walk_${dir}_${f}`;
+          const path = `${SPRITES_ROOT}/bosses/${id}/animations/${hash}/${dir}/frame_${String(f).padStart(3, '0')}.png`;
+          scene.load.image(key, path);
+        }
+      }
+    }
+  }
+
+  /**
+   * 적/보스 걷기 Phaser 애니메이션을 등록한다.
+   * BootScene.create()에서 preload 완료 후 호출해야 한다.
+   * @param {Phaser.Scene} scene
+   */
+  static registerWalkAnimations(scene) {
+    const register = (prefix, id) => {
+      for (const dir of WALK_DIRS) {
+        const animKey = `${prefix}_${id}_walk_${dir}`;
+        if (scene.anims.exists(animKey)) continue;
+        const frames = [];
+        for (let f = 0; f < WALK_FRAME_COUNT; f++) {
+          const frameKey = `${prefix}_${id}_walk_${dir}_${f}`;
+          if (scene.textures.exists(frameKey)) {
+            frames.push({ key: frameKey });
+          }
+        }
+        if (frames.length > 0) {
+          scene.anims.create({
+            key: animKey,
+            frames,
+            frameRate: 8,
+            repeat: -1,
+          });
+        }
+      }
+    };
+
+    for (const id of ENEMY_IDS) register('enemy', id);
+    for (const id of BOSS_IDS) register('boss', id);
   }
 
   /**

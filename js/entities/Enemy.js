@@ -4,6 +4,7 @@
  * Phase 3: 5종 적 비주얼 + 치즈 골렘 재생 + 아이소메트릭 depth.
  * Phase 4: 밀가루 유령(투명) + 빙결 상태이상.
  * Phase 9-4: 도형 → 스프라이트 이미지 교체 (fallback 유지).
+ * Phase 12: 8방향 걷기 애니메이션 + 크기 25% 증가.
  */
 
 import Phaser from 'phaser';
@@ -92,17 +93,34 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // ── 스프라이트 키 결정 (보스/일반) ──
     const isBoss = !!data.isBoss;
-    const spriteKey = isBoss ? `boss_${id}` : `enemy_${id}`;
+    const prefix = isBoss ? 'boss' : 'enemy';
+    const spriteKey = `${prefix}_${id}`;
     const hasSprite = SpriteLoader.hasTexture(this.scene, spriteKey);
 
-    if (hasSprite) {
-      // ── 스프라이트 이미지 사용 ──
+    // Phase 12: 걷기 애니메이션 사용 여부 확인
+    const walkAnimKey = `${prefix}_${id}_walk_south`;
+    const hasWalkAnim = this.scene.anims.exists(walkAnimKey);
+    this._walkPrefix = `${prefix}_${id}_walk`;
+    this._hasWalkAnim = hasWalkAnim;
+    this._currentDir = 'south';
+
+    // Phase 12: 크기 25% 증가 (적: 28→35, 보스: 40→50)
+    const targetSize = isBoss ? 50 : 35;
+
+    if (hasWalkAnim) {
+      // ── 걷기 애니메이션 스프라이트 사용 ──
+      const firstFrameKey = `${prefix}_${id}_walk_south_0`;
+      const sprite = this.scene.add.sprite(0, 0, firstFrameKey);
+      const texW = sprite.width || 48;
+      sprite.setScale(targetSize / texW);
+      sprite.play(walkAnimKey);
+      this.add(sprite);
+      this._bodySprite = sprite;
+    } else if (hasSprite) {
+      // ── 정지 이미지 fallback ──
       const sprite = this.scene.add.image(0, 0, spriteKey);
-      // 적: 48x48 → 28px, 보스: 84x84 → 40px
-      const targetSize = isBoss ? 40 : 28;
       const texW = sprite.width;
-      const scale = targetSize / texW;
-      sprite.setScale(scale);
+      sprite.setScale(targetSize / texW);
       this.add(sprite);
       this._bodySprite = sprite;
     } else {
@@ -111,7 +129,7 @@ export class Enemy extends Phaser.GameObjects.Container {
     }
 
     // HP 바 (스프라이트/도형 공통)
-    const hpBarY = isBoss ? -24 : -18;
+    const hpBarY = isBoss ? -30 : -22;
     this.hpBarBg = this.scene.add.rectangle(0, hpBarY, 26, 3, 0x333333);
     this.add(this.hpBarBg);
     this.hpBar = this.scene.add.rectangle(-13, hpBarY, 26, 3, 0x44ff44);
@@ -301,6 +319,18 @@ export class Enemy extends Phaser.GameObjects.Container {
     const dist = Math.sqrt(dx * dx + dy * dy);
     const moveAmount = this.speed * this.slowFactor * (delta / 1000);
 
+    // Phase 12: 이동 방향에 따라 걷기 애니메이션 전환
+    if (this._hasWalkAnim && dist > 0.1) {
+      const dir = Enemy._getDirection8(dx, dy);
+      if (dir !== this._currentDir) {
+        this._currentDir = dir;
+        const animKey = `${this._walkPrefix}_${dir}`;
+        if (this._bodySprite?.anims && this.scene.anims.exists(animKey)) {
+          this._bodySprite.play(animKey, true);
+        }
+      }
+    }
+
     if (dist <= moveAmount) {
       this.x = target.x;
       this.y = target.y;
@@ -312,6 +342,27 @@ export class Enemy extends Phaser.GameObjects.Container {
       this.x += (dx / dist) * moveAmount;
       this.y += (dy / dist) * moveAmount;
     }
+  }
+
+  /**
+   * dx, dy로부터 가장 가까운 8방향 문자열을 반환한다.
+   * @param {number} dx
+   * @param {number} dy
+   * @returns {string}
+   * @private
+   */
+  static _getDirection8(dx, dy) {
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI); // -180 ~ 180
+    // 0=east, 90=south, -90=north
+    if (angle >= -22.5 && angle < 22.5) return 'east';
+    if (angle >= 22.5 && angle < 67.5) return 'south-east';
+    if (angle >= 67.5 && angle < 112.5) return 'south';
+    if (angle >= 112.5 && angle < 157.5) return 'south-west';
+    if (angle >= 157.5 || angle < -157.5) return 'west';
+    if (angle >= -157.5 && angle < -112.5) return 'north-west';
+    if (angle >= -112.5 && angle < -67.5) return 'north';
+    if (angle >= -67.5 && angle < -22.5) return 'north-east';
+    return 'south';
   }
 
   /** @param {number} amount */
