@@ -752,16 +752,25 @@ export class ServiceScene extends Phaser.Scene {
     });
   }
 
-  /** 레시피 퀵슬롯 활성/비활성 갱신 */
+  /** 레시피 퀵슬롯 활성/비활성 갱신 (Phase 12: 솔드아웃 표시) */
   _updateRecipeQuickSlots() {
     for (const entry of this.recipeButtons) {
       const canMake = this.inventoryManager.hasEnough(entry.recipe.ingredients);
       if (canMake) {
         entry.btn.setFillStyle(0x334455).setAlpha(1);
         entry.text.setColor('#ffffff');
+        if (entry.soldOutText) entry.soldOutText.setVisible(false);
       } else {
         entry.btn.setFillStyle(0x222233).setAlpha(0.5);
         entry.text.setColor('#666666');
+        // 솔드아웃 라벨 표시
+        if (!entry.soldOutText) {
+          entry.soldOutText = this.add.text(entry.btn.x, entry.btn.y, 'SOLD OUT', {
+            fontSize: '10px', fontStyle: 'bold', color: '#ff4444',
+            stroke: '#000', strokeThickness: 2,
+          }).setOrigin(0.5).setDepth(entry.btn.depth + 1);
+        }
+        entry.soldOutText.setVisible(true);
       }
     }
   }
@@ -1315,31 +1324,21 @@ export class ServiceScene extends Phaser.Scene {
    * @private
    */
   _pickRecipeForType(customerType) {
-    let pool;
+    // Phase 12: 재고로 만들 수 있는 레시피만 주문 (솔드아웃 처리)
+    const craftable = this.availableRecipes.filter(r =>
+      this.inventoryManager.hasEnough(r.ingredients)
+    );
+    if (craftable.length === 0) return null;
 
     if (customerType === 'gourmet') {
-      // 미식가: ★★★ 이상만 주문
-      const highTierAll = this.availableRecipes.filter(r => r.tier >= 3);
-      if (highTierAll.length === 0) {
-        // tier 3 이상 레시피가 없으면 일반 풀 사용
-        pool = this.availableRecipes;
-      } else {
-        // 재고로 만들 수 있는 것 우선
-        const highTierPossible = highTierAll.filter(r =>
-          this.inventoryManager.hasEnough(r.ingredients)
-        );
-        pool = highTierPossible.length > 0 ? highTierPossible : highTierAll;
-      }
-    } else {
-      // 일반/VIP/급한/단체: 재고 가능한 것 우선, 없으면 아무거나
-      const possibleRecipes = this.availableRecipes.filter(r =>
-        this.inventoryManager.hasEnough(r.ingredients)
-      );
-      pool = possibleRecipes.length > 0 ? possibleRecipes : this.availableRecipes;
+      // 미식가: 만들 수 있는 것 중 ★★★ 이상 우선
+      const highTier = craftable.filter(r => r.tier >= 3);
+      const pool = highTier.length > 0 ? highTier : craftable;
+      return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    if (pool.length === 0) return null;
-    return pool[Math.floor(Math.random() * pool.length)];
+    // 일반/VIP/급한/단체: 만들 수 있는 레시피에서 랜덤 선택
+    return craftable[Math.floor(Math.random() * craftable.length)];
   }
 
   /**
