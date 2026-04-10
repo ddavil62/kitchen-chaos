@@ -491,12 +491,20 @@ export class SaveManager {
 
   /**
    * 스테이지 해금 여부.
+   * Phase 19-2: 시즌 2 첫 스테이지(7-1)는 6-3 클리어 + season2Unlocked 조건 추가.
    * @param {string} stageId
    * @returns {boolean}
    */
   static isUnlocked(stageId) {
     const idx = STAGE_ORDER.indexOf(stageId);
     if (idx <= 0) return true;
+
+    // ── 시즌 2 첫 스테이지 특수 조건 ──
+    if (stageId === '7-1') {
+      const data = SaveManager.load();
+      return !!data.stages['6-3']?.cleared && !!data.season2Unlocked;
+    }
+
     const prevId = STAGE_ORDER[idx - 1];
     const data = SaveManager.load();
     return !!data.stages[prevId]?.cleared;
@@ -513,16 +521,26 @@ export class SaveManager {
   }
 
   /**
-   * 누적 별점 합계.
+   * 시즌별 별점 합계.
+   * Phase 19-2: 시즌 필터 파라미터 추가 (기존 호출 호환 유지).
+   * @param {number} [season=0] - 0: 전체, 1: 시즌1(1~6장), 2: 시즌2(7~12장)
    * @returns {{ current: number, max: number }}
    */
-  static getTotalStars() {
+  static getTotalStars(season = 0) {
     const data = SaveManager.load();
+    let stages;
+    if (season === 1) {
+      stages = STAGE_ORDER.filter(id => parseInt(id) <= 6);
+    } else if (season === 2) {
+      stages = STAGE_ORDER.filter(id => parseInt(id) >= 7);
+    } else {
+      stages = STAGE_ORDER;
+    }
     let current = 0;
-    for (const stageId of STAGE_ORDER) {
+    for (const stageId of stages) {
       current += data.stages[stageId]?.stars || 0;
     }
-    return { current, max: STAGE_ORDER.length * 3 };
+    return { current, max: stages.length * 3 };
   }
 
   /**

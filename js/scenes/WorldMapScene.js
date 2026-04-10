@@ -5,6 +5,7 @@
  * 노드 터치 -> 슬라이드업 패널 -> 스테이지 선택 -> ChefSelectScene.
  * Phase 11-3b: fadeIn 300ms 통일.
  * Phase 11-3d: 버전 표기 APP_VERSION 참조로 변경.
+ * Phase 19-2: 시즌 탭 시스템 (12장 = 시즌1 6장 + 시즌2 6장).
  */
 
 import Phaser from 'phaser';
@@ -15,31 +16,39 @@ import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 
-// ── 챕터별 스테이지 분류 (StageSelectScene에서 이식) ──
+// ── 챕터별 스테이지 분류 (Phase 19-2: 시즌2 6장 추가) ──
 
 const CHAPTERS = [
+  // 시즌 1 (ch1~ch6)
   { id: 'ch1', nameKo: '1장: 파스타 레스토랑',   themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#8b4500', icon: '\uD83C\uDF5D', stages: ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6'] },
   { id: 'ch2', nameKo: '2장: 동양 요리 식당',     themeColor: '#88ccff', themeHex: 0x88ccff, strokeColor: '#224488', icon: '\uD83C\uDF5C', stages: ['2-1', '2-2', '2-3'] },
   { id: 'ch3', nameKo: '3장: 씨푸드 바',          themeColor: '#66eeff', themeHex: 0x66eeff, strokeColor: '#1a6688', icon: '\uD83E\uDD9E', stages: ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6'] },
   { id: 'ch4', nameKo: '4장: 화산 BBQ',           themeColor: '#ff6622', themeHex: 0xff6622, strokeColor: '#881100', icon: '\uD83D\uDD25', stages: ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6'] },
   { id: 'ch5', nameKo: '5장: 마법사 디저트 카페', themeColor: '#cc88ff', themeHex: 0xcc88ff, strokeColor: '#5522aa', icon: '\uD83E\uDDC1', stages: ['5-1', '5-2', '5-3', '5-4', '5-5', '5-6'] },
   { id: 'ch6', nameKo: '6장: 그랑 가스트로노미', themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#886600', icon: '\uD83D\uDC68\u200D\uD83C\uDF73', stages: ['6-1', '6-2', '6-3'] },
+  // 시즌 2 (ch7~ch12)
+  { id: 'ch7',  nameKo: '7장: 사쿠라 이자카야',    themeColor: '#ffb7c5', themeHex: 0xffb7c5, strokeColor: '#994466', icon: '\uD83C\uDF38', stages: ['7-1', '7-2', '7-3', '7-4', '7-5', '7-6'] },
+  { id: 'ch8',  nameKo: '8장: 용의 주방',           themeColor: '#ff4500', themeHex: 0xff4500, strokeColor: '#882200', icon: '\uD83D\uDC09', stages: ['8-1', '8-2', '8-3', '8-4', '8-5', '8-6'] },
+  { id: 'ch9',  nameKo: '9장: 별빛 비스트로',       themeColor: '#4169e1', themeHex: 0x4169e1, strokeColor: '#223388', icon: '\u2B50', stages: ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6'] },
+  { id: 'ch10', nameKo: '10장: 향신료 궁전',        themeColor: '#daa520', themeHex: 0xdaa520, strokeColor: '#886600', icon: '\uD83C\uDFF0', stages: ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6'] },
+  { id: 'ch11', nameKo: '11장: 선인장 칸티나',      themeColor: '#228b22', themeHex: 0x228b22, strokeColor: '#114411', icon: '\uD83C\uDF35', stages: ['11-1', '11-2', '11-3', '11-4', '11-5', '11-6'] },
+  { id: 'ch12', nameKo: '12장: 슈가 드림랜드',      themeColor: '#ff69b4', themeHex: 0xff69b4, strokeColor: '#993366', icon: '\uD83C\uDF6C', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'] },
 ];
 
-// ── 노드 위치 좌표 (2열 3행 지그재그) ──
+// ── 노드 위치 좌표 (2열 3행 지그재그, Phase 19-2: y +10 조정) ──
 
 const NODE_POSITIONS = [
-  { x: 100, y: 140 },  // ch1
-  { x: 260, y: 140 },  // ch2
-  { x: 100, y: 270 },  // ch3
-  { x: 260, y: 270 },  // ch4
-  { x: 100, y: 400 },  // ch5
-  { x: 260, y: 400 },  // ch6
+  { x: 100, y: 150 },  // 노드 1 (Phase 19-2: 140->150)
+  { x: 260, y: 150 },  // 노드 2
+  { x: 100, y: 280 },  // 노드 3 (Phase 19-2: 270->280)
+  { x: 260, y: 280 },  // 노드 4
+  { x: 100, y: 410 },  // 노드 5 (Phase 19-2: 400->410)
+  { x: 260, y: 410 },  // 노드 6
 ];
 
-// ── 연결선 쌍 (인덱스 기준) ──
+// ── 연결선 쌍 (Phase 19-2: CONNECTIONS -> SEASON_CONNECTIONS 이름 변경) ──
 
-const CONNECTIONS = [
+const SEASON_CONNECTIONS = [
   [0, 1], [0, 2], [1, 3], [2, 3], [2, 4], [3, 5], [4, 5],
 ];
 
@@ -49,23 +58,26 @@ export class WorldMapScene extends Phaser.Scene {
   }
 
   /**
-   * 씬 생성. 배경, 챕터 노드, 연결선, HUD, 엔드리스 섹션을 그린다.
+   * 씬 생성. 배경, 시즌 탭, 챕터 노드, 연결선, HUD, 엔드리스 섹션을 그린다.
+   * Phase 19-2: 시즌 탭 시스템 추가.
    */
   create() {
-    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ─���
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
     // 1. 배경
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0a0a1a);
 
-    // 2. 챕터 상태 계산
-    this._chapterStates = this._buildChapterStates();
+    // 2. 현재 시즌 상태 (Phase 19-2)
+    this._currentSeason = 1;
+    this._season2Unlocked = !!SaveManager.load().season2Unlocked;
 
-    // 3. 연결선 (노드 뒤에 렌더링)
-    this._drawConnections();
+    // 3. 시즌 탭 생성 (Phase 19-2)
+    this._createSeasonTabs();
 
-    // 4. 노드 렌더링
-    this._drawNodes();
+    // 4. 맵 콘텐츠 컨테이너 (탭 전환 시 재생성)
+    this._mapContainer = null;
+    this._buildSeasonMap();
 
     // 5. 상단 HUD
     this._createHUD();
@@ -98,28 +110,127 @@ export class WorldMapScene extends Phaser.Scene {
     });
   }
 
-  // ── 챕터 상태 계산 ──────────────────────────────────────────────
+  // ── 시즌 탭 (Phase 19-2) ──────────────────────────────────────
 
   /**
-   * 각 챕터의 해금/진행중/올클리어 상태를 계산한다.
-   * @returns {{ unlocked: boolean, inProgress: boolean, cleared: boolean, currentStars: number, maxStars: number }[]}
+   * ���즌 1/2 탭 버튼을 생성��다.
    * @private
    */
-  _buildChapterStates() {
-    return CHAPTERS.map((chapter) => {
+  _createSeasonTabs() {
+    const tabY = 60;
+    const tabW = 140;
+    const tabH = 28;
+    const tabGap = 10;
+    const totalW = tabW * 2 + tabGap;
+    const startX = (GAME_WIDTH - totalW) / 2 + tabW / 2;
+
+    // 시즌 1 탭
+    this._tab1Bg = this.add.rectangle(startX, tabY, tabW, tabH, 0x3344aa)
+      .setStrokeStyle(2, 0x5566cc)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(40);
+    this._tab1Text = this.add.text(startX, tabY, '\uC2DC\uC98C 1', {
+      fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
+    }).setOrigin(0.5).setDepth(41);
+
+    this._tab1Bg.on('pointerdown', () => {
+      if (this._currentSeason === 1) return;
+      SoundManager.playSFX('sfx_ui_tap');
+      this._switchSeason(1);
+    });
+
+    // 시즌 2 탭
+    const tab2X = startX + tabW + tabGap;
+    const tab2Color = this._season2Unlocked ? 0x2a2a44 : 0x222222;
+    this._tab2Bg = this.add.rectangle(tab2X, tabY, tabW, tabH, tab2Color)
+      .setStrokeStyle(2, this._season2Unlocked ? 0x4444aa : 0x333333)
+      .setDepth(40);
+
+    const tab2Label = this._season2Unlocked ? '\uC2DC\uC98C 2' : '\uD83D\uDD12 \uC2DC\uC98C 2';
+    const tab2TextColor = this._season2Unlocked ? '#aaaacc' : '#555555';
+    this._tab2Text = this.add.text(tab2X, tabY, tab2Label, {
+      fontSize: '13px', fontStyle: 'bold', color: tab2TextColor,
+    }).setOrigin(0.5).setDepth(41);
+
+    if (this._season2Unlocked) {
+      this._tab2Bg.setInteractive({ useHandCursor: true });
+      this._tab2Bg.on('pointerdown', () => {
+        if (this._currentSeason === 2) return;
+        SoundManager.playSFX('sfx_ui_tap');
+        this._switchSeason(2);
+      });
+    }
+  }
+
+  /**
+   * 시즌을 전환한다. 맵 콘텐츠를 재생성한다.
+   * @param {number} season - 1 또는 2
+   * @private
+   */
+  _switchSeason(season) {
+    this._currentSeason = season;
+
+    // 기존 패널 닫기
+    if (this._panelContainer) {
+      this._panelContainer.destroy();
+      this._panelContainer = null;
+    }
+
+    // 탭 하이라이트 갱신
+    this._tab1Bg.setFillStyle(season === 1 ? 0x3344aa : 0x2a2a44);
+    this._tab1Bg.setStrokeStyle(2, season === 1 ? 0x5566cc : 0x4444aa);
+    this._tab1Text.setColor(season === 1 ? '#ffffff' : '#aaaacc');
+
+    this._tab2Bg.setFillStyle(season === 2 ? 0x3344aa : 0x2a2a44);
+    this._tab2Bg.setStrokeStyle(2, season === 2 ? 0x5566cc : 0x4444aa);
+    this._tab2Text.setColor(season === 2 ? '#ffffff' : '#aaaacc');
+
+    // 맵 재생성
+    this._buildSeasonMap();
+
+    // HUD 별점 갱신
+    if (this._hudStarText) {
+      const { current, max } = SaveManager.getTotalStars(season);
+      this._hudStarText.setText(`\u2B50 ${current}/${max}`);
+    }
+  }
+
+  // ── 시즌별 맵 빌드 (Phase 19-2) ──────────────────────────────────
+
+  /**
+   * 현재 시즌에 맞는 챕터 노드/연결선을 생성한다.
+   * @private
+   */
+  _buildSeasonMap() {
+    // 기존 맵 컨테이너 파괴
+    if (this._mapContainer) {
+      this._mapContainer.destroy();
+    }
+
+    this._mapContainer = this.add.container(0, 0).setDepth(10);
+
+    const chapters = this._currentSeason === 1
+      ? CHAPTERS.slice(0, 6)
+      : CHAPTERS.slice(6, 12);
+
+    // 챕터 상태 계산 (현재 시즌 6개만)
+    this._chapterStates = chapters.map((chapter) => {
       const chapterUnlocked = SaveManager.isUnlocked(chapter.stages[0]);
       let currentStars = 0;
       const maxStars = chapter.stages.length * 3;
-
       for (const stageId of chapter.stages) {
         currentStars += SaveManager.getStars(stageId);
       }
-
       const cleared = chapterUnlocked && currentStars === maxStars;
       const inProgress = chapterUnlocked && !cleared;
-
       return { unlocked: chapterUnlocked, inProgress, cleared, currentStars, maxStars };
     });
+
+    // 연결선 렌더링
+    this._drawConnections(chapters);
+
+    // 노드 렌더링
+    this._drawNodes(chapters);
   }
 
   // ── 연결선 렌더링 ──────────────────────────────────────────────
@@ -127,13 +238,16 @@ export class WorldMapScene extends Phaser.Scene {
   /**
    * 챕터 노드 간 연결선을 그린다.
    * 해금 경로는 밝은 실선, 잠금 경로는 회색 점선.
+   * Phase 19-2: chapters 매개변수 추가, SEASON_CONNECTIONS 사용.
+   * @param {object[]} chapters - 현재 시즌의 챕터 배열 (6개)
    * @private
    */
-  _drawConnections() {
+  _drawConnections(chapters) {
     const g = this.add.graphics();
+    this._mapContainer.add(g);
     const chapterStates = this._chapterStates;
 
-    CONNECTIONS.forEach(([a, b]) => {
+    SEASON_CONNECTIONS.forEach(([a, b]) => {
       const posA = NODE_POSITIONS[a];
       const posB = NODE_POSITIONS[b];
       const stateA = chapterStates[a];
@@ -141,7 +255,7 @@ export class WorldMapScene extends Phaser.Scene {
       const bothUnlocked = stateA.unlocked && stateB.unlocked;
 
       if (bothUnlocked) {
-        // 밝은 실선 (해금 경로)
+        // 밝은 실선 (해금 경���)
         g.lineStyle(3, 0xaaaaaa, 0.8);
         g.beginPath();
         g.moveTo(posA.x, posA.y);
@@ -171,17 +285,21 @@ export class WorldMapScene extends Phaser.Scene {
     });
   }
 
-  // ── 노드 렌더링 ──────────────────────────────────────────────
+  // ���─ 노드 렌더링 ──────────────────────────────────────────────
 
   /**
    * 6개 챕터 노드를 그린다.
    * 잠금(회색+자물쇠) / 진행중(테마색+glow) / 올클리어(골든 테두리+체크).
+   * Phase 19-2: chapters 매개변수 추가.
+   * @param {object[]} chapters - 현재 시즌의 챕터 배열 (6개)
    * @private
    */
-  _drawNodes() {
+  _drawNodes(chapters) {
     const chapterStates = this._chapterStates;
+    // Phase 19-2: 시즌 오프셋 — 노드 라벨에 실제 챕터 번호 표시
+    const chapterOffset = this._currentSeason === 1 ? 0 : 6;
 
-    CHAPTERS.forEach((chapter, idx) => {
+    chapters.forEach((chapter, idx) => {
       const pos = NODE_POSITIONS[idx];
       const state = chapterStates[idx];
       const { x, y } = pos;
@@ -189,23 +307,21 @@ export class WorldMapScene extends Phaser.Scene {
       // 1. 글로우 원 (진행중 전용)
       if (state.inProgress) {
         const glow = this.add.circle(x, y, 50, chapter.themeHex, 0.2);
+        this._mapContainer.add(glow);
         this._applyGlow(glow, chapter.themeHex);
       }
 
       // 2. 노드 배경 원 + 테두리
       let bgColor, borderWidth, borderColor;
       if (!state.unlocked) {
-        // 잠금
         bgColor = 0x333333;
         borderWidth = 2;
         borderColor = 0x555555;
       } else if (state.cleared) {
-        // 올클리어
         bgColor = 0x221100;
         borderWidth = 4;
         borderColor = 0xffd700;
       } else {
-        // 진행중
         bgColor = 0x222222;
         borderWidth = 3;
         borderColor = chapter.themeHex;
@@ -213,49 +329,56 @@ export class WorldMapScene extends Phaser.Scene {
 
       const bgCircle = this.add.circle(x, y, 40, bgColor)
         .setStrokeStyle(borderWidth, borderColor);
+      this._mapContainer.add(bgCircle);
 
       // 3. 챕터 아이콘
       const iconAlpha = state.unlocked ? 1.0 : 0.4;
-      this.add.text(x, y - 6, chapter.icon, {
+      const iconText = this.add.text(x, y - 6, chapter.icon, {
         fontSize: '26px',
       }).setOrigin(0.5).setAlpha(iconAlpha);
+      this._mapContainer.add(iconText);
 
       // 4. 챕터 번호 라벨
       const labelColor = state.unlocked ? chapter.themeColor : '#555555';
-      const chapterNum = `${idx + 1}장`;
-      this.add.text(x, y + 18, chapterNum, {
+      const chapterNum = `${chapterOffset + idx + 1}\uC7A5`;
+      const labelText = this.add.text(x, y + 18, chapterNum, {
         fontSize: '11px',
         color: labelColor,
       }).setOrigin(0.5);
+      this._mapContainer.add(labelText);
 
       // 5. 별점 표시 (해금된 경우)
       if (state.unlocked) {
-        this.add.text(x, y + 30, `\u2605 ${state.currentStars}/${state.maxStars}`, {
+        const starText = this.add.text(x, y + 30, `\u2605 ${state.currentStars}/${state.maxStars}`, {
           fontSize: '10px',
           color: '#ffd700',
         }).setOrigin(0.5);
+        this._mapContainer.add(starText);
       }
 
       // 6. 자물쇠 (잠금 전용)
       if (!state.unlocked) {
-        this.add.text(x + 18, y - 22, '\uD83D\uDD12', {
+        const lockText = this.add.text(x + 18, y - 22, '\uD83D\uDD12', {
           fontSize: '16px',
         }).setOrigin(0.5);
+        this._mapContainer.add(lockText);
       }
 
-      // 7. 체크마크 (올클리어 전용)
+      // 7. 체크마크 (올클리어 ��용)
       if (state.cleared) {
-        this.add.text(x + 18, y - 22, '\u2713', {
+        const checkText = this.add.text(x + 18, y - 22, '\u2713', {
           fontSize: '18px',
           color: '#ffd700',
           fontStyle: 'bold',
         }).setOrigin(0.5);
+        this._mapContainer.add(checkText);
       }
 
       // 8. 인터랙션 (해금 노드만)
       if (state.unlocked) {
         const hitArea = this.add.circle(x, y, 44, 0x000000, 0)
           .setInteractive({ useHandCursor: true });
+        this._mapContainer.add(hitArea);
 
         hitArea.on('pointerdown', () => {
           SoundManager.playSFX('sfx_ui_tap');
@@ -290,6 +413,7 @@ export class WorldMapScene extends Phaser.Scene {
 
   /**
    * 상단 HUD (y=0~40): 뒤로가기, 총 별점, 레시피 수집률.
+   * Phase 19-2: 시즌별 별점 표시 + _hudStarText 멤버 변수 저장.
    * @private
    */
   _createHUD() {
@@ -314,9 +438,9 @@ export class WorldMapScene extends Phaser.Scene {
     backBg.on('pointerover', () => backBg.setFillStyle(0x666666));
     backBg.on('pointerout', () => backBg.setFillStyle(0x444444));
 
-    // 총 별점
-    const { current, max } = SaveManager.getTotalStars();
-    this.add.text(170, 20, `\u2B50 ${current}/${max}`, {
+    // 총 별점 (Phase 19-2: 시즌별 필터)
+    const { current, max } = SaveManager.getTotalStars(this._currentSeason);
+    this._hudStarText = this.add.text(170, 20, `\u2B50 ${current}/${max}`, {
       fontSize: '13px',
       color: '#ffd700',
     }).setOrigin(0.5).setDepth(51);
@@ -390,8 +514,9 @@ export class WorldMapScene extends Phaser.Scene {
   // ── 슬라이드업 패널 ──────────────────────────────────────────────
 
   /**
-   * 챕터의 스테이지 목록을 슬라이드업 패널로 표시한다.
-   * @param {number} chapterIdx - 챕터 인덱스 (0-based)
+   * 챕터의 스테이지 목록을 슬라이���업 패널로 표시한다.
+   * Phase 19-2: 시즌 오프셋 적용.
+   * @param {number} chapterIdx - 현재 시즌 내 챕터 인덱스 (0~5)
    * @private
    */
   _openStagePanel(chapterIdx) {
@@ -401,7 +526,9 @@ export class WorldMapScene extends Phaser.Scene {
       this._panelContainer = null;
     }
 
-    const chapter = CHAPTERS[chapterIdx];
+    // Phase 19-2: 시즌 오프셋 적용
+    const offset = this._currentSeason === 1 ? 0 : 6;
+    const chapter = CHAPTERS[offset + chapterIdx];
     const panelH = 400;
     const panelW = 300;
     const panelTargetY = GAME_HEIGHT - panelH;  // 240
@@ -417,9 +544,6 @@ export class WorldMapScene extends Phaser.Scene {
 
     // 오버레이 터치 시 패널 닫기
     dimOverlay.on('pointerdown', (pointer) => {
-      // 패널 영역 내 클릭이면 무시
-      // 패널 y 범위: container 기준 0~panelH, 화면 기준 panelTargetY~GAME_HEIGHT
-      // 패널 x 범위: 중앙 정렬 30~330
       const panelLeft = (GAME_WIDTH - panelW) / 2;
       const panelRight = panelLeft + panelW;
       const localY = pointer.y - panelTargetY;
@@ -484,7 +608,7 @@ export class WorldMapScene extends Phaser.Scene {
 
     // 패널 내부 스크롤 처리
     const contentHeight = chapter.stages.length * (itemH + itemGap);
-    const visibleHeight = panelH - 50;  // 패널 내 표시 가능 높이 (헤더 50px 제외)
+    const visibleHeight = panelH - 50;
     const maxScroll = Math.max(0, contentHeight - visibleHeight);
 
     if (maxScroll > 0) {
@@ -500,7 +624,6 @@ export class WorldMapScene extends Phaser.Scene {
 
       this.input.on('pointermove', this._panelDragMove = (pointer) => {
         if (!this._panelContainer || !pointer.isDown) return;
-        // 패널 영역 내에서만 스크롤
         const panelLeft = (GAME_WIDTH - panelW) / 2;
         const panelRightX = panelLeft + panelW;
         if (pointer.x < panelLeft || pointer.x > panelRightX) return;
@@ -557,7 +680,7 @@ export class WorldMapScene extends Phaser.Scene {
   /**
    * 패널 내 스테이지 항목을 생성한다.
    * StageSelectScene._createStageItem 로직 재활용.
-   * @param {Phaser.GameObjects.Container} container - 부모 컨테이너
+   * @param {Phaser.GameObjects.Container} container - 부모 컨테이��
    * @param {string} stageId - 스테이지 ID
    * @param {object} stage - 스테이지 데이터
    * @param {number} localY - 컨테이너 내부 y좌표
