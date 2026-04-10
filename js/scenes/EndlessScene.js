@@ -1,23 +1,25 @@
 /**
  * @fileoverview 엔드리스 모드 TD 씬.
- * Phase 11-1: MarketScene을 상속하여 무한 웨이브 로직만 override.
- * 5웨이브마다 ServiceScene으로 전환, 라이프 0 시 엔드리스 결과 화면으로 전환.
+ * Phase 11-1: 무한 웨이브 로직.
+ * Phase 13-4: GatheringScene을 상속하여 도구 배치 시스템 연동.
+ * 5웨이브마다 ServiceScene → MerchantScene → EndlessScene 복귀 루프.
+ * 라이프 0 시 엔드리스 결과 화면으로 전환.
  * Phase 11-3b: 보스 웨이브(10의 배수) BGM 전환 추가.
  */
 
-import { MarketScene } from './MarketScene.js';
+import { GatheringScene } from './GatheringScene.js';
 import { EndlessWaveGenerator } from '../managers/EndlessWaveGenerator.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { ENEMY_TYPES } from '../data/gameData.js';
 import { Enemy } from '../entities/Enemy.js';
-import { GAME_WIDTH, STARTING_LIVES, WAVE_CLEAR_BONUS } from '../config.js';
+import { GAME_WIDTH, STARTING_LIVES } from '../config.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
 
-export class EndlessScene extends MarketScene {
+export class EndlessScene extends GatheringScene {
   constructor() {
-    // MarketScene.constructor → Phaser.Scene({ key: 'MarketScene' })를 호출하고,
+    // GatheringScene.constructor → Phaser.Scene({ key: 'GatheringScene' })를 호출하고,
     // Phaser.Scene이 내부적으로 Systems 인스턴스를 생성하므로
     // super() 호출 직후 this.sys가 존재한다. key를 교체하여 별도 씬으로 등록한다.
     super();
@@ -28,28 +30,25 @@ export class EndlessScene extends MarketScene {
 
   /**
    * 엔드리스 모드 전용 초기화.
-   * ServiceScene에서 복귀 시 상태를 복원하고, 웨이브를 교체한다.
-   * @param {{ stageId?: string, endlessWave?: number, endlessScore?: number, endlessMaxCombo?: number, dailySpecials?: string[], gold?: number, lives?: number }} data
+   * MerchantScene에서 복귀 시 상태를 복원하고, 웨이브를 교체한다.
+   * Phase 13-4: 골드 복원 제거 (영구 골드는 ToolManager/SaveManager가 관리).
+   * @param {{ stageId?: string, endlessWave?: number, endlessScore?: number, endlessMaxCombo?: number, dailySpecials?: string[], lives?: number }} data
    */
   create(data) {
-    // 1. 엔드리스 전용 상태 복원 (ServiceScene에서 복귀 시)
+    // 1. 엔드리스 전용 상태 복원 (MerchantScene에서 복귀 시)
     this.endlessWave = data?.endlessWave || 0;
     this.endlessScore = data?.endlessScore || 0;
     this.endlessMaxCombo = data?.endlessMaxCombo || 0;
     this.dailySpecials = data?.dailySpecials || this._calcDailySpecials();
 
-    // ServiceScene에서 복귀 시 gold/lives 복원
-    this._restoreGold = data?.gold;
+    // MerchantScene에서 복귀 시 lives 복원 (골드는 영구 저장이므로 복원 불필요)
     this._restoreLives = data?.lives;
 
     // 2. stageId를 '1-1'로 고정하여 super.create 호출
     //    (경로/맵은 1-1을 재사용, WaveManager는 교체할 것이므로 waves는 무시됨)
     super.create({ stageId: '1-1' });
 
-    // 3. ServiceScene에서 복귀 시 gold/lives 복원 (super.create가 STARTING_GOLD/LIVES로 리셋하므로)
-    if (this._restoreGold !== undefined && this._restoreGold !== null) {
-      this.gold = this._restoreGold;
-    }
+    // 3. MerchantScene에서 복귀 시 lives 복원 (super.create가 STARTING_LIVES로 리셋하므로)
     if (this._restoreLives !== undefined && this._restoreLives !== null) {
       this.lives = this._restoreLives;
     }
@@ -232,13 +231,11 @@ export class EndlessScene extends MarketScene {
   // ── 웨이브 클리어 처리 ──────────────────────────────────────────
 
   /**
-   * 엔드리스 웨이브 클리어 시 보너스 지급, ServiceScene 전환 판단.
+   * 엔드리스 웨이브 클리어 시 ServiceScene 전환 판단.
+   * Phase 13-4: 골드 보너스 제거 (영업에서만 골드 획득).
    * @private
    */
   _onEndlessWaveCleared() {
-    // 웨이브 클리어 보너스 지급
-    this.gold += WAVE_CLEAR_BONUS;
-    this.endlessScore += WAVE_CLEAR_BONUS;
     this._updateHUD();
 
     // 5웨이브마다 ServiceScene으로 전환
@@ -263,6 +260,7 @@ export class EndlessScene extends MarketScene {
 
   /**
    * ServiceScene으로 전환. 엔드리스 상태를 모두 전달한다.
+   * Phase 13-4: gold 전달 제거 (영구 골드는 ToolManager/SaveManager가 관리).
    * @private
    */
   _transitionToService() {
@@ -273,7 +271,6 @@ export class EndlessScene extends MarketScene {
       this.scene.start('ServiceScene', {
         inventory: inv,
         stageId: '1-1',
-        gold: this.gold,
         lives: this.lives,
         isEndless: true,
         endlessWave: this.endlessWave,
@@ -384,12 +381,14 @@ export class EndlessScene extends MarketScene {
   /**
    * 적 처치 시 점수 추적 및 웨이브 진행 체크.
    * 엔드리스 스코어에도 반영한다.
+   * Phase 13-4: bossReward 골드 대신 보스 처치 시 점수만 추가.
+   * 재료 드롭은 GatheringScene._onBossKilled가 boss_killed 이벤트로 처리.
    * @param {Enemy} enemy
    * @override
    */
   _onEnemyDied(enemy) {
     this.score++;
-    // 보스 처치 시 보상
+    // 보스 처치 시 점수 추가 (bossReward 값을 점수로만 사용, 골드 지급 없음)
     const bossReward = enemy.data_?.bossReward || 0;
     if (bossReward > 0) {
       this.endlessScore += bossReward;

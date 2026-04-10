@@ -198,8 +198,10 @@ export function buildWaypointsFromSegments(segments) {
 export const APP_VERSION = '1.0.0';
 
 // ── 게임 규칙 상수 ──
+// Phase 13에서 도구 시스템으로 대체됨 — 하위 호환용 유지
 export const STARTING_GOLD = 120;
 export const STARTING_LIVES = 15;
 export const FRESHNESS_WINDOW_MS = 5000;
+// Phase 13에서 GatheringScene/EndlessScene에서 미사용 — 하위 호환용 유지
 export const WAVE_CLEAR_BONUS = 25;
 export const INGREDIENT_SELL_PRICE = 10;

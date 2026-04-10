@@ -1837,20 +1837,21 @@ export class ServiceScene extends Phaser.Scene {
     this.time.delayedCall(2500, () => {
       this.cameras.main.fadeOut(600, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        // ── Phase 11-1: 엔드리스 모드 시 EndlessScene으로 복귀 ──
+        // ── Phase 13-4: 엔드리스 모드 시 MerchantScene 경유 후 EndlessScene 복귀 ──
         if (this.isEndless) {
           const updatedMaxCombo = Math.max(this.endlessMaxCombo, this.maxCombo);
           const updatedScore = this.endlessScore + this.totalGold + this.tipTotal;
 
-          this.scene.start('EndlessScene', {
-            stageId: '1-1',
-            gold: this.marketGold + this.totalGold + this.tipTotal,
-            lives: this.marketLives,
-            endlessWave: this.endlessWave,
-            endlessScore: updatedScore,
-            endlessMaxCombo: updatedMaxCombo,
-            dailySpecials: this.dailySpecials,
-            inventory: {},  // 영업 후 인벤토리 초기화
+          this.scene.start('MerchantScene', {
+            isEndless: true,
+            endlessReturnData: {
+              stageId: '1-1',
+              lives: this.marketLives,
+              endlessWave: this.endlessWave,
+              endlessScore: updatedScore,
+              endlessMaxCombo: updatedMaxCombo,
+              dailySpecials: this.dailySpecials,
+            },
           });
           return;
         }
