@@ -1,5 +1,137 @@
 # Changelog
 
+## [2026-04-11] - Phase 19-3 PixelLab 에셋 + 시즌2 프롤로그 스토리
+
+### 추가
+
+- **PixelLab 에셋 6종** (`assets/sprites/`)
+  - `chefs/yuki_chef/rotations/south.png`: 유키 셰프 스프라이트 (48px, chibi, ice blue hair, white uniform)
+  - `chefs/lao_chef/rotations/south.png`: 라오 셰프 스프라이트 (48px, chibi, red apron, black hair)
+  - `portraits/portrait_yuki.png`: 유키 초상화 (64x64, pixel art portrait)
+  - `portraits/portrait_lao.png`: 라오 초상화 (64x64, pixel art portrait)
+  - `towers/wasabi_cannon/tower.png`: 와사비 대포 타워 (32x32, green launcher on bamboo base)
+  - `towers/spice_grinder/tower.png`: 향신료 그라인더 타워 (32x32, orange mortar/pestle on wooden base)
+  - SpriteLoader의 TOWER_IDS/CHEF_IDS/PORTRAIT_IDS에 19-1에서 이미 등록됨 -> 에셋 배치만으로 자동 로드
+
+- **대화 스크립트 3종** (`js/data/dialogueData.js`)
+  - season2_prologue (5줄): WCA 연락, 식란 동시다발 징후, 시즌2 개막 선언
+  - season2_yuki_intro (4줄): 유키 합류, 이자카야 식란 잠식
+  - season2_lao_intro (4줄): 라오 합류, 용 웍 오염
+  - 누적: 대화 스크립트 35종, 캐릭터 7종
+
+- **스토리 트리거 3건** (`js/data/storyData.js`)
+  - season2_prologue: worldmap_enter, 6-3 클리어 + !season2Unlocked, onComplete -> season2Unlocked=true + currentChapter=7
+  - season2_yuki_intro: worldmap_enter, season2Unlocked + currentChapter>=7 + !storyFlags.yuki_joined, onComplete -> storyFlags.yuki_joined=true
+  - season2_lao_intro: worldmap_enter, season2Unlocked + currentChapter>=8 + !storyFlags.lao_joined, onComplete -> storyFlags.lao_joined=true
+  - storyData.js에 `import SaveManager` 추가 (onComplete 콜백에서 세이브 조작)
+  - 누적: STORY_TRIGGERS 34항목
+
+- **StoryManager trigger.onComplete 지원** (`js/managers/StoryManager.js`)
+  - _fire()에서 trigger.onComplete 콜백 실행 (기존 chain의 onComplete와 합성)
+  - getProgress()에 stages, season2Unlocked 필드 추가 (시즌2 트리거 condition에서 참조)
+  - setFlag/hasFlag: 배열 기반(includes/push) -> 객체 기반(key 접근)으로 전환
+  - advanceChapter 기본값: storyFlags [] -> {}
+
+- **SaveManager v12->v13** (`js/managers/SaveManager.js`)
+  - SAVE_VERSION: 12 -> 13
+  - createDefault(): storyProgress.storyFlags를 [] -> {} 객체로 변경
+  - v12->v13 마이그레이션: Array.isArray(storyFlags) -> {} 변환
+
+### 변경된 파일 (4개 코드 + 6개 에셋)
+
+| 파일 | 변경 유형 |
+|------|----------|
+| `js/managers/SaveManager.js` | 수정 (v13 마이그레이션, storyFlags 타입 변경) |
+| `js/managers/StoryManager.js` | 수정 (onComplete, getProgress 확장, setFlag/hasFlag 객체 전환) |
+| `js/data/dialogueData.js` | 수정 (대화 3종 추가) |
+| `js/data/storyData.js` | 수정 (import SaveManager, 트리거 3건 + onComplete 콜백) |
+| `assets/sprites/chefs/yuki_chef/rotations/south.png` | 신규 |
+| `assets/sprites/chefs/lao_chef/rotations/south.png` | 신규 |
+| `assets/sprites/portraits/portrait_yuki.png` | 신규 |
+| `assets/sprites/portraits/portrait_lao.png` | 신규 |
+| `assets/sprites/towers/wasabi_cannon/tower.png` | 신규 |
+| `assets/sprites/towers/spice_grinder/tower.png` | 신규 |
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-11-kitchen-chaos-phase19-3-spec.md`
+- 리포트: `.claude/specs/2026-04-11-kitchen-chaos-phase19-3-report.md`
+- QA: `.claude/specs/2026-04-11-kitchen-chaos-phase19-3-qa.md`
+- visual_change: both
+- Vite 빌드 성공 (1,944KB gzip 428KB)
+- QA: PASS (10/10 수용 기준, 10/10 예외 시나리오, Playwright 17개 테스트 전수 통과)
+- 스펙 대비 추가 변경: StoryManager.getProgress()에 stages/season2Unlocked 노출, setFlag/hasFlag 객체 전환, advanceChapter 기본값 storyFlags {} 변경
+- LOW 이슈 3건 (기능 영향 없음): 시즌2 대화 skippable 필드 미설정, SaveManager lazy migration 패턴, 시즌2 트리거 배열 끝 위치(설계 의도)
+
+---
+
+## [2026-04-10] - Phase 19-2 UI 확장
+
+### 추가
+
+- **ChefSelectScene 5종 카드 리레이아웃** (`js/scenes/ChefSelectScene.js`)
+  - cardHeight 145->100, cardGap 10->8, cardStartY 90->55로 조정 (5장 카드 640px 내 수용, 55+500+32=587px)
+  - 아이콘 28->24px, 셰프 이름 16->15px, 스킬/설명 폰트 축소
+  - 타이틀 Y 30->20, 서브타이틀 Y 55->38
+
+- **시즌 2 셰프 잠금 표시** (`js/scenes/ChefSelectScene.js`)
+  - season2Unlocked=false 시 yuki_chef, lao_chef 잠금 처리
+  - 회색 배경(0x1a1a1a)+테두리(0x333333), 텍스트 #555555, 아이콘 alpha 0.3
+  - 자물쇠 오버레이 + "6장 클리어 시 해금" 텍스트
+  - setInteractive 미적용 (클릭 차단)
+
+- **WorldMapScene 시즌 탭 시스템** (`js/scenes/WorldMapScene.js`)
+  - `_createSeasonTabs()`: 상단 y=60에 시즌 1/2 탭 버튼 (140x28px, 13px bold)
+  - `_switchSeason(season)`: 탭 하이라이트 갱신 + 패널 닫기 + 맵 재생성
+  - `_buildSeasonMap()`: 현재 시즌 6개 챕터 노드/연결선 생성
+  - season2Unlocked=false 시 시즌 2 탭 비활성 (회색+자물쇠, 클릭 무반응)
+
+- **CHAPTERS 12개 확장** (`js/scenes/WorldMapScene.js`)
+  - ch7: 사쿠라 이자카야 (0xffb7c5), ch8: 용의 주방 (0xff4500)
+  - ch9: 별빛 비스트로 (0x4169e1), ch10: 향신료 궁전 (0xdaa520)
+  - ch11: 선인장 칸티나 (0x228b22), ch12: 슈가 드림랜드 (0xff69b4)
+
+- **시즌 2 스테이지 36개** (`js/data/stageData.js`)
+  - STAGE_ORDER에 7-1~12-6 추가 (총 66개)
+  - STAGES에 36개 엔트리: nameKo, waves(기존 적 재활용, 난이도 점진 상향), starThresholds
+  - 상세 밸런스는 플레이테스트에서 별도 조정 예정
+
+- **SaveManager.isUnlocked('7-1') 특수 조건** (`js/managers/SaveManager.js`)
+  - 6-3 cleared + season2Unlocked 복합 조건 (early return 패턴)
+
+- **SaveManager.getTotalStars(season)** (`js/managers/SaveManager.js`)
+  - season 파라미터 추가 (0=전체, 1=시즌1 1~6장, 2=시즌2 7~12장)
+  - 무인수 호출 시 전체 합계 반환 (하위 호환 유지)
+
+### 변경
+
+- **WorldMapScene NODE_POSITIONS** y값 +10 조정 (탭 영역 확보: 140->150, 270->280, 400->410)
+- **WorldMapScene _drawConnections/_drawNodes**: chapters 매개변수 방식으로 변경 (시즌별 6노드 렌더링)
+- **WorldMapScene _openStagePanel**: 시즌 오프셋 적용 (offset = currentSeason === 1 ? 0 : 6)
+- **WorldMapScene HUD**: 탭 전환 시 해당 시즌 별점으로 갱신
+
+### 변경된 파일 (4개)
+
+| 파일 | 변경 유형 |
+|------|----------|
+| `js/scenes/ChefSelectScene.js` | 수정 (레이아웃 상수, 폰트 축소, 잠금 로직) |
+| `js/scenes/WorldMapScene.js` | 수정 (CHAPTERS 12개, 탭 시스템, 시즌 전환) |
+| `js/data/stageData.js` | 수정 (STAGE_ORDER/STAGES 시즌2 36개 추가) |
+| `js/managers/SaveManager.js` | 수정 (isUnlocked 7-1 조건, getTotalStars season) |
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-10-kitchen-chaos-phase19-2-spec.md`
+- 리포트: `.claude/specs/2026-04-10-kitchen-chaos-phase19-2-report.md`
+- QA: `.claude/specs/2026-04-10-kitchen-chaos-phase19-2-qa.md`
+- visual_change: ui
+- Vite 빌드 성공 (1,940KB gzip 427KB)
+- QA: PASS (24/24 항목 통과, Playwright 26개 테스트 전수 통과)
+- 시즌 2 스테이지 밸런스는 기본 데이터만 준비, 플레이테스트에서 조정 예정
+- 스펙 대비 변경 사항 없음 (모든 요구사항 그대로 구현)
+
+---
+
 ## [2026-04-10] - Phase 19-1 데이터 레이어 + 세이브 확장 + 도구 전투 로직
 
 ### 추가

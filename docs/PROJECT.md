@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-10
+> 최종 업데이트: 2026-04-11
 
 ## 프로젝트 개요
 
@@ -82,7 +82,7 @@ kitchen-chaos/
     scenes/
       BootScene.js           # 에셋 로드
       MenuScene.js           # 메인 메뉴 (캠페인/엔드리스/상점/도감)
-      WorldMapScene.js       # 월드맵 (6챕터 노드맵 + 스테이지 패널)
+      WorldMapScene.js       # 월드맵 (12챕터 노드맵 + 시즌탭 + 스테이지 패널)
       ChefSelectScene.js     # 셰프 선택 (캠페인/엔드리스 분기)
       GatheringScene.js      # 재료 채집 페이즈 (TD, 도구 배치/회수/재배치)
       EndlessScene.js        # 엔드리스 TD 페이즈 (GatheringScene 상속)
@@ -93,7 +93,7 @@ kitchen-chaos/
       RecipeCollectionScene.js # 레시피 도감
       DialogueScene.js       # 대화 오버레이 씬 (타이핑 애니메이션, 건너뛰기)
     managers/
-      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v12)
+      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v13)
       ToolManager.js         # 영구 도구 인벤토리 (구매/판매/업그레이드/스탯)
       DialogueManager.js     # 대화 관리자 (start/hasSeen/markSeen)
       StoryManager.js        # 스토리 진행도 추적 + 트리거 중앙 디스패처
@@ -106,12 +106,15 @@ kitchen-chaos/
       ChefManager.js         # 셰프 선택/스킬 관리
       OrderManager.js        # 오더(미션) 시스템
     data/
-      gameData.js            # 적/도구(TOOL_DEFS)/재료/스테이지 정의
+      gameData.js            # 적/도구(TOOL_DEFS)/재료 정의
+      stageData.js           # 스테이지 데이터 66개 (시즌1 30 + 시즌2 36)
       recipeData.js          # 레시피 106종 정의
-      dialogueData.js        # 대화 스크립트 32종 + 캐릭터 6종 정의
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 30항목 (triggerPoint 8종)
-  assets/                    # 스프라이트/타일셋/아이콘
-    portraits/               # 캐릭터 초상화 (64x64 PixelLab)
+      dialogueData.js        # 대화 스크립트 35종 + 캐릭터 7종 정의 (시즌2 프롤로그 3종 포함)
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 34항목 (triggerPoint 8종, import SaveManager)
+  assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
+    sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
+    sprites/chefs/           # 셰프 스프라이트 5종 (48px)
+    sprites/towers/          # 타워 스프라이트 8종 (32x32)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
 ```
@@ -123,13 +126,13 @@ kitchen-chaos/
 | 재료 채집 | GatheringScene.js | 도구 배치/회수/재배치, 적 AI, 재료 드롭, 보스 재료 드롭, 웨이브 진행 |
 | 도구 관리 | ToolManager.js | 영구 도구 인벤토리 (구매/판매/업그레이드/스탯 조회) |
 | 행상인 | MerchantScene.js | 영업 후 도구 구매/판매/업그레이드 UI |
-| 월드맵 | WorldMapScene.js | 6챕터 노드맵, 슬라이드업 스테이지 패널, 진행률 HUD |
+| 월드맵 | WorldMapScene.js | 12챕터 노드맵(시즌1/2 탭), 슬라이드업 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장 |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 챕터 진행도, 스토리 플래그, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v12 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v13 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
 
@@ -148,13 +151,13 @@ kitchen-chaos/
 | 3단계 루프 | GatheringScene(재료 채집) + ServiceScene(영업) + MerchantScene(행상인) + ResultScene | 완료 |
 | 캠페인 | 6장 30스테이지, 보스 6종, 별점 시스템 | 완료 |
 | 레시피 | 106종 (서빙 86 + 버프 20), 5등급, 도감 | 완료 |
-| 셰프 시스템 | 5종 셰프(+유키/라오 데이터 등록, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
+| 셰프 시스템 | 5종 셰프(유키/라오 데이터 등록+잠금 표시, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
 | 사운드 | SFX 20종 + BGM 5종, 설정 UI | 완료 |
 | VFX | 파티클, 스크린 효과, 플로팅 텍스트 | 완료 |
 | 엔드리스 모드 | 무한 웨이브 TD, 데일리 스페셜, 로컬 랭킹 | 완료 |
-| 월드맵 UI | 6챕터 노드맵, 슬라이드업 스테이지 패널, 진행률 HUD, 엔드리스 섹션 | 완료 |
+| 월드맵 UI | 12챕터 노드맵(시즌1/2 탭 전환), 슬라이드업 스테이지 패널, 진행률 HUD, 엔드리스 섹션 | 완료 |
 | 튜토리얼 개선 | 영업/상점/엔드리스 안내, 개별 플래그 | 완료 |
 | UI/UX 폴리시 | 씬 전환, 버튼 스타일, 터치 피드백 통일 | 완료 |
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
@@ -163,8 +166,8 @@ kitchen-chaos/
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
 | 대화 엔진 | DialogueManager + DialogueScene 오버레이, 32종 스크립트, 선택지 분기 UI, 세이브 연동 | 완료 |
-| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 6캐릭터(+유키/라오), 챕터 1~6 메인+사이드+튜토리얼+이벤트 시나리오 | 완료 |
-| 스토리 매니저 | StoryManager + storyData 트리거 30항목(triggerPoint 8종), 챕터 진행도 추적, 씬 코드 1줄 연동 | 완료 |
+| 대화 콘텐츠 | 캐릭터 초상화 6종(PixelLab), 7캐릭터, 챕터 1~6 메인+사이드+튜토리얼+이벤트+시즌2 프롤로그 시나리오 | 완료 |
+| 스토리 매니저 | StoryManager + storyData 트리거 34항목(triggerPoint 8종), 챕터 진행도 추적, onComplete 콜백, 씬 코드 1줄 연동 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -174,9 +177,9 @@ kitchen-chaos/
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
 | 재료 | 15종 |
 | 레시피 | 106종 (서빙 86 + 버프 20) |
-| 스테이지 | 30개 (6장) |
+| 스테이지 | 66개 (시즌1: 6장 30개 + 시즌2: 6장 36개) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
-| 세이브 버전 | v12 |
+| 세이브 버전 | v13 |
 
 ## 알려진 제약사항
 
@@ -189,6 +192,7 @@ kitchen-chaos/
 ## 향후 계획
 
 - Phase 19-1 완료 (데이터 레이어 + 세이브 v12 + 도구 전투 로직).
-- 다음: Phase 19-2 (UI 확장 — ChefSelect 5종, WorldMap 시즌탭), Phase 19-3 (PixelLab 에셋 + 시즌2 프롤로그 스토리).
-- 시즌별 장기 확장 (80~100시간): 시즌1(1~6장, 완료) → 시즌2(국제, Phase 19~26) → 시즌3(극한 환경).
+- Phase 19-2 완료 (UI 확장 -- ChefSelect 5종 카드, WorldMap 시즌탭 12챕터, stageData 시즌2 36스테이지).
+- Phase 19-3 완료 (PixelLab 에셋 6종 + 시즌2 프롤로그 스토리 3종 + SaveManager v13).
+- 시즌별 장기 확장 (80~100시간): 시즌1(1~6장, 완료) -> 시즌2(국제, Phase 19~26) -> 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조
