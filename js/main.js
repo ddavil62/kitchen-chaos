@@ -6,6 +6,15 @@
 
 import Phaser from 'phaser';
 
+// ── 한글 폰트 윗줄 잘림 방지: 모든 Text에 기본 top padding 주입 ──
+const _origTextFactory = Phaser.GameObjects.GameObjectFactory.prototype.text;
+Phaser.GameObjects.GameObjectFactory.prototype.text = function (x, y, text, style) {
+  const s = style && typeof style === 'object' ? style : {};
+  if (!s.padding) s.padding = {};
+  if (s.padding.top === undefined) s.padding.top = 4;
+  return _origTextFactory.call(this, x, y, text, s);
+};
+
 import { BootScene } from './scenes/BootScene.js';
 import { MenuScene } from './scenes/MenuScene.js';
 import { StageSelectScene } from './scenes/StageSelectScene.js';
