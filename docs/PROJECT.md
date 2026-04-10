@@ -108,8 +108,8 @@ kitchen-chaos/
     data/
       gameData.js            # 적/도구(TOOL_DEFS)/재료/스테이지 정의
       recipeData.js          # 레시피 106종 정의
-      dialogueData.js        # 대화 스크립트 26종 + 캐릭터 4종 정의
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 24항목
+      dialogueData.js        # 대화 스크립트 32종 + 캐릭터 4종 정의
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 30항목 (triggerPoint 8종)
   assets/                    # 스프라이트/타일셋/아이콘
     portraits/               # 캐릭터 초상화 (64x64 PixelLab)
   tests/                     # Playwright 테스트
@@ -127,8 +127,8 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장 |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처, 챕터 진행도, 스토리 플래그, 4씬 1줄 호출 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 챕터 진행도, 스토리 플래그, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v11 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
@@ -162,9 +162,9 @@ kitchen-chaos/
 | 도구 시스템 | 영구 도구 6종, 구매/판매/업그레이드, ToolManager | 완료 |
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
-| 대화 엔진 | DialogueManager + DialogueScene 오버레이, 26종 스크립트, 세이브 연동 | 완료 |
-| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 챕터 1~6 메인+사이드 시나리오 | 완료 |
-| 스토리 매니저 | StoryManager + storyData 트리거 24항목, 챕터 진행도 추적, 씬 코드 1줄 연동 | 완료 |
+| 대화 엔진 | DialogueManager + DialogueScene 오버레이, 32종 스크립트, 선택지 분기 UI, 세이브 연동 | 완료 |
+| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 챕터 1~6 메인+사이드+튜토리얼+이벤트 시나리오 | 완료 |
+| 스토리 매니저 | StoryManager + storyData 트리거 30항목(triggerPoint 8종), 챕터 진행도 추적, 씬 코드 1줄 연동 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -187,12 +187,9 @@ kitchen-chaos/
 - StageSelectScene.js, MarketScene.js는 레거시로 유지 중 (각각 WorldMapScene, GatheringScene으로 교체됨)
 - config.js의 STARTING_GOLD, WAVE_CLEAR_BONUS는 하위 호환용으로 유지 (GatheringScene/EndlessScene에서 미사용)
 - Tower 엔티티의 hitArea가 Container 기반 Circle(0,0,20)로 설정되어 타워 바디 위치와 미세 불일치 가능 (LOW)
-- 대화 분기/선택지 미구현 (현재 선형 대화만)
 
 ## 향후 계획
 
-- Phase 15 완료 (챕터 2~6 스토리 콘텐츠, 대화 26종 + 트리거 24항목). 시즌 1 메인 시나리오 완성.
-- 후속: Phase 16 인게임 통합 (튜토리얼/이벤트/NPC 대화, 대화 분기/선택지).
-- 대화 분기/선택지 시스템 미구현 (현재 선형 대화만).
+- Phase 16 완료 (튜토리얼/이벤트 대화 연동, 선택지 분기 UI, 스크립트 32종 + 트리거 30항목). 시즌 1 대화 시스템 완성.
 - 시즌별 장기 확장 (80~100시간): 시즌1(현재 1~6장) → 시즌2(국제) → 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조

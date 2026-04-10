@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-10
-> 기준: Phase 15 완료 (챕터 2~6 스토리 콘텐츠)
+> 기준: Phase 16 완료 (인게임 대화 통합)
 
 ---
 
@@ -26,8 +26,9 @@
 | Phase 14-2 | 대화 콘텐츠 (초상화 4종 + 스크립트 13종 + 4씬 트리거 연결) | ✅ 완료 |
 | Phase 14-3 | StoryManager 트리거 중앙화, 챕터 진행도 추적, 세이브 v11 | ✅ 완료 |
 | Phase 15 | 챕터 2~6 스토리 콘텐츠 (대화 스크립트 26종, 트리거 24종) | ✅ 완료 |
+| Phase 16 | 인게임 대화 통합 (튜토리얼/이벤트 연동, 선택지 분기, 스크립트 32종) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 15 완료
+**현재 구현 완성도**: Phase 16 완료
 
 ### 현재 콘텐츠 규모
 
@@ -45,6 +46,8 @@
 | 직원 | 2종 (서빙/세척 도우미, IAP 추상화) |
 | 사운드 | SFX 20종 + BGM 5종 (Web Audio API 프로시저럴) |
 | VFX | 파티클 + 스크린 효과 + 플로팅 텍스트 (Canvas2D) |
+| 대화 스크립트 | 32종 |
+| 스토리 트리거 | 30항목 (triggerPoint 8종) |
 | 세이브 버전 | v11 |
 
 ### 게임 루프
@@ -469,13 +472,27 @@
 
 ---
 
-## Phase 16 — 인게임 통합 (예정)
+## ✅ Phase 16 — 인게임 대화 통합 (완료)
 
-> 목표: 튜토리얼 대화, 이벤트 대화, NPC 상호작용
+> 목표: 튜토리얼/이벤트 대화 연동, 대화 선택지/분기 시스템
 
-- [ ] 튜토리얼 대화 (첫 도구 배치, 첫 영업 등)
-- [ ] 영업 이벤트 대화 (특수 손님 등장 시)
-- [ ] 대화 분기/선택지 시스템
+### ✅ 16-1. 튜토리얼 대화 연동 (완료)
+
+- [x] GatheringScene: 첫 도구 배치 시 StoryManager.checkTriggers() 호출 (triggerPoint: tutorial_tool_placed)
+- [x] ServiceScene: 첫 서빙 완료 시 StoryManager.checkTriggers() 호출 (triggerPoint: tutorial_first_serve)
+- [x] 대화 스크립트 2종 추가 (tutorial_tool_placed, tutorial_first_serve)
+
+### ✅ 16-2. 영업 이벤트 대화 연동 (완료)
+
+- [x] ServiceScene._triggerRandomEvent() 내에서 service_event triggerPoint 호출
+- [x] 이벤트별 캐릭터 반응 대화 3종 추가 (event_happy_hour, event_food_review, event_kitchen_accident)
+
+### ✅ 16-3. 대화 선택지/분기 시스템 (완료)
+
+- [x] DialogueScene에 선택지 버튼 UI 구현 (36px 버튼, 8px gap, 최대 2개)
+- [x] dialogueData.js 형식에 choices 배열 지원 추가
+- [x] 샘플 분기 대화 1종 추가 (choice_sample_merchant)
+- [x] 누적: 대화 스크립트 32종, STORY_TRIGGERS 30항목, triggerPoint 8종
 
 ---
 
@@ -528,4 +545,4 @@
 | ~~14-2~~ | ~~초상화 4종, 스크립트 13종, 4씬 트리거~~ | 106 | 15 | ✅ 완료 |
 | ~~14-3~~ | ~~StoryManager 트리거 중앙화, 챕터 진행도~~ | 106 | 15 | ✅ 완료 |
 | ~~15~~ | ~~스토리 콘텐츠 (챕터 2~6 시나리오 + 사이드 대화)~~ | 106 | 15 | ✅ 완료 |
-| 16 | 인게임 통합 (튜토리얼/이벤트/NPC 대화) | 106 | 15 | 예정 |
+| ~~16~~ | ~~인게임 대화 통합 (튜토리얼/이벤트/선택지)~~ | 106 | 15 | ✅ 완료 |

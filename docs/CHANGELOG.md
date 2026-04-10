@@ -1,5 +1,57 @@
 # Changelog
 
+## [2026-04-10] - Phase 16 인게임 대화 통합
+
+### 추가
+
+- **튜토리얼 대화 연동** (`js/scenes/GatheringScene.js`, `js/scenes/ServiceScene.js`)
+  - GatheringScene: 첫 도구 배치 시 `StoryManager.checkTriggers(this, 'tutorial_tool_placed')` 호출 (1줄 추가)
+  - ServiceScene: 첫 서빙 완료 시 `StoryManager.checkTriggers(this, 'tutorial_first_serve')` 호출 (StoryManager import + 2곳 추가)
+  - triggerPoint 2종 추가: tutorial_tool_placed, tutorial_first_serve
+
+- **영업 이벤트 대화 연동** (`js/scenes/ServiceScene.js`)
+  - ServiceScene._triggerRandomEvent() 내에서 `StoryManager.checkTriggers(this, 'service_event', {eventType})` 호출
+  - 이벤트별 캐릭터 반응 대화 3종: event_happy_hour (해피아워), event_food_review (미식 평론가), event_kitchen_accident (주방 사고)
+
+- **대화 선택지/분기 시스템** (`js/scenes/DialogueScene.js`, `js/data/dialogueData.js`)
+  - DialogueScene에 선택지 버튼 UI 구현 (36px 버튼, 8px gap, 최대 2개)
+  - dialogueData.js 형식에 choices 배열 지원 추가
+  - AD 검수 반영: 버튼 높이 36px, 간격 8px, 최대 2개 제한
+
+- **대화 스크립트 6종 추가** (`js/data/dialogueData.js`, 수정)
+  - tutorial_tool_placed: 튜토리얼 - 첫 도구 배치 완료 시 캐릭터 반응
+  - tutorial_first_serve: 튜토리얼 - 첫 서빙 완료 시 캐릭터 반응
+  - event_happy_hour: 이벤트 - 해피아워 발생 시 캐릭터 반응
+  - event_food_review: 이벤트 - 미식 평론가 방문 시 캐릭터 반응
+  - event_kitchen_accident: 이벤트 - 주방 사고 발생 시 캐릭터 반응
+  - choice_sample_merchant: 선택지 샘플 - 행상인 할인 요청 (분기 대화)
+  - 누적: 대화 스크립트 32종 (26 + 6)
+
+- **스토리 트리거 6개 추가** (`js/data/storyData.js`, 수정)
+  - triggerPoint 4종 신규: tutorial_tool_placed, tutorial_first_serve, service_event, merchant_choice
+  - 누적: STORY_TRIGGERS 30항목, triggerPoint 8종 (기존 4 + 신규 4)
+
+### 변경된 파일 (5개)
+
+- `js/data/dialogueData.js`: 스크립트 6종 추가 (26 -> 32종)
+- `js/data/storyData.js`: 트리거 6개 추가 (24 -> 30항목)
+- `js/scenes/DialogueScene.js`: 선택지 UI 구현 (36px 버튼, 8px gap, 최대 2개)
+- `js/scenes/GatheringScene.js`: checkTriggers 호출 1줄 추가
+- `js/scenes/ServiceScene.js`: StoryManager import + checkTriggers 호출 2곳 추가
+
+### 유지
+
+- SaveManager 버전업 없음 (v11 유지)
+- 새 캐릭터(CHARACTERS) / 새 초상화 에셋 추가 없음
+- 기존 26개 스크립트/24개 트리거 변경 없음
+
+### 참고
+
+- visual_change: ui (선택지 버튼 UI 추가)
+- Phase 16 구현 순서: 16-1(튜토리얼 연동) -> 16-2(이벤트 연동) -> 16-3(선택지/분기)
+
+---
+
 ## [2026-04-10] - Phase 15 스토리 콘텐츠 (챕터 2~6)
 
 ### 추가
