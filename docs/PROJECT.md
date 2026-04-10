@@ -44,6 +44,8 @@
 | 포코 | 🎒 | 행상인 | 미력사 가문의 오랜 협력자이자 정화 도구 전문 장인. 위기에도 장사를 놓지 않는 상인 근성. |
 | 린 | 🔥 | 라이벌→동료 | 불꽃 요리사. 미미의 라이벌이자 나중에 동료가 되는 실력파 셰프. |
 | 메이지 | 🧁 | 연구원→동료 | 디저트 전문 미력사이자 식란 연구원. 식란의 원인을 학문적으로 추적. |
+| 유키 | ❄️ | 시즌2 동료 | 일본 출신 미력사. 차분하고 정밀한 칼잡이. 시즌2에서 합류. |
+| 라오 | 🐉 | 시즌2 동료 | 중국 출신 미력사. 호쾌한 웍 마스터. 시즌2에서 합류. |
 
 ### 시즌별 확장 구조 (80~100시간 분량)
 
@@ -91,7 +93,7 @@ kitchen-chaos/
       RecipeCollectionScene.js # 레시피 도감
       DialogueScene.js       # 대화 오버레이 씬 (타이핑 애니메이션, 건너뛰기)
     managers/
-      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v11)
+      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v12)
       ToolManager.js         # 영구 도구 인벤토리 (구매/판매/업그레이드/스탯)
       DialogueManager.js     # 대화 관리자 (start/hasSeen/markSeen)
       StoryManager.js        # 스토리 진행도 추적 + 트리거 중앙 디스패처
@@ -106,7 +108,7 @@ kitchen-chaos/
     data/
       gameData.js            # 적/도구(TOOL_DEFS)/재료/스테이지 정의
       recipeData.js          # 레시피 106종 정의
-      dialogueData.js        # 대화 스크립트 32종 + 캐릭터 4종 정의
+      dialogueData.js        # 대화 스크립트 32종 + 캐릭터 6종 정의
       storyData.js           # STORY_TRIGGERS 트리거 데이터 30항목 (triggerPoint 8종)
   assets/                    # 스프라이트/타일셋/아이콘
     portraits/               # 캐릭터 초상화 (64x64 PixelLab)
@@ -127,7 +129,7 @@ kitchen-chaos/
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 챕터 진행도, 스토리 플래그, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v11 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v12 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
 
@@ -146,7 +148,7 @@ kitchen-chaos/
 | 3단계 루프 | GatheringScene(재료 채집) + ServiceScene(영업) + MerchantScene(행상인) + ResultScene | 완료 |
 | 캠페인 | 6장 30스테이지, 보스 6종, 별점 시스템 | 완료 |
 | 레시피 | 106종 (서빙 86 + 버프 20), 5등급, 도감 | 완료 |
-| 셰프 시스템 | 3종 셰프, 패시브 + 액티브 스킬 (TD/영업 모두) | 완료 |
+| 셰프 시스템 | 5종 셰프(+유키/라오 데이터 등록, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
 | 사운드 | SFX 20종 + BGM 5종, 설정 UI | 완료 |
@@ -157,11 +159,11 @@ kitchen-chaos/
 | UI/UX 폴리시 | 씬 전환, 버튼 스타일, 터치 피드백 통일 | 완료 |
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
-| 도구 시스템 | 영구 도구 6종, 구매/판매/업그레이드, ToolManager | 완료 |
+| 도구 시스템 | 영구 도구 8종(+wasabi_cannon 범위/둔화, +spice_grinder DoT), 구매/판매/업그레이드, ToolManager | 완료 |
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
 | 대화 엔진 | DialogueManager + DialogueScene 오버레이, 32종 스크립트, 선택지 분기 UI, 세이브 연동 | 완료 |
-| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 챕터 1~6 메인+사이드+튜토리얼+이벤트 시나리오 | 완료 |
+| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 6캐릭터(+유키/라오), 챕터 1~6 메인+사이드+튜토리얼+이벤트 시나리오 | 완료 |
 | 스토리 매니저 | StoryManager + storyData 트리거 30항목(triggerPoint 8종), 챕터 진행도 추적, 씬 코드 1줄 연동 | 완료 |
 
 ## 콘텐츠 규모
@@ -169,12 +171,12 @@ kitchen-chaos/
 | 항목 | 수량 |
 |------|------|
 | 적 | 22종 (일반 16 + 보스 6) |
-| 도구 | 6종 (pan, salt, grill, delivery, freezer, soup_pot) |
+| 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
 | 재료 | 15종 |
 | 레시피 | 106종 (서빙 86 + 버프 20) |
 | 스테이지 | 30개 (6장) |
-| 셰프 | 3종 |
-| 세이브 버전 | v11 |
+| 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
+| 세이브 버전 | v12 |
 
 ## 알려진 제약사항
 
@@ -186,7 +188,7 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 18 완료. 시즌 1 콘텐츠 + 밸런스 + 레거시 정리 모두 완성.
-- 다음: Phase 19 (시즌 2 기반 인프라 — 월드맵 12챕터 확장, 셰프 2종, 도구 2종).
-- 시즌별 장기 확장 (80~100시간): 시즌1(현재 1~6장, 완료) → 시즌2(국제, Phase 19~26) → 시즌3(극한 환경).
+- Phase 19-1 완료 (데이터 레이어 + 세이브 v12 + 도구 전투 로직).
+- 다음: Phase 19-2 (UI 확장 — ChefSelect 5종, WorldMap 시즌탭), Phase 19-3 (PixelLab 에셋 + 시즌2 프롤로그 스토리).
+- 시즌별 장기 확장 (80~100시간): 시즌1(1~6장, 완료) → 시즌2(국제, Phase 19~26) → 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조

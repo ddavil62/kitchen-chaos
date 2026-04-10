@@ -1,5 +1,76 @@
 # Changelog
 
+## [2026-04-10] - Phase 19-1 데이터 레이어 + 세이브 확장 + 도구 전투 로직
+
+### 추가
+
+- **SaveManager v11->v12** (`js/managers/SaveManager.js`)
+  - tools에 wasabi_cannon, spice_grinder 필드 (초기값: [])
+  - season2Unlocked: false (시즌 2 해금 여부)
+  - lazy migration 방식 (load시 메모리 적용, save시 영속화)
+
+- **도구 2종 데이터** (`js/data/gameData.js`, TOOL_DEFS)
+  - wasabi_cannon: 범위 공격(splashRadius 40->55) + 둔화(30~35%, 1.5~2초), damage 18->30, fireRate 1200->900ms
+  - spice_grinder: 지속 피해(DoT, dotDamage 5->12, 2000ms), damage 12->22, fireRate 1000->750ms
+  - buyCost: wasabi_cannon [180,220,260], spice_grinder [160,200,240]
+  - projectileSpeed: wasabi_cannon 200, spice_grinder 180 *(스펙 누락 보완)*
+  - upgradeCost: [0, x, y] 형식으로 보정 *(기존 인덱싱 패턴 준수)*
+
+- **셰프 2종 데이터** (`js/data/chefData.js`)
+  - yuki_chef: 조리시간 -20%, 정밀 보너스(★★★+ 레시피 보상 +15%), 스킬 "정밀 절단" (90초 CD)
+  - lao_chef: 도구 공격력 +15%, 재료 드롭률 +10%, 스킬 "불꽃 웍" (120초 CD)
+  - CHEF_ORDER: ['petit_chef', 'flame_chef', 'ice_chef', 'yuki_chef', 'lao_chef'] 5종
+  - 패시브/스킬 발동 로직은 데이터만 등록, 실행 로직은 19-2 이후 범위
+
+- **캐릭터 정의** (`js/data/dialogueData.js`, CHARACTERS)
+  - yuki: nameKo '유키', color 0x87ceeb, role 'ally', portraitKey 'yuki'
+  - lao: nameKo '라오', color 0xff4500, role 'ally', portraitKey 'lao'
+
+- **Enemy.js applyDot()** (`js/entities/Enemy.js`)
+  - 500ms 간격 틱, _dotStacks 배열 독립 관리, _maxDotStacks=3
+  - update()에서 remaining 소진 시 스택 제거 (역순 순회)
+  - DoT 활성 중 주황 틴트(0xff8c00), 종료 시 clearTint()
+
+- **Projectile.js 범위/DoT 분기** (`js/entities/Projectile.js`)
+  - _hit()에 splashRadius 분기: 범위 내 적 damage * 0.6, 둔화 적용
+  - _hit()에 dotDamage 분기: enemy.applyDot() 호출
+  - wasabi_cannon 발사체: 연두(0x7cfc00), 1.2배 크기
+  - spice_grinder 발사체: 오렌지(0xff8c00)
+
+- **Tower.js fallback** (`js/entities/Tower.js`)
+  - wasabi_cannon, spice_grinder 도형 fallback 비주얼 추가
+
+- **ToolManager 확장** (`js/managers/ToolManager.js`)
+  - _defaultTools()에 wasabi_cannon, spice_grinder 기본값 추가
+
+### 변경
+
+- **MerchantScene** (`js/scenes/MerchantScene.js`)
+  - TOOL_ORDER: 6종 -> 8종 (wasabi_cannon, spice_grinder 추가)
+  - TOOL_ICONS에 wasabi_cannon('🟢'), spice_grinder('🟠') 추가
+  - 업그레이드 프리뷰에 splashRadius, slowRate, dotDamage 스탯 표시 추가
+
+- **SpriteLoader** (`js/managers/SpriteLoader.js`)
+  - CHEF_IDS: 3종 -> 5종 (+yuki_chef, lao_chef)
+  - PORTRAIT_IDS: 4종 -> 6종 (+yuki, lao)
+  - TOWER_IDS: 6종 -> 8종 (+wasabi_cannon, spice_grinder)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-10-kitchen-chaos-phase19-spec.md`
+- 리포트: `.claude/specs/2026-04-10-kitchen-chaos-phase19-1-report.md`
+- QA: `.claude/specs/2026-04-10-kitchen-chaos-phase19-1-qa.md`
+- 목적 정의서: `.claude/specs/2026-04-10-kitchen-chaos-phase19-1-scope.md`
+- visual_change: ui
+- Vite 빌드 성공 (51 모듈, 18.13초)
+- QA: PASS (수용 기준 7/7, Playwright 8/8, 예외 시나리오 10/10)
+- salt 둔화와 wasabi_cannon 둔화 공존 안전 (applySlow가 더 강한 효과 우선 적용)
+- 빙결 중 DoT 스택 정지 (burn과 불일치이나 게임플레이 영향 미미, 향후 일관성 검토 필요)
+- ChefSelectScene 5종 카드 화면 오버플로는 19-2 범위 (현재 크래시 없이 off-screen 렌더링)
+- 에셋 404(셰프 스프라이트, 초상화, 도구 에셋)는 19-3 범위, fallback 정상 동작
+
+---
+
 ## [2026-04-10] - Phase 18 레거시 정리 + 기술 부채
 
 ### 삭제
