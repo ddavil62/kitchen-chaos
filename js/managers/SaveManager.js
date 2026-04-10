@@ -9,12 +9,13 @@
  * Phase 11-1: v7 마이그레이션 — endless 엔드리스 기록 추가.
  * Phase 11-3a: v8 마이그레이션 — tutorialBattle/Service/Shop/Endless 4개 플래그로 분리.
  * Phase 13-1: v9 마이그레이션 — 영구 도구 시스템 (gold, tools, tutorialMerchant).
+ * Phase 14-1: v10 마이그레이션 — 대화 시스템 seenDialogues 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 9;
+const SAVE_VERSION = 10;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -72,6 +73,8 @@ function createDefault() {
       soup_pot: { count: 0, level: 1 },
     },
     tutorialMerchant: false,  // 행상인 튜토리얼 완료 여부
+    // ── Phase 14-1 추가 ──
+    seenDialogues: [],        // 시청 완료한 대화 스크립트 ID 목록
     // ── Phase 11-1 추가 ──
     endless: {
       unlocked: false,            // 6-3 클리어 시 true
@@ -447,6 +450,31 @@ export class SaveManager {
     };
   }
 
+  // ── 대화 시스템 (Phase 14-1) ──
+
+  /**
+   * 해당 대화를 이미 본 적 있는지 확인한다.
+   * @param {string} dialogueId
+   * @returns {boolean}
+   */
+  static hasSeenDialogue(dialogueId) {
+    const data = SaveManager.load();
+    return (data.seenDialogues || []).includes(dialogueId);
+  }
+
+  /**
+   * 해당 대화를 본 것으로 기록한다.
+   * @param {string} dialogueId
+   */
+  static markDialogueSeen(dialogueId) {
+    const data = SaveManager.load();
+    if (!data.seenDialogues) data.seenDialogues = [];
+    if (!data.seenDialogues.includes(dialogueId)) {
+      data.seenDialogues.push(dialogueId);
+      SaveManager.save(data);
+    }
+  }
+
   // ── 기존 메서드 ──
 
   /**
@@ -637,6 +665,12 @@ export class SaveManager {
       };
       data.tutorialMerchant = false;
       data.version = 9;
+    }
+
+    // v9 → v10: 대화 시스템 seenDialogues 추가
+    if (data.version < 10) {
+      data.seenDialogues = [];
+      data.version = 10;
     }
 
     return data;
