@@ -1,6 +1,8 @@
 /**
  * @fileoverview 스토리 매니저.
  * Phase 14-3: 챕터 진행도 추적, 조건부 트리거 중앙 관리.
+ * Phase 19-3: onComplete 콜백 지원, getProgress에 stages/season2Unlocked 노출,
+ *             storyFlags 객체 방식 전환.
  *
  * 주요 책임:
  * 1. storyProgress (currentChapter, storyFlags) 세이브 read/write
@@ -26,27 +28,36 @@ const STAGE_TO_CHAPTER = {
 export class StoryManager {
   /**
    * storyProgress 조회.
-   * @returns {{ currentChapter: number, storyFlags: string[], seenDialogues: string[] }}
+   * Phase 19-3: stages, season2Unlocked 추가 (시즌 2 트리거 condition에서 참조).
+   * @returns {{ currentChapter: number, storyFlags: object, seenDialogues: string[], stages: object, season2Unlocked: boolean }}
    */
   static getProgress() {
     const data = SaveManager.load();
     const seenDialogues = data.seenDialogues || [];
     return {
       currentChapter: data.storyProgress?.currentChapter || 1,
-      storyFlags: data.storyProgress?.storyFlags || [],
+      storyFlags: data.storyProgress?.storyFlags || {},
       seenDialogues,
+      // Phase 19-3: 시즌 2 트리거에서 stages/season2Unlocked 접근 필요
+      stages: data.stages || {},
+      season2Unlocked: !!data.season2Unlocked,
     };
   }
 
   /**
    * 스토리 플래그 설정.
+   * Phase 19-3: storyFlags를 객체로 변환하여 key=true 방식으로 저장.
    * @param {string} key
    */
   static setFlag(key) {
     const data = SaveManager.load();
-    if (!data.storyProgress) data.storyProgress = { currentChapter: 1, storyFlags: [] };
-    if (!data.storyProgress.storyFlags.includes(key)) {
-      data.storyProgress.storyFlags.push(key);
+    if (!data.storyProgress) data.storyProgress = { currentChapter: 1, storyFlags: {} };
+    // 배열→객체 마이그레이션 안전 처리
+    if (Array.isArray(data.storyProgress.storyFlags)) {
+      data.storyProgress.storyFlags = {};
+    }
+    if (!data.storyProgress.storyFlags[key]) {
+      data.storyProgress.storyFlags[key] = true;
       SaveManager.save(data);
     }
   }
@@ -57,7 +68,7 @@ export class StoryManager {
    * @returns {boolean}
    */
   static hasFlag(key) {
-    return StoryManager.getProgress().storyFlags.includes(key);
+    return !!StoryManager.getProgress().storyFlags[key];
   }
 
   /**
@@ -72,7 +83,7 @@ export class StoryManager {
 
     const data = SaveManager.load();
     if (!data.storyProgress) {
-      data.storyProgress = { currentChapter: 1, storyFlags: [] };
+      data.storyProgress = { currentChapter: 1, storyFlags: {} };
     }
     if (chapter > data.storyProgress.currentChapter) {
       data.storyProgress.currentChapter = chapter;
@@ -129,6 +140,15 @@ export class StoryManager {
           if (!chainSeen) {
             DialogueManager.start(scene, trigger.chain.dialogueId);
           }
+        };
+      }
+
+      // trigger.onComplete 콜백 지원 (Phase 19-3)
+      if (trigger.onComplete) {
+        const existingComplete = options.onComplete;
+        options.onComplete = () => {
+          if (existingComplete) existingComplete();
+          trigger.onComplete();
         };
       }
 

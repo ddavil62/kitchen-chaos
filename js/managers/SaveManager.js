@@ -12,12 +12,13 @@
  * Phase 14-1: v10 마이그레이션 — 대화 시스템 seenDialogues 추가.
  * Phase 14-3: v11 마이그레이션 — storyProgress (챕터 진행도, 스토리 플래그) 추가.
  * Phase 19-1: v12 마이그레이션 — 신규 도구 2종(wasabi_cannon, spice_grinder) + season2Unlocked 추가.
+ * Phase 19-3: v13 마이그레이션 — storyFlags 배열→객체 변환 (프로퍼티 접근 지원).
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 12;
+const SAVE_VERSION = 13;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -85,7 +86,7 @@ function createDefault() {
     // ── Phase 14-3 추가 ──
     storyProgress: {
       currentChapter: 1,      // 플레이어가 도달한 최고 챕터 (1~6)
-      storyFlags: [],         // 임의 스토리 플래그 목록
+      storyFlags: {},         // 임의 스토리 플래그 맵 (Phase 19-3: 배열→객체 변환)
     },
     // ── Phase 11-1 추가 ──
     endless: {
@@ -726,6 +727,14 @@ export class SaveManager {
       }
       if (data.season2Unlocked === undefined) data.season2Unlocked = false;
       data.version = 12;
+    }
+
+    // v12 → v13: storyFlags를 배열에서 객체로 변환 (Phase 19-3)
+    if (data.version < 13) {
+      if (Array.isArray(data.storyProgress?.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.version = 13;
     }
 
     return data;

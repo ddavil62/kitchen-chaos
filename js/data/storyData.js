@@ -3,6 +3,7 @@
  * Phase 14-3: 각 항목은 triggerPoint별로 분류되며, StoryManager.checkTriggers()가 평가한다.
  * Phase 15: 챕터 2~6 트리거 13개 추가.
  * Phase 16: 튜토리얼 2개, 영업 이벤트 3개, 선택지 샘플 1개 트리거 추가.
+ * Phase 19-3: 시즌 2 프롤로그 트리거 3건 추가 (prologue, yuki_intro, lao_intro).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -14,6 +15,8 @@
  * delay: ms 단위 지연 (scene.time.delayedCall)
  * chain: 부모 대화 onComplete 콜백에서 연쇄 실행할 대화
  */
+
+import { SaveManager } from '../managers/SaveManager.js';
 
 export const STORY_TRIGGERS = [
   // ── WorldMapScene 진입 ──────────────────────────────────────────
@@ -281,5 +284,55 @@ export const STORY_TRIGGERS = [
     once: true,
     condition: (ctx) => ctx.eventType === 'kitchen_accident',
     delay: 1500,
+  },
+
+  // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────
+  {
+    triggerPoint: 'worldmap_enter',
+    dialogueId: 'season2_prologue',
+    once: true,
+    condition: (ctx, save) =>
+      save.stages?.['6-3']?.stars > 0 && !save.season2Unlocked,
+    onComplete: () => {
+      const data = SaveManager.load();
+      data.season2Unlocked = true;
+      // currentChapter를 7로 올려서 시즌2 탭 + 7장 노드 활성화
+      if (data.storyProgress.currentChapter < 7) {
+        data.storyProgress.currentChapter = 7;
+      }
+      SaveManager.save(data);
+    },
+  },
+  {
+    triggerPoint: 'worldmap_enter',
+    dialogueId: 'season2_yuki_intro',
+    once: true,
+    condition: (ctx, save) =>
+      save.season2Unlocked && save.currentChapter >= 7 &&
+      !save.storyFlags?.yuki_joined,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.yuki_joined = true;
+      SaveManager.save(data);
+    },
+  },
+  {
+    triggerPoint: 'worldmap_enter',
+    dialogueId: 'season2_lao_intro',
+    once: true,
+    condition: (ctx, save) =>
+      save.season2Unlocked && save.currentChapter >= 8 &&
+      !save.storyFlags?.lao_joined,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.lao_joined = true;
+      SaveManager.save(data);
+    },
   },
 ];

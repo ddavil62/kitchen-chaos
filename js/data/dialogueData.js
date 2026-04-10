@@ -6,6 +6,7 @@
  * Phase 15: 신규 대화 스크립트 13개 추가 (챕터 2~6 메인 시나리오 + 사이드).
  * Phase 16: 튜토리얼 연동 2종, 영업 이벤트 3종, 선택지 샘플 1종 추가.
  * Phase 19-1: 시즌 2 캐릭터 2종(유키, 라오) CHARACTERS에 추가.
+ * Phase 19-3: 시즌 2 프롤로그 대화 3종 추가 (season2_prologue, season2_yuki_intro, season2_lao_intro).
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -502,6 +503,37 @@ export const DIALOGUES = {
       // 7 (공통 결말)
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '다음에 또 와~ 맛있는 도구 많이 준비해 둘게!' },
     ]
+  },
+
+  // ── 시즌 2 프롤로그 (Phase 19-3) ──
+
+  season2_prologue: {
+    id: 'season2_prologue',
+    lines: [
+      { speaker: '', portrait: '', text: '식란이 잠시 수그러들었지만... 세계 곳곳에서 이상 징후가 감지되기 시작했다.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '할머니, 해외에서 편지가 왔어요!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '세계 미력사 연합(WCA)이라... 해외에서 동시다발 식란이 발생했대.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '우리가 도와야 해! 이제 세계를 무대로!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '좋아, 시즌 2 개막이다! 새로운 동료들도 만나게 될 거야.' },
+    ],
+  },
+  season2_yuki_intro: {
+    id: 'season2_yuki_intro',
+    lines: [
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '당신이 미미... WCA에서 이야기 들었습니다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '제 고향 이자카야가 식란에 잠식됐어요. 도와주실 수 있나요?' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '물론이죠! 같이 가요, 유키 씨!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '유키의 정밀한 칼솜씨... 든든한 동료가 됐군!' },
+    ],
+  },
+  season2_lao_intro: {
+    id: 'season2_lao_intro',
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '하하! 너희가 그 유명한 미미 팀이구나!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '내 가문의 용 웍이 식란에 오염됐다... 도와달라!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '라오 씨! 당연히 도와드릴게요!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '또 새 동료야? 밥값은 내라구! ...농담이야~' },
+    ],
   },
 };
 
