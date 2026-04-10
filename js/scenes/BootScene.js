@@ -6,6 +6,7 @@
  * Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms).
  * Phase 11-3d: 초기화 시 세이브 데이터 크기 콘솔 로깅.
  * Phase 12: Android 하드웨어 백버튼 글로벌 리스너 등록.
+ * Phase 12: 앱 백그라운드/포그라운드 전환 시 오디오 일시정지/재개.
  */
 
 import Phaser from 'phaser';
@@ -67,6 +68,9 @@ export class BootScene extends Phaser.Scene {
     // ── Android 하드웨어 백버튼 리스너 (Phase 12) ──
     this._setupHardwareBackButton();
 
+    // ── 앱 백그라운드/포그라운드 전환 리스너 (Phase 12) ──
+    this._setupAppStateListener();
+
     this._startGame();
   }
 
@@ -92,6 +96,56 @@ export class BootScene extends Phaser.Scene {
       });
     } catch (e) {
       // 리스너 등록 실패 — 무시 (브라우저 환경)
+    }
+  }
+
+  /**
+   * Capacitor appStateChange 리스너를 등록한다.
+   * 백그라운드 진입 시 AudioContext를 suspend하고 게임 루프를 일시정지,
+   * 포그라운드 복귀 시 resume한다.
+   * 브라우저 환경 폴백으로 visibilitychange도 등록한다.
+   * @private
+   */
+  _setupAppStateListener() {
+    // ── Capacitor 네이티브 환경 ──
+    const Capacitor = window.Capacitor;
+    if (Capacitor && Capacitor.isNativePlatform()) {
+      try {
+        Capacitor.Plugins.App.addListener('appStateChange', ({ isActive }) => {
+          this._handleAppState(isActive);
+        });
+      } catch (e) { /* 무시 */ }
+    }
+
+    // ── 브라우저 환경 폴백 (탭 전환, 화면 끄기 등) ──
+    document.addEventListener('visibilitychange', () => {
+      this._handleAppState(!document.hidden);
+    });
+  }
+
+  /**
+   * 앱 활성/비활성 상태에 따라 오디오와 게임 루프를 제어한다.
+   * @param {boolean} isActive - 앱이 포그라운드인지 여부
+   * @private
+   */
+  _handleAppState(isActive) {
+    // AudioContext suspend/resume
+    const ctx = SoundManager._ctx;
+    if (ctx) {
+      if (isActive) {
+        ctx.resume().catch(() => {});
+      } else {
+        ctx.suspend().catch(() => {});
+      }
+    }
+
+    // Phaser 게임 루프 pause/resume
+    if (this.game) {
+      if (isActive) {
+        this.game.resume();
+      } else {
+        this.game.pause();
+      }
     }
   }
 
