@@ -14,7 +14,7 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { TOOL_DEFS } from '../data/gameData.js';
 import { ToolManager } from '../managers/ToolManager.js';
-import { DialogueManager } from '../managers/DialogueManager.js';
+import { StoryManager } from '../managers/StoryManager.js';
 
 // ── 레이아웃 상수 ──
 const BG_COLOR = 0x1a0a00;
@@ -78,25 +78,8 @@ export class MerchantScene extends Phaser.Scene {
     this._createSummaryBar();
     this._createDepartButton();
 
-    // ── 대화 트리거 (Phase 14-2d) ──
-    this._triggerMerchantDialogue();
-  }
-
-  // ── 대화 트리거 (Phase 14-2d) ──────────────────────────────────────
-
-  /**
-   * 행상인 씬 진입 시 대화를 트리거한다.
-   * 최초 방문 시 merchant_first_meet, 2회차 이후 poco_discount_fail.
-   * @private
-   */
-  _triggerMerchantDialogue() {
-    // 최초 방문: merchant_first_meet (hasSeen 내부 체크)
-    if (!DialogueManager.hasSeen('merchant_first_meet')) {
-      DialogueManager.start(this, 'merchant_first_meet');
-      return;
-    }
-    // 2회차 방문 이후: poco_discount_fail (1회만)
-    DialogueManager.start(this, 'poco_discount_fail');
+    // ── 대화 트리거 (Phase 14-3: StoryManager 중앙화) ──
+    StoryManager.checkTriggers(this, 'merchant_enter');
   }
 
   // ── 헤더 (타이틀 + 골드) ──────────────────────────────────────────

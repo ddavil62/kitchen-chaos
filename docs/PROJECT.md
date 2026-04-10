@@ -93,9 +93,10 @@ kitchen-chaos/
       RecipeCollectionScene.js # 레시피 도감
       DialogueScene.js       # 대화 오버레이 씬 (타이핑 애니메이션, 건너뛰기)
     managers/
-      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v10)
+      SaveManager.js         # 세이브/로드 + 마이그레이션 (현재 v11)
       ToolManager.js         # 영구 도구 인벤토리 (구매/판매/업그레이드/스탯)
       DialogueManager.js     # 대화 관리자 (start/hasSeen/markSeen)
+      StoryManager.js        # 스토리 진행도 추적 + 트리거 중앙 디스패처
       WaveManager.js         # 웨이브 적 스폰 관리
       EndlessWaveGenerator.js # 엔드리스 무한 웨이브 생성기
       RecipeManager.js       # 레시피 해금/조리 관리
@@ -108,6 +109,7 @@ kitchen-chaos/
       gameData.js            # 적/도구(TOOL_DEFS)/재료/스테이지 정의
       recipeData.js          # 레시피 106종 정의
       dialogueData.js        # 대화 스크립트 13종 + 캐릭터 4종 정의
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 13종
   assets/                    # 스프라이트/타일셋/아이콘
     portraits/               # 캐릭터 초상화 (64x64 PixelLab)
   tests/                     # Playwright 테스트
@@ -125,8 +127,9 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장 |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 픽셀아트 초상화 렌더링, 4씬 트리거, 시청 기록 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v10 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처, 챕터 진행도, 스토리 플래그, 4씬 1줄 호출 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v11 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
 
@@ -160,7 +163,8 @@ kitchen-chaos/
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
 | 대화 엔진 | DialogueManager + DialogueScene 오버레이, 13종 스크립트, 세이브 연동 | 완료 |
-| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 4씬 트리거 연결 | 완료 |
+| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 스크립트 13종 | 완료 |
+| 스토리 매니저 | StoryManager + storyData 데이터 기반 트리거 중앙화, 챕터 진행도 추적 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -172,7 +176,7 @@ kitchen-chaos/
 | 레시피 | 106종 (서빙 86 + 버프 20) |
 | 스테이지 | 30개 (6장) |
 | 셰프 | 3종 |
-| 세이브 버전 | v10 |
+| 세이브 버전 | v11 |
 
 ## 알려진 제약사항
 
@@ -188,7 +192,8 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 14-2 완료 (대화 콘텐츠, 초상화, 트리거 연결). Phase 14 전체 완료.
-- 후속: 4~6장 챕터 스토리 대화 확장, 대화 분기/선택지 시스템.
+- Phase 14-3 완료 (StoryManager 트리거 중앙화, 챕터 진행도). Phase 14 전체 완료.
+- 후속: Phase 15 스토리 콘텐츠 (챕터 1~6 메인 시나리오), Phase 16 인게임 통합 (튜토리얼/이벤트/NPC 대화).
+- 대화 분기/선택지 시스템 미구현 (현재 선형 대화만).
 - 시즌별 장기 확장 (80~100시간): 시즌1(현재 1~6장) → 시즌2(국제) → 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조

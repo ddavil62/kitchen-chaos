@@ -13,7 +13,7 @@ import { STAGES } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
-import { DialogueManager } from '../managers/DialogueManager.js';
+import { StoryManager } from '../managers/StoryManager.js';
 
 // ── 챕터별 스테이지 분류 (StageSelectScene에서 이식) ──
 
@@ -76,51 +76,8 @@ export class WorldMapScene extends Phaser.Scene {
     // 7. 패널 상태 초기화
     this._panelContainer = null;
 
-    // 8. 대화 트리거 (Phase 14-2d)
-    this._triggerDialogues();
-  }
-
-  // ── 대화 트리거 (Phase 14-2d) ──────────────────────────────────
-
-  /**
-   * 월드맵 진입 시 대화를 트리거한다.
-   * intro_welcome → chapter1_start 연쇄, 이후 챕터별 인트로, mage_research_hint.
-   * @private
-   */
-  _triggerDialogues() {
-    // 1. 최초 진입 시 intro_welcome → chapter1_start 연쇄
-    if (!DialogueManager.hasSeen('intro_welcome')) {
-      DialogueManager.start(this, 'intro_welcome', {
-        onComplete: () => {
-          if (SaveManager.isUnlocked('1-1')) {
-            DialogueManager.start(this, 'chapter1_start');
-          }
-        }
-      });
-      return; // intro 중이면 다른 트리거 건너뜀
-    }
-
-    // 2. 챕터별 인트로 대화 (한 번에 하나만)
-    const CHAPTER_DIALOGUES = [
-      null,               // ch1 (intro_welcome + chapter1_start로 대체)
-      'chapter2_intro',   // ch2 (2-1 해금 시)
-      'mage_introduction', // ch3 (3-1 해금 시)
-      null, null, null,
-    ];
-
-    for (let i = 0; i < CHAPTER_DIALOGUES.length; i++) {
-      const dialogueId = CHAPTER_DIALOGUES[i];
-      if (!dialogueId) continue;
-      if (this._chapterStates[i].unlocked && !DialogueManager.hasSeen(dialogueId)) {
-        DialogueManager.start(this, dialogueId);
-        return; // 한 번에 하나만 트리거
-      }
-    }
-
-    // 3. mage_research_hint: mage_introduction 시청 완료 후 다음 방문 1회
-    if (DialogueManager.hasSeen('mage_introduction') && !DialogueManager.hasSeen('mage_research_hint')) {
-      DialogueManager.start(this, 'mage_research_hint');
-    }
+    // 8. 대화 트리거 (Phase 14-3: StoryManager 중앙화)
+    StoryManager.checkTriggers(this, 'worldmap_enter');
   }
 
   // ── 하드웨어 백버튼 (Phase 12) ──────────────────────────────────

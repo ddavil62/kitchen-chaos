@@ -34,7 +34,7 @@ import { SoundManager } from '../managers/SoundManager.js';
 import { VFXManager } from '../managers/VFXManager.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
 import { ToolManager } from '../managers/ToolManager.js';
-import { DialogueManager } from '../managers/DialogueManager.js';
+import { StoryManager } from '../managers/StoryManager.js';
 
 export class GatheringScene extends Phaser.Scene {
   constructor() {
@@ -156,35 +156,11 @@ export class GatheringScene extends Phaser.Scene {
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
-    // ── 대화 트리거 (Phase 14-2d) ──
-    this._triggerGatheringDialogues();
+    // ── 대화 트리거 (Phase 14-3: StoryManager 중앙화) ──
+    StoryManager.checkTriggers(this, 'gathering_enter', { stageId: this.stageId });
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this.shutdown, this);
-  }
-
-  // ── 대화 트리거 (Phase 14-2d) ──────────────────────────────────
-
-  /**
-   * 채집 씬 진입 시 대화를 트리거한다.
-   * 보스 스테이지(x-6) 최초 진입 경고, 1-1 첫 진입 대화.
-   * @private
-   */
-  _triggerGatheringDialogues() {
-    // 보스 스테이지(x-6) 최초 진입 시 경고 (1회만)
-    if (this.stageId.endsWith('-6') && !DialogueManager.hasSeen('stage_boss_warning')) {
-      this.time.delayedCall(400, () => {
-        DialogueManager.start(this, 'stage_boss_warning');
-      });
-      return;
-    }
-
-    // 1-1 최초 진입 시 chapter1_start 대화 (WorldMap에서 못 본 경우 대비)
-    if (this.stageId === '1-1' && !DialogueManager.hasSeen('chapter1_start')) {
-      this.time.delayedCall(400, () => {
-        DialogueManager.start(this, 'chapter1_start');
-      });
-    }
   }
 
   // ── 아이소메트릭 맵 그리기 ─────────────────────────────────────

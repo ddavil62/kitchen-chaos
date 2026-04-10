@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-10
-> 기준: Phase 14-2 완료 (대화 콘텐츠 + 초상화 + 트리거)
+> 기준: Phase 14-3 완료 (StoryManager 트리거 중앙화)
 
 ---
 
@@ -24,8 +24,9 @@
 | Phase 13 | 도구 시스템 리워크, 행상인 씬, 재료 채집, 엔드리스 적용 | ✅ 완료 |
 | Phase 14-1 | 대화 엔진 (DialogueManager + DialogueScene + dialogueData) | ✅ 완료 |
 | Phase 14-2 | 대화 콘텐츠 (초상화 4종 + 스크립트 13종 + 4씬 트리거 연결) | ✅ 완료 |
+| Phase 14-3 | StoryManager 트리거 중앙화, 챕터 진행도 추적, 세이브 v11 | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 14-2 완료
+**현재 구현 완성도**: Phase 14-3 완료
 
 ### 현재 콘텐츠 규모
 
@@ -43,7 +44,7 @@
 | 직원 | 2종 (서빙/세척 도우미, IAP 추상화) |
 | 사운드 | SFX 20종 + BGM 5종 (Web Audio API 프로시저럴) |
 | VFX | 파티클 + 스크린 효과 + 플로팅 텍스트 (Canvas2D) |
-| 세이브 버전 | v10 |
+| 세이브 버전 | v11 |
 
 ### 게임 루프
 
@@ -401,7 +402,7 @@
 
 ## ✅ Phase 14 — 스토리 시스템 (완료)
 
-> 목표: 식란 세계관 기반 스토리 콘텐츠 구현, 대화 트리거 연결, 캐릭터 확장
+> 목표: 식란 세계관 기반 스토리 콘텐츠 구현, 대화 트리거 연결, 캐릭터 확장, 트리거 중앙화
 > 세계관 상세: `docs/PROJECT.md` "세계관 — 식란(食亂)의 세계" 참조
 
 ### ✅ 14-1. 대화 엔진 (완료)
@@ -437,6 +438,38 @@
 - [x] MerchantScene: merchant_first_meet, poco_discount_fail
 - [x] ResultScene: stage_first_clear, chapter1_clear, rin_first_meet, chapter3_rin_joins, after_first_loss
 - [x] GatheringScene: stage_boss_warning, chapter1_start
+
+### ✅ 14-3. StoryManager 트리거 중앙화 (완료)
+
+- [x] StoryManager.js 신규: getProgress, checkTriggers, advanceChapter, setFlag, hasFlag
+- [x] storyData.js 신규: STORY_TRIGGERS 13종 (triggerPoint, condition, dialogueId, once, delay, chain)
+- [x] SaveManager v10->v11: storyProgress {currentChapter, storyFlags} 추가
+- [x] v10->v11 마이그레이션: seenDialogues 기반 currentChapter 추론 복원
+- [x] WorldMapScene: `_triggerDialogues()` 제거 -> `StoryManager.checkTriggers(this, 'worldmap_enter')` *(씬 코드에서 if/else 분기 전부 제거)*
+- [x] MerchantScene: `_triggerMerchantDialogue()` 제거 -> `StoryManager.checkTriggers(this, 'merchant_enter')`
+- [x] ResultScene: `_triggerResultDialogues()` 제거 -> `StoryManager.checkTriggers()` + `advanceChapter()`
+- [x] GatheringScene: `_triggerGatheringDialogues()` 제거 -> `StoryManager.checkTriggers(this, 'gathering_enter', {stageId})`
+
+---
+
+## Phase 15 — 스토리 콘텐츠 (예정)
+
+> 목표: 챕터 1~6 메인 시나리오 대화 스크립트 작성
+> StoryManager + storyData.js 기반으로 씬 코드 수정 없이 트리거 추가
+
+- [ ] 챕터 1~3 메인 시나리오 대화 스크립트
+- [ ] 챕터 4~6 메인 시나리오 대화 스크립트
+- [ ] 캐릭터별 사이드 대화 확장
+
+---
+
+## Phase 16 — 인게임 통합 (예정)
+
+> 목표: 튜토리얼 대화, 이벤트 대화, NPC 상호작용
+
+- [ ] 튜토리얼 대화 (첫 도구 배치, 첫 영업 등)
+- [ ] 영업 이벤트 대화 (특수 손님 등장 시)
+- [ ] 대화 분기/선택지 시스템
 
 ---
 
@@ -487,3 +520,6 @@
 | ~~13~~ | ~~도구 시스템 리워크, 행상인, 재료 채집~~ | 106 | 15 | ✅ 완료 |
 | ~~14-1~~ | ~~대화 엔진 (DialogueManager + DialogueScene)~~ | 106 | 15 | ✅ 완료 |
 | ~~14-2~~ | ~~초상화 4종, 스크립트 13종, 4씬 트리거~~ | 106 | 15 | ✅ 완료 |
+| ~~14-3~~ | ~~StoryManager 트리거 중앙화, 챕터 진행도~~ | 106 | 15 | ✅ 완료 |
+| 15 | 스토리 콘텐츠 (챕터 1~6 메인 시나리오 대화) | 106 | 15 | 예정 |
+| 16 | 인게임 통합 (튜토리얼/이벤트/NPC 대화) | 106 | 15 | 예정 |

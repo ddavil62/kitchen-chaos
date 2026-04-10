@@ -1,5 +1,58 @@
 # Changelog
 
+## [2026-04-10] - Phase 14-3 StoryManager 트리거 중앙화
+
+### 추가
+
+- **StoryManager** (`js/managers/StoryManager.js`, 신규)
+  - static 스토리 관리자
+  - API: getProgress(), checkTriggers(scene, triggerPoint, context), advanceChapter(stageId), setFlag(key), hasFlag(key)
+  - checkTriggers(): STORY_TRIGGERS 배열에서 triggerPoint 매칭 + condition 평가 -> 첫 매칭 트리거 실행
+  - _fire(): delay 지원, chain 연쇄 실행 (onComplete 콜백)
+  - STAGE_TO_CHAPTER 매핑으로 스테이지 -> 챕터 번호 추론
+
+- **storyData.js** (`js/data/storyData.js`, 신규)
+  - STORY_TRIGGERS 배열: 13종 트리거 데이터
+  - 각 항목: triggerPoint, dialogueId, once, condition(ctx, save), delay, chain
+  - triggerPoint 4종: worldmap_enter (4개), merchant_enter (2개), gathering_enter (1개), result_clear (4개) + result_market_failed (1개)
+  - chain 연쇄: intro_welcome -> chapter1_start, stage_first_clear(1-6) -> chapter1_clear
+
+### 변경
+
+- **SaveManager** (`js/managers/SaveManager.js`)
+  - SAVE_VERSION: 10 -> 11
+  - createDefault(): storyProgress { currentChapter: 1, storyFlags: [] } 추가
+  - _migrate(): v10->v11 블록 -- seenDialogues 기반 currentChapter 추론 복원 (chapter3_rin_joins -> 3, chapter2_intro/rin_first_meet -> 2)
+
+- **WorldMapScene** (`js/scenes/WorldMapScene.js`)
+  - `_triggerDialogues()` 메서드 전체 제거 (intro_welcome, chapter2_intro, mage_introduction, mage_research_hint if/else 분기)
+  - DialogueManager import -> StoryManager import
+  - create()에서 `StoryManager.checkTriggers(this, 'worldmap_enter')` 1줄로 교체
+
+- **MerchantScene** (`js/scenes/MerchantScene.js`)
+  - `_triggerMerchantDialogue()` 메서드 전체 제거 (merchant_first_meet, poco_discount_fail if/else 분기)
+  - DialogueManager import -> StoryManager import
+  - create()에서 `StoryManager.checkTriggers(this, 'merchant_enter')` 1줄로 교체
+
+- **ResultScene** (`js/scenes/ResultScene.js`)
+  - `_triggerResultDialogues()` 메서드 전체 제거 (stage_first_clear, chapter1_clear, rin_first_meet, chapter3_rin_joins, after_first_loss if/else 분기)
+  - DialogueManager import -> StoryManager import
+  - 캠페인 클리어: `StoryManager.checkTriggers(this, 'result_clear', {stageId, stars, isFirstClear})` + `StoryManager.advanceChapter(stageId)`
+  - 장보기 실패: `StoryManager.checkTriggers(this, 'result_market_failed')`
+
+- **GatheringScene** (`js/scenes/GatheringScene.js`)
+  - `_triggerGatheringDialogues()` 메서드 전체 제거 (stage_boss_warning, chapter1_start if/else 분기)
+  - DialogueManager import -> StoryManager import
+  - create()에서 `StoryManager.checkTriggers(this, 'gathering_enter', {stageId})` 1줄로 교체
+
+### 참고
+
+- 리포트: `.claude/specs/2026-04-10-kitchen-chaos-phase14-3-report.md`
+- visual_change: none
+- storyData.js에 트리거를 추가하는 것만으로 씬 코드 수정 없이 새 대화 삽입 가능
+
+---
+
 ## [2026-04-10] - Phase 14-2 대화 콘텐츠 + 캐릭터 초상화
 
 ### 추가

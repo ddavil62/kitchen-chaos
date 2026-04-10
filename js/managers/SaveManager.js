@@ -10,12 +10,13 @@
  * Phase 11-3a: v8 마이그레이션 — tutorialBattle/Service/Shop/Endless 4개 플래그로 분리.
  * Phase 13-1: v9 마이그레이션 — 영구 도구 시스템 (gold, tools, tutorialMerchant).
  * Phase 14-1: v10 마이그레이션 — 대화 시스템 seenDialogues 추가.
+ * Phase 14-3: v11 마이그레이션 — storyProgress (챕터 진행도, 스토리 플래그) 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 10;
+const SAVE_VERSION = 11;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -75,6 +76,11 @@ function createDefault() {
     tutorialMerchant: false,  // 행상인 튜토리얼 완료 여부
     // ── Phase 14-1 추가 ──
     seenDialogues: [],        // 시청 완료한 대화 스크립트 ID 목록
+    // ── Phase 14-3 추가 ──
+    storyProgress: {
+      currentChapter: 1,      // 플레이어가 도달한 최고 챕터 (1~6)
+      storyFlags: [],         // 임의 스토리 플래그 목록
+    },
     // ── Phase 11-1 추가 ──
     endless: {
       unlocked: false,            // 6-3 클리어 시 true
@@ -671,6 +677,21 @@ export class SaveManager {
     if (data.version < 10) {
       data.seenDialogues = [];
       data.version = 10;
+    }
+
+    // v10 → v11: 스토리 진행도 추가
+    if (data.version < 11) {
+      // 기존 seenDialogues로 currentChapter를 추론하여 복원
+      const seenDialogues = data.seenDialogues || [];
+      let inferredChapter = 1;
+      if (seenDialogues.includes('chapter3_rin_joins')) inferredChapter = 3;
+      else if (seenDialogues.includes('chapter2_intro') || seenDialogues.includes('rin_first_meet')) inferredChapter = 2;
+
+      data.storyProgress = {
+        currentChapter: inferredChapter,
+        storyFlags: [],
+      };
+      data.version = 11;
     }
 
     return data;
