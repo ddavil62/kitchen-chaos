@@ -219,7 +219,8 @@ export class ChefSelectScene extends Phaser.Scene {
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       // Phase 11-1: 엔드리스 모드 분기
-      const targetScene = this._isEndless ? 'EndlessScene' : 'MarketScene';
+      // Phase 13-3: 캠페인은 GatheringScene으로 전환 (MarketScene → GatheringScene)
+      const targetScene = this._isEndless ? 'EndlessScene' : 'GatheringScene';
       const targetStageId = this._isEndless ? '1-1' : this.stageId;
       this.scene.start(targetScene, { stageId: targetStageId });
     });

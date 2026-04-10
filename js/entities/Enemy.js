@@ -453,9 +453,12 @@ export class Enemy extends Phaser.GameObjects.Container {
       });
     }
 
-    // 보스 처치 보상
-    if (this.data_.bossReward) {
-      this.scene.events.emit('boss_killed', { reward: this.data_.bossReward });
+    // 보스 처치 보상 (Phase 13-3: bossDrops 재료 드롭 추가)
+    if (this.data_.bossReward || this.data_.bossDrops) {
+      this.scene.events.emit('boss_killed', {
+        reward: this.data_.bossReward || 0,
+        bossDrops: this.data_.bossDrops || null,
+      });
     }
 
     this.scene.events.emit('enemy_died', this);

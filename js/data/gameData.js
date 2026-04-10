@@ -87,7 +87,8 @@ export const ENEMY_TYPES = {
     summonInterval: 2000,   // 2초마다 carrot_goblin 소환
     summonType: 'carrot_goblin',
     enrageHpThreshold: 0.5, // HP 50% 이하 시 속도 2배
-    bossReward: 100,        // 처치 시 +100 골드
+    bossReward: 100,        // 처치 시 +100 골드 (MarketScene/EndlessScene 하위 호환)
+    bossDrops: [{ ingredient: 'flour', count: 3 }, { ingredient: 'egg', count: 2 }],  // Phase 13-3: 재료 드롭
   },
   // ── Phase 6 신규 적 ──
   fish_knight: {
@@ -130,6 +131,7 @@ export const ENEMY_TYPES = {
     summonType: 'cheese_rat',
     enrageHpThreshold: 0.4,
     bossReward: 150,
+    bossDrops: [{ ingredient: 'fish', count: 3 }, { ingredient: 'rice', count: 3 }],  // Phase 13-3
     bossDebuff: { speedReduction: 0.30, duration: 15000 },  // HP 40% 이하 시 전체 타워 공격속도 -30%, 15초, 1회
   },
   // ── Phase 8 신규 적 ──
@@ -173,6 +175,7 @@ export const ENEMY_TYPES = {
     summonType: 'shrimp_samurai',
     enrageHpThreshold: 0.3,
     bossReward: 200,
+    bossDrops: [{ ingredient: 'shrimp', count: 4 }, { ingredient: 'squid', count: 3 }],  // Phase 13-3
     inkDebuff: { rangeReduction: 0.50, duration: 3000 },  // HP 30% 이하 시 전체 타워 사거리 -50%, 3초, 1회
   },
   // ── Phase 9 신규 적 ──
@@ -216,6 +219,7 @@ export const ENEMY_TYPES = {
     magmaBlastThreshold: 0.2,         // HP 20% 이하 시 전체 타워 3초 비활성화
     magmaBlastDuration: 3000,
     bossReward: 250,
+    bossDrops: [{ ingredient: 'sugar', count: 4 }, { ingredient: 'butter', count: 3 }],  // Phase 13-3
   },
   // ── Phase 10 보스 ──
   master_patissier: {
@@ -236,6 +240,7 @@ export const ENEMY_TYPES = {
     magicBlastThreshold: 0.2,          // HP 20% 이하 시 전체 투사체 4초 무효화 + sugar_fairy x2 추가소환
     magicBlastDuration: 4000,
     bossReward: 300,
+    bossDrops: [{ ingredient: 'milk', count: 5 }, { ingredient: 'sugar', count: 4 }],  // Phase 13-3
   },
   cuisine_god: {
     id: 'cuisine_god',
@@ -259,6 +264,7 @@ export const ENEMY_TYPES = {
     phase3ShieldInterval: 10000,
     phase3ShieldHp: 500,
     bossReward: 500,
+    bossDrops: [{ ingredient: 'meat', count: 5 }, { ingredient: 'cheese', count: 5 }, { ingredient: 'butter', count: 4 }],  // Phase 13-3
   },
 };
 
