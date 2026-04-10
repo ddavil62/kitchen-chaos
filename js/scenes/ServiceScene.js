@@ -31,6 +31,7 @@ import { STAFF_TYPES } from '../data/staffData.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { VFXManager } from '../managers/VFXManager.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
+import { ToolManager } from '../managers/ToolManager.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -1823,6 +1824,12 @@ export class ServiceScene extends Phaser.Scene {
     // 만족도 0이면 보상 50% 감소
     if (this.satisfaction <= 0) {
       this.totalGold = Math.floor(this.totalGold * 0.5);
+    }
+
+    // Phase 13-2: 영업 수입을 영구 골드에 누적
+    const earnedGold = this.totalGold + this.tipTotal;
+    if (earnedGold > 0) {
+      ToolManager.addGold(earnedGold);
     }
 
     this._showMessage(message, 2000);

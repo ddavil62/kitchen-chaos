@@ -4,6 +4,7 @@
  * 기존 GameOverScene을 대체한다.
  * Phase 10-4: BGM 재생 추가.
  * Phase 11-1: 엔드리스 모드 결과 화면 분기 추가.
+ * Phase 13-2: 정상 정산 후 "행상인 방문" 버튼 추가 (MerchantScene 경유).
  *
  * 화면 구성:
  *   타이틀 → 장보기 결과 → 영업 결과 → 평가(별점) → 보상 → 버튼
@@ -356,21 +357,25 @@ export class ResultScene extends Phaser.Scene {
     y += 25;
 
     // ── 버튼 ──
-    this._createButton(y, '다시 하기', 0xff6b35, () => {
-      this._fadeToScene('ChefSelectScene', { stageId: this.stageId });
-    });
-    y += 60;
-
-    // 다음 스테이지 (마지막이 아닌 경우에만)
-    const nextStageId = this._getNextStageId();
-    if (nextStageId && stars > 0) {
-      this._createButton(y, '다음 스테이지 \u25B6', 0x22aa44, () => {
-        this._fadeToScene('ChefSelectScene', { stageId: nextStageId });
+    // Phase 13-2: 영업 성공 시 행상인 방문 버튼 (MerchantScene 경유)
+    if (stars > 0) {
+      this._createButton(y, '\uD589\uC0C1\uC778 \uBC29\uBB38 \u25B6', 0xcc8800, () => {
+        this._fadeToScene('MerchantScene', {
+          stageId: this.stageId,
+          marketResult: this.marketResult,
+          serviceResult: this.serviceResult,
+          isMarketFailed: false,
+        });
       });
       y += 60;
     }
 
-    this._createButton(y, '스테이지 선택', 0x444444, () => {
+    this._createButton(y, '\uB2E4\uC2DC \uD558\uAE30', 0xff6b35, () => {
+      this._fadeToScene('ChefSelectScene', { stageId: this.stageId });
+    });
+    y += 60;
+
+    this._createButton(y, '\uC2A4\uD14C\uC774\uC9C0 \uC120\uD0DD', 0x444444, () => {
       this._fadeToScene('StageSelectScene');
     });
   }
