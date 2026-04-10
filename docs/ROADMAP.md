@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-10
-> 기준: Phase 17 완료, Phase 18~27 계획 수립
+> 기준: Phase 18 완료, Phase 19~27 계획 수립
 
 ---
 
@@ -28,7 +28,7 @@
 | Phase 15 | 챕터 2~6 스토리 콘텐츠 (대화 스크립트 26종, 트리거 24종) | ✅ 완료 |
 | Phase 16 | 인게임 대화 통합 (튜토리얼/이벤트 연동, 선택지 분기, 스크립트 32종) | ✅ 완료 |
 | Phase 17 | 밸런스 QA (수치 시뮬레이션, 병목 탐지, 조정) | ✅ 완료 |
-| Phase 18 | 레거시 정리 + 기술 부채 | 📋 계획 |
+| Phase 18 | 레거시 정리 + 기술 부채 | ✅ 완료 |
 | Phase 19 | 시즌 2 기반 인프라 (월드맵 확장, 신규 캐릭터, 세이브) | 📋 계획 |
 | Phase 20 | 7장 — 사쿠라 이자카야 (일식) | 📋 계획 |
 | Phase 21 | 8장 — 용의 주방 (중식) | 📋 계획 |
@@ -39,7 +39,7 @@
 | Phase 26 | 시즌 2 밸런스 QA + 스토리 종합 | 📋 계획 |
 | Phase 27 | 업적 시스템 (30~50개, 보상, 업적 UI) | 📋 계획 |
 
-**현재 구현 완성도**: 시즌 1 완성 (Phase 17), 시즌 2 로드맵 확정
+**현재 구현 완성도**: 시즌 1 완성 + 레거시 정리 완료 (Phase 18), 시즌 2 로드맵 확정
 
 ### 현재 콘텐츠 규모
 
@@ -520,28 +520,30 @@
 
 ---
 
-## Phase 18 — 레거시 정리 + 기술 부채
+## ✅ Phase 18 — 레거시 정리 + 기술 부채 (완료)
 
 > 목표: 사용하지 않는 레거시 코드 제거, 코드 품질 향상, 빌드 크기 절감
 
-### 18-1. 레거시 씬 삭제
+### ✅ 18-1. 레거시 씬 삭제 (완료)
 
-- [ ] MarketScene.js 삭제 (GatheringScene으로 완전 대체됨)
-- [ ] StageSelectScene.js 삭제 (WorldMapScene으로 완전 대체됨)
-- [ ] main.js 씬 등록에서 제거
-- [ ] import 참조 정리
+- [x] MarketScene.js 삭제 (GatheringScene으로 완전 대체됨)
+- [x] StageSelectScene.js 삭제 (WorldMapScene으로 완전 대체됨)
+- [x] GameScene.js 삭제 (Phase 7 레거시, main.js 미등록)
+- [x] GameOverScene.js 삭제 (Phase 7 레거시, ResultScene으로 대체)
+- [x] main.js 씬 등록에서 제거 + import 참조 정리
+- [x] ResultScene.js의 StageSelectScene 참조 -> WorldMapScene으로 교체
 
-### 18-2. config.js 정리
+### ✅ 18-2. config.js 정리 (완료)
 
-- [ ] STARTING_GOLD, WAVE_CLEAR_BONUS 등 미사용 상수 제거
-- [ ] 하위 호환 주석 정리
-- [ ] 각 씬에서 직접 사용하는 상수만 유지
+- [x] STARTING_GOLD, WAVE_CLEAR_BONUS, INGREDIENT_SELL_PRICE 미사용 상수 제거
+- [x] 하위 호환 주석 정리, @fileoverview 현행화
+- [x] MarketScene 레이아웃 섹션 주석 -> 게임 씬 레이아웃으로 교체
+- [x] RestaurantScene 상수는 활성 코드 사용 중이므로 주석만 현행화 (유지)
 
-### 18-3. 코드 품질
+### ✅ 18-3. 코드 품질 (완료)
 
-- [ ] 미사용 import/변수 정리 (전체 파일 스캔)
-- [ ] JSDoc 누락분 보강 (Phase 13~17에서 추가된 함수)
-- [ ] Playwright 테스트 정리 (레거시 씬 참조 테스트 제거/갱신)
+- [x] JSDoc 누락분 보강 — 7개 파일 (GatheringScene, MerchantScene, WorldMapScene, ToolManager, StoryManager, DialogueManager, DialogueScene)
+- [x] Playwright 테스트 정리 (worldmap-qa.spec.js 회귀 테스트 삭제, endless-mode-qa.spec.js StageSelectScene -> WorldMapScene 교체)
 
 ---
 
@@ -852,7 +854,7 @@
 | ~~15~~ | ~~스토리 콘텐츠 (챕터 2~6 시나리오 + 사이드 대화)~~ | 106 | 15 | ✅ 완료 |
 | ~~16~~ | ~~인게임 대화 통합 (튜토리얼/이벤트/선택지)~~ | 106 | 15 | ✅ 완료 |
 | ~~17~~ | ~~밸런스 QA (시뮬레이션, P1+P2 조정)~~ | 106 | 15 | ✅ 완료 |
-| 18 | 레거시 정리 + 기술 부채 | 106 | 15 | 📋 계획 |
+| ~~18~~ | ~~레거시 정리 + 기술 부채~~ | 106 | 15 | ✅ 완료 |
 | 19 | 시즌 2 기반 (월드맵 12챕터, 셰프 2종, 도구 2종) | 106 | 15 | 📋 계획 |
 | 20 | 7장 사쿠라 이자카야 (참치, 와사비) | ~116 | 17 | 📋 계획 |
 | 21 | 8장 용의 주방 (두부, 고수) | ~126 | 19 | 📋 계획 |

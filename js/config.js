@@ -1,20 +1,20 @@
 /**
  * @fileoverview Kitchen Chaos Tycoon 전역 설정 상수.
- * Phase 7: MarketScene 풀스크린 레이아웃.
+ * 화면 크기, 게임 씬 레이아웃, 아이소메트릭 그리드, 경로 유틸리티를 정의한다.
  *
  * 화면 레이아웃 (360×640):
- *   0~40    HUD (MarketScene)
- *   40~480  아이소메트릭 맵 그리드 (MarketScene) — 다이아몬드 9×8, 440px
- *   480~540 타워 선택 바 (MarketScene)
- *   540~590 재료 수집 현황 바 (MarketScene)
- *   590~640 웨이브 컨트롤 (MarketScene)
+ *   0~40    HUD (GatheringScene / EndlessScene)
+ *   40~480  아이소메트릭 맵 그리드 — 다이아몬드 9×10, 440px
+ *   480~540 도구 선택 바
+ *   540~590 재료 수집 현황 바
+ *   590~640 웨이브 컨트롤
  */
 
 // ── 화면 크기 ──
 export const GAME_WIDTH = 360;
 export const GAME_HEIGHT = 640;
 
-// ── MarketScene 레이아웃 (Phase 7) ──
+// ── 게임 씬 레이아웃 (GatheringScene / EndlessScene) ──
 export const HUD_HEIGHT = 40;
 export const GAME_AREA_Y = HUD_HEIGHT;                     // 40
 export const GAME_AREA_HEIGHT = 440;                        // 440px (기존 320 → 440)
@@ -25,7 +25,7 @@ export const INGREDIENT_BAR_HEIGHT = 50;                         // 540~590
 export const WAVE_CONTROL_Y = INGREDIENT_BAR_Y + INGREDIENT_BAR_HEIGHT; // 590
 export const WAVE_CONTROL_HEIGHT = 50;                                    // 590~640
 
-// ── RestaurantScene 레이아웃 (하위 호환용, Phase 7-2에서 제거 예정) ──
+// ── RestaurantScene / ServiceScene 레이아웃 (KitchenPanelUI, CustomerZoneUI 사용) ──
 export const RESTAURANT_Y = 420;
 export const RESTAURANT_HEIGHT = 220;
 export const CUSTOMER_ZONE_HEIGHT = 100;
@@ -198,10 +198,5 @@ export function buildWaypointsFromSegments(segments) {
 export const APP_VERSION = '1.0.0';
 
 // ── 게임 규칙 상수 ──
-// Phase 13에서 도구 시스템으로 대체됨 — 하위 호환용 유지
-export const STARTING_GOLD = 120;
-export const STARTING_LIVES = 15;
-export const FRESHNESS_WINDOW_MS = 5000;
-// Phase 13에서 GatheringScene/EndlessScene에서 미사용 — 하위 호환용 유지
-export const WAVE_CLEAR_BONUS = 25;
-export const INGREDIENT_SELL_PRICE = 10;
+export const STARTING_LIVES = 15;       // 라운드 시작 생명 수 (GatheringScene, EndlessScene)
+export const FRESHNESS_WINDOW_MS = 5000; // 재료 신선도 유지 시간 (ms) (Enemy, IngredientManager)

@@ -496,7 +496,7 @@ test.describe('Phase 11-1 엔드리스 모드 검증', () => {
 
   // ── 6. 기존 캠페인 모드 회귀 테스트 ──
   test.describe('캠페인 모드 회귀 테스트', () => {
-    test('캠페인 모드 시작이 기존과 동일하게 동작', async ({ page }) => {
+    test('캠페인 모드 시작 시 WorldMapScene으로 진입', async ({ page }) => {
       const save = createClearedSaveV7();
       await page.goto('http://localhost:5173');
       await setSaveData(page, save);
@@ -505,20 +505,20 @@ test.describe('Phase 11-1 엔드리스 모드 검증', () => {
       await waitForScene(page, 'MenuScene');
       await page.waitForTimeout(1000);
 
-      // 직접 scene.start로 StageSelectScene 전환
+      // WorldMapScene으로 전환
       await page.evaluate(() => {
         const game = window.__game;
-        game.scene.start('StageSelectScene');
+        game.scene.start('WorldMapScene');
       });
       await page.waitForTimeout(2000);
 
       const isActive = await page.evaluate(() => {
         const game = window.__game;
-        const scene = game.scene.getScene('StageSelectScene');
+        const scene = game.scene.getScene('WorldMapScene');
         return scene?.sys?.isActive() || false;
       });
 
-      await page.screenshot({ path: 'tests/screenshots/campaign-stage-select.png' });
+      await page.screenshot({ path: 'tests/screenshots/campaign-worldmap.png' });
       expect(isActive).toBe(true);
     });
 

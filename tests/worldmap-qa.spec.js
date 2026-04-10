@@ -131,7 +131,7 @@ test.describe('Phase 11-2 WorldMapScene 검증', () => {
 
   // ── 1. MenuScene -> WorldMapScene 전환 ──
   test.describe('MenuScene -> WorldMapScene 전환', () => {
-    test('AC: "게임 시작" 터치 시 WorldMapScene으로 전환 (StageSelectScene 진입 안됨)', async ({ page }) => {
+    test('AC: "게임 시작" 터치 시 WorldMapScene으로 전환', async ({ page }) => {
       const save = createFreshSave();
       await page.goto('http://localhost:5173');
       await setSaveData(page, save);
@@ -143,13 +143,11 @@ test.describe('Phase 11-2 WorldMapScene 검증', () => {
         const game = window.__game;
         return {
           worldMapActive: game.scene.getScene('WorldMapScene')?.sys?.isActive() || false,
-          stageSelectActive: game.scene.getScene('StageSelectScene')?.sys?.isActive() || false,
           menuActive: game.scene.getScene('MenuScene')?.sys?.isActive() || false,
         };
       });
 
       expect(sceneStatus.worldMapActive).toBe(true);
-      expect(sceneStatus.stageSelectActive).toBe(false);
       expect(sceneStatus.menuActive).toBe(false);
     });
   });
@@ -828,58 +826,7 @@ test.describe('Phase 11-2 WorldMapScene 검증', () => {
     });
   });
 
-  // ── 9. 회귀 테스트 ──
-  test.describe('회귀 테스트', () => {
-    test('StageSelectScene이 여전히 scene 배열에 존재', async ({ page }) => {
-      await page.goto('http://localhost:5173');
-      await waitForGame(page);
-
-      const sceneExists = await page.evaluate(() => {
-        const game = window.__game;
-        return !!game.scene.getScene('StageSelectScene');
-      });
-
-      expect(sceneExists).toBe(true);
-    });
-
-    test('직접 StageSelectScene 전환 시 정상 동작', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', err => errors.push(err.message));
-
-      const save = createCh1ClearedSave();
-      await page.goto('http://localhost:5173');
-      await setSaveData(page, save);
-      await page.reload();
-      await waitForGame(page);
-      await waitForScene(page, 'MenuScene');
-      await page.waitForTimeout(500);
-
-      await page.evaluate(() => {
-        const game = window.__game;
-        game.scene.start('StageSelectScene');
-      });
-      await page.waitForTimeout(2000);
-
-      const isActive = await page.evaluate(() => {
-        const game = window.__game;
-        return game.scene.getScene('StageSelectScene')?.sys?.isActive() || false;
-      });
-
-      expect(isActive).toBe(true);
-
-      const criticalErrors = errors.filter(e =>
-        !e.includes('AudioContext') &&
-        !e.includes('WebGL') &&
-        !e.includes('favicon') &&
-        !e.includes('net::') &&
-        !e.includes('404')
-      );
-
-      expect(criticalErrors.length).toBe(0);
-    });
-  });
-
-  // ── 10. 시각적 검증 ──
+  // ── 9. 시각적 검증 ──
   test.describe('시각적 검증', () => {
     test('전체 월드맵 레이아웃 (신규 세이브)', async ({ page }) => {
       const save = createFreshSave();

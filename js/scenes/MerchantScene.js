@@ -47,14 +47,14 @@ export class MerchantScene extends Phaser.Scene {
   }
 
   /**
-   * @param {{
-   *   stageId?: string,
-   *   marketResult?: object,
-   *   serviceResult?: object,
-   *   isMarketFailed?: boolean,
-   *   isEndless?: boolean,
-   *   endlessReturnData?: object|null
-   * }} data
+   * 씬 초기화. ResultScene 또는 EndlessScene에서 전달받은 데이터를 저장한다.
+   * @param {object} data
+   * @param {string}  [data.stageId='1-1'] - ���테이지 ID
+   * @param {object}  [data.marketResult] - 장보기 결과
+   * @param {object}  [data.serviceResult] - 영업 결과
+   * @param {boolean} [data.isMarketFailed=false] - 장보기 실패 여부
+   * @param {boolean} [data.isEndless=false] - 엔드리스 모드 여부
+   * @param {object|null} [data.endlessReturnData=null] - 엔드리스 복귀 데��터
    */
   init(data) {
     this.stageId = data.stageId || '1-1';
@@ -65,6 +65,9 @@ export class MerchantScene extends Phaser.Scene {
     this.endlessReturnData = data.endlessReturnData || null;
   }
 
+  /**
+   * 씬 생성. 배경, 헤더, 도구 목록, 요약 바, 출발 버튼을 구성한다.
+   */
   create() {
     // ── 페이드인 ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
@@ -101,7 +104,10 @@ export class MerchantScene extends Phaser.Scene {
     this._updateGoldText();
   }
 
-  /** @private */
+  /**
+   * 보유 골드 텍스트를 갱신한다.
+   * @private
+   */
   _updateGoldText() {
     const gold = ToolManager.getGold();
     this.goldText.setText(`\uD83D\uDCB0 \uBCF4\uC720 \uACE8\uB4DC: ${gold}g`);

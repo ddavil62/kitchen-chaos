@@ -17,10 +17,8 @@ Phaser.GameObjects.GameObjectFactory.prototype.text = function (x, y, text, styl
 
 import { BootScene } from './scenes/BootScene.js';
 import { MenuScene } from './scenes/MenuScene.js';
-import { StageSelectScene } from './scenes/StageSelectScene.js';
 import { WorldMapScene } from './scenes/WorldMapScene.js';
 import { ChefSelectScene } from './scenes/ChefSelectScene.js';
-import { MarketScene } from './scenes/MarketScene.js';
 import { GatheringScene } from './scenes/GatheringScene.js';
 import { EndlessScene } from './scenes/EndlessScene.js';
 import { ServiceScene } from './scenes/ServiceScene.js';
@@ -45,7 +43,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, StageSelectScene, WorldMapScene, ChefSelectScene, MarketScene, GatheringScene, EndlessScene, ServiceScene, ResultScene, MerchantScene, ShopScene, RecipeCollectionScene, DialogueScene],
+  scene: [BootScene, MenuScene, WorldMapScene, ChefSelectScene, GatheringScene, EndlessScene, ServiceScene, ResultScene, MerchantScene, ShopScene, RecipeCollectionScene, DialogueScene],
   input: {
     activePointers: 1,
   },

@@ -81,10 +81,8 @@ kitchen-chaos/
       BootScene.js           # 에셋 로드
       MenuScene.js           # 메인 메뉴 (캠페인/엔드리스/상점/도감)
       WorldMapScene.js       # 월드맵 (6챕터 노드맵 + 스테이지 패널)
-      StageSelectScene.js    # 스테이지 선택 (레거시, WorldMapScene으로 교체됨)
       ChefSelectScene.js     # 셰프 선택 (캠페인/엔드리스 분기)
       GatheringScene.js      # 재료 채집 페이즈 (TD, 도구 배치/회수/재배치)
-      MarketScene.js         # TD 페이즈 (레거시, GatheringScene으로 교체됨)
       EndlessScene.js        # 엔드리스 TD 페이즈 (GatheringScene 상속)
       ServiceScene.js        # 영업 페이즈 (타이쿤, 골드→영구 저장)
       ResultScene.js         # 결과 화면 (캠페인/엔드리스 분기)
@@ -184,12 +182,11 @@ kitchen-chaos/
 - 온라인 랭킹 미구현 (엔드리스는 로컬 기록만)
 - 엔드리스 ServiceScene은 1장(stageId='1-1') 기준 config 사용
 - WorldMapScene HUD 레시피 수집률 텍스트가 3자리 수("100/106")일 때 우측 끝 미세 클리핑 (LOW)
-- StageSelectScene.js, MarketScene.js는 레거시로 유지 중 (각각 WorldMapScene, GatheringScene으로 교체됨)
-- config.js의 STARTING_GOLD, WAVE_CLEAR_BONUS는 하위 호환용으로 유지 (GatheringScene/EndlessScene에서 미사용)
 - Tower 엔티티의 hitArea가 Container 기반 Circle(0,0,20)로 설정되어 타워 바디 위치와 미세 불일치 가능 (LOW)
 
 ## 향후 계획
 
-- Phase 16 완료 (튜토리얼/이벤트 대화 연동, 선택지 분기 UI, 스크립트 32종 + 트리거 30항목). 시즌 1 대화 시스템 완성.
-- 시즌별 장기 확장 (80~100시간): 시즌1(현재 1~6장) → 시즌2(국제) → 시즌3(극한 환경).
+- Phase 18 완료. 시즌 1 콘텐츠 + 밸런스 + 레거시 정리 모두 완성.
+- 다음: Phase 19 (시즌 2 기반 인프라 — 월드맵 12챕터 확장, 셰프 2종, 도구 2종).
+- 시즌별 장기 확장 (80~100시간): 시즌1(현재 1~6장, 완료) → 시즌2(국제, Phase 19~26) → 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조

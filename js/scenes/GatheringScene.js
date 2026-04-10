@@ -41,7 +41,10 @@ export class GatheringScene extends Phaser.Scene {
     super({ key: 'GatheringScene' });
   }
 
-  /** @param {{ stageId?: string }} data */
+  /**
+   * 씬 생성. 맵, HUD, 도구 바, 매니저 초기화 및 이벤트 등록.
+   * @param {{ stageId?: string }} data - 스테이지 ID를 포함하는 데이터 객체
+   */
   create(data) {
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_battle');
@@ -165,6 +168,11 @@ export class GatheringScene extends Phaser.Scene {
 
   // ── 아이소메트릭 맵 그리기 ─────────────────────────────────────
 
+  /**
+   * 아이소메트릭 다이아몬드 그리드를 렌더링한다.
+   * 경로 셀은 갈색, 비경로 셀은 초록색으로 표시.
+   * @private
+   */
   _drawMap() {
     const gfx = this.add.graphics();
     gfx.setDepth(0);
@@ -201,6 +209,10 @@ export class GatheringScene extends Phaser.Scene {
 
   // ── HUD (상단 40px) ─────────────────────────────────────────────
 
+  /**
+   * 상단 HUD (도구 수량, 웨이브, 생명, 콤보) 생성.
+   * @private
+   */
   _createHUD() {
     const hudBg = this.add.rectangle(GAME_WIDTH / 2, HUD_HEIGHT / 2, GAME_WIDTH, HUD_HEIGHT, 0x1a1a2e);
     hudBg.setDepth(100);
@@ -366,13 +378,21 @@ export class GatheringScene extends Phaser.Scene {
   // ── 도구 선택 바 (480~540px) ──────────────────────────────────
   // 탭 영역(16px) + 버튼 영역(34px) = 50px + 버프 탭 추가
 
+  /**
+   * 도구 선택 바 (480~540px 영역) 전체를 생성한다.
+   * 배경, 카테고리 탭, 도구 버튼을 순차 렌더링.
+   * @private
+   */
   _createTowerBar() {
     this._renderTowerBarBackground();
     this._renderTowerTabs();
     this._renderTowerButtons();
   }
 
-  /** 도구 바 배경 (1회 호출) */
+  /**
+   * 도구 바 배경 렌더링 (1회 호출).
+   * @private
+   */
   _renderTowerBarBackground() {
     this.add.rectangle(
       GAME_WIDTH / 2, TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2,
@@ -380,7 +400,10 @@ export class GatheringScene extends Phaser.Scene {
     ).setDepth(100);
   }
 
-  /** 카테고리 탭 생성 (1회 호출) */
+  /**
+   * 공격/지원/버프 카테고리 탭 버튼 생성 (1회 호출).
+   * @private
+   */
   _renderTowerTabs() {
     const categories = [
       { id: 'attack', label: '공격' },
@@ -411,7 +434,10 @@ export class GatheringScene extends Phaser.Scene {
     });
   }
 
-  /** 탭 활성화 색상 갱신 */
+  /**
+   * 카테고리 탭 활성화 색상 갱신.
+   * @private
+   */
   _updateTabHighlight() {
     this._towerTabObjects.forEach(tab => {
       tab.bg.setFillStyle(
@@ -582,6 +608,10 @@ export class GatheringScene extends Phaser.Scene {
     });
   }
 
+  /**
+   * 도구 바 버튼의 선택 상태 하이라이트를 갱신한다.
+   * @private
+   */
   _updateTowerBarSelection() {
     this._towerBarButtons.forEach(btn => {
       const inventory = ToolManager.getToolInventory();
@@ -651,6 +681,10 @@ export class GatheringScene extends Phaser.Scene {
 
   // ── 입력 처리 (아이소메트릭 히트박스) ───────────────────────────
 
+  /**
+   * 아이소메트릭 히트박스 기반 입력 핸들러 설정.
+   * @private
+   */
   _setupInput() {
     // 맵 영역 전체를 덮는 투명 히트 영역
     const hitArea = this.add.rectangle(
@@ -934,6 +968,11 @@ export class GatheringScene extends Phaser.Scene {
 
   // ── 이벤트 핸들러 (씬 내부) ────────────────────────────────────
 
+  /**
+   * ��이브 시작 이벤트 핸들러. HUD 갱신, SFX/VFX 재생, 보스 BGM 전환.
+   * @param {number} waveNum - 1-based 웨이브 번호
+   * @private
+   */
   _onWaveStarted(waveNum) {
     this.waveText.setText(`\uC6E8\uC774\uBE0C ${waveNum}/${this.waveManager.totalWaves}`);
     this.waitingForNextWave = false;
@@ -975,6 +1014,11 @@ export class GatheringScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * 적 사망 이벤트 핸들러. 점수 증가, 오더 진행, VFX 재생.
+   * @param {Enemy} enemy - 사망한 적 인스턴스
+   * @private
+   */
   _onEnemyDied(enemy) {
     this.score++;
     this.orderManager.addProgress('kill_count');
@@ -988,6 +1032,11 @@ export class GatheringScene extends Phaser.Scene {
     this._checkWaveProgress();
   }
 
+  /**
+   * 적이 기지에 도달했을 때의 이벤트 핸들러. 생명 감소, 게임오버 체크.
+   * @param {Enemy} enemy - 도달한 적 인스턴스
+   * @private
+   */
   _onEnemyReachedBase(enemy) {
     this.lives--;
     this._updateHUD();
@@ -1230,6 +1279,11 @@ export class GatheringScene extends Phaser.Scene {
 
   // ── 배달 도구 자동 수거 ────────────────────────────────────────
 
+  /**
+   * 배달 도구의 자동 수거 로직 업데이트.
+   * @param {number} delta - 프레임 경과 시간 (ms)
+   * @private
+   */
   _updateDeliveryTowers(delta) {
     this.towers.getChildren().forEach(tower => {
       if (!tower.active || tower.data_?.id !== 'delivery') return;
@@ -1296,6 +1350,10 @@ export class GatheringScene extends Phaser.Scene {
 
   // ── 게임 종료 ───────────────────────────────────────────────────
 
+  /**
+   * 게임오버 처리. 패배 연출 후 ResultScene으로 전환 (영업 건너뜀).
+   * @private
+   */
   _triggerGameOver() {
     if (this.isGameOver) return;
     this.isGameOver = true;
@@ -1319,7 +1377,8 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
-   * 승리 처리. 골드 전달 제거.
+   * 승리 처리. 인벤토리 요약 표시 후 ServiceScene으로 전환.
+   * @private
    */
   _triggerVictory() {
     if (this.isVictory) return;
@@ -1358,7 +1417,10 @@ export class GatheringScene extends Phaser.Scene {
 
   // ── 웨이브 시작 버튼 (590~640px 웨이브 컨트롤 영역) ────────────
 
-  /** 웨이브 컨트롤 영역에 웨이브 시작 버튼 생성 */
+  /**
+   * 웨이브 컨트롤 영역 (590~640px)에 웨이브 시작 버튼을 생성한다.
+   * @private
+   */
   _createWaveButton() {
     const cx = GAME_WIDTH / 2;
     const cy = WAVE_CONTROL_Y + WAVE_CONTROL_HEIGHT / 2;

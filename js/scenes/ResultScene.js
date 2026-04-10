@@ -190,8 +190,8 @@ export class ResultScene extends Phaser.Scene {
     });
     y += 70;
 
-    this._createButton(y, '스테이지 선택', 0x444444, () => {
-      this._fadeToScene('StageSelectScene');
+    this._createButton(y, '월드맵으로', 0x444444, () => {
+      this._fadeToScene('WorldMapScene');
     });
 
     // ── 대화 트리거: 첫 실패 격려 (Phase 14-3: StoryManager 중앙화) ──
@@ -381,8 +381,8 @@ export class ResultScene extends Phaser.Scene {
     });
     y += 60;
 
-    this._createButton(y, '\uC2A4\uD14C\uC774\uC9C0 \uC120\uD0DD', 0x444444, () => {
-      this._fadeToScene('StageSelectScene');
+    this._createButton(y, '\uC6D4\uB4DC\uB9F5\uC73C\uB85C', 0x444444, () => {
+      this._fadeToScene('WorldMapScene');
     });
 
     // ── 대화 트리거 (Phase 14-3: StoryManager 중앙화) ──

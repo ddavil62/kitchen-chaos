@@ -79,8 +79,12 @@ export class DialogueScene extends Phaser.Scene {
     this._choiceButtons = [];
   }
 
+  /**
+   * 씬 생성. 딤 오버레이, 대화 패널, 초상화, 텍스트, 건너뛰기 버튼을 구성하고
+   * 첫 번째 대사를 표시한다.
+   */
   create() {
-    // ── 딤 오버레이 (배경 씬 input 블로킹) ──
+    // ── ��� 오버레이 (배경 �� input 블로킹) ──
     this._dimOverlay = this.add.rectangle(
       GAME_WIDTH / 2, GAME_HEIGHT / 2,
       GAME_WIDTH, GAME_HEIGHT,

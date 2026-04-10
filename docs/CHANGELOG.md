@@ -1,5 +1,73 @@
 # Changelog
 
+## [2026-04-10] - Phase 18 레거시 정리 + 기술 부채
+
+### 삭제
+
+- **레거시 씬 4개** (`js/scenes/`)
+  - `StageSelectScene.js` — WorldMapScene으로 대체됨 (Phase 11)
+  - `MarketScene.js` — GatheringScene으로 대체됨 (Phase 13)
+  - `GameScene.js` — Phase 7 레거시, main.js 미등록
+  - `GameOverScene.js` — Phase 7 레거시, ResultScene으로 대체됨
+
+- **config.js 미사용 상수 3개** (`js/config.js`)
+  - `STARTING_GOLD = 120` (레거시 씬에서만 사용)
+  - `WAVE_CLEAR_BONUS = 25` (레거시 씬에서만 사용)
+  - `INGREDIENT_SELL_PRICE = 10` (어떤 파일에서도 import되지 않음)
+  - 관련 하위 호환 주석 2줄 제거
+
+### 변경
+
+- **main.js** (`js/main.js`)
+  - StageSelectScene, MarketScene import 2줄 제거
+  - scene 배열에서 StageSelectScene, MarketScene 2항목 제거
+
+- **ResultScene.js** (`js/scenes/ResultScene.js`)
+  - `_fadeToScene('StageSelectScene')` 2곳 -> `_fadeToScene('WorldMapScene')`
+  - 버튼 레이블 "스테이지 선택" -> "월드맵으로"
+
+- **config.js** (`js/config.js`)
+  - @fileoverview: "Phase 7: MarketScene 풀스크린 레이아웃" -> "화면 크기, 게임 씬 레이아웃, ..." 현행화
+  - 레이아웃 섹션 주석: "MarketScene 레이아웃 (Phase 7)" -> "게임 씬 레이아웃 (GatheringScene / EndlessScene)"
+  - RestaurantScene 주석: "Phase 7-2에서 제거 예정" -> "KitchenPanelUI, CustomerZoneUI 사용" 현행화
+  - STARTING_LIVES, FRESHNESS_WINDOW_MS는 활성 코드 사용 중이므로 유지
+
+- **worldmap-qa.spec.js** (`tests/worldmap-qa.spec.js`)
+  - "회귀 테스트" 섹션(StageSelectScene 검증 2건) 전체 삭제
+  - test 이름에서 "(StageSelectScene 진입 안됨)" 괄호 내용 제거
+  - stageSelectActive 관련 코드(assertion + evaluate) 삭제
+
+- **endless-mode-qa.spec.js** (`tests/endless-mode-qa.spec.js`)
+  - 캠페인 모드 회귀 테스트: `game.scene.start('StageSelectScene')` -> `'WorldMapScene'` 교체
+
+- **docs/PROJECT.md**
+  - 디렉토리 구조에서 레거시 씬 항목 삭제
+  - "알려진 제약사항"에서 삭제된 파일/상수 관련 오래된 2줄 제거
+
+### 추가
+
+- **JSDoc 보강** — 7개 파일의 public/private 메서드에 JSDoc 추가
+  - `js/scenes/GatheringScene.js`: create, _drawMap, _buildTowerBar, _buildIngredientBar, _buildWaveControl, _spawnEnemy, _onEnemyReachEnd, _onWaveClear, _deployTool, _relocateTool, _cancelRelocation, _transitionToService, _transitionToResult
+  - `js/scenes/MerchantScene.js`: init, create, _buildToolList, _buildToolItem, _onBuy, _onSell, _onUpgrade, _updateGoldDisplay, _updateToolDisplay, _buildSummaryBar, _fadeToScene
+  - `js/scenes/WorldMapScene.js`: create, _buildChapterNode, _buildConnections, _buildStagePanel, _onNodeTap, _closePanel, _buildEndlessSection
+  - `js/managers/ToolManager.js`: buyTool, sellTool, upgradeTool, getToolStats, hasAnyTool, _defaultTools
+  - `js/managers/StoryManager.js`: checkTriggers, advanceChapter, getProgress, setFlag, hasFlag
+  - `js/managers/DialogueManager.js`: start, hasSeen, markSeen
+  - `js/scenes/DialogueScene.js`: init, create, _startDialogue, _showLine, _typeText, _onTap, _showChoices, _onChoiceSelect
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-10-kitchen-chaos-phase18-spec.md`
+- 리포트: `.claude/specs/2026-04-10-kitchen-chaos-phase18-report.md`
+- QA: `.claude/specs/2026-04-10-kitchen-chaos-phase18-qa.md`
+- 목적 정의서: `.claude/specs/2026-04-10-kitchen-chaos-phase18-scope.md`
+- visual_change: none
+- Vite 빌드 성공 (51 모듈, 18.38초), 삭제된 씬 키에 대한 잔존 참조 0건
+- RestaurantScene 레이아웃 상수(RESTAURANT_Y 등)는 KitchenPanelUI, CustomerZoneUI에서 활성 사용 중이므로 유지
+- 잔여 LOW 이슈: SaveManager.js:29, gameData.js:90 주석에 MarketScene 참조 잔존 (런타임 영향 없음)
+
+---
+
 ## [2026-04-10] - Phase 16 인게임 대화 통합
 
 ### 추가
