@@ -8,12 +8,13 @@
  * Phase 10-6: v6 마이그레이션 — soundSettings 추가.
  * Phase 11-1: v7 마이그레이션 — endless 엔드리스 기록 추가.
  * Phase 11-3a: v8 마이그레이션 — tutorialBattle/Service/Shop/Endless 4개 플래그로 분리.
+ * Phase 13-1: v9 마이그레이션 — 영구 도구 시스템 (gold, tools, tutorialMerchant).
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 8;
+const SAVE_VERSION = 9;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -60,6 +61,17 @@ function createDefault() {
       sfxVolume: 0.8,             // SFX 볼륨 (0.0~1.0)
       muted: false,               // 전체 음소거 여부
     },
+    // ── Phase 13 추가 ──
+    gold: 0,               // 영구 골드 (영업에서 누적)
+    tools: {
+      pan:      { count: 2, level: 1 },  // 스타터 키트: 프라이팬 2개
+      salt:     { count: 0, level: 1 },
+      grill:    { count: 0, level: 1 },
+      delivery: { count: 0, level: 1 },
+      freezer:  { count: 0, level: 1 },
+      soup_pot: { count: 0, level: 1 },
+    },
+    tutorialMerchant: false,  // 행상인 튜토리얼 완료 여부
     // ── Phase 11-1 추가 ──
     endless: {
       unlocked: false,            // 6-3 클리어 시 true
@@ -353,6 +365,26 @@ export class SaveManager {
     SaveManager.save(data);
   }
 
+  // ── 영구 골드 (Phase 13) ──
+
+  /**
+   * 영구 골드 잔액 조회.
+   * @returns {number}
+   */
+  static getGold() {
+    return SaveManager.load().gold || 0;
+  }
+
+  /**
+   * 영구 골드 설정 (직접 덮어쓰기).
+   * @param {number} amount
+   */
+  static setGold(amount) {
+    const data = SaveManager.load();
+    data.gold = amount;
+    SaveManager.save(data);
+  }
+
   // ── 엔드리스 모드 (Phase 11-1) ──
 
   /**
@@ -590,6 +622,21 @@ export class SaveManager {
       data.tutorialEndless = data.tutorialEndless || false;
       // 구 플래그 제거하지 않음 (하위 호환 유지)
       data.version = 8;
+    }
+
+    // v8 → v9: 영구 도구 시스템 + 골드 추가
+    if (data.version < 9) {
+      data.gold = 0;
+      data.tools = {
+        pan:      { count: 2, level: 1 },  // 스타터 키트
+        salt:     { count: 0, level: 1 },
+        grill:    { count: 0, level: 1 },
+        delivery: { count: 0, level: 1 },
+        freezer:  { count: 0, level: 1 },
+        soup_pot: { count: 0, level: 1 },
+      };
+      data.tutorialMerchant = false;
+      data.version = 9;
     }
 
     return data;

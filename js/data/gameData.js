@@ -343,6 +343,106 @@ export const TOWER_TYPES = {
   },
 };
 
+// ── 도구 정의 (Phase 13: 영구 도구 시스템) ──
+export const TOOL_DEFS = {
+  pan: {
+    id: 'pan',
+    nameKo: '프라이팬',
+    maxCount: 5,
+    buyCost: [80, 120, 180, 250, 350],
+    sellRate: 0.5,
+    maxLevel: 3,
+    upgradeCost: [0, 150, 400],
+    stats: {
+      1: { damage: 25, range: 100, fireRate: 1000, projectileSpeed: 200 },
+      2: { damage: 35, range: 110, fireRate: 900, projectileSpeed: 200 },
+      3: { damage: 50, range: 120, fireRate: 800, projectileSpeed: 200 },
+    },
+    color: 0xc0c0c0,
+    category: 'attack',
+  },
+  salt: {
+    id: 'salt',
+    nameKo: '소금 분사기',
+    maxCount: 4,
+    buyCost: [120, 180, 260, 360],
+    sellRate: 0.5,
+    maxLevel: 3,
+    upgradeCost: [0, 200, 500],
+    stats: {
+      1: { damage: 12, range: 120, fireRate: 600, projectileSpeed: 180, slowFactor: 0.5, slowDuration: 2000 },
+      2: { damage: 16, range: 130, fireRate: 550, projectileSpeed: 180, slowFactor: 0.55, slowDuration: 2500 },
+      3: { damage: 22, range: 140, fireRate: 500, projectileSpeed: 180, slowFactor: 0.60, slowDuration: 3000 },
+    },
+    color: 0x87ceeb,
+    category: 'attack',
+  },
+  grill: {
+    id: 'grill',
+    nameKo: '화염 그릴',
+    maxCount: 3,
+    buyCost: [200, 300, 450],
+    sellRate: 0.5,
+    maxLevel: 3,
+    upgradeCost: [0, 300, 700],
+    stats: {
+      1: { damage: 18, range: 90, fireRate: 800, projectileSpeed: 220, burnDamage: 5, burnDuration: 3000, burnInterval: 500 },
+      2: { damage: 25, range: 100, fireRate: 750, projectileSpeed: 220, burnDamage: 8, burnDuration: 3500, burnInterval: 500 },
+      3: { damage: 35, range: 110, fireRate: 700, projectileSpeed: 220, burnDamage: 12, burnDuration: 4000, burnInterval: 500 },
+    },
+    color: 0xff4500,
+    category: 'attack',
+  },
+  delivery: {
+    id: 'delivery',
+    nameKo: '배달 로봇',
+    maxCount: 3,
+    buyCost: [100, 160, 240],
+    sellRate: 0.5,
+    maxLevel: 3,
+    upgradeCost: [0, 180, 450],
+    stats: {
+      1: { damage: 0, range: 110, fireRate: 0, projectileSpeed: 0, collectRadius: 110, collectInterval: 2000 },
+      2: { damage: 0, range: 130, fireRate: 0, projectileSpeed: 0, collectRadius: 130, collectInterval: 1700 },
+      3: { damage: 0, range: 150, fireRate: 0, projectileSpeed: 0, collectRadius: 150, collectInterval: 1400 },
+    },
+    color: 0x00cc88,
+    category: 'support',
+  },
+  freezer: {
+    id: 'freezer',
+    nameKo: '냉동고',
+    maxCount: 3,
+    buyCost: [160, 240, 360],
+    sellRate: 0.5,
+    maxLevel: 3,
+    upgradeCost: [0, 250, 600],
+    stats: {
+      1: { damage: 8, range: 100, fireRate: 1500, projectileSpeed: 160, freezeDuration: 1500, canTargetInvisible: true },
+      2: { damage: 12, range: 110, fireRate: 1300, projectileSpeed: 160, freezeDuration: 2000, canTargetInvisible: true },
+      3: { damage: 18, range: 120, fireRate: 1100, projectileSpeed: 160, freezeDuration: 2500, canTargetInvisible: true },
+    },
+    color: 0x00bfff,
+    category: 'attack',
+  },
+  soup_pot: {
+    id: 'soup_pot',
+    nameKo: '수프 솥',
+    maxCount: 3,
+    buyCost: [140, 220, 330],
+    sellRate: 0.5,
+    maxLevel: 3,
+    upgradeCost: [0, 200, 500],
+    stats: {
+      1: { damage: 0, range: 120, fireRate: 0, projectileSpeed: 0, auraInterval: 3000, auraEffect: 0.15 },
+      2: { damage: 0, range: 130, fireRate: 0, projectileSpeed: 0, auraInterval: 2500, auraEffect: 0.20 },
+      3: { damage: 0, range: 140, fireRate: 0, projectileSpeed: 0, auraInterval: 2000, auraEffect: 0.25 },
+    },
+    color: 0x32cd32,
+    category: 'support',
+  },
+};
+
 // ── 재료 타입 정의 ──
 export const INGREDIENT_TYPES = {
   carrot: {
