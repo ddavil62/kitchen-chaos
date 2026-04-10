@@ -5,7 +5,7 @@
  *
  * 화면 구성 (360x640):
  *   0~60     타이틀 + 보유 골드
- *   60~530   도구 목록 (6종, 스크롤 가능)
+ *   60~530   도구 목록 (8종, 스크롤 가능)
  *   530~570  도구 요약 바
  *   570~630  출발하기 버튼
  */
@@ -36,10 +36,13 @@ const TOOL_ICONS = {
   delivery: '\uD83E\uDD16',  // 로봇
   freezer: '\u2744\uFE0F',   // 냉동
   soup_pot: '\uD83C\uDF72',  // 수프
+  // ── Phase 19-1: 시즌 2 도구 ──
+  wasabi_cannon: '\uD83D\uDFE2',   // 와사비 대포 (녹색 원)
+  spice_grinder: '\uD83D\uDFE0',   // 향신료 그라인더 (주황 원)
 };
 
 /** 도구 표시 순서 */
-const TOOL_ORDER = ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'];
+const TOOL_ORDER = ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'];
 
 export class MerchantScene extends Phaser.Scene {
   constructor() {
@@ -353,6 +356,17 @@ export class MerchantScene extends Phaser.Scene {
       }
       if (curStats.auraEffect !== undefined && nextStats.auraEffect !== undefined && curStats.auraEffect !== nextStats.auraEffect) {
         previewParts.push(`\uBC84\uD504 ${Math.round(curStats.auraEffect * 100)}%\u2192${Math.round(nextStats.auraEffect * 100)}%`);
+      }
+      // Phase 19-1: 와사비 대포 범위 공격 스탯
+      if (curStats.splashRadius !== undefined && nextStats.splashRadius !== undefined && curStats.splashRadius !== nextStats.splashRadius) {
+        previewParts.push(`\uBC94\uC704 ${curStats.splashRadius}\u2192${nextStats.splashRadius}`);
+      }
+      if (curStats.slowRate !== undefined && nextStats.slowRate !== undefined && curStats.slowRate !== nextStats.slowRate) {
+        previewParts.push(`\uB454\uD654 ${Math.round(curStats.slowRate * 100)}%\u2192${Math.round(nextStats.slowRate * 100)}%`);
+      }
+      // Phase 19-1: 향신료 그라인더 DoT 스탯
+      if (curStats.dotDamage !== undefined && nextStats.dotDamage !== undefined && curStats.dotDamage !== nextStats.dotDamage) {
+        previewParts.push(`DoT ${curStats.dotDamage}\u2192${nextStats.dotDamage}`);
       }
 
       if (previewParts.length > 0) {

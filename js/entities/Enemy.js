@@ -53,6 +53,12 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.isFrozen = false;
     this.freezeTimer = 0;
 
+    // ── DoT 스택 (Phase 19-1: spice_grinder) ──
+    /** @type {Array<{damage: number, remaining: number, interval: number, timer: number}>} */
+    this._dotStacks = [];
+    /** DoT 스택 최대 개수 */
+    this._maxDotStacks = 3;
+
     // ── 투명 (밀가루 유령) ──
     this.isInvisible = !!enemyData.invisible;
     this.visibleTimer = 0;  // 피격 시 2초간 보임
@@ -248,6 +254,28 @@ export class Enemy extends Phaser.GameObjects.Container {
       if (this.burnTimer <= 0) this.isBurning = false;
     }
 
+    // ── DoT 스택 처리 (Phase 19-1: spice_grinder) ──
+    if (this._dotStacks.length > 0) {
+      for (let i = this._dotStacks.length - 1; i >= 0; i--) {
+        const dot = this._dotStacks[i];
+        dot.remaining -= delta;
+        dot.timer -= delta;
+        if (dot.timer <= 0) {
+          this.takeDamage(dot.damage);
+          dot.timer = dot.interval;
+        }
+        if (dot.remaining <= 0) {
+          this._dotStacks.splice(i, 1);
+        }
+      }
+      // DoT 활성 중이면 주황 틴트, 종료 시 원복
+      if (this._dotStacks.length > 0) {
+        if (!this.isFrozen && !this._enraged) this.setTint(0xff8c00);
+      } else {
+        if (!this.isFrozen && !this._enraged) this.clearTint();
+      }
+    }
+
     // ── 재생 (치즈 골렘) ──
     if (this.regenRate > 0 && this.hp < this.maxHp) {
       this.hp = Math.min(this.maxHp, this.hp + this.regenRate * (delta / 1000));
@@ -417,6 +445,23 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.burnTimer = duration;
     this.burnInterval = interval;
     this.burnIntervalTimer = interval;
+  }
+
+  /**
+   * DoT(지속 피해) 적용 (Phase 19-1: spice_grinder).
+   * 독립 스택으로 관리되며 최대 3스택까지 중첩 가능.
+   * @param {number} damage - 틱당 피해량
+   * @param {number} duration - 총 지속 시간 (ms)
+   * @param {number} [interval=500] - 틱 간격 (ms)
+   */
+  applyDot(damage, duration, interval = 500) {
+    if (this._dotStacks.length >= this._maxDotStacks) return;
+    this._dotStacks.push({
+      damage,
+      remaining: duration,
+      interval,
+      timer: interval,  // 첫 틱은 interval 후에 발동
+    });
   }
 
   /** @private */

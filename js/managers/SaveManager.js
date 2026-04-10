@@ -11,12 +11,13 @@
  * Phase 13-1: v9 마이그레이션 — 영구 도구 시스템 (gold, tools, tutorialMerchant).
  * Phase 14-1: v10 마이그레이션 — 대화 시스템 seenDialogues 추가.
  * Phase 14-3: v11 마이그레이션 — storyProgress (챕터 진행도, 스토리 플래그) 추가.
+ * Phase 19-1: v12 마이그레이션 — 신규 도구 2종(wasabi_cannon, spice_grinder) + season2Unlocked 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 11;
+const SAVE_VERSION = 12;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -72,8 +73,13 @@ function createDefault() {
       delivery: { count: 0, level: 1 },
       freezer:  { count: 0, level: 1 },
       soup_pot: { count: 0, level: 1 },
+      // ── Phase 19-1 추가 ──
+      wasabi_cannon: { count: 0, level: 1 },
+      spice_grinder: { count: 0, level: 1 },
     },
     tutorialMerchant: false,  // 행상인 튜토리얼 완료 여부
+    // ── Phase 19-1 추가 ──
+    season2Unlocked: false,   // 시즌 2 해금 여부
     // ── Phase 14-1 추가 ──
     seenDialogues: [],        // 시청 완료한 대화 스크립트 ID 목록
     // ── Phase 14-3 추가 ──
@@ -692,6 +698,16 @@ export class SaveManager {
         storyFlags: [],
       };
       data.version = 11;
+    }
+
+    // v11 → v12: 신규 도구 2종 + 시즌 2 해금 플래그 추가
+    if (data.version < 12) {
+      if (data.tools) {
+        if (!data.tools.wasabi_cannon) data.tools.wasabi_cannon = { count: 0, level: 1 };
+        if (!data.tools.spice_grinder) data.tools.spice_grinder = { count: 0, level: 1 };
+      }
+      if (data.season2Unlocked === undefined) data.season2Unlocked = false;
+      data.version = 12;
     }
 
     return data;

@@ -2,6 +2,7 @@
  * @fileoverview 셰프 캐릭터 데이터 정의.
  * Phase 6: 3종 셰프, 패시브 + 액티브 스킬.
  * Phase 8-6: 영업 액티브 스킬 (serviceSkill) 추가.
+ * Phase 19-1: 시즌 2 셰프 2종 (유키, 라오) 데이터 추가.
  */
 
 export const CHEF_TYPES = {
@@ -69,6 +70,34 @@ export const CHEF_TYPES = {
       cooldown: 150000,  // 150초
     },
   },
+  // ── Phase 19-1: 시즌 2 셰프 ──
+  yuki_chef: {
+    id: 'yuki_chef',
+    nameKo: '유키',
+    icon: '❄️',
+    color: 0x87ceeb,
+    passiveDesc: '조리시간 -20%, ★★★+ 레시피 보상 +15%',
+    skillName: '정밀 절단',
+    skillDesc: '다음 5개 요리 조리시간 0',
+    skillCooldown: 90000,
+    serviceSkill: {
+      type: 'precision_cut',
+      count: 5,
+    },
+  },
+  lao_chef: {
+    id: 'lao_chef',
+    nameKo: '라오',
+    icon: '🐉',
+    color: 0xff4500,
+    passiveDesc: '도구 공격력 +15%, 재료 드롭률 +10%',
+    skillName: '불꽃 웍',
+    skillDesc: '전 테이블 주문 즉시 완성',
+    skillCooldown: 120000,
+    serviceSkill: {
+      type: 'flame_wok',
+    },
+  },
 };
 
-export const CHEF_ORDER = ['petit_chef', 'flame_chef', 'ice_chef'];
+export const CHEF_ORDER = ['petit_chef', 'flame_chef', 'ice_chef', 'yuki_chef', 'lao_chef'];

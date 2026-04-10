@@ -447,6 +447,39 @@ export const TOOL_DEFS = {
     color: 0x32cd32,
     category: 'support',
   },
+  // ── Phase 19-1: 시즌 2 신규 도구 ──
+  wasabi_cannon: {
+    id: 'wasabi_cannon',
+    nameKo: '와사비 대포',
+    maxCount: 3,
+    buyCost: [180, 220, 260],
+    sellRate: 0.4,
+    maxLevel: 3,
+    upgradeCost: [0, 150, 250],
+    stats: {
+      1: { damage: 18, range: 110, fireRate: 1200, projectileSpeed: 200, splashRadius: 40, slowRate: 0.3, slowDuration: 1500 },
+      2: { damage: 24, range: 120, fireRate: 1050, projectileSpeed: 200, splashRadius: 48, slowRate: 0.3, slowDuration: 1800 },
+      3: { damage: 30, range: 130, fireRate: 900, projectileSpeed: 200, splashRadius: 55, slowRate: 0.35, slowDuration: 2000 },
+    },
+    color: 0x7cfc00,
+    category: 'attack',
+  },
+  spice_grinder: {
+    id: 'spice_grinder',
+    nameKo: '향신료 그라인더',
+    maxCount: 3,
+    buyCost: [160, 200, 240],
+    sellRate: 0.4,
+    maxLevel: 3,
+    upgradeCost: [0, 130, 220],
+    stats: {
+      1: { damage: 12, range: 100, fireRate: 1000, projectileSpeed: 180, dotDamage: 5, dotDuration: 2000 },
+      2: { damage: 17, range: 110, fireRate: 870, projectileSpeed: 180, dotDamage: 8, dotDuration: 2000 },
+      3: { damage: 22, range: 120, fireRate: 750, projectileSpeed: 180, dotDamage: 12, dotDuration: 2000 },
+    },
+    color: 0xff8c00,
+    category: 'attack',
+  },
 };
 
 // ── 재료 타입 정의 ──

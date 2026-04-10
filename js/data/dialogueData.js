@@ -5,6 +5,7 @@
  * Phase 14-2c: 신규 대화 스크립트 10개 추가.
  * Phase 15: 신규 대화 스크립트 13개 추가 (챕터 2~6 메인 시나리오 + 사이드).
  * Phase 16: 튜토리얼 연동 2종, 영업 이벤트 3종, 선택지 샘플 1종 추가.
+ * Phase 19-1: 시즌 2 캐릭터 2종(유키, 라오) CHARACTERS에 추가.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -514,4 +515,7 @@ export const CHARACTERS = {
   rin:  { id: 'rin',  nameKo: '린',   portrait: '\u{1F525}', portraitKey: 'rin',  color: 0xff4444, role: 'rival',      desc: '불꽃 요리사. 미미의 라이벌이자 나중에 동료.' },
   mage: { id: 'mage', nameKo: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', color: 0xcc88ff, role: 'researcher', desc: '디저트 전문 미력사. 식란의 원인을 학문적으로 추적.' },
   narrator: { id: 'narrator', nameKo: '', portrait: '', color: 0xcccccc, role: 'narrator', desc: '' },
+  // ── Phase 19-1: 시즌 2 캐릭터 ──
+  yuki: { id: 'yuki', nameKo: '유키', portrait: '❄️', portraitKey: 'yuki', color: 0x87ceeb, role: 'ally', desc: '일본 출신 미력사. 차분하고 정밀한 칼잡이.' },
+  lao: { id: 'lao', nameKo: '라오', portrait: '🐉', portraitKey: 'lao', color: 0xff4500, role: 'ally', desc: '중국 출신 미력사. 호쾌한 웍 마스터.' },
 };

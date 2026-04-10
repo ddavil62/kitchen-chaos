@@ -209,12 +209,15 @@ export class ToolManager {
    */
   static _defaultTools() {
     return {
-      pan:      { count: 2, level: 1 },
-      salt:     { count: 0, level: 1 },
-      grill:    { count: 0, level: 1 },
-      delivery: { count: 0, level: 1 },
-      freezer:  { count: 0, level: 1 },
-      soup_pot: { count: 0, level: 1 },
+      pan:            { count: 2, level: 1 },
+      salt:           { count: 0, level: 1 },
+      grill:          { count: 0, level: 1 },
+      delivery:       { count: 0, level: 1 },
+      freezer:        { count: 0, level: 1 },
+      soup_pot:       { count: 0, level: 1 },
+      // ── Phase 19-1: 시즌 2 도구 ──
+      wasabi_cannon:  { count: 0, level: 1 },
+      spice_grinder:  { count: 0, level: 1 },
     };
   }
 }

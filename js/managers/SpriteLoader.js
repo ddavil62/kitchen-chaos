@@ -31,11 +31,11 @@ const BOSS_IDS = [
   'master_patissier', 'cuisine_god',
 ];
 
-// ── 타워 ID 목록 (6종) ──
-const TOWER_IDS = ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot'];
+// ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
+const TOWER_IDS = ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'];
 
-// ── 셰프 ID 목록 (3종) ──
-const CHEF_IDS = ['petit_chef', 'flame_chef', 'ice_chef'];
+// ── 셰프 ID 목록 (5종, Phase 19-1: yuki_chef, lao_chef 추가) ──
+const CHEF_IDS = ['petit_chef', 'flame_chef', 'ice_chef', 'yuki_chef', 'lao_chef'];
 
 // ── 재료 파일 매핑 (게임 내 ID → 에셋 파일명) ──
 // gameData.js의 INGREDIENT_TYPES ID와 에셋 파일명이 다른 경우를 매핑한다.
@@ -94,8 +94,8 @@ const WALK_DIRS = ['south', 'south-east', 'east', 'north-east', 'north', 'north-
 /** 걷기 애니메이션 프레임 수 */
 const WALK_FRAME_COUNT = 6;
 
-// ── 초상화 ID 목록 (Phase 14-2b) ──
-const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage'];
+// ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가) ──
+const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao'];
 
 // ── 타일셋 ID 목록 (6종) ──
 const TILESET_IDS = [

@@ -124,6 +124,18 @@ export class Tower extends Phaser.GameObjects.Container {
     } else if (data.id === 'soup_pot') {
       const pot = this.scene.add.circle(0, 2, 12, 0x32cd32);
       this.add(pot);
+    } else if (data.id === 'wasabi_cannon') {
+      // 와사비 대포: 연두색 사각형 + 포구
+      const base = this.scene.add.rectangle(0, 2, 24, 18, 0x7cfc00);
+      const barrel = this.scene.add.rectangle(0, -10, 8, 10, 0x55aa00);
+      this.add(base);
+      this.add(barrel);
+    } else if (data.id === 'spice_grinder') {
+      // 향신료 그라인더: 주황색 원 + 절구
+      const mortar = this.scene.add.circle(0, 2, 12, 0xff8c00);
+      const pestle = this.scene.add.rectangle(0, -8, 4, 14, 0xcc6600);
+      this.add(mortar);
+      this.add(pestle);
     }
   }
 
