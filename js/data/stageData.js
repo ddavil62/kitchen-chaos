@@ -557,17 +557,17 @@ export const STAGES = {
         { type: 'chili_demon', count: 10, interval: 1000 },
         { type: 'rice_slime', count: 5, interval: 2200 },
       ]},
-      { wave: 8, enemies: [
+      { wave: 8, enemies: [ // Phase 17: cheese_golem 4→3, meat_ogre 10→8 (스파이크 완화)
         { type: 'flour_ghost', count: 12, interval: 1200 },
-        { type: 'meat_ogre', count: 10, interval: 1200 },
-        { type: 'cheese_golem', count: 4, interval: 2800 },
+        { type: 'meat_ogre', count: 8, interval: 1200 },
+        { type: 'cheese_golem', count: 3, interval: 2800 },
         { type: 'egg_sprite', count: 8, interval: 1200 },
         { type: 'rice_slime', count: 4, interval: 2500 },
       ]},
-      { wave: 9, enemies: [
-        { type: 'carrot_goblin', count: 25, interval: 400 },
+      { wave: 9, enemies: [ // Phase 17: cheese_golem 5→3, carrot_goblin 25→18 (53%→~30% 완화)
+        { type: 'carrot_goblin', count: 18, interval: 400 },
         { type: 'chili_demon', count: 12, interval: 900 },
-        { type: 'cheese_golem', count: 5, interval: 2500 },
+        { type: 'cheese_golem', count: 3, interval: 2500 },
         { type: 'flour_ghost', count: 8, interval: 1500 },
         { type: 'rice_slime', count: 4, interval: 2500 },
       ]},
@@ -891,24 +891,24 @@ export const STAGES = {
         { type: 'cheese_rat', count: 8, interval: 1200 },
         { type: 'rice_slime', count: 3, interval: 2800 },
       ]},
-      { wave: 7, enemies: [
-        { type: 'fish_knight', count: 8, interval: 1500 },
+      { wave: 7, enemies: [ // Phase 17: fish_knight 8→6 (난이도 스파이크 완화)
+        { type: 'fish_knight', count: 6, interval: 1500 },
         { type: 'cheese_rat', count: 10, interval: 1000 },
         { type: 'mushroom_scout', count: 6, interval: 1500 },
         { type: 'cheese_golem', count: 2, interval: 3500 },
       ]},
-      { wave: 8, enemies: [
-        { type: 'meat_ogre', count: 8, interval: 1500 },
-        { type: 'cheese_rat', count: 12, interval: 900 },
+      { wave: 8, enemies: [ // Phase 17: meat_ogre 8→6, cheese_rat 12→10
+        { type: 'meat_ogre', count: 6, interval: 1500 },
+        { type: 'cheese_rat', count: 10, interval: 900 },
         { type: 'mushroom_scout', count: 8, interval: 1200 },
         { type: 'egg_sprite', count: 6, interval: 1500 },
       ]},
-      { wave: 9, enemies: [
-        { type: 'carrot_goblin', count: 22, interval: 450 },
-        { type: 'fish_knight', count: 10, interval: 1200 },
+      { wave: 9, enemies: [ // Phase 17: 전체 감소 (66%→~45% 스파이크 완화)
+        { type: 'carrot_goblin', count: 16, interval: 450 },
+        { type: 'fish_knight', count: 8, interval: 1200 },
         { type: 'cheese_rat', count: 10, interval: 1000 },
         { type: 'mushroom_scout', count: 8, interval: 1200 },
-        { type: 'cheese_golem', count: 3, interval: 3000 },
+        { type: 'cheese_golem', count: 2, interval: 3000 },
       ]},
     ],
     customers: [
@@ -3833,7 +3833,7 @@ export const STAGES = {
       duration: 420,
       customerInterval: 1.6,
       maxCustomers: 60,
-      customerPatience: 20,
+      customerPatience: 22,  // Phase 17: 20→22 (6-1과 통일, T2 마진 확보)
     },
   },
 
@@ -4058,7 +4058,7 @@ export const STAGES = {
       duration: 480,
       customerInterval: 1.5,
       maxCustomers: 70,
-      customerPatience: 18,
+      customerPatience: 22,  // Phase 17: 18→22 (T3 2회 서빙 보장)
     },
   },
 };
