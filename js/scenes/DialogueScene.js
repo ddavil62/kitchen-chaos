@@ -40,10 +40,10 @@ const HINT_Y = 620;
 
 const TYPING_SPEED_MS = 30;
 
-// ── Phase 16-3: 선택지 레이아웃 상수 ──
-const CHOICE_BASE_Y = 565;
-const CHOICE_BTN_HEIGHT = 28;
-const CHOICE_BTN_GAP = 4;
+// ── Phase 16-3: 선택지 레이아웃 상수 (AD 검수 반영: 터치 타겟 36px, gap 8px) ──
+const CHOICE_BASE_Y = 568;
+const CHOICE_BTN_HEIGHT = 36;
+const CHOICE_BTN_GAP = 8;
 const CHOICE_BTN_WIDTH = 300;
 const CHOICE_BTN_COLOR = 0x3a2a00;
 const CHOICE_BTN_HOVER = 0x5a4a10;
@@ -304,10 +304,13 @@ export class DialogueScene extends Phaser.Scene {
    * @private
    */
   _renderChoices(choices) {
-    this._showingChoices = true;
     this._clearChoices();
+    this._showingChoices = true;
 
-    choices.forEach((choice, i) => {
+    // 패널 오버플로우 방지: 최대 2개 (AD 검수 반영)
+    const limited = choices.slice(0, 2);
+
+    limited.forEach((choice, i) => {
       const btnY = CHOICE_BASE_Y + i * (CHOICE_BTN_HEIGHT + CHOICE_BTN_GAP);
 
       // 버튼 배경
@@ -331,11 +334,14 @@ export class DialogueScene extends Phaser.Scene {
       bg.on('pointerover', () => bg.setFillStyle(CHOICE_BTN_HOVER));
       bg.on('pointerout', () => bg.setFillStyle(CHOICE_BTN_COLOR));
 
-      // 선택 시 분기 진행
+      // 선택 시: 터치 피드백 + 분기 진행 (AD 검수: pointerdown 피드백 추가)
       bg.on('pointerdown', () => {
-        this._clearChoices();
-        this._showingChoices = false;
-        this._showLine(choice.next);
+        bg.setFillStyle(0x7a6a20);
+        this.time.delayedCall(80, () => {
+          this._clearChoices();
+          this._showingChoices = false;
+          this._showLine(choice.next);
+        });
       });
 
       this._choiceButtons.push(bg, label);
