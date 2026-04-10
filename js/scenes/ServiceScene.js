@@ -1013,9 +1013,16 @@ export class ServiceScene extends Phaser.Scene {
     this._updateSkillButton();
 
     // 재료 소진 체크 — Phase 8-4: 세척 중인 슬롯도 "진행 중"으로 간주
-    if (this._isAllStockEmpty() && !this._hasCookingInProgress() && !this._hasReadyDish() && !this._hasWashingSlot()) {
-      this._endService('stock');
-      return;
+    // Phase 12: 재고는 남아있지만 만들 수 있는 레시피가 없는 경우도 조기종료
+    if (!this._hasCookingInProgress() && !this._hasReadyDish() && !this._hasWashingSlot()) {
+      if (this._isAllStockEmpty()) {
+        this._endService('stock');
+        return;
+      }
+      if (!this._canMakeAnyRecipe()) {
+        this._endService('no_recipe');
+        return;
+      }
     }
 
     // ── Phase 11-3a: 영업 튜토리얼 자동 진행 ──
@@ -1805,6 +1812,9 @@ export class ServiceScene extends Phaser.Scene {
       case 'stock':
         message = '\uC7AC\uB8CC \uC18C\uC9C4! \uC601\uC5C5 \uC885\uB8CC';
         break;
+      case 'no_recipe':
+        message = '만들 수 있는 음식이 없습니다!\n영업을 조기 종료합니다';
+        break;
       case 'satisfaction':
         message = '\uB808\uC2A4\uD1A0\uB791 \uD3D0\uC1C4!';
         isVictory = true; // 보상 50% 감소이지만 실패는 아님
@@ -2113,6 +2123,15 @@ export class ServiceScene extends Phaser.Scene {
    */
   _hasWashingSlot() {
     return this.cookingSlots.some(s => s.washing);
+  }
+
+  /**
+   * 현재 재고로 만들 수 있는 레시피가 하나라도 있는지 확인한다 (Phase 12).
+   * @returns {boolean}
+   * @private
+   */
+  _canMakeAnyRecipe() {
+    return this.availableRecipes.some(r => this.inventoryManager.hasEnough(r.ingredients));
   }
 
   /**
