@@ -125,14 +125,18 @@ export class DialogueScene extends Phaser.Scene {
       paused: true,
     });
 
-    // ── 건너뛰기 버튼 ──
+    // ── 건너뛰기 버튼 (AD 검수: 터치 타겟 44px 이상 확보) ──
     if (this._script.skippable) {
       this._skipBtn = this.add.text(SKIP_X, SKIP_Y, '건너뛰기', {
-        fontSize: '11px',
+        fontSize: '13px',
         color: '#aaaaaa',
         stroke: '#000000',
         strokeThickness: 1,
-      }).setOrigin(1, 0).setDepth(TEXT_DEPTH).setInteractive({ useHandCursor: true });
+      }).setOrigin(1, 0).setDepth(TEXT_DEPTH).setInteractive({
+        hitArea: new Phaser.Geom.Rectangle(-8, -15, 60, 44),
+        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+        useHandCursor: true,
+      });
       this._skipBtn.on('pointerdown', () => this._endDialogue());
     }
 
@@ -227,7 +231,9 @@ export class DialogueScene extends Phaser.Scene {
     }
     this._dialogueText.setText(this._fullText);
 
-    // 진행 힌트 표시
+    // 진행 힌트 표시 (AD 검수: 대사 하단에 근접 배치)
+    const textBottom = DIALOGUE_Y + this._dialogueText.height;
+    this._hintText.setY(Math.min(textBottom + 20, 600));
     this._hintText.setAlpha(1);
     this._hintTween.resume();
   }
