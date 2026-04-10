@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-10
-> 기준: Phase 11 완료 (엔드리스, 월드맵, 최종 폴리시, 출시 준비)
+> 기준: Phase 13 완료 (도구 시스템 리워크, 행상인, 재료 채집)
 
 ---
 
@@ -19,15 +19,18 @@
 | Phase 8 | 영업 심화 (테이블/인테리어/직원/특수손님/이벤트/셰프스킬), 새우/토마토/버터, 3장 6스테이지, 레시피 66종 | ✅ 완료 |
 | Phase 9 | 설탕/우유, 4장 화산 BBQ, 레시피 89종, PixelLab 픽셀아트 에셋, SpriteLoader | ✅ 완료 |
 | Phase 10 | 5장+6장 캠페인 30스테이지 완성, 레시피 106종, SoundManager, VFXManager, 설정 UI | ✅ 완료 |
+| Phase 11 | 엔드리스 모드, 월드맵, 튜토리얼, UI/UX 폴리시, 성능 최적화, 출시 준비 | ✅ 완료 |
+| Phase 12 | 리네이밍 (Kitchen Chaos Defense → Kitchen Chaos Tycoon) | ✅ 완료 |
+| Phase 13 | 도구 시스템 리워크, 행상인 씬, 재료 채집, 엔드리스 적용 | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 11 완료, Phase 12(도구 시스템 리워크) 진행 중
+**현재 구현 완성도**: Phase 13 완료
 
 ### 현재 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
 | 적 종류 | 22종 (일반 16 + 보스 6) |
-| 타워 종류 | 6종 (pan, salt, grill, delivery, freezer, soup_pot) |
+| 도구 종류 | 6종 (pan, salt, grill, delivery, freezer, soup_pot) — 영구 보유, 업그레이드 3단계 |
 | 재료 종류 | 15종 (당근, 고기, 문어, 고추, 밀가루, 달걀, 쌀, 생선, 버섯, 치즈, 새우, 토마토, 버터, 설탕, 우유) |
 | 레시피 | 106종 (서빙 86 + 버프 20) |
 | 스테이지 | 30개 (1장 6 + 2장 3 + 3장 6 + 4장 6 + 5장 6 + 6장 3) |
@@ -38,13 +41,13 @@
 | 직원 | 2종 (서빙/세척 도우미, IAP 추상화) |
 | 사운드 | SFX 20종 + BGM 5종 (Web Audio API 프로시저럴) |
 | VFX | 파티클 + 스크린 효과 + 플로팅 텍스트 (Canvas2D) |
-| 세이브 버전 | v7 |
+| 세이브 버전 | v9 |
 
 ### 게임 루프
 
 ```
-메뉴 → 월드맵 → 셰프 선택 → MarketScene(TD) → ServiceScene(타이쿤) → ResultScene
-메뉴 → 월드맵 → 엔드리스 → 셰프 선택 → EndlessScene(TD) ↔ ServiceScene(5웨이브마다) → ResultScene(게임오버)
+메뉴 → 월드맵 → 셰프 선택 → GatheringScene(재료 채집) → ServiceScene(영업) → ResultScene → MerchantScene(행상인) → 월드맵
+메뉴 → 월드맵 → 엔드리스 → 셰프 선택 → EndlessScene(TD) ↔ ServiceScene(영업) → MerchantScene(행상인) → EndlessScene(계속) → ... → ResultScene(게임오버)
 ```
 
 ---
@@ -316,7 +319,7 @@
 
 ---
 
-## Phase 13 — 도구 시스템 리워크 (예정)
+## ✅ Phase 13 — 도구 시스템 리워크 (완료)
 
 > 목표: 핵심 경제 루프 분리 — 재료 채집(TD)에서 골드 제거, 타워를 영구 도구로 전환, 행상인 씬 추가
 > 상세 기획서: `.claude/specs/2026-04-10-kitchen-chaos-phase13-scope.md`
@@ -327,19 +330,42 @@
 - 타워 → 영구 도구 (영업 골드로 구매/업그레이드, 스테이지 간 유지)
 - 재료 채집에서 골드 보상 완전 제거 (웨이브 보너스, 보스 골드 삭제)
 - 보스 처치 → 희귀 재료 대량 드롭
-- 행상인 씬 (MerchantScene): 영업 종료 후 방문, 도구 구매/업그레이드
-- 도구 자유 재배치 (배치된 도구를 전투 중 이동 가능)
+- 행상인 씬 (MerchantScene): 영업 종료 후 방문, 도구 구매/판매/업그레이드
+- 도구 자유 재배치 (배치된 도구를 전투 중 이동 가능, 탭-탭 방식)
 
-### 서브페이즈
+### ✅ 13-1. 도구 데이터 + ToolManager + 세이브 v9 (완료)
 
-| 서브페이즈 | 내용 | 상태 |
-|-----------|------|------|
-| **13-1** | 도구 데이터 + ToolManager + 세이브 v9 | 예정 |
-| **13-2** | 행상인 씬 (MerchantScene) | 예정 |
-| **13-3** | 재료 채집 씬 리워크 (GatheringScene) | 예정 |
-| **13-4** | 엔드리스 적용 + 골드 연동 + 밸런싱 | 예정 |
+- [x] gameData.js에 TOOL_DEFS 6종 추가 (pan, salt, grill, delivery, freezer, soup_pot)
+- [x] ToolManager.js 신규 (static 메서드: 구매/판매/업그레이드/스탯 조회)
+- [x] SaveManager v8→v9 마이그레이션 (gold, tools, tutorialMerchant 필드)
+- [x] 스타터 키트: 프라이팬 2개 (Lv1)
 
-**구현 순서**: 13-1 → 13-2 → 13-3 → 13-4
+### ✅ 13-2. 행상인 씬 (완료)
+
+- [x] MerchantScene.js 신규 (360x640 레이아웃, 도구 구매/판매/업그레이드 UI)
+- [x] 도구 목록 스크롤, 스탯 프리뷰, 도구 요약 바
+- [x] 모든 도구 판매 시 경고 팝업
+- [x] ResultScene에 "행상인 방문" 버튼 추가
+- [x] ServiceScene에서 영업 종료 시 영구 골드 누적 (ToolManager.addGold)
+- [x] main.js에 MerchantScene 등록
+
+### ✅ 13-3. 재료 채집 씬 리워크 (완료)
+
+- [x] GatheringScene.js 신규 (MarketScene 기반, 골드 시스템 완전 제거)
+- [x] 도구 배치/회수/재배치 (탭-탭 방식, 노란 테두리, 회수 버튼)
+- [x] 보스 처치 → 재료 드롭 (bossDrops, 보스 6종)
+- [x] HUD: 골드 표시 → 도구 수량 (배치/보유)
+- [x] ChefSelectScene 전환 대상 → GatheringScene
+- [x] Enemy.js bossDrops 이벤트 전달
+
+### ✅ 13-4. 엔드리스 적용 + 밸런싱 (완료)
+
+- [x] EndlessScene 상속: MarketScene → GatheringScene
+- [x] 엔드리스 골드 시스템 완전 제거 (WAVE_CLEAR_BONUS, gold 복원/전달 제거)
+- [x] 엔드리스 루프에 행상인 삽입 (ServiceScene → MerchantScene → EndlessScene)
+- [x] config.js STARTING_GOLD/WAVE_CLEAR_BONUS 하위 호환 주석 추가
+
+**구현 순서**: ~~13-1~~ → ~~13-2~~ → ~~13-3~~ → ~~13-4~~
 
 ---
 
@@ -359,4 +385,4 @@
 | ~~10~~ | ~~30스테이지 완성, 사운드/VFX~~ | 106 | 15 | ✅ 완료 |
 | ~~11~~ | ~~엔드리스, 월드맵, 최종 폴리시~~ | 106 | 15 | ✅ 완료 |
 | ~~12~~ | ~~리네이밍 (Kitchen Chaos Tycoon)~~ | 106 | 15 | ✅ 완료 |
-| **13** | **도구 시스템 리워크, 행상인, 재료 채집** | 106 | 15 | 📋 예정 |
+| ~~13~~ | ~~도구 시스템 리워크, 행상인, 재료 채집~~ | 106 | 15 | ✅ 완료 |

@@ -1,5 +1,86 @@
 # Changelog
 
+## [2026-04-10] - Phase 13 도구 시스템 리워크
+
+### 추가
+
+- **ToolManager** (`js/managers/ToolManager.js`, 신규)
+  - 영구 도구 인벤토리 매니저 (static 메서드)
+  - API: getToolInventory, getGold, addGold, canBuyTool, buyTool, getBuyCost, canSellTool, getSellPrice, sellTool, canUpgradeTool, upgradeTool, getUpgradeCost, getToolStats, hasAnyTool, _defaultTools
+  - 판매가 = buyCost[count-1] * sellRate(0.5), 레벨 유지
+
+- **TOOL_DEFS** (`js/data/gameData.js`, +150줄)
+  - 6종 도구 데이터: pan, salt, grill, delivery, freezer, soup_pot
+  - 각 도구: maxCount(3~5), buyCost(점증), sellRate(0.5), maxLevel(3), upgradeCost, stats(레벨별), category(attack/support)
+  - 특수 속성: projectileSpeed, burnInterval, canTargetInvisible 등
+
+- **GatheringScene** (`js/scenes/GatheringScene.js`, 신규)
+  - MarketScene 기반, 골드 시스템 완전 제거 (STARTING_GOLD, WAVE_CLEAR_BONUS 미사용)
+  - ToolManager 기반 도구 배치 (보유 도구만 팔레트 표시, 잔여 수량 관리)
+  - 도구 회수/재배치: 탭-탭 방식 (노란 테두리 + 회수 버튼)
+  - 보스 처치 시 재료 드롭 (bossDrops 배열, 드롭 팝업 + 인벤토리 추가)
+  - HUD: 골드 표시 제거 → 도구 수량(배치/보유) 표시
+
+- **MerchantScene** (`js/scenes/MerchantScene.js`, 신규)
+  - 360x640 레이아웃: 타이틀(y=20~60) + 도구 목록(y=80~530, 스크롤) + 요약 바(y=540~570) + 출발 버튼(y=580~620)
+  - 도구 6종: 구매 버튼(골드 부족 시 비활성화, 상한 시 MAX) + 판매 버튼(미보유 시 비활성화) + 업그레이드 버튼(스탯 프리뷰)
+  - 마지막 도구 판매 시 경고 팝업
+  - 구매/판매/업그레이드 후 전체 UI 즉시 새로고침
+  - 캠페인: MerchantScene → WorldMapScene / 엔드리스: MerchantScene → EndlessScene
+
+- **보스 재료 드롭** (`js/data/gameData.js`, `js/entities/Enemy.js`)
+  - 보스 6종에 bossDrops 배열 추가 (기존 bossReward 골드 대체)
+  - pasta_boss: 밀가루3+달걀2 / dragon_ramen: 생선3+쌀3 / seafood_kraken: 새우4+문어3
+  - lava_dessert_golem: 설탕4+버터3 / master_patissier: 우유5+설탕4 / cuisine_god: 고기5+치즈5+버터4
+  - Enemy.js boss_killed 이벤트에 bossDrops 데이터 전달
+
+### 변경
+
+- **SaveManager** (`js/managers/SaveManager.js`)
+  - SAVE_VERSION: 8 → 9
+  - createDefault(): gold(0), tools(6종, 스타터: pan×2 Lv1), tutorialMerchant(false) 추가
+  - _migrate(): v8→v9 블록 추가
+  - 신규 API: getGold(), setGold()
+
+- **EndlessScene** (`js/scenes/EndlessScene.js`)
+  - 상속: MarketScene → GatheringScene
+  - 골드 시스템 완전 제거 (WAVE_CLEAR_BONUS import 제거, gold 복원/전달 제거)
+  - _onEndlessWaveCleared(): 골드 보너스 로직 제거
+  - bossReward는 점수 전용으로만 사용 (골드 미지급)
+
+- **ServiceScene** (`js/scenes/ServiceScene.js`)
+  - _endService(): ToolManager.addGold() 호출로 영구 골드 누적
+  - 엔드리스 모드 종료 시: EndlessScene 직접 복귀 → MerchantScene 경유로 변경
+
+- **ResultScene** (`js/scenes/ResultScene.js`)
+  - 캠페인 정상 정산 시 "행상인 방문" 버튼 추가
+  - 장보기 실패/엔드리스 결과는 변경 없음
+
+- **ChefSelectScene** (`js/scenes/ChefSelectScene.js`)
+  - 캠페인 전환 대상: MarketScene → GatheringScene
+
+- **main.js** (`js/main.js`)
+  - GatheringScene, MerchantScene import + 씬 배열 등록
+
+- **config.js** (`js/config.js`)
+  - STARTING_GOLD, WAVE_CLEAR_BONUS에 Phase 13 하위 호환 주석 추가
+
+### 유지
+
+- **MarketScene.js** — 삭제하지 않고 레거시로 유지 (GatheringScene이 대체)
+- **TOWER_TYPES** (gameData.js) — 기존 데이터 유지, TOOL_DEFS가 새 시스템용
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-10-kitchen-chaos-phase13-scope.md`
+- 리포트 13-1: `.claude/specs/2026-04-10-kitchen-chaos-phase13-1-report.md`
+- 리포트 13-2: `.claude/specs/2026-04-10-kitchen-chaos-phase13-2-report.md`
+- 리포트 13-3: `.claude/specs/2026-04-10-kitchen-chaos-phase13-3-report.md`
+- 리포트 13-4: `.claude/specs/2026-04-10-kitchen-chaos-phase13-4-report.md`
+- 커밋: 13-1 `daa95d9` / 13-2 `e0e51f6` / 13-3 `fc90b66` / 13-4 `2f0da1d`
+
+---
+
 ## [2026-04-10] - Phase 11-3d 출시 준비
 
 ### 추가
