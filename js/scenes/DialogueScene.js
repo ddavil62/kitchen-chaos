@@ -7,7 +7,7 @@
  * 레이아웃 (360x640 기준):
  *   y=460~640: 대화 패널 (높이 180px)
  *   y=470: 이름 + 초상화 (좌측) / 건너뛰기 (우측)
- *   y=500~610: 대사 텍스트 (wordWrap 320px)
+ *   y=524~620: 대사 텍스트 (wordWrap 320px, 초상화 아래)
  *   y=620, x=340: 진행 힌트 "▼" (텍스트 완료 시만 깜빡임)
  */
 
@@ -28,7 +28,7 @@ const NAME_Y = 472;
 const PORTRAIT_SIZE = 48;
 
 const DIALOGUE_X = 20;
-const DIALOGUE_Y = 500;
+const DIALOGUE_Y = 524;
 const DIALOGUE_MAX_W = 320;
 
 const SKIP_X = 340;
@@ -252,7 +252,7 @@ export class DialogueScene extends Phaser.Scene {
 
     // 진행 힌트 표시 (AD 검수: 대사 하단에 근접 배치)
     const textBottom = DIALOGUE_Y + this._dialogueText.height;
-    this._hintText.setY(Math.min(textBottom + 20, 600));
+    this._hintText.setY(Math.min(textBottom + 14, 628));
     this._hintText.setAlpha(1);
     this._hintTween.resume();
   }
