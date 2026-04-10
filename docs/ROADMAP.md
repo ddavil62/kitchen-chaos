@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-10
-> 기준: Phase 14-1 완료 (대화 엔진)
+> 기준: Phase 14-2 완료 (대화 콘텐츠 + 초상화 + 트리거)
 
 ---
 
@@ -23,8 +23,9 @@
 | Phase 12 | 리네이밍 (Kitchen Chaos Defense → Kitchen Chaos Tycoon) | ✅ 완료 |
 | Phase 13 | 도구 시스템 리워크, 행상인 씬, 재료 채집, 엔드리스 적용 | ✅ 완료 |
 | Phase 14-1 | 대화 엔진 (DialogueManager + DialogueScene + dialogueData) | ✅ 완료 |
+| Phase 14-2 | 대화 콘텐츠 (초상화 4종 + 스크립트 13종 + 4씬 트리거 연결) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 14-1 완료
+**현재 구현 완성도**: Phase 14-2 완료
 
 ### 현재 콘텐츠 규모
 
@@ -398,26 +399,44 @@
 
 ---
 
-## Phase 14 — 스토리 시스템 (진행 예정)
+## ✅ Phase 14 — 스토리 시스템 (완료)
 
 > 목표: 식란 세계관 기반 스토리 콘텐츠 구현, 대화 트리거 연결, 캐릭터 확장
 > 세계관 상세: `docs/PROJECT.md` "세계관 — 식란(食亂)의 세계" 참조
 
-### 14-1. 대화 엔진 ✅ 완료
+### ✅ 14-1. 대화 엔진 (완료)
 
 - [x] DialogueManager + DialogueScene + dialogueData 기반 인프라
 
-### 14-2. 스토리 콘텐츠 + 대화 트리거 (예정)
+### ✅ 14-2. 대화 콘텐츠 + 캐릭터 초상화 + 트리거 연결 (완료)
 
-- [ ] 대화 스크립트 확장 (식란 세계관 반영, 챕터별 스토리 대사)
-- [ ] 기존 씬에 대화 트리거 연결 (WorldMapScene 첫 진입, 행상인 첫 방문, 스테이지 클리어 등)
-- [ ] 캐릭터 확장: 린(🔥, 라이벌), 메이지(🧁, 연구원)
-- [ ] 튜토리얼 대화 (미미+포코의 미력사 각성 시퀀스)
+> 원래 14-2(스크립트 확장/트리거) + 14-3(초상화 교체)을 통합 구현
 
-### 14-3. 캐릭터 초상화 교체 (예정)
+#### 14-2a. PixelLab 캐릭터 초상화 4종
 
-- [ ] 이모지 → 픽셀 아트 스프라이트 교체 (PixelLab)
-- [ ] DialogueScene portrait 렌더링 업데이트
+- [x] 미미(mimi), 포코(poco), 린(rin), 메이지(mage) 픽셀아트 초상화 생성
+- [x] 64x64px, 투명 배경, 일관된 스타일(single color outline, basic shading)
+- [x] 저장: `assets/portraits/portrait_{id}.png`
+
+#### 14-2b. DialogueScene 스프라이트 렌더링
+
+- [x] SpriteLoader._loadPortraits(): 초상화 4종 텍스처 로드
+- [x] DialogueScene: PORTRAIT_SIZE 24->48, _portraitImage(Image) + _portraitEmoji(Text) 이중 시스템
+- [x] portraitKey 기반 스프라이트 표시 + 이모지 fallback
+- [x] setDisplaySize(48,48) 적용으로 렌더 크기 정규화 *(QA에서 setTexture() 후 setDisplaySize 누락 발견, 수정 완료)*
+
+#### 14-2c. 대화 스크립트 확장
+
+- [x] CHARACTERS에 린(rin, 0xff4444), 메이지(mage, 0xcc88ff) 추가
+- [x] 기존 mimi/poco에 portraitKey 필드 추가
+- [x] 10개 신규 대화 스크립트 추가 (총 13개)
+
+#### 14-2d. 대화 트리거 연결 (4개 씬)
+
+- [x] WorldMapScene: intro_welcome, chapter2_intro, mage_introduction, mage_research_hint
+- [x] MerchantScene: merchant_first_meet, poco_discount_fail
+- [x] ResultScene: stage_first_clear, chapter1_clear, rin_first_meet, chapter3_rin_joins, after_first_loss
+- [x] GatheringScene: stage_boss_warning, chapter1_start
 
 ---
 
@@ -467,3 +486,4 @@
 | ~~12~~ | ~~리네이밍 (Kitchen Chaos Tycoon)~~ | 106 | 15 | ✅ 완료 |
 | ~~13~~ | ~~도구 시스템 리워크, 행상인, 재료 채집~~ | 106 | 15 | ✅ 완료 |
 | ~~14-1~~ | ~~대화 엔진 (DialogueManager + DialogueScene)~~ | 106 | 15 | ✅ 완료 |
+| ~~14-2~~ | ~~초상화 4종, 스크립트 13종, 4씬 트리거~~ | 106 | 15 | ✅ 완료 |

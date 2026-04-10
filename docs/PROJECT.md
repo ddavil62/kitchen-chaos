@@ -107,8 +107,9 @@ kitchen-chaos/
     data/
       gameData.js            # 적/도구(TOOL_DEFS)/재료/스테이지 정의
       recipeData.js          # 레시피 106종 정의
-      dialogueData.js        # 대화 스크립트 + 캐릭터 정의
+      dialogueData.js        # 대화 스크립트 13종 + 캐릭터 4종 정의
   assets/                    # 스프라이트/타일셋/아이콘
+    portraits/               # 캐릭터 초상화 (64x64 PixelLab)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
 ```
@@ -124,7 +125,7 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장 |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 오버레이 표시, 시청 기록 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 픽셀아트 초상화 렌더링, 4씬 트리거, 시청 기록 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v10 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
@@ -158,7 +159,8 @@ kitchen-chaos/
 | 도구 시스템 | 영구 도구 6종, 구매/판매/업그레이드, ToolManager | 완료 |
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
-| 대화 엔진 | DialogueManager + DialogueScene 오버레이, 3종 샘플 스크립트, 세이브 연동 | 완료 |
+| 대화 엔진 | DialogueManager + DialogueScene 오버레이, 13종 스크립트, 세이브 연동 | 완료 |
+| 대화 콘텐츠 | 캐릭터 초상화 4종(PixelLab), 4캐릭터, 4씬 트리거 연결 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -181,12 +183,12 @@ kitchen-chaos/
 - StageSelectScene.js, MarketScene.js는 레거시로 유지 중 (각각 WorldMapScene, GatheringScene으로 교체됨)
 - config.js의 STARTING_GOLD, WAVE_CLEAR_BONUS는 하위 호환용으로 유지 (GatheringScene/EndlessScene에서 미사용)
 - Tower 엔티티의 hitArea가 Container 기반 Circle(0,0,20)로 설정되어 타워 바디 위치와 미세 불일치 가능 (LOW)
-- 대화 트리거는 미구현 (Phase 14-1은 엔진만, 기존 씬에 연결은 후속 Phase에서)
-- 대화 캐릭터 초상화가 이모지 임시 방식 (추후 스프라이트 교체 가능하도록 portrait 필드 유지)
+- 3장 이후(4~6장) 챕터 스토리 대화 미구현 (시즌 1 후반은 후속 Phase)
+- 대화 분기/선택지 미구현 (현재 선형 대화만)
 
 ## 향후 계획
 
-- Phase 13 완료 (도구 시스템 리워크, 행상인, 재료 채집), Phase 14-1 완료 (대화 엔진).
-- Phase 14-2 예정: 식란 세계관 기반 스토리 콘텐츠 + 대화 트리거 연결 + 캐릭터 확장(린, 메이지).
+- Phase 14-2 완료 (대화 콘텐츠, 초상화, 트리거 연결). Phase 14 전체 완료.
+- 후속: 4~6장 챕터 스토리 대화 확장, 대화 분기/선택지 시스템.
 - 시즌별 장기 확장 (80~100시간): 시즌1(현재 1~6장) → 시즌2(국제) → 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조

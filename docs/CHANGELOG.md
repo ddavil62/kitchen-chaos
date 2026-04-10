@@ -1,5 +1,115 @@
 # Changelog
 
+## [2026-04-10] - Phase 14-2 대화 콘텐츠 + 캐릭터 초상화
+
+### 추가
+
+- **캐릭터 초상화 4종** (`assets/portraits/`, 신규)
+  - portrait_mimi.png, portrait_poco.png, portrait_rin.png, portrait_mage.png
+  - 64x64px, 투명 배경, PixelLab 생성 (치비 스타일, single color outline, basic shading)
+
+- **SpriteLoader 초상화 로드** (`js/managers/SpriteLoader.js`, 수정)
+  - PORTRAIT_IDS 상수: `['mimi', 'poco', 'rin', 'mage']`
+  - `_loadPortraits()` 메서드: 4종 초상화 텍스처 preload
+  - `preload()`에서 `_loadPortraits()` 호출 추가
+
+- **CHARACTERS 확장 + 스크립트 10종 추가** (`js/data/dialogueData.js`, 수정)
+  - CHARACTERS에 린(rin, color:0xff4444, role:rival), 메이지(mage, color:0xcc88ff, role:researcher) 추가
+  - 기존 mimi/poco에 `portraitKey` 필드 추가
+  - 기존 3종 스크립트의 각 라인에 `portraitKey` 필드 추가
+  - 신규 10종: chapter1_start, chapter1_clear, chapter2_intro, rin_first_meet, mage_introduction, poco_discount_fail, stage_boss_warning, after_first_loss, chapter3_rin_joins, mage_research_hint
+  - 총 13개 스크립트, 식란 세계관(미력사/정화/식란) 용어 반영
+
+- **대화 트리거 — WorldMapScene** (`js/scenes/WorldMapScene.js`, 수정)
+  - DialogueManager import
+  - `_triggerDialogues()`: intro_welcome (첫 진입), chapter2_intro (2장 해금), mage_introduction (3장 해금), mage_research_hint (메이지 등장 후 재방문)
+  - intro_welcome -> chapter1_start 연쇄 트리거 (onComplete 콜백)
+
+- **대화 트리거 — MerchantScene** (`js/scenes/MerchantScene.js`, 수정)
+  - DialogueManager import
+  - `_triggerMerchantDialogue()`: merchant_first_meet (최초 방문), poco_discount_fail (2회차 이후 방문)
+
+- **대화 트리거 — ResultScene** (`js/scenes/ResultScene.js`, 수정)
+  - DialogueManager import
+  - `_triggerResultDialogues()`: stage_first_clear (최초 클리어, 800ms 딜레이), chapter1_clear (1-6 클리어 시 연쇄), rin_first_meet (2-1 최초 클리어), chapter3_rin_joins (3-3 최초 클리어), after_first_loss (첫 장보기 실패)
+
+- **대화 트리거 — GatheringScene** (`js/scenes/GatheringScene.js`, 수정)
+  - DialogueManager import
+  - `_triggerGatheringDialogues()`: stage_boss_warning (보스 스테이지 x-6 최초 진입, 400ms 딜레이), chapter1_start (WorldMap 미시청 시 백업 트리거)
+
+### 변경
+
+- **DialogueScene** (`js/scenes/DialogueScene.js`, 수정)
+  - PORTRAIT_SIZE: 24 -> 48
+  - `_portraitText` (Text 오브젝트) -> `_portraitImage` (Phaser.Image) + `_portraitEmoji` (Text, fallback)
+  - `_showLine()`: portraitKey 존재 + SpriteLoader.hasTexture() true -> 스프라이트 표시, false -> 이모지 fallback
+  - `setTexture()` 호출 후 `setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE)` 적용 (QA BUG-001 수정)
+  - 이름 텍스트 x좌표: NAME_X + PORTRAIT_SIZE + 6 = 74 (이미지 크기 반영)
+
+### 수정 (QA 피드백)
+
+- **BUG-001**: `DialogueScene._showLine()` Line 192에서 `setTexture()` 호출 시 Phaser가 내부 스케일을 리셋하여 초상화가 64px(네이티브)로 렌더링되던 문제. `setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE)` 체이닝으로 48px 정규화 적용
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-10-kitchen-chaos-phase14-2-spec.md`
+- 리포트: `.claude/specs/2026-04-10-kitchen-chaos-phase14-2-report.md`
+- QA: `.claude/specs/2026-04-10-kitchen-chaos-phase14-2-qa.md`
+- 목적 정의서: `.claude/specs/2026-04-10-kitchen-chaos-phase14-2-scope.md`
+- 스펙의 14-3(초상화 교체)이 14-2에 통합됨
+
+---
+
+## [2026-04-10] - Phase 14-1 대화 엔진
+
+### 추가
+
+- **dialogueData.js** (`js/data/dialogueData.js`, 신규)
+  - 3개 대화 스크립트: intro_welcome (8줄, 미미+포코 첫 만남), merchant_first_meet (6줄, 행상인 첫 방문), stage_first_clear (5줄, 첫 클리어)
+  - CHARACTERS 정의 3종: mimi (주인공, 0xff8899), poco (행상인, 0xffaa33), narrator (0xcccccc)
+  - 이모지 초상화: 미미=`U+1F467`, 포코=`U+1F392` (임시, 추후 스프라이트 교체 가능)
+
+- **DialogueManager** (`js/managers/DialogueManager.js`, 신규)
+  - static 대화 관리자
+  - API: start(callerScene, dialogueId, options), hasSeen(dialogueId), markSeen(dialogueId), getScript(dialogueId), resetAll()
+  - start(): 이미 본 대화는 건너뜀 (force 옵션으로 강제 재생 가능)
+  - markSeen(): 대화 종료 시 onComplete 콜백 내에서 자동 호출
+
+- **DialogueScene** (`js/scenes/DialogueScene.js`, 신규)
+  - scene.launch() 오버레이 씬 (배경 씬 위에 표시)
+  - 레이아웃: 딤 오버레이(0x000000, 0.3) + 하단 180px 패널(0x1a0a00, alpha 0.88) + 상단 구분선(0xff6b35)
+  - 캐릭터: 이모지 초상화(24px, 좌측) + 이름(14px bold, #ffd700) + 대사(14px, wordWrap 320px)
+  - 타이핑 애니메이션: 30ms/글자, time.addEvent 기반
+  - 인터랙션: 탭 시 타이핑 중→즉시 완료, 완료→다음 대사, 마지막 대사→씬 종료+콜백
+  - 건너뛰기: skippable 스크립트에 우상단 버튼 표시 (hitArea 60x44, AD 검수 반영)
+  - narrator 스타일: 이탤릭, #cccccc, 이름/초상화 숨김
+  - 진행 힌트: "▼" 깜빡임 tween (alpha 0.2~1, 500ms yoyo), 대사 하단에 동적 Y (AD 검수 반영)
+  - shutdown(): 타이머 + tween 정리
+
+### 변경
+
+- **SaveManager** (`js/managers/SaveManager.js`)
+  - SAVE_VERSION: 9 → 10
+  - createDefault(): seenDialogues(빈 배열) 추가
+  - _migrate(): v9→v10 블록 (seenDialogues=[] 초기화)
+  - 신규 API: hasSeenDialogue(dialogueId), markDialogueSeen(dialogueId)
+
+- **main.js** (`js/main.js`)
+  - DialogueScene import + scene 배열 등록
+
+### AD 검수 반영
+
+- 건너뛰기 버튼 hitArea: 기본 텍스트 영역 → 60x44 Rectangle (터치 타겟 확대)
+- 진행 힌트 "▼" 위치: 고정 y=620 → 대사 텍스트 하단 + 20px (동적 조정, max y=600)
+
+### 참고
+
+- 리포트: `.claude/specs/2026-04-10-kitchen-chaos-phase14-1-dialogue-engine-report.md`
+- 커밋: cbd1f4f (구현), a6a5de8 (AD 수정)
+- 대화 트리거 연동은 후속 Phase에서 구현 예정 (기존 씬 미수정)
+
+---
+
 ## [2026-04-10] - Phase 13 도구 시스템 리워크
 
 ### 추가

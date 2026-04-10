@@ -189,7 +189,7 @@ export class DialogueScene extends Phaser.Scene {
       // 초상화: 스프라이트 이미지 우선, 로드 실패 시 이모지 fallback (Phase 14-2b)
       const portraitKey = line.portraitKey ? `portrait_${line.portraitKey}` : '';
       if (portraitKey && SpriteLoader.hasTexture(this, portraitKey)) {
-        this._portraitImage.setTexture(portraitKey).setVisible(true);
+        this._portraitImage.setTexture(portraitKey).setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE).setVisible(true);
         this._portraitEmoji.setVisible(false);
       } else {
         this._portraitEmoji.setText(line.portrait || '').setVisible(true);
