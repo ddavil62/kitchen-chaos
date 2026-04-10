@@ -32,6 +32,7 @@ import { SoundManager } from '../managers/SoundManager.js';
 import { VFXManager } from '../managers/VFXManager.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
 import { ToolManager } from '../managers/ToolManager.js';
+import { StoryManager } from '../managers/StoryManager.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -1084,6 +1085,8 @@ export class ServiceScene extends Phaser.Scene {
       if (this.servedCount > 0) {
         this._tutAdvanced3 = true;
         this._tutorial.advance();
+        // Phase 16-1: 첫 서빙 완료 튜토리얼 대사 트리거
+        StoryManager.checkTriggers(this, 'tutorial_first_serve');
       }
     }
   }
@@ -2024,6 +2027,9 @@ export class ServiceScene extends Phaser.Scene {
 
     // 이벤트 배너 표시
     this._showEventBanner(evtDef);
+
+    // Phase 16-2: 이벤트별 캐릭터 반응 대화 트리거
+    StoryManager.checkTriggers(this, 'service_event', { eventType: chosen });
   }
 
   /**

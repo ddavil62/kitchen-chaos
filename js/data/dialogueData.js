@@ -4,7 +4,8 @@
  * Phase 14-2b: portraitKey 필드 추가, CHARACTERS 확장 (린/메이지).
  * Phase 14-2c: 신규 대화 스크립트 10개 추가.
  * Phase 15: 신규 대화 스크립트 13개 추가 (챕터 2~6 메인 시나리오 + 사이드).
- * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text)로 구성된다.
+ * Phase 16: 튜토리얼 연동 2종, 영업 이벤트 3종, 선택지 샘플 1종 추가.
+ * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
  * 미력사(味力師)는 조리 도구의 정화 마법으로 폭주한 식재료를 진정시키는 비밀 요리사 혈통.
@@ -12,7 +13,7 @@
 
 // ── 대화 스크립트 ──
 
-/** @type {Object<string, {id: string, skippable: boolean, lines: Array<{speaker: string, portrait: string, portraitKey?: string, text: string}>}>} */
+/** @type {Object<string, {id: string, skippable: boolean, lines: Array<{speaker: string, portrait: string, portraitKey?: string, text: string, choices?: Array<{label: string, next: number}>}>}>} */
 export const DIALOGUES = {
   // ── 기존 3종 (Phase 14-1, portraitKey 추가) ──
 
@@ -407,6 +408,98 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '마그마 강화?! 그거 안전한 거야?!' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '미력사 전용이니까 괜찮아! 일반인이 쓰면... 음, 좀 위험하지.' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '그건 안 괜찮은 거잖아!! 다음에 봐, 포코!' },
+    ]
+  },
+
+  // ── 신규 6종 (Phase 16) ──
+
+  // ── Phase 16-1: 튜토리얼 대화 2종 ──
+
+  tutorial_tool_placed_dialogue: {
+    id: 'tutorial_tool_placed_dialogue',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '오, 배치 감각이 있는데? 할머니의 피는 속일 수 없군!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '도구는 경로 옆에 놓아야 효과적이야. 잘 기억해 둬!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '이렇게 하면 식재료들을 정화할 수 있는 거지?' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '맞아! 녀석들이 경로를 따라 오면 도구가 알아서 정화해 줄 거야.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '자, 이제 웨이브 시작 버튼을 눌러봐! 식란이 온다!' },
+    ]
+  },
+  tutorial_first_serve_dialogue: {
+    id: 'tutorial_first_serve_dialogue',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '첫 번째 서빙 완료! 손님이 맛있게 먹고 있어!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '잘했어! 정화한 재료로 만든 요리는 역시 다르다니까~' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '이제 좀 식당 분위기가 나는 것 같아!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '이 페이스를 유지해! 시간이 끝나기 전에 최대한 서빙하는 거야.' },
+    ]
+  },
+
+  // ── Phase 16-2: 영업 이벤트 대화 3종 ──
+
+  event_happy_hour_dialogue: {
+    id: 'event_happy_hour_dialogue',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '갑자기 손님이 몰려오고 있어?! 무슨 일이야!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '해피아워야! 어디선가 소문이 난 모양이군~' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '소문?! 아직 개업한 지 얼마 안 됐는데!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '미력사가 만든 요리는 소문이 빠르거든. 자, 빨리 조리 시작!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '알겠어! 최대한 빨리 서빙할게!' },
+    ]
+  },
+  event_food_review_dialogue: {
+    id: 'event_food_review_dialogue',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '저, 저 사람... 미식 평론가 같아! 메모하면서 먹고 있어!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '오호~ 맛집 리뷰어가 왔군! 이건 대박 기회야!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '서빙 5명 분량을 완벽하게 해내면 좋은 평가를 받을 수 있어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '긴장되지만... 할머니 식당의 명예를 위해! 최선을 다할게!' },
+    ]
+  },
+  event_kitchen_accident_dialogue: {
+    id: 'event_kitchen_accident_dialogue',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '으악! 조리대에서 불이?! 어떡해!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '침착해! 주방 사고는 가끔 일어나는 거야!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '조리 슬롯 하나를 잠깐 못 쓰게 되겠지만, 다른 슬롯으로 버텨!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '알겠어! 하나 없어도 해낼 수 있어! 아마도!' },
+    ]
+  },
+
+  // ── Phase 16-3: 선택지 샘플 대화 1종 ──
+
+  choice_sample_merchant: {
+    id: 'choice_sample_merchant',
+    skippable: true,
+    lines: [
+      // 0: 도입
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '이번에 새 정화 도구 세트가 들어왔는데~ 관심 있어?' },
+      // 1: 선택지 제시
+      {
+        speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi',
+        text: '음... 어떻게 할까?',
+        choices: [
+          { label: '할인해 달라고 하기', next: 2 },
+          { label: '그냥 구경만 할게', next: 5 },
+        ]
+      },
+      // 2: 할인 요청 분기
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '포코~ 단골인데 좀 깎아줘! 제발~!' },
+      // 3
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '에이~ 또 할인? 미력사 도구는 원가가 비싸다니까!' },
+      // 4
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '대신 다음에 특별한 거 하나 서비스로 줄게. 약속!' },
+      // 5: 구경만 분기
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '오늘은 구경만 할게~ 눈이 즐거우니까!' },
+      // 6
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '구경만?! 만지면 사야 한다고! ...농담이야, 농담!' },
+      // 7 (공통 결말)
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '다음에 또 와~ 맛있는 도구 많이 준비해 둘게!' },
     ]
   },
 };

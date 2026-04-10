@@ -2,6 +2,7 @@
  * @fileoverview 대화 표시 오버레이 씬.
  * Phase 14-1: scene.launch()로 오버레이 동작하며, 배경 씬의 input을 블로킹한다.
  * Phase 14-2b: 이모지 → 픽셀아트 스프라이트 초상화 렌더링 (fallback 유지).
+ * Phase 16-3: 선택지(choices) 분기 UI 추가 — 버튼 클릭으로 대화 분기 진행.
  * 하단 180px 반투명 패널에 캐릭터 이름, 초상화, 대사 텍스트(타이핑 애니메이션)를 표시.
  *
  * 레이아웃 (360x640 기준):
@@ -39,6 +40,14 @@ const HINT_Y = 620;
 
 const TYPING_SPEED_MS = 30;
 
+// ── Phase 16-3: 선택지 레이아웃 상수 ──
+const CHOICE_BASE_Y = 565;
+const CHOICE_BTN_HEIGHT = 28;
+const CHOICE_BTN_GAP = 4;
+const CHOICE_BTN_WIDTH = 300;
+const CHOICE_BTN_COLOR = 0x3a2a00;
+const CHOICE_BTN_HOVER = 0x5a4a10;
+
 export class DialogueScene extends Phaser.Scene {
   constructor() {
     super({ key: 'DialogueScene' });
@@ -64,6 +73,10 @@ export class DialogueScene extends Phaser.Scene {
     this._typedCount = 0;
     /** @private */
     this._typingTimer = null;
+    /** @private 선택지 표시 중 여부 */
+    this._showingChoices = false;
+    /** @private 선택지 버튼 게임오브젝트 배열 */
+    this._choiceButtons = [];
   }
 
   create() {
@@ -174,6 +187,8 @@ export class DialogueScene extends Phaser.Scene {
     }
 
     this._lineIndex = index;
+    // Phase 16-3: 이전 선택지 버튼 정리
+    this._clearChoices();
     const line = this._script.lines[index];
 
     // 화자 갱신
@@ -250,11 +265,18 @@ export class DialogueScene extends Phaser.Scene {
     }
     this._dialogueText.setText(this._fullText);
 
-    // 진행 힌트 표시 (AD 검수: 대사 하단에 근접 배치)
-    const textBottom = DIALOGUE_Y + this._dialogueText.height;
-    this._hintText.setY(Math.min(textBottom + 14, 628));
-    this._hintText.setAlpha(1);
-    this._hintTween.resume();
+    const line = this._script.lines[this._lineIndex];
+
+    // Phase 16-3: 선택지가 있으면 버튼 렌더링, 없으면 기존 진행 힌트
+    if (line.choices && line.choices.length > 0) {
+      this._renderChoices(line.choices);
+    } else {
+      // 진행 힌트 표시 (AD 검수: 대사 하단에 근접 배치)
+      const textBottom = DIALOGUE_Y + this._dialogueText.height;
+      this._hintText.setY(Math.min(textBottom + 14, 628));
+      this._hintText.setAlpha(1);
+      this._hintTween.resume();
+    }
   }
 
   // ── 인터랙션 ──
@@ -267,10 +289,67 @@ export class DialogueScene extends Phaser.Scene {
     if (this._isTyping) {
       // 타이핑 중 → 즉시 완료
       this._completeTyping();
-    } else {
+    } else if (!this._showingChoices) {
+      // Phase 16-3: 선택지 표시 중에는 탭으로 진행하지 않음
       // 완료 상태 → 다음 대사
       this._showLine(this._lineIndex + 1);
     }
+  }
+
+  // ── 선택지 시스템 (Phase 16-3) ──
+
+  /**
+   * 선택지 버튼을 렌더링한다.
+   * @param {Array<{label: string, next: number}>} choices
+   * @private
+   */
+  _renderChoices(choices) {
+    this._showingChoices = true;
+    this._clearChoices();
+
+    choices.forEach((choice, i) => {
+      const btnY = CHOICE_BASE_Y + i * (CHOICE_BTN_HEIGHT + CHOICE_BTN_GAP);
+
+      // 버튼 배경
+      const bg = this.add.rectangle(
+        GAME_WIDTH / 2, btnY,
+        CHOICE_BTN_WIDTH, CHOICE_BTN_HEIGHT,
+        CHOICE_BTN_COLOR, 0.9
+      ).setDepth(TEXT_DEPTH + 1)
+        .setStrokeStyle(1, 0xffd700)
+        .setInteractive({ useHandCursor: true });
+
+      // 버튼 텍스트
+      const label = this.add.text(GAME_WIDTH / 2, btnY, choice.label, {
+        fontSize: '13px',
+        color: '#ffd700',
+        stroke: '#000000',
+        strokeThickness: 1,
+      }).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
+
+      // 호버 효과
+      bg.on('pointerover', () => bg.setFillStyle(CHOICE_BTN_HOVER));
+      bg.on('pointerout', () => bg.setFillStyle(CHOICE_BTN_COLOR));
+
+      // 선택 시 분기 진행
+      bg.on('pointerdown', () => {
+        this._clearChoices();
+        this._showingChoices = false;
+        this._showLine(choice.next);
+      });
+
+      this._choiceButtons.push(bg, label);
+    });
+  }
+
+  /**
+   * 선택지 버튼을 모두 제거한다.
+   * @private
+   */
+  _clearChoices() {
+    this._choiceButtons.forEach(obj => obj.destroy());
+    this._choiceButtons = [];
+    this._showingChoices = false;
   }
 
   /**
@@ -302,5 +381,7 @@ export class DialogueScene extends Phaser.Scene {
       this._hintTween.stop();
       this._hintTween = null;
     }
+    // Phase 16-3: 선택지 버튼 정리
+    this._clearChoices();
   }
 }

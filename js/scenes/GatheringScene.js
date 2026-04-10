@@ -781,7 +781,11 @@ export class GatheringScene extends Phaser.Scene {
     });
 
     // 튜토리얼 2단계: 도구 배치 완료
-    if (this._tutorial?.isActive()) this._tutorial.advance();
+    if (this._tutorial?.isActive()) {
+      this._tutorial.advance();
+      // Phase 16-1: 도구 배치 튜토리얼 대사 트리거
+      StoryManager.checkTriggers(this, 'tutorial_tool_placed');
+    }
   }
 
   // ── 도구 재배치 (탭-탭 방식) ─────────────────────────────────

@@ -2,6 +2,7 @@
  * @fileoverview 스토리 트리거 데이터.
  * Phase 14-3: 각 항목은 triggerPoint별로 분류되며, StoryManager.checkTriggers()가 평가한다.
  * Phase 15: 챕터 2~6 트리거 13개 추가.
+ * Phase 16: 튜토리얼 2개, 영업 이벤트 3개, 선택지 샘플 1개 트리거 추가.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -79,6 +80,14 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.seenDialogues.includes('merchant_first_meet'),
   },
+  // Phase 16-3: 선택지 샘플 대화 (할인 요청)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'choice_sample_merchant',
+    once: true,
+    condition: (ctx, save) =>
+      save.seenDialogues.includes('poco_discount_fail'),
+  },
   // Phase 15: 포코 사이드 (챕터 4+)
   {
     triggerPoint: 'merchant_enter',
@@ -86,7 +95,8 @@ export const STORY_TRIGGERS = [
     once: true,
     condition: (ctx, save) =>
       save.currentChapter >= 4 &&
-      save.seenDialogues.includes('poco_discount_fail'),
+      save.seenDialogues.includes('poco_discount_fail') &&
+      save.seenDialogues.includes('choice_sample_merchant'),
   },
 
   // ── GatheringScene 진입 ─────────────────────────────────────────
@@ -226,5 +236,50 @@ export const STORY_TRIGGERS = [
     once: true,
     condition: () => true,
     delay: 800,
+  },
+
+  // ── GatheringScene 튜토리얼: 도구 배치 완료 (Phase 16-1) ────────
+  {
+    triggerPoint: 'tutorial_tool_placed',
+    dialogueId: 'tutorial_tool_placed_dialogue',
+    once: true,
+    condition: () => true,
+    delay: 300,
+  },
+
+  // ── ServiceScene 튜토리얼: 첫 서빙 완료 (Phase 16-1) ───────────
+  {
+    triggerPoint: 'tutorial_first_serve',
+    dialogueId: 'tutorial_first_serve_dialogue',
+    once: true,
+    condition: () => true,
+    delay: 500,
+  },
+
+  // ── ServiceScene 영업 이벤트: 해피아워 (Phase 16-2) ─────────────
+  {
+    triggerPoint: 'service_event',
+    dialogueId: 'event_happy_hour_dialogue',
+    once: true,
+    condition: (ctx) => ctx.eventType === 'happy_hour',
+    delay: 1500,
+  },
+
+  // ── ServiceScene 영업 이벤트: 맛집 리뷰 (Phase 16-2) ────────────
+  {
+    triggerPoint: 'service_event',
+    dialogueId: 'event_food_review_dialogue',
+    once: true,
+    condition: (ctx) => ctx.eventType === 'food_review',
+    delay: 1500,
+  },
+
+  // ── ServiceScene 영업 이벤트: 주방 사고 (Phase 16-2) ────────────
+  {
+    triggerPoint: 'service_event',
+    dialogueId: 'event_kitchen_accident_dialogue',
+    once: true,
+    condition: (ctx) => ctx.eventType === 'kitchen_accident',
+    delay: 1500,
   },
 ];
