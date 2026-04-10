@@ -146,6 +146,9 @@ export class DialogueScene extends Phaser.Scene {
     // 딤 오버레이 탭도 진행으로 처리
     this._dimOverlay.on('pointerdown', () => this._onTap());
 
+    // 씬 종료 시 정리
+    this.events.once('shutdown', this.shutdown, this);
+
     // 첫 대사 표시
     this._showLine(0);
   }
