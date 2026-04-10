@@ -94,6 +94,9 @@ const WALK_DIRS = ['south', 'south-east', 'east', 'north-east', 'north', 'north-
 /** 걷기 애니메이션 프레임 수 */
 const WALK_FRAME_COUNT = 6;
 
+// ── 초상화 ID 목록 (Phase 14-2b) ──
+const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage'];
+
 // ── 타일셋 ID 목록 (6종) ──
 const TILESET_IDS = [
   'pasta_field', 'oriental_bamboo', 'seafood_beach', 'volcano_lava',
@@ -115,6 +118,7 @@ export class SpriteLoader {
     SpriteLoader._loadChefs(scene);
     SpriteLoader._loadIngredients(scene);
     SpriteLoader._loadTilesets(scene);
+    SpriteLoader._loadPortraits(scene);
   }
 
   /**
@@ -270,6 +274,20 @@ export class SpriteLoader {
         `tileset_${id}`,
         `${SPRITES_ROOT}/tilesets/${id}.png`,
         { frameWidth: 32, frameHeight: 32 }
+      );
+    }
+  }
+
+  /**
+   * 캐릭터 초상화 4종 로드 (Phase 14-2b).
+   * @param {Phaser.Scene} scene
+   * @private
+   */
+  static _loadPortraits(scene) {
+    for (const id of PORTRAIT_IDS) {
+      scene.load.image(
+        `portrait_${id}`,
+        `${SPRITES_ROOT}/portraits/portrait_${id}.png`
       );
     }
   }

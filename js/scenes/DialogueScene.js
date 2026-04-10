@@ -1,7 +1,8 @@
 /**
  * @fileoverview 대화 표시 오버레이 씬.
  * Phase 14-1: scene.launch()로 오버레이 동작하며, 배경 씬의 input을 블로킹한다.
- * 하단 180px 반투명 패널에 캐릭터 이름, 이모지 초상화, 대사 텍스트(타이핑 애니메이션)를 표시.
+ * Phase 14-2b: 이모지 → 픽셀아트 스프라이트 초상화 렌더링 (fallback 유지).
+ * 하단 180px 반투명 패널에 캐릭터 이름, 초상화, 대사 텍스트(타이핑 애니메이션)를 표시.
  *
  * 레이아웃 (360x640 기준):
  *   y=460~640: 대화 패널 (높이 180px)
@@ -12,6 +13,7 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { SpriteLoader } from '../managers/SpriteLoader.js';
 
 // ── 레이아웃 상수 ──
 const PANEL_Y = 460;
@@ -23,7 +25,7 @@ const TEXT_DEPTH = 201;
 
 const NAME_X = 20;
 const NAME_Y = 472;
-const PORTRAIT_SIZE = 24;
+const PORTRAIT_SIZE = 48;
 
 const DIALOGUE_X = 20;
 const DIALOGUE_Y = 500;
@@ -86,9 +88,14 @@ export class DialogueScene extends Phaser.Scene {
       0xff6b35, 0.6
     ).setDepth(PANEL_DEPTH);
 
-    // ── 캐릭터 이름 + 초상화 ──
-    this._portraitText = this.add.text(NAME_X, NAME_Y, '', {
-      fontSize: `${PORTRAIT_SIZE}px`,
+    // ── 캐릭터 초상화: 스프라이트 이미지 + 이모지 fallback (Phase 14-2b) ──
+    this._portraitImage = this.add.image(NAME_X + PORTRAIT_SIZE / 2, NAME_Y + PORTRAIT_SIZE / 2, '__DEFAULT')
+      .setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE)
+      .setDepth(TEXT_DEPTH)
+      .setVisible(false);
+
+    this._portraitEmoji = this.add.text(NAME_X, NAME_Y, '', {
+      fontSize: '24px',
     }).setDepth(TEXT_DEPTH);
 
     this._nameText = this.add.text(NAME_X + PORTRAIT_SIZE + 6, NAME_Y + 2, '', {
@@ -172,13 +179,22 @@ export class DialogueScene extends Phaser.Scene {
     // 화자 갱신
     const isNarrator = (line.speaker === 'narrator' || line.speaker === '');
     if (isNarrator) {
-      this._portraitText.setText('');
+      this._portraitImage.setVisible(false);
+      this._portraitEmoji.setText('');
       this._nameText.setText('');
       // 내레이터 스타일: 이탤릭
       this._dialogueText.setFontStyle('italic');
       this._dialogueText.setColor('#cccccc');
     } else {
-      this._portraitText.setText(line.portrait || '');
+      // 초상화: 스프라이트 이미지 우선, 로드 실패 시 이모지 fallback (Phase 14-2b)
+      const portraitKey = line.portraitKey ? `portrait_${line.portraitKey}` : '';
+      if (portraitKey && SpriteLoader.hasTexture(this, portraitKey)) {
+        this._portraitImage.setTexture(portraitKey).setVisible(true);
+        this._portraitEmoji.setVisible(false);
+      } else {
+        this._portraitEmoji.setText(line.portrait || '').setVisible(true);
+        this._portraitImage.setVisible(false);
+      }
       this._nameText.setText(line.speaker);
       this._dialogueText.setFontStyle('');
       this._dialogueText.setColor('#ffffff');

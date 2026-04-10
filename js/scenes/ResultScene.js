@@ -15,6 +15,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { STAGES, STAGE_ORDER } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
+import { DialogueManager } from '../managers/DialogueManager.js';
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -191,6 +192,11 @@ export class ResultScene extends Phaser.Scene {
 
     this._createButton(y, '스테이지 선택', 0x444444, () => {
       this._fadeToScene('StageSelectScene');
+    });
+
+    // ── 대화 트리거: 첫 실패 격려 (Phase 14-2d) ──
+    this.time.delayedCall(800, () => {
+      DialogueManager.start(this, 'after_first_loss');
     });
   }
 
@@ -377,6 +383,47 @@ export class ResultScene extends Phaser.Scene {
 
     this._createButton(y, '\uC2A4\uD14C\uC774\uC9C0 \uC120\uD0DD', 0x444444, () => {
       this._fadeToScene('StageSelectScene');
+    });
+
+    // ── 대화 트리거 (Phase 14-2d) ──
+    this._triggerResultDialogues(stars, isFirstClear);
+  }
+
+  // ── 대화 트리거 (Phase 14-2d) ──────────────────────────────────────
+
+  /**
+   * 정산 화면에서 대화를 트리거한다.
+   * 별점 애니메이션(500ms) + 여유(300ms) 후 대화 시작.
+   * @param {number} stars - 획득 별점
+   * @param {boolean} isFirstClear - 첫 클리어 여부
+   * @private
+   */
+  _triggerResultDialogues(stars, isFirstClear) {
+    if (stars <= 0 || !isFirstClear) return;
+
+    this.time.delayedCall(800, () => {
+      // 특수 스테이지별 대화 (연쇄 트리거)
+      if (this.stageId === '1-6') {
+        DialogueManager.start(this, 'stage_first_clear', {
+          onComplete: () => {
+            DialogueManager.start(this, 'chapter1_clear');
+          }
+        });
+        return;
+      }
+
+      if (this.stageId === '2-1') {
+        DialogueManager.start(this, 'rin_first_meet');
+        return;
+      }
+
+      if (this.stageId === '3-3') {
+        DialogueManager.start(this, 'chapter3_rin_joins');
+        return;
+      }
+
+      // 기본: 첫 클리어 대화
+      DialogueManager.start(this, 'stage_first_clear');
     });
   }
 
