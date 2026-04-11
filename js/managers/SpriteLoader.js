@@ -3,6 +3,7 @@
  * Phaser preload()에서 호출하여 적/보스/타워/셰프/재료 아이콘을 로드한다.
  * Phase 9-4: south 방향 정지 이미지만 우선 로드.
  * Phase 12: 적/보스 8방향 걷기 애니메이션 프레임 로드 + Phaser anim 등록.
+ * Phase 19-4: 서비스씬 에셋 (테이블 5종, 손님 5종, 바닥, 카운터) 로드.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -12,6 +13,10 @@
  *   셰프:   chef_{id}      (예: chef_petit_chef)
  *   재료:   ingredient_{id} (예: ingredient_carrot)
  *   타일셋: tileset_{id}    (예: tileset_pasta_field)
+ *   테이블: table_lv{N}    (예: table_lv0)
+ *   손님:   customer_{type} (예: customer_normal)
+ *   바닥:   floor_hall
+ *   카운터: counter_cooking
  */
 
 // ── 에셋 경로 루트 ──
@@ -103,6 +108,15 @@ const TILESET_IDS = [
   'dessert_cafe', 'grand_finale',
 ];
 
+// ── 서비스씬 에셋 경로 (Phase 19-4) ──
+const SERVICE_ROOT = '/sprites/service';
+
+// ── 테이블 등급 수 ──
+const TABLE_GRADE_COUNT = 5; // Lv0 ~ Lv4
+
+// ── 손님 유형 목록 ──
+const CUSTOMER_TYPE_IDS = ['normal', 'vip', 'gourmet', 'rushed', 'group'];
+
 export class SpriteLoader {
   /**
    * Phaser scene의 preload()에서 호출.
@@ -119,6 +133,7 @@ export class SpriteLoader {
     SpriteLoader._loadIngredients(scene);
     SpriteLoader._loadTilesets(scene);
     SpriteLoader._loadPortraits(scene);
+    SpriteLoader._loadServiceAssets(scene);
   }
 
   /**
@@ -290,6 +305,25 @@ export class SpriteLoader {
         `${SPRITES_ROOT}/portraits/portrait_${id}.png`
       );
     }
+  }
+
+  /**
+   * 서비스씬 에셋 로드 — 테이블 5종, 손님 5종, 바닥, 카운터.
+   * @param {Phaser.Scene} scene
+   * @private
+   */
+  static _loadServiceAssets(scene) {
+    // 테이블 Lv0~4
+    for (let lv = 0; lv < TABLE_GRADE_COUNT; lv++) {
+      scene.load.image(`table_lv${lv}`, `${SERVICE_ROOT}/table_lv${lv}.png`);
+    }
+    // 손님 유형별
+    for (const type of CUSTOMER_TYPE_IDS) {
+      scene.load.image(`customer_${type}`, `${SERVICE_ROOT}/customer_${type}.png`);
+    }
+    // 홀 바닥 + 카운터
+    scene.load.image('floor_hall', `${SERVICE_ROOT}/floor_hall.png`);
+    scene.load.image('counter_cooking', `${SERVICE_ROOT}/counter_cooking.png`);
   }
 
   /**

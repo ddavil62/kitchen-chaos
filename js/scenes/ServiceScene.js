@@ -33,6 +33,7 @@ import { VFXManager } from '../managers/VFXManager.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
 import { ToolManager } from '../managers/ToolManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
+import { SpriteLoader } from '../managers/SpriteLoader.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -412,10 +413,16 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createTables() {
-    // 홀 배경 — 인테리어 Lv3 이상 시 약간 밝은 배경
-    const hallBgColor = (this.interiorFlower >= 3 || this.interiorLighting >= 3) ? 0x222240 : 0x1a1a2e;
-    this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, hallBgColor)
-      .setDepth(0);
+    // 홀 배경 — Phase 19-4: 바닥 스프라이트 우선, fallback: 색상 직사각형
+    if (SpriteLoader.hasTexture(this, 'floor_hall')) {
+      this.add.image(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, 'floor_hall')
+        .setDisplaySize(GAME_WIDTH, HALL_H)
+        .setDepth(0);
+    } else {
+      const hallBgColor = (this.interiorFlower >= 3 || this.interiorLighting >= 3) ? 0x222240 : 0x1a1a2e;
+      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, hallBgColor)
+        .setDepth(0);
+    }
 
     /** @type {Phaser.GameObjects.Container[]} */
     this.tableContainers = [];
@@ -437,31 +444,38 @@ export class ServiceScene extends Phaser.Scene {
 
         const container = this.add.container(cx, cy).setDepth(10);
 
-        // 테이블 배경 — 등급별 색상
-        const tableBg = this.add.rectangle(0, 0, tw, th, TABLE_COLORS[grade], 0.6)
-          .setStrokeStyle(TABLE_STROKE_WIDTH[grade], TABLE_STROKE_COLOR[grade]);
-        container.add(tableBg);
+        // 테이블 배경 — Phase 19-4: 등급별 스프라이트 우선, fallback: 색상 직사각형
+        const tableKey = `table_lv${grade}`;
+        if (SpriteLoader.hasTexture(this, tableKey)) {
+          const tableImg = this.add.image(0, 0, tableKey)
+            .setDisplaySize(tw, th);
+          container.add(tableImg);
+        } else {
+          const tableBg = this.add.rectangle(0, 0, tw, th, TABLE_COLORS[grade], 0.6)
+            .setStrokeStyle(TABLE_STROKE_WIDTH[grade], TABLE_STROKE_COLOR[grade]);
+          container.add(tableBg);
 
-        // Lv1: 테이블보 (가운데 작은 밝은 사각형)
-        if (grade >= 1) {
-          const cloth = this.add.rectangle(0, 0, tw - 16, th - 16, 0xffffff, 0.15);
-          container.add(cloth);
+          // Lv1: 테이블보 (가운데 작은 밝은 사각형)
+          if (grade >= 1) {
+            const cloth = this.add.rectangle(0, 0, tw - 16, th - 16, 0xffffff, 0.15);
+            container.add(cloth);
+          }
+
+          // Lv4: VIP 뱃지 텍스트
+          if (grade >= 4) {
+            const vipBadge = this.add.text(tw / 2 - 4, -th / 2 + 4, 'VIP', {
+              fontSize: '7px', fontStyle: 'bold', color: '#ffd700',
+              backgroundColor: '#000000aa',
+              padding: { x: 2, y: 1 },
+            }).setOrigin(1, 0);
+            container.add(vipBadge);
+          }
+
+          // 의자 (작은 원 2개)
+          const chair1 = this.add.circle(-chairOffset, 0, 8, 0x654321);
+          const chair2 = this.add.circle(chairOffset, 0, 8, 0x654321);
+          container.add([chair1, chair2]);
         }
-
-        // Lv4: VIP 뱃지 텍스트
-        if (grade >= 4) {
-          const vipBadge = this.add.text(tw / 2 - 4, -th / 2 + 4, 'VIP', {
-            fontSize: '7px', fontStyle: 'bold', color: '#ffd700',
-            backgroundColor: '#000000aa',
-            padding: { x: 2, y: 1 },
-          }).setOrigin(1, 0);
-          container.add(vipBadge);
-        }
-
-        // 의자 (작은 원 2개)
-        const chair1 = this.add.circle(-chairOffset, 0, 8, 0x654321);
-        const chair2 = this.add.circle(chairOffset, 0, 8, 0x654321);
-        container.add([chair1, chair2]);
 
         // "빈 테이블" 텍스트
         const statusText = this.add.text(0, -20, '\uBE48 \uD14C\uC774\uBE14', {
@@ -485,11 +499,14 @@ export class ServiceScene extends Phaser.Scene {
           .setOrigin(0, 0.5).setVisible(false);
         container.add(pBarFill);
 
-        // 손님 아이콘 (숨겨짐)
-        const custIcon = this.add.text(0, -5, '', {
+        // 손님 아이콘 — Phase 19-4: 스프라이트 Image + fallback Text 이중 생성
+        const custIconImg = this.add.image(0, -5, '__MISSING')
+          .setDisplaySize(32, 32).setVisible(false);
+        container.add(custIconImg);
+        const custIconText = this.add.text(0, -5, '', {
           fontSize: '24px',
         }).setOrigin(0.5).setVisible(false);
-        container.add(custIcon);
+        container.add(custIconText);
 
         // 터치 영역
         const hitArea = this.add.rectangle(0, 0, tw + 10, th + 10, 0x000000, 0)
@@ -505,7 +522,8 @@ export class ServiceScene extends Phaser.Scene {
         container.setData('bubbleText', bubbleText);
         container.setData('pBarBg', pBarBg);
         container.setData('pBarFill', pBarFill);
-        container.setData('custIcon', custIcon);
+        container.setData('custIconImg', custIconImg);
+        container.setData('custIconText', custIconText);
       }
     }
   }
@@ -523,7 +541,8 @@ export class ServiceScene extends Phaser.Scene {
     const bubbleText = container.getData('bubbleText');
     const pBarBg = container.getData('pBarBg');
     const pBarFill = container.getData('pBarFill');
-    const custIcon = container.getData('custIcon');
+    const custIconImg = container.getData('custIconImg');
+    const custIconText = container.getData('custIconText');
 
     if (!cust) {
       // Phase 11-3c: 빈 테이블이 이미 빈 상태면 렌더 상태 변경 생략
@@ -535,7 +554,8 @@ export class ServiceScene extends Phaser.Scene {
       bubbleText.setVisible(false);
       pBarBg.setVisible(false);
       pBarFill.setVisible(false);
-      custIcon.setVisible(false);
+      custIconImg.setVisible(false);
+      custIconText.setVisible(false);
       return;
     }
 
@@ -544,11 +564,22 @@ export class ServiceScene extends Phaser.Scene {
 
     statusText.setVisible(false);
 
-    // 손님 아이콘 — Phase 8-5: customerType 기반
-    const typeIcon = CUSTOMER_TYPE_ICONS[cust.customerType] || CUSTOMER_TYPE_ICONS.normal;
+    // 손님 아이콘 — Phase 19-4: 스프라이트 우선, fallback: 이모지 텍스트
+    const custType = cust.customerType || 'normal';
+    const custSpriteKey = `customer_${custType}`;
+    const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
     // 단체 손님 부분 서빙 완료 시 체크마크 표시
-    const servedMark = (cust.customerType === 'group' && cust.groupServed) ? '\u2705' : '';
-    custIcon.setText(servedMark || typeIcon).setVisible(true);
+    const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
+
+    if (!servedMark && SpriteLoader.hasTexture(this, custSpriteKey)) {
+      // 스프라이트 이미지 표시
+      custIconImg.setTexture(custSpriteKey).setDisplaySize(32, 32).setVisible(true);
+      custIconText.setVisible(false);
+    } else {
+      // fallback: 이모지 텍스트 표시 (또는 체크마크)
+      custIconImg.setVisible(false);
+      custIconText.setText(servedMark || typeIcon).setVisible(true);
+    }
 
     // 말풍선 — 요리 이름
     const recipe = RECIPE_MAP[cust.dish];
@@ -586,10 +617,16 @@ export class ServiceScene extends Phaser.Scene {
 
       const container = this.add.container(cx, cy).setDepth(10);
 
-      // 슬롯 배경
-      const bg = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x333344)
-        .setStrokeStyle(1, 0x555566);
-      container.add(bg);
+      // 슬롯 배경 — Phase 19-4: 카운터 스프라이트 우선, fallback: 색상 직사각형
+      if (SpriteLoader.hasTexture(this, 'counter_cooking')) {
+        const bg = this.add.image(0, 0, 'counter_cooking')
+          .setDisplaySize(slotW - 10, COOK_H - 10);
+        container.add(bg);
+      } else {
+        const bg = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x333344)
+          .setStrokeStyle(1, 0x555566);
+        container.add(bg);
+      }
 
       // 라벨
       const label = this.add.text(0, -12, '\uBE48 \uC2AC\uB86F', {
