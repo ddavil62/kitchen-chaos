@@ -605,10 +605,26 @@ export class ServiceScene extends Phaser.Scene {
         .setOrigin(0, 0.5);
       container.add(progFill);
 
+      // 버리기 버튼 — ready 상태일 때만 표시
+      const discardBtnW = 60;
+      const discardBtnX = (slotW - 10) / 2 - discardBtnW / 2 - 2;
+      const discardBtn = this.add.rectangle(discardBtnX, -12, discardBtnW, 20, 0x662222)
+        .setStrokeStyle(1, 0xaa4444)
+        .setInteractive({ useHandCursor: true })
+        .setVisible(false);
+      container.add(discardBtn);
+      const discardLabel = this.add.text(discardBtnX, -12, '🗑 버리기', {
+        fontSize: '9px', color: '#ffaaaa',
+      }).setOrigin(0.5).setVisible(false);
+      container.add(discardLabel);
+      discardBtn.on('pointerdown', () => this._discardDish(i));
+
       container.setData('label', label);
       container.setData('progBg', progBg);
       container.setData('progFill', progFill);
       container.setData('progWidth', slotW - 30);
+      container.setData('discardBtn', discardBtn);
+      container.setData('discardLabel', discardLabel);
 
       this.cookSlotContainers.push(container);
     }
@@ -626,6 +642,12 @@ export class ServiceScene extends Phaser.Scene {
     const label = container.getData('label');
     const progFill = container.getData('progFill');
     const progWidth = container.getData('progWidth');
+    const discardBtn = container.getData('discardBtn');
+    const discardLabel = container.getData('discardLabel');
+
+    // 기본적으로 버리기 버튼 숨김
+    discardBtn?.setVisible(false);
+    discardLabel?.setVisible(false);
 
     // Phase 8-5: 주방 사고로 비활성화된 슬롯
     if (idx === this.accidentSlotIdx) {
@@ -652,6 +674,9 @@ export class ServiceScene extends Phaser.Scene {
     if (slot.ready) {
       label.setText(`\u2705 ${slot.recipe.nameKo}`).setColor('#44ff44');
       progFill.setScale(1, 1).setFillStyle(0x44ff44);
+      // 완료된 요리 — 버리기 버튼 표시
+      discardBtn?.setVisible(true);
+      discardLabel?.setVisible(true);
     } else {
       const remain = Math.ceil(slot.timeLeft / 1000);
       label.setText(`\uC870\uB9AC\uC911: ${slot.recipe.nameKo} ${remain}\uCD08`).setColor('#ffffff');
@@ -1522,6 +1547,27 @@ export class ServiceScene extends Phaser.Scene {
       }
       this._updateCookSlotUI(i);
     }
+  }
+
+  // ── 조리 슬롯 버리기 ──────────────────────────────────────────────
+
+  /**
+   * 완료된 요리를 슬롯에서 버린다. 재료는 반환하지 않는다.
+   * @param {number} idx 슬롯 인덱스
+   * @private
+   */
+  _discardDish(idx) {
+    if (this.isServiceOver || this.isPaused) return;
+    const slot = this.cookingSlots[idx];
+    if (!slot.ready) return;
+
+    const name = slot.recipe?.nameKo || '요리';
+    slot.recipe = null;
+    slot.timeLeft = 0;
+    slot.totalTime = 0;
+    slot.ready = false;
+    this._updateCookSlotUI(idx);
+    this._showMessage(`${name} 버림`);
   }
 
   // ── 레시피 탭 → 조리 시작 ─────────────────────────────────────────
