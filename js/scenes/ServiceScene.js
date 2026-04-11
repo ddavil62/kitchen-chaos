@@ -1648,13 +1648,23 @@ export class ServiceScene extends Phaser.Scene {
   /**
    * 재고 소진으로 주문 불가능해진 착석 손님을 패널티 없이 퇴장시킨다.
    * consumeRecipe 직후 호출하여 이미 착석한 손님이 솔드아웃 메뉴를 무한 대기하는 문제를 해결한다.
+   * 단, 이미 조리 중이거나 완성된 요리가 있는 레시피의 손님은 퇴장 제외 (재료 소비 후 즉시 쫓겨나는 버그 방지).
    * @private
    */
   _dismissSoldOutCustomers() {
+    // 현재 조리 중이거나 완성 대기 중인 레시피 ID 집합
+    const cookingRecipeIds = new Set(
+      this.cookingSlots
+        .filter(s => s && s.recipe)
+        .map(s => s.recipe.id)
+    );
+
     for (let i = 0; i < this.tableCount; i++) {
       const cust = this.tables[i];
       if (!cust) continue;
       if (this.inventoryManager.hasEnough(cust.recipe.ingredients)) continue;
+      // 이 손님의 요리가 조리 중이면 퇴장 보류
+      if (cookingRecipeIds.has(cust.recipe.id)) continue;
 
       // 단체 손님: 짝 테이블도 함께 퇴장
       if (cust.customerType === 'group' && cust.groupPairIdx >= 0) {
