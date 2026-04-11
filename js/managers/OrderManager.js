@@ -19,9 +19,10 @@ export class OrderManager {
   /**
    * 웨이브 시작 시 오더 생성 시도.
    * @param {number} waveNum 현재 웨이브 번호
+   * @param {number} [maxEnemyCount=Infinity] 이번 웨이브 실제 적 총 수 (달성 불가 kill_count 필터링용)
    * @returns {object|null} 생성된 오더 또는 null
    */
-  tryGenerateOrder(waveNum) {
+  tryGenerateOrder(waveNum, maxEnemyCount = Infinity) {
     this.currentOrder = null;
     this.progress = 0;
     this.completed = false;
@@ -30,9 +31,14 @@ export class OrderManager {
     if (waveNum < ORDER_MIN_WAVE) return null;
     if (Math.random() > ORDER_CHANCE) return null;
 
-    // 랜덤 오더 선택
-    const idx = Math.floor(Math.random() * ORDER_TEMPLATES.length);
-    this.currentOrder = { ...ORDER_TEMPLATES[idx] };
+    // kill_count 오더는 이번 웨이브 적 수 이하인 것만 허용
+    const feasible = ORDER_TEMPLATES.filter(
+      o => o.type !== 'kill_count' || o.target <= maxEnemyCount
+    );
+    if (feasible.length === 0) return null;
+
+    const idx = Math.floor(Math.random() * feasible.length);
+    this.currentOrder = { ...feasible[idx] };
     return this.currentOrder;
   }
 

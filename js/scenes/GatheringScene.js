@@ -992,8 +992,12 @@ export class GatheringScene extends Phaser.Scene {
     // ── Phase 11-3b: 보스 웨이브 BGM 전환 ──
     this._checkBossWaveBGM(waveNum);
 
-    // ── 오더 생성 시도 ──
-    const order = this.orderManager.tryGenerateOrder(waveNum);
+    // ── 오더 생성 시도 (이번 웨이브 적 총 수 전달로 달성 불가 오더 방지) ──
+    const waveDef = this.waveManager._waves[waveNum - 1];
+    const maxEnemyCount = waveDef
+      ? waveDef.enemies.reduce((sum, g) => sum + g.count, 0)
+      : Infinity;
+    const order = this.orderManager.tryGenerateOrder(waveNum, maxEnemyCount);
     this._updateOrderHUD();
     if (order) {
       this._showMessage(`[오더] ${order.descKo}`, 2000);
