@@ -212,9 +212,10 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── 빙결 ──
     if (this.isFrozen) {
       this.freezeTimer -= delta;
-      if (this.freezeTimer <= 0) {
+      if (this.freezeTimer <= 0 || !isFinite(this.freezeTimer)) {
         this.isFrozen = false;
-        this.setTint();  // 빙결 틴트 해제
+        this.freezeTimer = 0;
+        this.clearTint();  // 빙결 틴트 해제 (setTint() 인자 없음은 Container에서 오작동 가능)
       }
       // 빙결 중에는 이동/재생 불가, 화상 DoT만 적용
       if (this.isBurning) {
