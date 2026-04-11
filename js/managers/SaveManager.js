@@ -18,7 +18,7 @@
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 13;
+const SAVE_VERSION = 14;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -66,9 +66,9 @@ function createDefault() {
       muted: false,               // 전체 음소거 여부
     },
     // ── Phase 13 추가 ──
-    gold: 80,              // 영구 골드 (영업에서 누적, 스타터 보조금 포함)
+    gold: 0,               // 영구 골드 (영업에서 누적)
     tools: {
-      pan:      { count: 2, level: 1 },  // 스타터 키트: 프라이팬 2개
+      pan:      { count: 4, level: 1 },  // 스타터 키트: 프라이팬 4개
       salt:     { count: 0, level: 1 },
       grill:    { count: 0, level: 1 },
       delivery: { count: 0, level: 1 },
@@ -735,6 +735,14 @@ export class SaveManager {
         data.storyProgress.storyFlags = {};
       }
       data.version = 13;
+    }
+
+    // v13 → v14: 스타터 프라이팬 2개 → 4개 (초반 난이도 완화)
+    if (data.version < 14) {
+      if (data.tools?.pan && data.tools.pan.count <= 2) {
+        data.tools.pan.count = 4;
+      }
+      data.version = 14;
     }
 
     return data;

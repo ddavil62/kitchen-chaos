@@ -209,7 +209,7 @@ export class ToolManager {
    */
   static _defaultTools() {
     return {
-      pan:            { count: 2, level: 1 },
+      pan:            { count: 4, level: 1 },
       salt:           { count: 0, level: 1 },
       grill:          { count: 0, level: 1 },
       delivery:       { count: 0, level: 1 },
