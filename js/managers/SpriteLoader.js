@@ -325,10 +325,6 @@ export class SpriteLoader {
     // 홀 바닥 + 카운터
     scene.load.image('floor_hall', `${SERVICE_ROOT}/floor_hall.png`);
     scene.load.image('counter_cooking', `${SERVICE_ROOT}/counter_cooking.png`);
-    // 홀 장식 — 뒷벽, 코너 식물, 입구 매트
-    scene.load.image('wall_back',    `${SERVICE_ROOT}/wall_back.png`);
-    scene.load.image('decor_plant',  `${SERVICE_ROOT}/decor_plant.png`);
-    scene.load.image('entrance_mat', `${SERVICE_ROOT}/entrance_mat.png`);
   }
 
   /**
