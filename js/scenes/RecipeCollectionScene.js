@@ -331,7 +331,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
 
       // 보유 수 / 최대 수
       const countStr = `${count} / ${def.maxCount}`;
-      const countTxt = this.add.text(x, y + 35, countStr, {
+      const countTxt = this.add.text(x, y + 30, countStr, {
         fontSize: '10px', color: count > 0 ? '#88ff88' : '#666666',
       }).setOrigin(0.5);
       this._gridContainer.add(countTxt);
@@ -354,7 +354,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
     }
 
     const cx = GAME_WIDTH / 2;
-    const cy = GAME_HEIGHT / 2 + 40;
+    const cy = GAME_HEIGHT / 2 + 10;
     const container = this.add.container(0, 0).setDepth(50);
 
     // 오버레이 (탭으로 닫기)
@@ -362,40 +362,40 @@ export class RecipeCollectionScene extends Phaser.Scene {
       GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5).setInteractive();
     container.add(overlay);
 
-    // 팝업 배경 (320x320)
-    const popBg = this.add.rectangle(cx, cy, 320, 320, 0x221100)
+    // 팝업 배경 (320x260)
+    const popBg = this.add.rectangle(cx, cy, 320, 260, 0x221100)
       .setStrokeStyle(2, toolDef.color);
     container.add(popBg);
 
     // 헤더: 아이콘 + 이름
     const icon = RecipeCollectionScene.TOOL_ICONS[toolDef.id] || '\uD83D\uDD27';
-    container.add(this.add.text(cx - 110, cy - 140, `${icon} ${toolDef.nameKo}`, {
+    container.add(this.add.text(cx - 110, cy - 110, `${icon} ${toolDef.nameKo}`, {
       fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }));
 
     // 닫기 버튼 (X)
-    const closeBtn = this.add.rectangle(cx + 130, cy - 140, 36, 24, 0xcc2222)
+    const closeBtn = this.add.rectangle(cx + 130, cy - 110, 36, 24, 0xcc2222)
       .setInteractive({ useHandCursor: true });
     container.add(closeBtn);
-    container.add(this.add.text(cx + 130, cy - 140, '\u2715', {
+    container.add(this.add.text(cx + 130, cy - 110, '\u2715', {
       fontSize: '14px', color: '#ffffff',
     }).setOrigin(0.5));
 
     // 구분선
-    container.add(this.add.rectangle(cx, cy - 118, 280, 1, 0x444444));
+    container.add(this.add.rectangle(cx, cy - 88, 280, 1, 0x444444));
 
     // 기능 설명 (descKo)
-    container.add(this.add.text(cx, cy - 106, toolDef.descKo || '', {
+    container.add(this.add.text(cx, cy - 76, toolDef.descKo || '', {
       fontSize: '12px', color: '#cccccc', wordWrap: { width: 270 }, lineSpacing: 3,
     }).setOrigin(0.5, 0));
 
     // 구분선
-    container.add(this.add.rectangle(cx, cy - 74, 280, 1, 0x444444));
+    container.add(this.add.rectangle(cx, cy - 36, 280, 1, 0x444444));
 
     // 스탯 비교표 헤더
     const tableX = cx - 120;
-    let rowY = cy - 60;
+    let rowY = cy - 22;
     const colOffsets = [0, 100, 150, 200];  // 항목, Lv1, Lv2, Lv3
     const headerLabels = ['\uD56D\uBAA9', 'Lv1', 'Lv2', 'Lv3'];
     headerLabels.forEach((h, i) => {
@@ -431,10 +431,10 @@ export class RecipeCollectionScene extends Phaser.Scene {
     }
 
     // 구분선
-    container.add(this.add.rectangle(cx, rowY + 4, 280, 1, 0x444444));
+    container.add(this.add.rectangle(cx, rowY + 12, 280, 1, 0x444444));
 
     // 로어 (loreKo)
-    container.add(this.add.text(cx, rowY + 14, toolDef.loreKo || '', {
+    container.add(this.add.text(cx, rowY + 22, toolDef.loreKo || '', {
       fontSize: '11px', fontStyle: 'italic', color: '#aaaaaa',
       wordWrap: { width: 270 }, lineSpacing: 2,
     }).setOrigin(0.5, 0));

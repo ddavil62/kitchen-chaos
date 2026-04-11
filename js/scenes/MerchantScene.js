@@ -181,7 +181,11 @@ export class MerchantScene extends Phaser.Scene {
       const infoBtnX = GAME_WIDTH - MARGIN_X - 10;
       const infoBtnY = yOff + 10;
       const infoBg = this.add.rectangle(infoBtnX, infoBtnY, 20, 20, 0x224466)
-        .setInteractive({ useHandCursor: true });
+        .setInteractive({
+          useHandCursor: true,
+          hitArea: new Phaser.Geom.Rectangle(-18, -18, 36, 36),
+          hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+        });
       this.listContainer.add(infoBg);
       const infoTxt = this.add.text(infoBtnX, infoBtnY, '\u2139', {
         fontSize: '13px', fontStyle: 'bold', color: '#88ccff',
@@ -590,51 +594,51 @@ export class MerchantScene extends Phaser.Scene {
       .setDepth(100).setInteractive();
     elements.push(overlay);
 
-    // 팝업 배경 (300x340)
-    const popBg = this.add.rectangle(cx, cy, 300, 340, 0x221100)
+    // 팝업 배경 (300x280)
+    const popBg = this.add.rectangle(cx, cy, 300, 280, 0x221100)
       .setDepth(101).setStrokeStyle(2, toolDef.color);
     elements.push(popBg);
 
     // 헤더: 아이콘 + 이름
     const icon = TOOL_ICONS[toolDef.id] || '\uD83D\uDD27';
-    const titleText = this.add.text(cx - 100, cy - 150, `${icon} ${toolDef.nameKo}`, {
+    const titleText = this.add.text(cx - 100, cy - 120, `${icon} ${toolDef.nameKo}`, {
       fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setDepth(102);
     elements.push(titleText);
 
     // 닫기 버튼 (X)
-    const closeBtn = this.add.rectangle(cx + 125, cy - 150, 36, 24, 0xcc2222)
+    const closeBtn = this.add.rectangle(cx + 125, cy - 120, 36, 24, 0xcc2222)
       .setInteractive({ useHandCursor: true }).setDepth(102);
     elements.push(closeBtn);
-    const closeTxt = this.add.text(cx + 125, cy - 150, '\u2715', {
+    const closeTxt = this.add.text(cx + 125, cy - 120, '\u2715', {
       fontSize: '14px', color: '#ffffff',
     }).setOrigin(0.5).setDepth(102);
     elements.push(closeTxt);
 
     // 구분선 1
-    const sep1 = this.add.rectangle(cx, cy - 128, 260, 1, 0x444444).setDepth(102);
+    const sep1 = this.add.rectangle(cx, cy - 98, 260, 1, 0x444444).setDepth(102);
     elements.push(sep1);
 
     // 기능 설명 (descKo)
-    const descText = this.add.text(cx, cy - 110, toolDef.descKo || '', {
+    const descText = this.add.text(cx, cy - 80, toolDef.descKo || '', {
       fontSize: '13px', color: '#cccccc', wordWrap: { width: 260 }, lineSpacing: 3,
     }).setOrigin(0.5, 0).setDepth(102);
     elements.push(descText);
 
     // 구분선 2
-    const sep2 = this.add.rectangle(cx, cy - 70, 260, 1, 0x444444).setDepth(102);
+    const sep2 = this.add.rectangle(cx, cy - 40, 260, 1, 0x444444).setDepth(102);
     elements.push(sep2);
 
     // 현재 레벨 표시
-    const lvText = this.add.text(cx - 120, cy - 58, `\uD604\uC7AC Lv: ${currentLevel}`, {
+    const lvText = this.add.text(cx - 120, cy - 28, `\uD604\uC7AC Lv: ${currentLevel}`, {
       fontSize: '12px', fontStyle: 'bold', color: '#ffd700',
     }).setDepth(102);
     elements.push(lvText);
 
     // 스탯 바 렌더링
     const stats = toolDef.stats[currentLevel];
-    let barY = cy - 36;
+    let barY = cy - 6;
     const barX = cx - 30;
 
     // 공격력 (attack 카테고리만)
@@ -662,11 +666,11 @@ export class MerchantScene extends Phaser.Scene {
     }
 
     // 구분선 3
-    const sep3 = this.add.rectangle(cx, barY + 4, 260, 1, 0x444444).setDepth(102);
+    const sep3 = this.add.rectangle(cx, barY + 12, 260, 1, 0x444444).setDepth(102);
     elements.push(sep3);
 
     // 로어 (loreKo)
-    const loreText = this.add.text(cx, barY + 16, toolDef.loreKo || '', {
+    const loreText = this.add.text(cx, barY + 24, toolDef.loreKo || '', {
       fontSize: '11px', fontStyle: 'italic', color: '#aaaaaa',
       wordWrap: { width: 260 }, lineSpacing: 2,
     }).setOrigin(0.5, 0).setDepth(102);
