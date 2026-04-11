@@ -1046,6 +1046,10 @@ export class GatheringScene extends Phaser.Scene {
     this.vfx.waveAnnounce(waveNum);
     this.vfx.screenFlash(0xffffff, 0.3, 200);
 
+    // ── Phase 21: 웨이브 시작 시 타워 이동 모드 자동 해제 ──
+    // 이동/회수 액션 패널과 이동 가능 셀 오버레이를 정리한다.
+    this._deselectTower();
+
     // ── Phase 11-3b: 보스 웨이브 BGM 전환 ──
     this._checkBossWaveBGM(waveNum);
 
