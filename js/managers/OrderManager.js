@@ -38,7 +38,7 @@ export class OrderManager {
 
   /**
    * 진행도 증가 (이벤트 발생 시 호출).
-   * @param {string} type 이벤트 타입 (kill_count, serve_count, collect_count, enemy_leaked)
+   * @param {string} type 이벤트 타입 (kill_count, collect_count, enemy_leaked)
    * @param {number} [amount=1] 증가량
    */
   addProgress(type, amount = 1) {

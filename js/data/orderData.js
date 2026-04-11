@@ -1,6 +1,8 @@
 /**
  * @fileoverview 오더(웨이브 내 미션) 템플릿 데이터.
  * Phase 6: 웨이브 시작 시 30% 확률로 출현, 달성 시 보너스.
+ * 주의: serve_count 타입은 채집↔영업 페이즈 분리 이후 레거시 제거됨.
+ * 유효 타입: kill_count, no_leak, collect_count
  */
 
 export const ORDER_TEMPLATES = [
@@ -19,22 +21,6 @@ export const ORDER_TEMPLATES = [
     target: 20,
     rewardGold: 40,
     rewardCoin: 8,
-  },
-  {
-    id: 'serve_1',
-    descKo: '이번 웨이브에서 요리 1개 서빙',
-    type: 'serve_count',
-    target: 1,
-    rewardGold: 25,
-    rewardCoin: 4,
-  },
-  {
-    id: 'serve_2',
-    descKo: '이번 웨이브에서 요리 2개 서빙',
-    type: 'serve_count',
-    target: 2,
-    rewardGold: 40,
-    rewardCoin: 7,
   },
   {
     id: 'no_leak',
