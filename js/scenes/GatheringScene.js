@@ -356,6 +356,9 @@ export class GatheringScene extends Phaser.Scene {
   _updateChefSkillCooldown(delta) {
     if (!this._chefData || this._skillReady) return;
 
+    // 웨이브 대기 중에는 쿨다운 회복 금지 (꼼수 방지)
+    if (!this.waveManager?.isActive) return;
+
     this._skillCooldownTimer -= delta;
     if (this._skillCooldownTimer <= 0) {
       this._skillReady = true;
