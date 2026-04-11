@@ -8,7 +8,7 @@ export const ENEMY_TYPES = {
   carrot_goblin: {
     id: 'carrot_goblin',
     nameKo: '당근 고블린',
-    hp: 80,
+    hp: 55,
     speed: 90,
     ingredient: 'carrot',
     bodyColor: 0xff6b35,

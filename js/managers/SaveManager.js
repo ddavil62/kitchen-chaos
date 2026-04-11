@@ -66,7 +66,7 @@ function createDefault() {
       muted: false,               // 전체 음소거 여부
     },
     // ── Phase 13 추가 ──
-    gold: 0,               // 영구 골드 (영업에서 누적)
+    gold: 80,              // 영구 골드 (영업에서 누적, 스타터 보조금 포함)
     tools: {
       pan:      { count: 2, level: 1 },  // 스타터 키트: 프라이팬 2개
       salt:     { count: 0, level: 1 },
