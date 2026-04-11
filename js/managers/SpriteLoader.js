@@ -325,6 +325,10 @@ export class SpriteLoader {
     // 홀 바닥 + 카운터
     scene.load.image('floor_hall', `${SERVICE_ROOT}/floor_hall.png`);
     scene.load.image('counter_cooking', `${SERVICE_ROOT}/counter_cooking.png`);
+    // Phase 19-6: 홀 배경 데코 에셋
+    scene.load.image('wall_back',     `${SERVICE_ROOT}/wall_back.png`);
+    scene.load.image('decor_plant',   `${SERVICE_ROOT}/decor_plant.png`);
+    scene.load.image('entrance_arch', `${SERVICE_ROOT}/entrance_arch.png`);
   }
 
   /**

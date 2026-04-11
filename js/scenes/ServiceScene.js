@@ -87,8 +87,8 @@ const SISO_HALF_W   = 40;
 const SISO_HALF_H   = 30;
 /** 격자 원점 절대 X 좌표 */
 const SISO_ORIGIN_X = 140;
-/** 격자 원점 절대 Y 좌표 (HALL_Y=40 기준 +80 = 120, 격자 하단이 y=268로 경계 12px 여백 확보) */
-const SISO_ORIGIN_Y = 120;
+/** 격자 원점 절대 Y 좌표 (Phase 19-6: 120→100으로 상향, 뒷벽 데코 공간 확보) */
+const SISO_ORIGIN_Y = 100;
 /** 테이블 스프라이트 표시 너비 */
 const SISO_TABLE_W  = 72;
 /** 테이블 스프라이트 표시 높이 */
@@ -365,7 +365,12 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createHUD() {
-    this.add.rectangle(GAME_WIDTH / 2, HUD_H / 2, GAME_WIDTH, HUD_H, 0x1a1a2e)
+    // Phase 19-6: HUD 배경 웜 다크 (#1c0e00)로 통일
+    this.add.rectangle(GAME_WIDTH / 2, HUD_H / 2, GAME_WIDTH, HUD_H, 0x1c0e00)
+      .setDepth(100);
+    // HUD 하단 골드 구분선 (1px, 반투명)
+    this.add.rectangle(GAME_WIDTH / 2, HUD_H, GAME_WIDTH, 1, 0xffd700)
+      .setAlpha(0.4)
       .setDepth(100);
 
     this.goldText = this.add.text(10, 10, `\uD83E\uDE99 ${this.totalGold}`, {
@@ -376,8 +381,9 @@ export class ServiceScene extends Phaser.Scene {
       fontSize: '14px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(0.5, 0).setDepth(101);
 
+    // Phase 19-6: satText 색상 웜 앰버로 통일
     this.satText = this.add.text(GAME_WIDTH - 10, 10, `\u2B50 ${this.satisfaction}%`, {
-      fontSize: '14px', color: '#ffcc00', fontStyle: 'bold',
+      fontSize: '14px', color: '#e8c87a', fontStyle: 'bold',
     }).setOrigin(1, 0).setDepth(101);
 
     this.comboText = this.add.text(GAME_WIDTH / 2, 26, '', {
@@ -466,6 +472,40 @@ export class ServiceScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * 홀 배경 데코 오브젝트 — 뒷벽, 화분, 입구를 배치한다.
+   * 에셋 미로드 시 해당 오브젝트를 생략하고 에러를 발생시키지 않는다.
+   * @private
+   */
+  _createHallDecor() {
+    // 뒷벽 — 홀 상단 가로 전체 배치
+    if (SpriteLoader.hasTexture(this, 'wall_back')) {
+      this.add.image(GAME_WIDTH / 2, HALL_Y + 26, 'wall_back')
+        .setDisplaySize(GAME_WIDTH, 52)
+        .setDepth(3);
+    }
+
+    // 화분 — 좌측 코너
+    if (SpriteLoader.hasTexture(this, 'decor_plant')) {
+      const plantY = 120;
+      this.add.image(18, plantY, 'decor_plant')
+        .setDisplaySize(28, 42)
+        .setDepth(10 + plantY);
+      // 우측 코너 — 좌우 반전
+      this.add.image(GAME_WIDTH - 18, plantY, 'decor_plant')
+        .setDisplaySize(28, 42)
+        .setFlipX(true)
+        .setDepth(10 + plantY);
+    }
+
+    // 입구 아치 — 홀 하단 경계
+    if (SpriteLoader.hasTexture(this, 'entrance_arch')) {
+      this.add.image(GAME_WIDTH / 2, COOK_Y - 24, 'entrance_arch')
+        .setDisplaySize(120, 40)
+        .setDepth(5);
+    }
+  }
+
   /** @private */
   _createTables() {
     // 홀 배경 — Phase 19-5: 아이소메트릭 헤링본 파케 바닥 텍스처 + fallback: 웜 브라운
@@ -479,6 +519,8 @@ export class ServiceScene extends Phaser.Scene {
     }
     // 아이소메트릭 격자 경계선 오버레이
     this._drawIsoFloor();
+    // Phase 19-6: 홀 배경 데코 오브젝트 (뒷벽·화분·입구)
+    this._createHallDecor();
 
     /** @type {Phaser.GameObjects.Container[]} */
     this.tableContainers = [];
@@ -668,9 +710,20 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createCookingSlots() {
-    // 조리 구역 전체 배경 (항상 렌더링 — floor_hall이 없는 영역 처리)
-    this.add.rectangle(GAME_WIDTH / 2, COOK_Y + COOK_H / 2, GAME_WIDTH, COOK_H, 0x222233)
-      .setDepth(0);
+    // Phase 19-6: 조리·재고·레시피 구역 공통 배경 (웜 다크 톤 통합)
+    this.add.rectangle(
+      GAME_WIDTH / 2,
+      COOK_Y + (RECIPE_Y + RECIPE_H - COOK_Y) / 2,
+      GAME_WIDTH,
+      RECIPE_Y + RECIPE_H - COOK_Y,
+      0x1c1008,
+    ).setDepth(0);
+    // 🔥 조리 섹션 레이블
+    this.add.text(10, COOK_Y + 4, '\uD83D\uDD25 \uC870\uB9AC', {
+      fontSize: '10px', color: '#8B6914', fontStyle: 'bold',
+    }).setDepth(10);
+    // COOK↔STOCK 구분선 (앰버 1px)
+    this.add.rectangle(GAME_WIDTH / 2, STOCK_Y, GAME_WIDTH, 1, 0x8B6914).setDepth(9);
 
     /** @type {Phaser.GameObjects.Container[]} */
     this.cookSlotContainers = [];
@@ -682,9 +735,9 @@ export class ServiceScene extends Phaser.Scene {
 
       const container = this.add.container(cx, cy).setDepth(10);
 
-      // 슬롯 배경 — Phase 19-4: 카운터 스프라이트(데코)와 어두운 배경 혼합
-      const bgRect = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x333344)
-        .setStrokeStyle(1, 0x555566);
+      // 슬롯 배경 — Phase 19-6: 웜 다크 팔레트로 통합
+      const bgRect = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x2d1a08)
+        .setStrokeStyle(1, 0x4a3520);
       container.add(bgRect);
       if (SpriteLoader.hasTexture(this, 'counter_cooking')) {
         // 카운터 이미지를 슬롯 왼쪽에 자연 크기(비율 유지)로 배치
@@ -793,11 +846,12 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createInventoryPanel() {
-    this.add.rectangle(GAME_WIDTH / 2, STOCK_Y + STOCK_H / 2, GAME_WIDTH, STOCK_H, 0x1a1a2e)
-      .setDepth(0);
+    // Phase 19-6: 개별 배경 제거 — _createCookingSlots() 공통 배경으로 통합
+    // STOCK↔RECIPE 구분선 (앰버 1px)
+    this.add.rectangle(GAME_WIDTH / 2, RECIPE_Y, GAME_WIDTH, 1, 0x8B6914).setDepth(9);
 
-    this.add.text(10, STOCK_Y + 5, '\uC7AC\uB8CC \uC7AC\uACE0', {
-      fontSize: '11px', color: '#aaaaaa', fontStyle: 'bold',
+    this.add.text(10, STOCK_Y + 5, '\uD83E\uDD55 \uC7AC\uACE0', {
+      fontSize: '11px', color: '#8B6914', fontStyle: 'bold',
     }).setDepth(10);
 
     /** @type {Object<string, Phaser.GameObjects.Text>} */
@@ -816,8 +870,9 @@ export class ServiceScene extends Phaser.Scene {
 
       const info = INGREDIENT_TYPES[type];
       const qty = this.inventoryManager.inventory[type] || 0;
+      // Phase 19-6: 활성 텍스트 색상 → 웜 앰버
       const txt = this.add.text(x, y, `${info.icon}\u00D7${qty}`, {
-        fontSize: '13px', color: qty > 0 ? '#ffffff' : '#555555',
+        fontSize: '13px', color: qty > 0 ? '#e8c87a' : '#555555',
       }).setDepth(10);
       this.stockTexts[type] = txt;
     });
@@ -829,7 +884,7 @@ export class ServiceScene extends Phaser.Scene {
       const qty = this.inventoryManager.inventory[type] || 0;
       const info = INGREDIENT_TYPES[type];
       txt.setText(`${info.icon}\u00D7${qty}`);
-      txt.setColor(qty > 0 ? '#ffffff' : '#555555');
+      txt.setColor(qty > 0 ? '#e8c87a' : '#555555');
     }
   }
 
@@ -837,11 +892,10 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createRecipeQuickSlots() {
-    this.add.rectangle(GAME_WIDTH / 2, RECIPE_Y + RECIPE_H / 2, GAME_WIDTH, RECIPE_H, 0x111122)
-      .setDepth(0);
+    // Phase 19-6: 개별 배경 제거 — _createCookingSlots() 공통 배경으로 통합
 
-    this.add.text(10, RECIPE_Y + 5, '\uB808\uC2DC\uD53C', {
-      fontSize: '11px', color: '#aaaaaa', fontStyle: 'bold',
+    this.add.text(10, RECIPE_Y + 5, '\uD83D\uDCCB \uB808\uC2DC\uD53C', {
+      fontSize: '11px', color: '#8B6914', fontStyle: 'bold',
     }).setDepth(10);
 
     /** @type {{ btn: Phaser.GameObjects.Rectangle, text: Phaser.GameObjects.Text, recipe: object }[]} */
@@ -861,20 +915,24 @@ export class ServiceScene extends Phaser.Scene {
       const y = startY + row * (btnH + gapY) + btnH / 2;
 
       // 스크롤 영역 밖이면 일단 생성은 하되 클리핑으로 처리
-      const bg = this.add.rectangle(x, y, btnW, btnH, 0x334455)
-        .setStrokeStyle(1, 0x556677)
+      // Phase 19-6: 버튼 배경 웜 다크 팔레트로 통합
+      const bg = this.add.rectangle(x, y, btnW, btnH, 0x2d1a0a)
+        .setStrokeStyle(1, 0x4a3520)
         .setInteractive({ useHandCursor: true })
         .setDepth(10);
+      bg.on('pointerover', () => bg.setFillStyle(0x4a2e10));
+      bg.on('pointerout',  () => bg.setFillStyle(0x2d1a0a));
 
       // 레시피 이름 + 재료 요약
       const ingStr = Object.entries(recipe.ingredients)
         .map(([t, n]) => `${INGREDIENT_TYPES[t]?.icon || t}${n}`)
         .join('');
+      // Phase 19-6: 텍스트 색상 웜 앰버로 통합
       const label = this.add.text(x, y - 6, recipe.nameKo, {
-        fontSize: '10px', color: '#ffffff', fontStyle: 'bold',
+        fontSize: '10px', color: '#e8c87a', fontStyle: 'bold',
       }).setOrigin(0.5).setDepth(11);
       const subLabel = this.add.text(x, y + 10, ingStr, {
-        fontSize: '10px', color: '#cccccc',
+        fontSize: '10px', color: '#b89a5a',
       }).setOrigin(0.5).setDepth(11);
 
       bg.on('pointerdown', () => this._onRecipeTap(recipe));
@@ -888,12 +946,14 @@ export class ServiceScene extends Phaser.Scene {
     for (const entry of this.recipeButtons) {
       const canMake = this.inventoryManager.hasEnough(entry.recipe.ingredients);
       if (canMake) {
-        entry.btn.setFillStyle(0x334455).setAlpha(1);
-        entry.text.setColor('#ffffff');
+        // Phase 19-6: 활성 색상 웜 팔레트
+        entry.btn.setFillStyle(0x2d1a0a).setAlpha(1);
+        entry.text.setColor('#e8c87a');
         if (entry.soldOutText) entry.soldOutText.setVisible(false);
       } else {
-        entry.btn.setFillStyle(0x222233).setAlpha(0.5);
-        entry.text.setColor('#666666');
+        // Phase 19-6: 비활성 색상 웜 팔레트
+        entry.btn.setFillStyle(0x1c1008).setAlpha(0.5);
+        entry.text.setColor('#6b4a2a');
         // 솔드아웃 라벨 표시
         if (!entry.soldOutText) {
           entry.soldOutText = this.add.text(entry.btn.x, entry.btn.y, 'SOLD OUT', {
