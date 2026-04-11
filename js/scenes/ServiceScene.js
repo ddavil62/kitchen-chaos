@@ -466,6 +466,44 @@ export class ServiceScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * 홀 분위기 장식 — B: 뒷벽, C: 입구 매트, E: 코너 화분.
+   * @private
+   */
+  _createHallDecor() {
+    // B. 뒷벽 — 홀 최상단에 레스토랑 내부 벽 이미지
+    const WALL_H = 50;
+    if (SpriteLoader.hasTexture(this, 'wall_back')) {
+      this.add.image(GAME_WIDTH / 2, HALL_Y + WALL_H / 2, 'wall_back')
+        .setDisplaySize(GAME_WIDTH, WALL_H)
+        .setDepth(3);
+    } else {
+      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + WALL_H / 2, GAME_WIDTH, WALL_H, 0x3D2B1A)
+        .setDepth(3);
+    }
+
+    // E. 코너 화분 — 홀 좌우 사이드 데드존
+    const PLANT_W = 28, PLANT_H = 42;
+    const plantY = HALL_Y + WALL_H + 30; // 벽 바로 아래 (y≈120)
+    if (SpriteLoader.hasTexture(this, 'decor_plant')) {
+      this.add.image(18, plantY, 'decor_plant')
+        .setDisplaySize(PLANT_W, PLANT_H)
+        .setDepth(10 + plantY);
+      this.add.image(GAME_WIDTH - 18, plantY, 'decor_plant')
+        .setDisplaySize(PLANT_W, PLANT_H)
+        .setDepth(10 + plantY)
+        .setFlipX(true);
+    }
+
+    // C. 입구 매트 — 홀 하단 중앙 (손님 등장 방향 표시)
+    const MAT_W = 72, MAT_H = 34;
+    if (SpriteLoader.hasTexture(this, 'entrance_mat')) {
+      this.add.image(GAME_WIDTH / 2, COOK_Y - MAT_H / 2 - 4, 'entrance_mat')
+        .setDisplaySize(MAT_W, MAT_H)
+        .setDepth(5);
+    }
+  }
+
   /** @private */
   _createTables() {
     // 홀 배경 — Phase 19-5: 아이소메트릭 헤링본 파케 바닥 텍스처 + fallback: 웜 브라운
@@ -479,6 +517,8 @@ export class ServiceScene extends Phaser.Scene {
     }
     // 아이소메트릭 격자 경계선 오버레이
     this._drawIsoFloor();
+    // 홀 분위기 장식 — 뒷벽, 코너 식물, 입구 매트
+    this._createHallDecor();
 
     /** @type {Phaser.GameObjects.Container[]} */
     this.tableContainers = [];
