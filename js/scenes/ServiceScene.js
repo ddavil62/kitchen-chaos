@@ -7,6 +7,8 @@
  * Phase 8-6: 셰프 영업 액티브 스킬 (특급 서비스 / 화염 조리 / 시간 동결).
  * Phase 10-5: VFXManager 연동 (서빙 반짝이, 골드 플로팅, 콤보, 손님 이모지).
  * Phase 11-3c: 비활성 테이블 렌더 최적화, 씬 Tween/Timer 정리.
+ * Phase 19-5: 홀 영역 테이블 배치를 flat top-down → 아이소메트릭 다이아몬드 격자로 전환.
+ *             _cellToWorld(), _drawIsoFloor() 추가. depth sorting y좌표 기반 적용.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -73,6 +75,24 @@ const TABLE_COLORS = [0x8b4513, 0xa0622d, 0xccbbaa, 0xd4a017, 0xffd700];
 const TABLE_STROKE_WIDTH = [1, 1, 1, 2, 2];
 /** 등급별 테이블 스트로크 색상 */
 const TABLE_STROKE_COLOR = [0x5a2d0c, 0x7a4a1d, 0x998877, 0xd4a017, 0xffd700];
+
+// ── Phase 19-5: 서비스씬 전용 아이소메트릭 상수 ──
+/** 홀 최대 열 수 */
+const SISO_COLS     = 4;
+/** 홀 최대 행 수 */
+const SISO_ROWS     = 2;
+/** 다이아몬드 반너비 (px) */
+const SISO_HALF_W   = 40;
+/** 다이아몬드 반높이 (px) */
+const SISO_HALF_H   = 30;
+/** 격자 원점 절대 X 좌표 */
+const SISO_ORIGIN_X = 140;
+/** 격자 원점 절대 Y 좌표 (HALL_Y=40 기준 +80 = 120, 격자 하단이 y=268로 경계 12px 여백 확보) */
+const SISO_ORIGIN_Y = 120;
+/** 테이블 스프라이트 표시 너비 */
+const SISO_TABLE_W  = 72;
+/** 테이블 스프라이트 표시 높이 */
+const SISO_TABLE_H  = 56;
 
 // ── 인테리어 효과값 배열 (Phase 8-3) ──
 
@@ -411,91 +431,115 @@ export class ServiceScene extends Phaser.Scene {
 
   // ── 테이블 동적 석수 (홀 영역 40~280px) ──────────────────────────
 
+  /**
+   * 아이소메트릭 격자 좌표를 화면 좌표로 변환한다.
+   * @param {number} col - 열 인덱스 (0 ~ SISO_COLS-1)
+   * @param {number} row - 행 인덱스 (0 ~ SISO_ROWS-1)
+   * @returns {{ x: number, y: number }} 화면 중심 좌표
+   * @private
+   */
+  _cellToWorld(col, row) {
+    return {
+      x: SISO_ORIGIN_X + (col - row) * SISO_HALF_W,
+      y: SISO_ORIGIN_Y + (col + row) * SISO_HALF_H,
+    };
+  }
+
+  /**
+   * 홀 아이소메트릭 바닥 격자 테두리를 그린다.
+   * floor_hall.png 이미지 위에 다이아몬드 셀 경계선 오버레이를 추가해 깊이감을 부여한다.
+   * @private
+   */
+  _drawIsoFloor() {
+    const gfx = this.add.graphics().setDepth(1);
+    gfx.lineStyle(1, 0x3A2410, 0.3);
+    for (let col = 0; col < SISO_COLS; col++) {
+      for (let row = 0; row < SISO_ROWS; row++) {
+        const { x: cx, y: cy } = this._cellToWorld(col, row);
+        gfx.strokePoints([
+          { x: cx,              y: cy - SISO_HALF_H },
+          { x: cx + SISO_HALF_W, y: cy              },
+          { x: cx,              y: cy + SISO_HALF_H },
+          { x: cx - SISO_HALF_W, y: cy              },
+        ], true);
+      }
+    }
+  }
+
   /** @private */
   _createTables() {
-    // 홀 배경 — Phase 19-4: 바닥 스프라이트 우선, fallback: 색상 직사각형
+    // 홀 배경 — Phase 19-5: 아이소메트릭 헤링본 파케 바닥 텍스처 + fallback: 웜 브라운
     if (SpriteLoader.hasTexture(this, 'floor_hall')) {
       this.add.image(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, 'floor_hall')
         .setDisplaySize(GAME_WIDTH, HALL_H)
         .setDepth(0);
     } else {
-      const hallBgColor = (this.interiorFlower >= 3 || this.interiorLighting >= 3) ? 0x222240 : 0x1a1a2e;
-      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, hallBgColor)
+      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0x5C3A1E)
         .setDepth(0);
     }
+    // 아이소메트릭 격자 경계선 오버레이
+    this._drawIsoFloor();
 
     /** @type {Phaser.GameObjects.Container[]} */
     this.tableContainers = [];
 
-    const cellW = GAME_WIDTH / this.tableCols;
-    const cellH = HALL_H / TABLE_ROWS;
-    const tw = this.tableW;
-    const th = this.tableH;
-    const chairOffset = Math.floor(tw / 2.5);
-
-    for (let row = 0; row < TABLE_ROWS; row++) {
-      for (let col = 0; col < this.tableCols; col++) {
-        const idx = row * this.tableCols + col;
+    // Phase 19-5: 아이소메트릭 다이아몬드 격자 배치 (SISO_ROWS × SISO_COLS)
+    for (let row = 0; row < SISO_ROWS; row++) {
+      for (let col = 0; col < SISO_COLS; col++) {
+        const idx = row * SISO_COLS + col;
         if (idx >= this.tableCount) break;
 
-        const cx = cellW * col + cellW / 2;
-        const cy = HALL_Y + cellH * row + cellH / 2;
+        const { x: cx, y: cy } = this._cellToWorld(col, row);
         const grade = this.tableUpgrades[idx] || 0;
 
-        const container = this.add.container(cx, cy).setDepth(10);
+        // depth = y좌표 기반 동적 할당 (앞행이 뒷행 위에 렌더링)
+        const container = this.add.container(cx, cy).setDepth(10 + cy);
 
-        // 테이블 배경 — Phase 19-4: 등급별 스프라이트 우선, fallback: 색상 직사각형
+        // 테이블 스프라이트 — Phase 19-4 아이소메트릭 에셋 재활용
         const tableKey = `table_lv${grade}`;
         if (SpriteLoader.hasTexture(this, tableKey)) {
           const tableImg = this.add.image(0, 0, tableKey)
-            .setDisplaySize(tw, th);
+            .setDisplaySize(SISO_TABLE_W, SISO_TABLE_H);
           container.add(tableImg);
         } else {
-          const tableBg = this.add.rectangle(0, 0, tw, th, TABLE_COLORS[grade], 0.6)
-            .setStrokeStyle(TABLE_STROKE_WIDTH[grade], TABLE_STROKE_COLOR[grade]);
-          container.add(tableBg);
-
-          // Lv1: 테이블보 (가운데 작은 밝은 사각형)
-          if (grade >= 1) {
-            const cloth = this.add.rectangle(0, 0, tw - 16, th - 16, 0xffffff, 0.15);
-            container.add(cloth);
-          }
-
-          // Lv4: VIP 뱃지 텍스트
-          if (grade >= 4) {
-            const vipBadge = this.add.text(tw / 2 - 4, -th / 2 + 4, 'VIP', {
-              fontSize: '7px', fontStyle: 'bold', color: '#ffd700',
-              backgroundColor: '#000000aa',
-              padding: { x: 2, y: 1 },
-            }).setOrigin(1, 0);
-            container.add(vipBadge);
-          }
-
-          // 의자 (작은 원 2개)
-          const chair1 = this.add.circle(-chairOffset, 0, 8, 0x654321);
-          const chair2 = this.add.circle(chairOffset, 0, 8, 0x654321);
-          container.add([chair1, chair2]);
+          // fallback: 다이아몬드 폴리곤
+          const gfx = this.add.graphics();
+          gfx.fillStyle(TABLE_COLORS[grade], 0.7);
+          gfx.fillPoints([
+            { x: 0,              y: -SISO_HALF_H },
+            { x: SISO_HALF_W,    y: 0            },
+            { x: 0,              y: SISO_HALF_H  },
+            { x: -SISO_HALF_W,   y: 0            },
+          ], true);
+          gfx.lineStyle(TABLE_STROKE_WIDTH[grade], TABLE_STROKE_COLOR[grade]);
+          gfx.strokePoints([
+            { x: 0,              y: -SISO_HALF_H },
+            { x: SISO_HALF_W,    y: 0            },
+            { x: 0,              y: SISO_HALF_H  },
+            { x: -SISO_HALF_W,   y: 0            },
+          ], true);
+          container.add(gfx);
         }
 
         // "빈 테이블" 텍스트
-        const statusText = this.add.text(0, -20, '\uBE48 \uD14C\uC774\uBE14', {
+        const statusText = this.add.text(0, -SISO_HALF_H + 8, '\uBE48 \uD14C\uC774\uBE14', {
           fontSize: '10px', color: '#888888',
         }).setOrigin(0.5);
         container.add(statusText);
 
         // 말풍선 (숨겨짐)
-        const bubble = this.add.rectangle(0, -45, 80, 22, 0xffffff, 0.9)
+        const bubble = this.add.rectangle(0, -SISO_HALF_H - 18, 80, 22, 0xffffff, 0.9)
           .setStrokeStyle(1, 0x000000).setVisible(false);
         container.add(bubble);
-        const bubbleText = this.add.text(0, -45, '', {
+        const bubbleText = this.add.text(0, -SISO_HALF_H - 18, '', {
           fontSize: '9px', color: '#333333',
         }).setOrigin(0.5).setVisible(false);
         container.add(bubbleText);
 
         // 인내심 바 (숨겨짐)
-        const pBarBg = this.add.rectangle(0, 30, 60, 6, 0x333333).setVisible(false);
+        const pBarBg = this.add.rectangle(0, SISO_HALF_H + 6, 60, 6, 0x333333).setVisible(false);
         container.add(pBarBg);
-        const pBarFill = this.add.rectangle(-30, 30, 60, 6, 0x00ff00)
+        const pBarFill = this.add.rectangle(-30, SISO_HALF_H + 6, 60, 6, 0x00ff00)
           .setOrigin(0, 0.5).setVisible(false);
         container.add(pBarFill);
 
@@ -508,8 +552,8 @@ export class ServiceScene extends Phaser.Scene {
         }).setOrigin(0.5).setVisible(false);
         container.add(custIconText);
 
-        // 터치 영역
-        const hitArea = this.add.rectangle(0, 0, tw + 10, th + 10, 0x000000, 0)
+        // 터치 영역 (다이아몬드 외접 사각형)
+        const hitArea = this.add.rectangle(0, 0, SISO_TABLE_W + 10, SISO_TABLE_H + 10, 0x000000, 0)
           .setInteractive({ useHandCursor: true });
         container.add(hitArea);
         hitArea.on('pointerdown', () => this._onTableTap(idx));

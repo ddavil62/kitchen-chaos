@@ -1,5 +1,56 @@
 # Changelog
 
+## [2026-04-11] - Phase 19-5 영업씬 아이소메트릭화
+
+### 추가
+
+- **아이소메트릭 상수 8개** (`js/scenes/ServiceScene.js`)
+  - `SISO_COLS=4`, `SISO_ROWS=2`: 격자 크기
+  - `SISO_HALF_W=40`, `SISO_HALF_H=30`: 셀 반폭 (4:3 비율)
+  - `SISO_ORIGIN_X=140`, `SISO_ORIGIN_Y=120`: 그리드 원점 (스펙 ORIGIN_Y=100에서 경계 여백 확보를 위해 조정)
+  - `SISO_TABLE_W=72`, `SISO_TABLE_H=56`: 테이블 표시 크기 (스펙 제안 80x60 대비 축소, 간격 확보)
+
+- **`_cellToWorld(col, row)` 메서드** (`js/scenes/ServiceScene.js`)
+  - 홀 격자 좌표 -> 아이소메트릭 월드 픽셀 좌표 변환
+  - 공식: `x = SISO_ORIGIN_X + (col - row) * SISO_HALF_W`, `y = SISO_ORIGIN_Y + (col + row) * SISO_HALF_H`
+
+- **`_drawIsoFloor()` 메서드** (`js/scenes/ServiceScene.js`)
+  - floor_hall 이미지 + 아이소 그리드 오버레이 병렬 렌더링 (스펙의 양자택일 대신 병렬 방식 채택)
+
+### 변경
+
+- **`_createTables()` 전면 재작성** (`js/scenes/ServiceScene.js`)
+  - flat top-down 직사각형 격자 -> 아이소메트릭 다이아몬드 격자 좌표
+  - depth sorting: `container.setDepth(10 + cy)` 적용 (앞행이 뒷행 위에 렌더링)
+  - 테이블 displaySize: `SISO_TABLE_W(72) x SISO_TABLE_H(56)`
+  - 말풍선, 인내심 바, 손님 아이콘 y 오프셋 아이소 크기 기반으로 조정
+
+- **`floor_hall.png` 재생성** (`assets/service/floor_hall.png`)
+  - 이전: flat top-down 나무판자 텍스처 360x240
+  - 이후: 헤링본 파케 원목 텍스처 360x240 (PixelLab create_map_object)
+
+### 변경된 파일 (1개 코드 + 1개 에셋)
+
+| 파일 | 변경 유형 |
+|------|----------|
+| `js/scenes/ServiceScene.js` | 수정 (상수 8개, 메서드 2개 추가, `_createTables()` 재작성) |
+| `assets/service/floor_hall.png` | 재생성 (flat -> 헤링본 파케 아이소 텍스처) |
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-11-kitchen-chaos-phase19-5-spec.md`
+- 리포트: `.claude/specs/2026-04-11-kitchen-chaos-phase19-5-report.md`
+- QA: `.claude/specs/2026-04-11-kitchen-chaos-phase19-5-qa.md`
+- 목적 정의서: `.claude/specs/2026-04-11-kitchen-chaos-phase19-5-scope.md`
+- visual_change: both (floor_hall 에셋 재생성 + UI 레이아웃 전면 재배치)
+- QA: PASS (15/15 -- 수용 기준 14개 + 예외 시나리오 6개 모두 통과)
+- 스펙 대비 변경: SISO_ORIGIN_Y 100->120 (경계 여백 확보), SISO_TABLE_W/H 신규 추가 72/56 (가독성 향상), _drawIsoFloor 이미지+오버레이 병렬 (시각 품질 향상), SISO_COLS/ROWS 상수 추가 (매직넘버 제거)
+- dead code: `tableW`, `tableH`, `tableCols` 잔존 (기능 무영향, 향후 정리 권장)
+- config.js, GatheringScene.js, SpriteLoader.js 수정 없음 (스펙 제약 준수)
+- `_updateTableUI()`, `_onTableTap()` 무변경 (setData 키 동일 유지)
+
+---
+
 ## [2026-04-11] - Phase 19-4 영업 씬 비주얼 리워크
 
 ### 추가
