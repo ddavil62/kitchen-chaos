@@ -828,12 +828,13 @@ export class ServiceScene extends Phaser.Scene {
       return;
     }
 
+    // 조리 중/완료 모두 버리기 버튼 표시
+    discardBtn?.setVisible(true);
+    discardLabel?.setVisible(true);
+
     if (slot.ready) {
       label.setText(`\u2705 ${slot.recipe.nameKo}`).setColor('#44ff44');
       progFill.setScale(1, 1).setFillStyle(0x44ff44);
-      // 완료된 요리 — 버리기 버튼 표시
-      discardBtn?.setVisible(true);
-      discardLabel?.setVisible(true);
     } else {
       const remain = Math.ceil(slot.timeLeft / 1000);
       label.setText(`\uC870\uB9AC\uC911: ${slot.recipe.nameKo} ${remain}\uCD08`).setColor('#ffffff');
@@ -1726,14 +1727,14 @@ export class ServiceScene extends Phaser.Scene {
   // ── 조리 슬롯 버리기 ──────────────────────────────────────────────
 
   /**
-   * 완료된 요리를 슬롯에서 버린다. 재료는 반환하지 않는다.
+   * 조리 중이거나 완료된 요리를 슬롯에서 버린다. 재료는 반환하지 않는다.
    * @param {number} idx 슬롯 인덱스
    * @private
    */
   _discardDish(idx) {
     if (this.isServiceOver || this.isPaused) return;
     const slot = this.cookingSlots[idx];
-    if (!slot.ready) return;
+    if (!slot.recipe) return;
 
     const name = slot.recipe?.nameKo || '요리';
     slot.recipe = null;
