@@ -354,7 +354,18 @@ export class RecipeCollectionScene extends Phaser.Scene {
     }
 
     const cx = GAME_WIDTH / 2;
-    const cy = GAME_HEIGHT / 2 + 10;
+
+    // ── 스탯 행 수를 미리 계산하여 팝업 높이를 동적으로 결정 ──
+    let rowCount = 1; // 사거리 항상 포함
+    if (toolDef.category === 'attack') rowCount += 2; // 공격력 + 공격속도
+    const specialKey = this._findSpecialStatKey(toolDef.stats[1]);
+    if (specialKey) rowCount += 1;
+
+    // 높이 = 상하패딩(70) + 헤더(30) + sep(10) + descKo(50) + sep(10) + 스탯헤더행(20) + 행당18px + sep(10) + loreKo(50)
+    const popupH = 70 + 30 + 10 + 50 + 10 + 20 + rowCount * 18 + 10 + 50;
+    // cy를 화면 중앙(+10)에 두되, 팝업이 화면 밖으로 나가지 않도록 clamp
+    const cy = Math.max(popupH / 2 + 10, Math.min(GAME_HEIGHT - popupH / 2 - 10, GAME_HEIGHT / 2 + 10));
+
     const container = this.add.container(0, 0).setDepth(50);
 
     // 오버레이 (탭으로 닫기)
@@ -362,40 +373,43 @@ export class RecipeCollectionScene extends Phaser.Scene {
       GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5).setInteractive();
     container.add(overlay);
 
-    // 팝업 배경 (320x260)
-    const popBg = this.add.rectangle(cx, cy, 320, 260, 0x221100)
+    // 팝업 배경 (320 x 동적 높이)
+    const popBg = this.add.rectangle(cx, cy, 320, popupH, 0x221100)
       .setStrokeStyle(2, toolDef.color);
     container.add(popBg);
 
+    // ── 팝업 상단 기준 Y 좌표 ──
+    const topY = cy - popupH / 2;
+
     // 헤더: 아이콘 + 이름
     const icon = RecipeCollectionScene.TOOL_ICONS[toolDef.id] || '\uD83D\uDD27';
-    container.add(this.add.text(cx - 110, cy - 110, `${icon} ${toolDef.nameKo}`, {
+    container.add(this.add.text(cx - 110, topY + 20, `${icon} ${toolDef.nameKo}`, {
       fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }));
 
     // 닫기 버튼 (X)
-    const closeBtn = this.add.rectangle(cx + 130, cy - 110, 36, 24, 0xcc2222)
+    const closeBtn = this.add.rectangle(cx + 130, topY + 20, 36, 24, 0xcc2222)
       .setInteractive({ useHandCursor: true });
     container.add(closeBtn);
-    container.add(this.add.text(cx + 130, cy - 110, '\u2715', {
+    container.add(this.add.text(cx + 130, topY + 20, '\u2715', {
       fontSize: '14px', color: '#ffffff',
     }).setOrigin(0.5));
 
     // 구분선
-    container.add(this.add.rectangle(cx, cy - 88, 280, 1, 0x444444));
+    container.add(this.add.rectangle(cx, topY + 42, 280, 1, 0x444444));
 
     // 기능 설명 (descKo)
-    container.add(this.add.text(cx, cy - 76, toolDef.descKo || '', {
+    container.add(this.add.text(cx, topY + 54, toolDef.descKo || '', {
       fontSize: '12px', color: '#cccccc', wordWrap: { width: 270 }, lineSpacing: 3,
     }).setOrigin(0.5, 0));
 
     // 구분선
-    container.add(this.add.rectangle(cx, cy - 36, 280, 1, 0x444444));
+    container.add(this.add.rectangle(cx, topY + 94, 280, 1, 0x444444));
 
     // 스탯 비교표 헤더
     const tableX = cx - 120;
-    let rowY = cy - 22;
+    let rowY = topY + 108;
     const colOffsets = [0, 100, 150, 200];  // 항목, Lv1, Lv2, Lv3
     const headerLabels = ['\uD56D\uBAA9', 'Lv1', 'Lv2', 'Lv3'];
     headerLabels.forEach((h, i) => {
@@ -421,8 +435,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
       rowY += 18;
     }
 
-    // 특수 스탯 행 (존재하는 첫 번째 항목)
-    const specialKey = this._findSpecialStatKey(toolDef.stats[1]);
+    // 특수 스탯 행 (존재하는 첫 번째 항목, 위에서 이미 계산됨)
     if (specialKey) {
       const specialLabel = this._getSpecialLabel(specialKey);
       const suffix = this._getSpecialSuffix(specialKey);

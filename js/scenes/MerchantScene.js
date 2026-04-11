@@ -587,58 +587,77 @@ export class MerchantScene extends Phaser.Scene {
     this._popupOpen = true;
     const elements = [];
     const cx = GAME_WIDTH / 2;
-    const cy = GAME_HEIGHT / 2;
+
+    // ── 렌더할 스탯 바 수를 미리 계산하여 팝업 높이를 동적으로 결정 ──
+    const stats = toolDef.stats[currentLevel];
+    let statBarCount = 0;
+    if (toolDef.category === 'attack') {
+      statBarCount += 1; // 공격력
+      statBarCount += 1; // 사거리
+      statBarCount += 1; // 공격속도
+    } else {
+      statBarCount += 1; // 사거리
+    }
+    const specialStat = this._getSpecialStat(stats);
+    if (specialStat) statBarCount += 1;
+
+    // 높이 = 상하패딩(80) + 제목줄(30) + sep(10) + descKo(50) + sep(10) + lvLabel(20) + 바당24px + sep(10) + loreKo(40)
+    const popupH = 80 + 30 + 10 + 50 + 10 + 20 + statBarCount * 24 + 10 + 40;
+    // cy를 화면 중앙에 두되, 팝업이 화면 밖으로 나가지 않도록 clamp
+    const cy = Math.max(popupH / 2 + 10, Math.min(GAME_HEIGHT - popupH / 2 - 10, GAME_HEIGHT / 2));
 
     // 반투명 오버레이
-    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+    const overlay = this.add.rectangle(cx, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
       .setDepth(100).setInteractive();
     elements.push(overlay);
 
-    // 팝업 배경 (300x280)
-    const popBg = this.add.rectangle(cx, cy, 300, 280, 0x221100)
+    // 팝업 배경 (300 x 동적 높이)
+    const popBg = this.add.rectangle(cx, cy, 300, popupH, 0x221100)
       .setDepth(101).setStrokeStyle(2, toolDef.color);
     elements.push(popBg);
 
+    // ── 팝업 상단 기준 Y 좌표 ──
+    const topY = cy - popupH / 2;
+
     // 헤더: 아이콘 + 이름
     const icon = TOOL_ICONS[toolDef.id] || '\uD83D\uDD27';
-    const titleText = this.add.text(cx - 100, cy - 120, `${icon} ${toolDef.nameKo}`, {
+    const titleText = this.add.text(cx - 100, topY + 20, `${icon} ${toolDef.nameKo}`, {
       fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setDepth(102);
     elements.push(titleText);
 
     // 닫기 버튼 (X)
-    const closeBtn = this.add.rectangle(cx + 125, cy - 120, 36, 24, 0xcc2222)
+    const closeBtn = this.add.rectangle(cx + 125, topY + 20, 36, 24, 0xcc2222)
       .setInteractive({ useHandCursor: true }).setDepth(102);
     elements.push(closeBtn);
-    const closeTxt = this.add.text(cx + 125, cy - 120, '\u2715', {
+    const closeTxt = this.add.text(cx + 125, topY + 20, '\u2715', {
       fontSize: '14px', color: '#ffffff',
     }).setOrigin(0.5).setDepth(102);
     elements.push(closeTxt);
 
     // 구분선 1
-    const sep1 = this.add.rectangle(cx, cy - 98, 260, 1, 0x444444).setDepth(102);
+    const sep1 = this.add.rectangle(cx, topY + 42, 260, 1, 0x444444).setDepth(102);
     elements.push(sep1);
 
     // 기능 설명 (descKo)
-    const descText = this.add.text(cx, cy - 80, toolDef.descKo || '', {
+    const descText = this.add.text(cx, topY + 60, toolDef.descKo || '', {
       fontSize: '13px', color: '#cccccc', wordWrap: { width: 260 }, lineSpacing: 3,
     }).setOrigin(0.5, 0).setDepth(102);
     elements.push(descText);
 
     // 구분선 2
-    const sep2 = this.add.rectangle(cx, cy - 40, 260, 1, 0x444444).setDepth(102);
+    const sep2 = this.add.rectangle(cx, topY + 100, 260, 1, 0x444444).setDepth(102);
     elements.push(sep2);
 
     // 현재 레벨 표시
-    const lvText = this.add.text(cx - 120, cy - 28, `\uD604\uC7AC Lv: ${currentLevel}`, {
+    const lvText = this.add.text(cx - 120, topY + 112, `\uD604\uC7AC Lv: ${currentLevel}`, {
       fontSize: '12px', fontStyle: 'bold', color: '#ffd700',
     }).setDepth(102);
     elements.push(lvText);
 
-    // 스탯 바 렌더링
-    const stats = toolDef.stats[currentLevel];
-    let barY = cy - 6;
+    // 스탯 바 렌더링 (stats, specialStat은 위에서 이미 계산됨)
+    let barY = topY + 134;
     const barX = cx - 30;
 
     // 공격력 (attack 카테고리만)
@@ -658,8 +677,7 @@ export class MerchantScene extends Phaser.Scene {
       barY += 24;
     }
 
-    // 특수 스탯 (우선순위에 따라 1개)
-    const specialStat = this._getSpecialStat(stats);
+    // 특수 스탯 (우선순위에 따라 1개, 위에서 이미 계산됨)
     if (specialStat) {
       this._drawStatBar(elements, specialStat.label, specialStat.value, specialStat.max, barX, barY, specialStat.display);
       barY += 24;
