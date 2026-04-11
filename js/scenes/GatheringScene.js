@@ -82,6 +82,9 @@ export class GatheringScene extends Phaser.Scene {
     /** @type {Tower|null} 현재 선택된(재배치 대상) 타워 */
     this._selectedTower = null;
 
+    /** @type {Phaser.GameObjects.Graphics[]} 이동 가능 셀 오버레이 목록 */
+    this._movableOverlays = [];
+
     // ── 그룹 ──
     this.enemies = this.add.group();
     this.towers = this.add.group();
@@ -796,8 +799,7 @@ export class GatheringScene extends Phaser.Scene {
     tower.setDepth(10 + col + row);
     this.towers.add(tower);
 
-    // 타워 탭 이벤트 (재배치용)
-    tower.setInteractive(new Phaser.Geom.Circle(0, 0, 20), Phaser.Geom.Circle.Contains);
+    // 타워 클릭은 hitArea(worldToCell)로 처리 — 별도 setInteractive 불필요
 
     // 현재 버프 적용
     if (this._currentBuff) {
@@ -847,7 +849,7 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
-   * 타워 선택 (노란 테두리 + 회수 버튼 표시).
+   * 타워 선택 (노란 테두리 + 이동/회수 버튼 + 이동 가능 셀 하이라이트).
    * @param {Tower} tower
    * @private
    */
@@ -860,7 +862,8 @@ export class GatheringScene extends Phaser.Scene {
     if (tower.list && tower.list.length > 0) {
       tower.list[0].setStrokeStyle?.(2, 0xffff00);
     }
-    this._showRecallButton(tower);
+    this._showTowerActionPanel(tower);
+    this._showMoveOverlay(tower);
   }
 
   /**
@@ -875,24 +878,41 @@ export class GatheringScene extends Phaser.Scene {
       }
       this._selectedTower = null;
     }
-    this._hideRecallButton();
+    this._hideTowerActionPanel();
+    this._hideMoveOverlay();
   }
 
   /**
-   * 회수 버튼 표시.
+   * 이동/회수 액션 패널 표시 (이동 버튼 + 회수 버튼).
    * @param {Tower} tower
    * @private
    */
-  _showRecallButton(tower) {
-    this._hideRecallButton();
-    const btnX = tower.x;
-    const btnY = tower.y - 30;
+  _showTowerActionPanel(tower) {
+    this._hideTowerActionPanel();
+    const cx = tower.x;
+    const btnY = tower.y - 34;
+    const btnW = 48;
+    const gap = 4;
 
-    this._recallBg = this.add.rectangle(btnX, btnY, 50, 20, 0xaa3333, 0.9)
+    // [이동] 버튼 (파랑)
+    this._moveBg = this.add.rectangle(cx - btnW / 2 - gap / 2, btnY, btnW, 22, 0x2255aa, 0.92)
       .setDepth(200).setInteractive({ useHandCursor: true });
-    this._recallLabel = this.add.text(btnX, btnY, '회수', {
+    this._moveLabel = this.add.text(cx - btnW / 2 - gap / 2, btnY, '이동', {
       fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(201);
+
+    // [회수] 버튼 (빨강)
+    this._recallBg = this.add.rectangle(cx + btnW / 2 + gap / 2, btnY, btnW, 22, 0xaa3333, 0.92)
+      .setDepth(200).setInteractive({ useHandCursor: true });
+    this._recallLabel = this.add.text(cx + btnW / 2 + gap / 2, btnY, '회수', {
+      fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
+    }).setOrigin(0.5).setDepth(201);
+
+    // 이동 버튼: 빈 셀 탭 안내 토글 (오버레이는 이미 표시 중이므로 별도 처리 불필요)
+    this._moveBg.on('pointerdown', () => {
+      // 이미 이동 모드 — 사용자에게 힌트만 표시
+      this._showMessage('빈 셀을 탭하여 이동', 1200);
+    });
 
     this._recallBg.on('pointerdown', () => {
       this._recallTower(this._selectedTower);
@@ -900,18 +920,55 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
-   * 회수 버튼 숨김.
+   * 이동/회수 액션 패널 숨김.
    * @private
    */
-  _hideRecallButton() {
-    if (this._recallBg) {
-      this._recallBg.destroy();
-      this._recallBg = null;
+  _hideTowerActionPanel() {
+    if (this._moveBg) { this._moveBg.destroy(); this._moveBg = null; }
+    if (this._moveLabel) { this._moveLabel.destroy(); this._moveLabel = null; }
+    if (this._recallBg) { this._recallBg.destroy(); this._recallBg = null; }
+    if (this._recallLabel) { this._recallLabel.destroy(); this._recallLabel = null; }
+  }
+
+  /**
+   * 이동 가능한 빈 셀에 초록 다이아몬드 오버레이 표시.
+   * @param {Tower} tower - 현재 선택된 타워 (현재 위치 제외용)
+   * @private
+   */
+  _showMoveOverlay(tower) {
+    this._hideMoveOverlay();
+    const cols = this.stageData?.gridCols || GRID_COLS;
+    const rows = this.stageData?.gridRows || GRID_ROWS;
+    const occupiedKeys = new Set(this.towers.getChildren().map(t => t._cellKey));
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const key = `${col},${row}`;
+        // 현재 타워 위치·경로·다른 타워 위치 제외
+        if (key === tower._cellKey) continue;
+        if (this.stagePathCells.has(key)) continue;
+        if (occupiedKeys.has(key)) continue;
+
+        const d = cellDiamond(col, row);
+        const gfx = this.add.graphics().setDepth(5);
+        gfx.fillStyle(0x44ff88, 0.25);
+        gfx.fillPoints([d.top, d.right, d.bottom, d.left], true);
+        gfx.lineStyle(1, 0x44ff88, 0.6);
+        gfx.strokePoints([d.top, d.right, d.bottom, d.left], true);
+        this._movableOverlays.push(gfx);
+      }
     }
-    if (this._recallLabel) {
-      this._recallLabel.destroy();
-      this._recallLabel = null;
+  }
+
+  /**
+   * 이동 가능 셀 오버레이 제거.
+   * @private
+   */
+  _hideMoveOverlay() {
+    for (const gfx of this._movableOverlays) {
+      gfx.destroy();
     }
+    this._movableOverlays = [];
   }
 
   /**
@@ -1741,7 +1798,8 @@ export class GatheringScene extends Phaser.Scene {
     this.ingredientManager?.destroy();
     this.vfx?.destroy();
     this._tutorial?.end?.();
-    this._hideRecallButton();
+    this._hideTowerActionPanel();
+    this._hideMoveOverlay();
 
     // Phase 11-3c: 씬 전환 시 Tween/Timer 명시적 정리
     this.tweens.killAll();
