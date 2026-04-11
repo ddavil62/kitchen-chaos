@@ -822,6 +822,22 @@ export class ServiceScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(102);
 
     pauseBtn.on('pointerdown', () => this._togglePause());
+
+    // 장사 마감 버튼 — 일시정지 상태일 때만 표시
+    this.closingBtn = this.add.rectangle(GAME_WIDTH - 145, BOTTOM_Y + BOTTOM_H / 2, 80, 36, 0x662222)
+      .setStrokeStyle(1, 0xaa4444)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(101)
+      .setVisible(false);
+    this.closingLabel = this.add.text(GAME_WIDTH - 145, BOTTOM_Y + BOTTOM_H / 2, '🔒 마감', {
+      fontSize: '11px', color: '#ffaaaa',
+    }).setOrigin(0.5).setDepth(102).setVisible(false);
+
+    this.closingBtn.on('pointerdown', () => {
+      if (this.isPaused && !this.isServiceOver) {
+        this._endService('manual');
+      }
+    });
   }
 
   /**
@@ -967,6 +983,9 @@ export class ServiceScene extends Phaser.Scene {
   _togglePause() {
     this.isPaused = !this.isPaused;
     this.pauseLabel.setText(this.isPaused ? '\u25B6 \uC7AC\uAC1C' : '\u23F8 \uC77C\uC2DC\uC815\uC9C0');
+    // 마감 버튼: 일시정지 중일 때만 표시
+    this.closingBtn.setVisible(this.isPaused);
+    this.closingLabel.setVisible(this.isPaused);
   }
 
   // ── 메인 업데이트 루프 ────────────────────────────────────────────
@@ -1855,6 +1874,9 @@ export class ServiceScene extends Phaser.Scene {
       case 'satisfaction':
         message = '\uB808\uC2A4\uD1A0\uB791 \uD3D0\uC1C4!';
         isVictory = true; // 보상 50% 감소이지만 실패는 아님
+        break;
+      case 'manual':
+        message = '장사 마감!';
         break;
     }
 
