@@ -501,6 +501,7 @@ export class ServiceScene extends Phaser.Scene {
           const tableImg = this.add.image(0, 0, tableKey)
             .setDisplaySize(SISO_TABLE_W, SISO_TABLE_H);
           container.add(tableImg);
+          container.setData('tableImg', tableImg);
         } else {
           // fallback: 다이아몬드 폴리곤
           const gfx = this.add.graphics();
@@ -592,7 +593,14 @@ export class ServiceScene extends Phaser.Scene {
       // Phase 11-3c: 빈 테이블이 이미 빈 상태면 렌더 상태 변경 생략
       if (container.getData('_isEmpty')) return;
       container.setData('_isEmpty', true);
-      // 빈 테이블
+      // 빈 테이블 — 컴포짓 해제 후 empty 텍스처로 복원
+      const tImgEmpty = container.getData('tableImg');
+      if (tImgEmpty) {
+        const emptyGrade = this.tableUpgrades[idx] || 0;
+        tImgEmpty.setTexture(`table_lv${emptyGrade}`)
+          .setDisplaySize(SISO_TABLE_W, SISO_TABLE_H)
+          .setY(0);
+      }
       statusText.setText('\uBE48 \uD14C\uC774\uBE14').setVisible(true);
       bubble.setVisible(false);
       bubbleText.setVisible(false);
@@ -608,21 +616,33 @@ export class ServiceScene extends Phaser.Scene {
 
     statusText.setVisible(false);
 
-    // 손님 아이콘 — Phase 19-4: 스프라이트 우선, fallback: 이모지 텍스트
-    const custType = cust.customerType || 'normal';
-    const custSpriteKey = `customer_${custType}`;
-    const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
-    // 단체 손님 부분 서빙 완료 시 체크마크 표시
-    const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
+    // 컴포짓 스프라이트 처리 — 테이블+손님이 하나의 PNG에 합성된 occupied 에셋 사용
+    const grade = this.tableUpgrades[idx] || 0;
+    const occupiedKey = `table_lv${grade}_occupied`;
+    const tImg = container.getData('tableImg');
+    const useComposite = tImg && SpriteLoader.hasTexture(this, occupiedKey);
 
-    if (!servedMark && SpriteLoader.hasTexture(this, custSpriteKey)) {
-      // 스프라이트 이미지 표시
-      custIconImg.setTexture(custSpriteKey).setDisplaySize(32, 32).setVisible(true);
+    if (useComposite) {
+      // occupied 컴포짓: 높이 비율 96/80 = 1.2배, Y=-6으로 바닥 정렬 유지
+      const occH = Math.round(SISO_TABLE_H * 1.2); // 67
+      tImg.setTexture(occupiedKey).setDisplaySize(SISO_TABLE_W, occH).setY(-6);
+      custIconImg.setVisible(false);
       custIconText.setVisible(false);
     } else {
-      // fallback: 이모지 텍스트 표시 (또는 체크마크)
-      custIconImg.setVisible(false);
-      custIconText.setText(servedMark || typeIcon).setVisible(true);
+      // fallback: 기존 손님 아이콘 방식 (컴포짓 없는 경우)
+      const custType = cust.customerType || 'normal';
+      const custSpriteKey = `customer_${custType}`;
+      const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
+      // 단체 손님 부분 서빙 완료 시 체크마크 표시
+      const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
+
+      if (!servedMark && SpriteLoader.hasTexture(this, custSpriteKey)) {
+        custIconImg.setTexture(custSpriteKey).setDisplaySize(32, 32).setVisible(true);
+        custIconText.setVisible(false);
+      } else {
+        custIconImg.setVisible(false);
+        custIconText.setText(servedMark || typeIcon).setVisible(true);
+      }
     }
 
     // 말풍선 — 요리 이름

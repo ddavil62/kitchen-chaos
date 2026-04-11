@@ -313,9 +313,10 @@ export class SpriteLoader {
    * @private
    */
   static _loadServiceAssets(scene) {
-    // 테이블 Lv0~4
+    // 테이블 Lv0~4 (빈 상태 + 손님 착석 컴포짓)
     for (let lv = 0; lv < TABLE_GRADE_COUNT; lv++) {
       scene.load.image(`table_lv${lv}`, `${SERVICE_ROOT}/table_lv${lv}.png`);
+      scene.load.image(`table_lv${lv}_occupied`, `${SERVICE_ROOT}/table_lv${lv}_occupied.png`);
     }
     // 손님 유형별
     for (const type of CUSTOMER_TYPE_IDS) {
