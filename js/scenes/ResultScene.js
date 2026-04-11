@@ -233,7 +233,7 @@ export class ResultScene extends Phaser.Scene {
     }
 
     // 스크롤 가능한 컨테이너
-    let y = 30;
+    let y = 20;
 
     // ── 타이틀 ──
     const stageName = STAGES[this.stageId]?.nameKo || this.stageId;
@@ -246,11 +246,11 @@ export class ResultScene extends Phaser.Scene {
     this.add.text(GAME_WIDTH / 2, y, `${this.stageId} ${stageName}`, {
       fontSize: '13px', color: '#aaaaaa',
     }).setOrigin(0.5);
-    y += 30;
+    y += 24;
 
     // 구분선
     this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 40, 1, 0x444444);
-    y += 15;
+    y += 12;
 
     // ── 장보기 섹션 ──
     this.add.text(30, y, '\uD83D\uDCE6 장보기', {
@@ -271,14 +271,14 @@ export class ResultScene extends Phaser.Scene {
 
     // 구분선
     this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 60, 1, 0x333333);
-    y += 15;
+    y += 12;
 
     // ── 영업 섹션 ──
     if (sr) {
       this.add.text(30, y, '\uD83C\uDF7D 영업', {
         fontSize: '16px', fontStyle: 'bold', color: '#ffcc88',
       });
-      y += 28;
+      y += 24;
 
       const serveRate = sr.totalCustomers > 0
         ? Math.round(sr.servedCount / sr.totalCustomers * 100)
@@ -306,7 +306,7 @@ export class ResultScene extends Phaser.Scene {
 
     // 구분선
     this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 60, 1, 0x333333);
-    y += 15;
+    y += 12;
 
     // ── 평가 섹션 ──
     this.add.text(30, y, '\u2B50 평가', {
@@ -340,13 +340,13 @@ export class ResultScene extends Phaser.Scene {
 
     // 구분선
     this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 60, 1, 0x333333);
-    y += 15;
+    y += 12;
 
     // ── 보상 섹션 ──
     this.add.text(30, y, '\uD83D\uDCB0 보상', {
       fontSize: '16px', fontStyle: 'bold', color: '#44ff88',
     });
-    y += 28;
+    y += 26;
 
     let rewardText = `+${totalCoinsEarned} 코인`;
     if (isFirstClear && stars > 0) {
@@ -356,11 +356,11 @@ export class ResultScene extends Phaser.Scene {
       fontSize: '15px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     });
-    y += 40;
+    y += 32;
 
     // 구분선
     this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 40, 1, 0x444444);
-    y += 25;
+    y += 18;
 
     // ── 버튼 ──
     // Phase 13-2: 영업 성공 시 행상인 방문 버튼 (MerchantScene 경유)
@@ -373,13 +373,13 @@ export class ResultScene extends Phaser.Scene {
           isMarketFailed: false,
         });
       });
-      y += 60;
+      y += 54;
     }
 
     this._createButton(y, '\uB2E4\uC2DC \uD558\uAE30', 0xff6b35, () => {
       this._fadeToScene('ChefSelectScene', { stageId: this.stageId });
     });
-    y += 60;
+    y += 54;
 
     this._createButton(y, '\uC6D4\uB4DC\uB9F5\uC73C\uB85C', 0x444444, () => {
       this._fadeToScene('WorldMapScene');
