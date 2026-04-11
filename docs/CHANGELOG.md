@@ -1,5 +1,84 @@
 # Changelog
 
+## [2026-04-11] - Phase 19-6 영업씬 전체 UI 디자인 재설계
+
+### 추가
+
+- **홀 배경 데코 에셋 3종** (`assets/service/`)
+  - `wall_back.png` (512x80): 홀 뒷벽 (배치: x=180, y=66, displaySize=360x52, depth=3)
+  - `decor_plant.png` (64x96): 코너 화분 (좌: 18,120 / 우: 342,120 flipX, displaySize=28x42, depth=130)
+  - `entrance_arch.png` (192x64): 입구 아치 (x=180, y=256, displaySize=120x40, depth=5)
+  - SpriteLoader `_loadServiceAssets()`에 3종 키 등록 (SpriteLoader.js L329-331)
+
+- **`_createHallDecor()` 메서드** (`js/scenes/ServiceScene.js` L480-506)
+  - 뒷벽/화분/입구 아치 배치 (SpriteLoader.hasTexture() 기반 fallback)
+  - `_createTables()` 내부에서 `_drawIsoFloor()` 직후 호출 (L523)
+
+- **하단 패널 공통 배경** (`js/scenes/ServiceScene.js` L714-720)
+  - COOK_Y~RECIPE_Y+RECIPE_H 구간 단일 배경 0x1c1008, depth=0
+  - 기존 개별 배경(재고 0x1a1a2e, 레시피 0x111122) 제거
+
+- **섹션 레이블 3종**
+  - 조리 레이블 (L722-724): fontSize 10px, color #8B6914
+  - 재고 레이블 (L853-855): fontSize 11px, color #8B6914
+  - 레시피 레이블 (L897-899): fontSize 11px, color #8B6914
+
+- **앰버 구분선 2개** (1px, 0x8B6914, depth=9)
+  - COOK/STOCK 경계 (y=340, L726)
+  - STOCK/RECIPE 경계 (y=440, L851)
+
+### 변경
+
+- **`SISO_ORIGIN_Y`** (ServiceScene.js L91)
+  - 120 -> 100 (테이블 그리드 20px 상향 이동)
+
+- **HUD 배경** (ServiceScene.js L369)
+  - 0x1a1a2e (차가운 남색) -> 0x1c0e00 (웜 다크)
+  - 하단 1px 골드 구분선 추가 (0xffd700, alpha=0.4, L372-374)
+  - satText 색상: #ffcc00 -> #e8c87a (L386)
+
+- **조리 슬롯** (ServiceScene.js L739-740)
+  - 배경: 0x333344 -> 0x2d1a08, stroke: 0x555566 -> 0x4a3520
+
+- **재고 패널** (ServiceScene.js L849, L875)
+  - 개별 배경 0x1a1a2e 제거 (공통 배경으로 통합)
+  - 활성 텍스트: #ffffff -> #e8c87a, 비활성: #555555 유지
+
+- **레시피 패널** (ServiceScene.js L895, L919-935)
+  - 개별 배경 0x111122 제거
+  - 버튼 배경: 0x334455 -> 0x2d1a0a, stroke: 0x4a3520
+  - 버튼 hover: 0x4a2e10
+  - 텍스트: 이름 #e8c87a, 재료 #b89a5a
+  - 비활성: fill 0x1c1008/alpha 0.5, text #6b4a2a
+
+- **`_updateRecipeQuickSlots()` 색상 동기화** (ServiceScene.js L950-956)
+  - 활성: fill=0x2d1a0a/alpha=1/text=#e8c87a
+  - 비활성: fill=0x1c1008/alpha=0.5/text=#6b4a2a
+
+### 변경된 파일 (2개 코드 + 3개 에셋)
+
+| 파일 | 변경 유형 |
+|------|----------|
+| `js/managers/SpriteLoader.js` | 수정 (에셋 3종 키 등록) |
+| `js/scenes/ServiceScene.js` | 수정 (SISO_ORIGIN_Y, _createHallDecor 추가, HUD/패널/슬롯 색상 통일) |
+| `assets/service/wall_back.png` | 신규 (512x80, SD Forge DreamShaper 8) |
+| `assets/service/decor_plant.png` | 신규 (64x96, SD Forge DreamShaper 8) |
+| `assets/service/entrance_arch.png` | 신규 (192x64, SD Forge DreamShaper 8) |
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-11-kitchen-chaos-phase19-6-scope.md`
+- QA: `.claude/specs/2026-04-11-kitchen-chaos-phase19-6-qa.md`
+- visual_change: both (환경 에셋 3종 + UI 패널 색상/레이아웃 재설계)
+- QA: PASS (수용 기준 24/24, 예외 시나리오 6/6, Playwright 34/34, 시각적 5/5)
+- Vite 빌드 성공 (51 modules, chunk size 1948KB 경고는 기존 이슈)
+- 스펙 대비 변경: 없음 (모든 요구사항 그대로 구현)
+- 조리 레이블 fontSize 10px, 재고/레시피 레이블 11px (스펙 의도)
+- 하단바(_createBottomBar) 0x0d0d1a 차가운 남색은 변경 범위 밖, 향후 톤 통일 검토 권장
+- 영업 씬 에셋 누적: 15종 (기존 12종 + 데코 3종)
+
+---
+
 ## [2026-04-11] - Phase 19-5 영업씬 아이소메트릭화
 
 ### 추가
