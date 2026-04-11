@@ -388,16 +388,16 @@ export class MerchantScene extends Phaser.Scene {
     const maxScroll = Math.max(0, contentHeight - LIST_HEIGHT);
     this.scrollY = 0;
 
-    // 스크롤 인터랙션 영역
-    const zone = this.add.zone(GAME_WIDTH / 2, LIST_TOP + LIST_HEIGHT / 2, GAME_WIDTH, LIST_HEIGHT)
-      .setInteractive();
-
     let dragging = false;
     let lastPointerY = 0;
+    let startPointerY = 0;
 
-    zone.on('pointerdown', (pointer) => {
+    // zone 대신 scene 레벨 이벤트로 처리 — zone은 버튼 이벤트를 흡수하므로 사용 금지
+    this.input.on('pointerdown', (pointer) => {
+      if (pointer.y < LIST_TOP || pointer.y > LIST_BOTTOM) return;
       dragging = true;
       lastPointerY = pointer.y;
+      startPointerY = pointer.y;
     });
 
     this.input.on('pointermove', (pointer) => {
