@@ -1437,6 +1437,38 @@ export class ServiceScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * 재고 소진으로 주문 불가능해진 착석 손님을 패널티 없이 퇴장시킨다.
+   * consumeRecipe 직후 호출하여 이미 착석한 손님이 솔드아웃 메뉴를 무한 대기하는 문제를 해결한다.
+   * @private
+   */
+  _dismissSoldOutCustomers() {
+    for (let i = 0; i < this.tableCount; i++) {
+      const cust = this.tables[i];
+      if (!cust) continue;
+      if (this.inventoryManager.hasEnough(cust.recipe.ingredients)) continue;
+
+      // 단체 손님: 짝 테이블도 함께 퇴장
+      if (cust.customerType === 'group' && cust.groupPairIdx >= 0) {
+        const pairIdx = cust.groupPairIdx;
+        if (this.tables[pairIdx]) {
+          this.tables[pairIdx] = null;
+          this._updateTableUI(pairIdx);
+          if (this.tableContainers[pairIdx]) {
+            this._showFloatingText(this.tableContainers[pairIdx], '재료 소진', '#ffaa44');
+          }
+        }
+      }
+
+      // 패널티 없이 퇴장 — 재고 부족은 레스토랑 측 사유
+      this.tables[i] = null;
+      this._updateTableUI(i);
+      if (this.tableContainers[i]) {
+        this._showFloatingText(this.tableContainers[i], '재료 소진', '#ffaa44');
+      }
+    }
+  }
+
   // ── 조리 진행 ─────────────────────────────────────────────────────
 
   /**
@@ -1500,6 +1532,8 @@ export class ServiceScene extends Phaser.Scene {
     this.inventoryManager.consumeRecipe(recipe.ingredients);
     this._updateInventoryPanel();
     this._updateRecipeQuickSlots();
+    // 재고 소진으로 주문 불가한 착석 손님 즉시 퇴장 (패널티 없음)
+    this._dismissSoldOutCustomers();
 
     // 조리 시작 — Phase 8-3: 인테리어 오픈키친 보너스 적용
     const cookTimeBonus = ChefManager.getCookTimeBonus();
