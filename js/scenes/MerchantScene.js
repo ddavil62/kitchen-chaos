@@ -601,8 +601,8 @@ export class MerchantScene extends Phaser.Scene {
     const specialStat = this._getSpecialStat(stats);
     if (specialStat) statBarCount += 1;
 
-    // 높이 = 상하패딩(80) + 제목줄(30) + sep(10) + descKo(50) + sep(10) + lvLabel(20) + 바당24px + sep(10) + loreKo(40)
-    const popupH = 80 + 30 + 10 + 50 + 10 + 20 + statBarCount * 24 + 10 + 40;
+    // 높이 = 상단패딩(20) + 제목줄(30) + sep(10) + descKo(50) + sep(10) + lvLabel(20) + 바당24px + sep(10) + loreKo(40) + 하단패딩(30)
+    const popupH = 20 + 30 + 10 + 50 + 10 + 20 + statBarCount * 24 + 10 + 40 + 30;
     // cy를 화면 중앙에 두되, 팝업이 화면 밖으로 나가지 않도록 clamp
     const cy = Math.max(popupH / 2 + 10, Math.min(GAME_HEIGHT - popupH / 2 - 10, GAME_HEIGHT / 2));
 

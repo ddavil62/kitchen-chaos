@@ -361,8 +361,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
     const specialKey = this._findSpecialStatKey(toolDef.stats[1]);
     if (specialKey) rowCount += 1;
 
-    // 높이 = 상하패딩(70) + 헤더(30) + sep(10) + descKo(50) + sep(10) + 스탯헤더행(20) + 행당18px + sep(10) + loreKo(50)
-    const popupH = 70 + 30 + 10 + 50 + 10 + 20 + rowCount * 18 + 10 + 50;
+    // 높이 = 상단패딩(15) + 헤더(30) + sep(10) + descKo(50) + sep(10) + 스탯헤더행(20) + 행당18px + sep(10) + loreKo(50) + 하단패딩(25)
+    const popupH = 15 + 30 + 10 + 50 + 10 + 20 + rowCount * 18 + 10 + 50 + 25;
     // cy를 화면 중앙(+10)에 두되, 팝업이 화면 밖으로 나가지 않도록 clamp
     const cy = Math.max(popupH / 2 + 10, Math.min(GAME_HEIGHT - popupH / 2 - 10, GAME_HEIGHT / 2 + 10));
 

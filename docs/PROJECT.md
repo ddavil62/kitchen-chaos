@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-11
+> 최종 업데이트: 2026-04-12
 
 ## 프로젝트 개요
 
@@ -170,6 +170,7 @@ kitchen-chaos/
 | 대화 콘텐츠 | 캐릭터 초상화 6종(PixelLab), 7캐릭터, 챕터 1~6 메인+사이드+튜토리얼+이벤트+시즌2 프롤로그 시나리오 | 완료 |
 | 스토리 매니저 | StoryManager + storyData 트리거 34항목(triggerPoint 8종), 챕터 진행도 추적, onComplete 콜백, 씬 코드 1줄 연동 | 완료 |
 | 영업 씬 비주얼 | ServiceScene 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코 3종, 웜 다크 통합 팔레트) + fallback | 완료 |
+| 도구 도감/팝업 | 행상인 ℹ 팝업(스탯바+로어), 도감 도구 탭(3열 그리드+Lv테이블), TOOL_DEFS descKo/loreKo | 완료 |
 
 ## 콘텐츠 규모
 

@@ -1,5 +1,36 @@
 # Changelog
 
+## [2026-04-12] - Phase 20 도구 정보 팝업 + 도감 도구 탭
+
+### 추가
+
+- **TOOL_DEFS 8종에 descKo, loreKo 필드 추가** (`js/data/gameData.js`)
+  - descKo: 도구 기능 설명 텍스트
+  - loreKo: 식란 세계관 기반 도구 로어 텍스트
+
+- **MerchantScene 도구 정보 팝업** (`js/scenes/MerchantScene.js`)
+  - 각 도구 행 우상단 ℹ 버튼 추가
+  - `_showToolInfoPopup()`: 스탯 바 + descKo + loreKo 표시
+  - 팝업 높이 동적 계산 (attack/support 카테고리별 스탯 바 수 반영)
+
+- **RecipeCollectionScene 도구 탭** (`js/scenes/RecipeCollectionScene.js`)
+  - "도구" 탭 추가, 8종 3열 그리드 표시
+  - `_showToolDetail()`: Lv1/2/3 스탯 테이블 상세 팝업
+  - 팝업 높이 동적 계산 (attack/support 카테고리별)
+
+### 수정
+
+- **OrderManager kill_count 오더 버그** — 웨이브 실제 적 수 초과 시 출현하던 버그 수정
+- **조리 중 손님 퇴장 버그** — 마지막 재료 소비 직후 조리 중인 손님이 퇴장되던 버그 수정 (`_dismissSoldOutCustomers`)
+- **조리 중 버리기 버튼** — 조리 중에도 버리기 버튼 활성화
+
+### 참고
+
+- visual_change: ui (팝업 UI + 도감 탭 추가)
+- QA: PASS
+
+---
+
 ## [2026-04-11] - Phase 19-6 영업씬 전체 UI 디자인 재설계
 
 ### 추가
