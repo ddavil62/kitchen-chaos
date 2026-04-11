@@ -150,7 +150,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
     const cols = 5;
     const cellSize = 58;
     const startX = (GAME_WIDTH - cols * cellSize) / 2 + cellSize / 2;
-    const startY = 110;
+    const startY = 128;
 
     recipes.forEach((recipe, i) => {
       const col = i % cols;
@@ -301,7 +301,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
     const cols = 3;
     const cellSize = 90;
     const startX = 90;  // (360 - 3*90)/2 + 45 = 90
-    const startY = 110;
+    const startY = 128;
     const rowGap = 100;
     const inventory = ToolManager.getToolInventory();
 
