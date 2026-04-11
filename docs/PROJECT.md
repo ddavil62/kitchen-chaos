@@ -115,6 +115,7 @@ kitchen-chaos/
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
+    service/                 # 영업 씬 에셋 12종 (테이블/손님/바닥/카운터)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
 ```
@@ -128,7 +129,7 @@ kitchen-chaos/
 | 행상인 | MerchantScene.js | 영업 후 도구 구매/판매/업그레이드 UI |
 | 월드맵 | WorldMapScene.js | 12챕터 노드맵(시즌1/2 탭), 슬라이드업 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
-| 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장 |
+| 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 픽셀아트 스프라이트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
@@ -168,6 +169,7 @@ kitchen-chaos/
 | 대화 엔진 | DialogueManager + DialogueScene 오버레이, 32종 스크립트, 선택지 분기 UI, 세이브 연동 | 완료 |
 | 대화 콘텐츠 | 캐릭터 초상화 6종(PixelLab), 7캐릭터, 챕터 1~6 메인+사이드+튜토리얼+이벤트+시즌2 프롤로그 시나리오 | 완료 |
 | 스토리 매니저 | StoryManager + storyData 트리거 34항목(triggerPoint 8종), 챕터 진행도 추적, onComplete 콜백, 씬 코드 1줄 연동 | 완료 |
+| 영업 씬 비주얼 | ServiceScene 픽셀아트 렌더링 (테이블 5종, 손님 5종, 홀 바닥, 조리 카운터) + fallback | 완료 |
 
 ## 콘텐츠 규모
 
@@ -191,8 +193,6 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 19-1 완료 (데이터 레이어 + 세이브 v12 + 도구 전투 로직).
-- Phase 19-2 완료 (UI 확장 -- ChefSelect 5종 카드, WorldMap 시즌탭 12챕터, stageData 시즌2 36스테이지).
-- Phase 19-3 완료 (PixelLab 에셋 6종 + 시즌2 프롤로그 스토리 3종 + SaveManager v13).
-- 시즌별 장기 확장 (80~100시간): 시즌1(1~6장, 완료) -> 시즌2(국제, Phase 19~26) -> 시즌3(극한 환경).
+- Phase 19 완료 (시즌2 기반 인프라 -- 데이터/UI/에셋/스토리/영업 씬 비주얼 리워크).
+- 시즌별 장기 확장 (80~100시간): 시즌1(1~6장, 완료) -> 시즌2(국제, Phase 20~26) -> 시즌3(극한 환경).
 - 상세: `docs/ROADMAP.md` 참조

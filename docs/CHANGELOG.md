@@ -1,5 +1,55 @@
 # Changelog
 
+## [2026-04-11] - Phase 19-4 영업 씬 비주얼 리워크
+
+### 추가
+
+- **PixelLab 에셋 12종** (`assets/service/`)
+  - `table_lv0.png` ~ `table_lv4.png`: 테이블 5종 (80x64px, 쿼터뷰 픽셀아트, 등급별 소재 차등)
+  - `customer_normal.png`, `customer_vip.png`, `customer_gourmet.png`, `customer_rushed.png`: 손님 캐릭터 4종 (48x48px, chibi 픽셀아트)
+  - `customer_group.png`: 단체 손님 1종 (68x68px, 단일 인물로 대체 -- PixelLab API 제한으로 2인 구성 불가)
+  - `floor_hall.png`: 식당 홀 바닥 타일 (360x240px, 목재 따뜻한 베이지)
+  - `counter_cooking.png`: 조리 카운터 아이콘 (174x54px, 냄비 형태 아이콘)
+
+- **SpriteLoader 서비스 에셋 로드** (`js/managers/SpriteLoader.js`)
+  - 상수: SERVICE_ROOT, TABLE_GRADE_COUNT(5), CUSTOMER_TYPE_IDS(5종)
+  - `_loadServiceAssets()`: 테이블 5종 + 손님 5종 + 바닥 + 카운터 텍스처 로드
+  - `preload()`에 `_loadServiceAssets()` 호출 등록
+
+- **ServiceScene 스프라이트 렌더링** (`js/scenes/ServiceScene.js`)
+  - SpriteLoader import 추가
+  - `_createTables()`: 홀 배경을 `floor_hall` Image로 교체 (fallback: 기존 색상 직사각형)
+  - `_createTables()`: 테이블을 `table_lv{N}` 스프라이트로 교체 (fallback: TABLE_COLORS 직사각형)
+  - `_createTables()`: 손님 아이콘을 custIconImg(Image) + custIconText(Text) 이중 구조로 교체
+  - `_updateTableUI()`: SpriteLoader.hasTexture() 기반 Image/Text 표시 분기
+  - `_createCookingSlots()`: 슬롯 배경을 `counter_cooking` Image로 교체 (fallback: 기존 색상 직사각형)
+
+### 변경된 파일 (2개 코드 + 12개 에셋)
+
+| 파일 | 변경 유형 |
+|------|----------|
+| `js/managers/SpriteLoader.js` | 수정 (상수 3개, 메서드 1개, preload 호출 1줄) |
+| `js/scenes/ServiceScene.js` | 수정 (SpriteLoader import, 홀/테이블/손님/카운터 렌더링 교체) |
+| `assets/service/table_lv0.png` ~ `table_lv4.png` | 신규 (5개) |
+| `assets/service/customer_normal.png` ~ `customer_group.png` | 신규 (5개) |
+| `assets/service/floor_hall.png` | 신규 |
+| `assets/service/counter_cooking.png` | 신규 |
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-11-kitchen-chaos-phase19-4-scope.md`
+- 리포트: `.claude/specs/2026-04-11-kitchen-chaos-phase19-4-report.md`
+- QA: `.claude/specs/2026-04-11-kitchen-chaos-phase19-4-qa.md`
+- visual_change: both (art 에셋 생성 + UI 렌더링 교체)
+- Vite 빌드 성공 (51 modules)
+- QA: PASS (27/28 테스트 통과, 1건 headless Chromium 타이밍 이슈 -- 코드 결함 아님)
+- 스펙 대비 변경: 손님 에셋 해상도 32x48 -> 48x48 (group은 48x48 -> 68x68), counter_cooking 175x55 -> 174x54 (PixelLab 생성 오차), customer_group 2인 구성 -> 단일 인물 (API 제한). 모두 setDisplaySize로 렌더링에 영향 없음
+- custIconImg 초기 텍스처 `__MISSING` 사용 (Phaser 내장 placeholder, visible=false 처리)
+- counter_cooking 아이콘 46x46 정사각형 스케일링 (원본 3:1 비율 왜곡, 아이콘 장식 용도 허용 범위)
+- 기존 TABLE_COLORS, CUSTOMER_TYPE_ICONS 등 fallback 상수 보존 (스펙 요구)
+
+---
+
 ## [2026-04-11] - Phase 19-3 PixelLab 에셋 + 시즌2 프롤로그 스토리
 
 ### 추가

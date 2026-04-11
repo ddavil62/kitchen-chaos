@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-11
-> 기준: Phase 19-1/19-2/19-3 완료
+> 기준: Phase 19-1/19-2/19-3/19-4 완료
 
 ---
 
@@ -38,8 +38,9 @@
 | Phase 25 | 12장 — 슈가 드림랜드 (디저트 월드, 시즌 2 최종) | 📋 계획 |
 | Phase 26 | 시즌 2 밸런스 QA + 스토리 종합 | 📋 계획 |
 | Phase 27 | 업적 시스템 (30~50개, 보상, 업적 UI) | 📋 계획 |
+| Phase 28 | 아트 리워크 — Phase 1~19 레거시 스프라이트 64px 재생성 | 🎨 예정 |
 
-**현재 구현 완성도**: 시즌 1 완성, Phase 19 완료 (데이터 레이어 + 세이브 v13 + 도구 전투 로직 + UI 확장 + stageData 시즌2 + PixelLab 에셋 6종 + 시즌2 프롤로그 스토리)
+**현재 구현 완성도**: 시즌 1 완성, Phase 19 완료 (데이터 레이어 + 세이브 v13 + 도구 전투 로직 + UI 확장 + stageData 시즌2 + PixelLab 에셋 6종 + 시즌2 프롤로그 스토리 + 영업 씬 비주얼 리워크 에셋 12종)
 
 ### 현재 콘텐츠 규모
 
@@ -582,6 +583,17 @@
 - [x] SaveManager v12→v13 (storyFlags 배열→객체 마이그레이션)
 - [x] StoryManager._fire() trigger.onComplete 지원, setFlag/hasFlag 객체 패턴 전환
 
+### ✅ 19-4. 영업 씬 비주얼 리워크 (완료)
+
+- [x] PixelLab 에셋 12종 생성 (테이블 5종, 손님 5종, 홀 바닥, 조리 카운터) → `assets/service/`
+- [x] SpriteLoader `_loadServiceAssets()` 메서드 추가 + preload 등록
+- [x] ServiceScene 홀 배경 → `floor_hall` 스프라이트 교체 (fallback: 색상 직사각형)
+- [x] ServiceScene 테이블 → `table_lv{N}` 스프라이트 교체 (fallback: TABLE_COLORS 직사각형)
+- [x] ServiceScene 손님 아이콘 → `customer_{type}` 스프라이트 교체 (custIconImg + custIconText 이중 구조)
+- [x] ServiceScene 조리 슬롯 → `counter_cooking` 스프라이트 교체 (fallback: 색상 직사각형)
+- [x] SpriteLoader.hasTexture() 기반 fallback 전략 전체 적용
+- [x] 기존 인터랙션 로직 무변경 (테이블 터치/서빙/조리 진행 바/버리기 버튼)
+
 ---
 
 ## Phase 20 — 7장: 사쿠라 이자카야 (일식)
@@ -858,7 +870,7 @@
 | ~~16~~ | ~~인게임 대화 통합 (튜토리얼/이벤트/선택지)~~ | 106 | 15 | ✅ 완료 |
 | ~~17~~ | ~~밸런스 QA (시뮬레이션, P1+P2 조정)~~ | 106 | 15 | ✅ 완료 |
 | ~~18~~ | ~~레거시 정리 + 기술 부채~~ | 106 | 15 | ✅ 완료 |
-| ~~19~~ | ~~시즌 2 기반 (월드맵 12챕터, 셰프 2종, 도구 2종)~~ | 106 | 15 | ✅ 완료 |
+| ~~19~~ | ~~시즌 2 기반 (월드맵 12챕터, 셰프 2종, 도구 2종, 영업 씬 비주얼)~~ | 106 | 15 | ✅ 완료 |
 | 20 | 7장 사쿠라 이자카야 (참치, 와사비) | ~116 | 17 | 📋 계획 |
 | 21 | 8장 용의 주방 (두부, 고수) | ~126 | 19 | 📋 계획 |
 | 22 | 9장 별빛 비스트로 (트러플) | ~136 | 20 | 📋 계획 |
@@ -867,3 +879,42 @@
 | 25 | 12장 슈가 드림랜드 (카카오, 바닐라) — 시즌 2 최종 | ~166 | 25 | 📋 계획 |
 | 26 | 시즌 2 밸런스 QA + 스토리 종합 | ~166 | 25 | 📋 계획 |
 | 27 | 업적 시스템 (30~50개, 보상 UI) | ~166 | 25 | 📋 계획 |
+| 28 | 아트 리워크 (전체 스프라이트 64px 재생성) | ~166 | 25 | 🎨 예정 |
+
+---
+
+## Phase 28 — 아트 리워크: 레거시(Phase 1~19) 스프라이트 64px 재생성
+
+> 목표: 기존 32~48px 스프라이트를 64px로 재생성하여 시각 품질 개선
+
+### 배경
+
+- 현재 적/보스/셰프 스프라이트: 32~48px (레트로 도트 느낌이 강함)
+- 실제 렌더 크기: 일반 적 35px, 보스 50px (게임 캔버스 360×640)
+- 64px 원본으로 재생성 시: 축소 스케일이 줄어 선명하고 덜 레트로한 느낌
+
+### 앵커 이미지 (아트 방향 기준)
+
+- **당근 고블린 64px v2** — 아트 리워크 기준 레퍼런스
+  - 파일: `assets/enemies/carrot_goblin/carrot_goblin_64px_anchor.png`
+  - PixelLab Character ID: `ca774523-aeca-4f33-8495-4fb0db4ba22a`
+  - 설정: size=64, outline=single color black outline, shading=basic shading, detail=medium detail, proportions=chibi, view=low top-down
+
+### 생성 표준 설정
+
+```
+size: 64
+outline: "single color black outline"
+shading: "basic shading"
+detail: "medium detail"
+proportions: {"type": "preset", "name": "chibi"}
+view: "low top-down"
+n_directions: 8
+```
+
+### 대상 에셋 목록
+
+- [ ] 적 일반 (16종) — 32px → 64px
+- [ ] 보스 (4종) — 48px → 64px
+- [ ] 셰프 캐릭터 스프라이트 (5종)
+- [ ] 초상화는 제외 (별도 포맷)

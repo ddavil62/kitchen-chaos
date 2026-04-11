@@ -604,6 +604,7 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createCookingSlots() {
+    // 조리 구역 전체 배경 (항상 렌더링 — floor_hall이 없는 영역 처리)
     this.add.rectangle(GAME_WIDTH / 2, COOK_Y + COOK_H / 2, GAME_WIDTH, COOK_H, 0x222233)
       .setDepth(0);
 
@@ -617,15 +618,17 @@ export class ServiceScene extends Phaser.Scene {
 
       const container = this.add.container(cx, cy).setDepth(10);
 
-      // 슬롯 배경 — Phase 19-4: 카운터 스프라이트 우선, fallback: 색상 직사각형
+      // 슬롯 배경 — Phase 19-4: 카운터 스프라이트(데코)와 어두운 배경 혼합
+      const bgRect = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x333344)
+        .setStrokeStyle(1, 0x555566);
+      container.add(bgRect);
       if (SpriteLoader.hasTexture(this, 'counter_cooking')) {
-        const bg = this.add.image(0, 0, 'counter_cooking')
-          .setDisplaySize(slotW - 10, COOK_H - 10);
-        container.add(bg);
-      } else {
-        const bg = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x333344)
-          .setStrokeStyle(1, 0x555566);
-        container.add(bg);
+        // 카운터 이미지를 슬롯 왼쪽에 자연 크기(비율 유지)로 배치
+        const iconH = COOK_H - 14;
+        const icon = this.add.image(-(slotW / 2) + iconH / 2 + 4, 0, 'counter_cooking')
+          .setDisplaySize(iconH, iconH)
+          .setAlpha(0.9);
+        container.add(icon);
       }
 
       // 라벨
