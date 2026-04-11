@@ -729,8 +729,7 @@ export class GatheringScene extends Phaser.Scene {
     if (!this.selectedTowerType) return;
 
     if (this.stagePathCells.has(`${col},${row}`)) {
-      this._showMessage('경로 위에는 배치할 수 없습니다', 1000);
-      return;
+      return; // 경로 셀 — 조용히 무시 (적 클릭 오해 방지)
     }
 
     const exists = this.towers.getChildren().some(t => t._cellKey === key);
@@ -807,6 +806,12 @@ export class GatheringScene extends Phaser.Scene {
     this._updateHUD();
     // 팔레트 갱신 (잔여 수량 업데이트)
     this._renderTowerButtons();
+
+    // 잔여 수량 소진 시 배치 모드 자동 해제
+    if (this._getAvailableCount(typeId) <= 0) {
+      this.selectedTowerType = null;
+      this._updateTowerBarSelection();
+    }
 
     this.tweens.add({
       targets: tower,
@@ -930,9 +935,8 @@ export class GatheringScene extends Phaser.Scene {
   _handleTowerRelocate(col, row) {
     const key = `${col},${row}`;
 
-    // 경로 위 불가
+    // 경로 위 불가 — 조용히 무시
     if (this.stagePathCells.has(key)) {
-      this._showMessage('경로 위에는 배치할 수 없습니다', 1000);
       return;
     }
 
@@ -1608,7 +1612,7 @@ export class GatheringScene extends Phaser.Scene {
       stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(121);
 
-    this._messagePopup = this.add.container(0, 0, [bg, text]).setDepth(120);
+    this._messagePopup = this.add.container(0, 0, [bg, text]).setDepth(999);
 
     this.time.delayedCall(duration, () => {
       if (this._messagePopup) {
