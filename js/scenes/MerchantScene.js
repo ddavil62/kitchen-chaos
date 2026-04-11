@@ -177,6 +177,24 @@ export class MerchantScene extends Phaser.Scene {
       });
       this.listContainer.add(headerText);
 
+      // 1행 우측: 정보 (i) 버튼 (20x20)
+      const infoBtnX = GAME_WIDTH - MARGIN_X - 10;
+      const infoBtnY = yOff + 10;
+      const infoBg = this.add.rectangle(infoBtnX, infoBtnY, 20, 20, 0x224466)
+        .setInteractive({ useHandCursor: true });
+      this.listContainer.add(infoBg);
+      const infoTxt = this.add.text(infoBtnX, infoBtnY, '\u2139', {
+        fontSize: '13px', fontStyle: 'bold', color: '#88ccff',
+      }).setOrigin(0.5);
+      this.listContainer.add(infoTxt);
+      infoBg.on('pointerdown', () => {
+        // 드래그 직후에는 팝업을 열지 않는다
+        if ((this._lastDragDist || 0) >= 5) return;
+        this._showToolInfoPopup(def, tool.level);
+      });
+      infoBg.on('pointerover', () => infoBg.setFillStyle(0x336688));
+      infoBg.on('pointerout', () => infoBg.setFillStyle(0x224466));
+
       // 2행: 구매 / 판매 버튼
       const btnY = yOff + 30;
       this._createToolBuyButton(toolId, def, tool, gold, MARGIN_X, btnY);
@@ -394,6 +412,8 @@ export class MerchantScene extends Phaser.Scene {
 
     // zone 대신 scene 레벨 이벤트로 처리 — zone은 버튼 이벤트를 흡수하므로 사용 금지
     this.input.on('pointerdown', (pointer) => {
+      // 팝업 오픈 중에는 스크롤 비활성화
+      if (this._popupOpen) return;
       if (pointer.y < LIST_TOP || pointer.y > LIST_BOTTOM) return;
       dragging = true;
       lastPointerY = pointer.y;
@@ -408,7 +428,10 @@ export class MerchantScene extends Phaser.Scene {
       this.listContainer.y = LIST_TOP - this.scrollY;
     });
 
-    this.input.on('pointerup', () => {
+    this.input.on('pointerup', (pointer) => {
+      // 드래그 거리 기록 (info 버튼 핸들러에서 참조)
+      const dragDist = Math.abs(pointer.y - startPointerY);
+      this._lastDragDist = dragDist;
       dragging = false;
     });
   }
@@ -540,6 +563,195 @@ export class MerchantScene extends Phaser.Scene {
     cancelBtn.on('pointerdown', () => {
       closePopup();
     });
+  }
+
+  // ── 도구 정보 팝업 ───────────────────────────────────────────────
+
+  /**
+   * 도구 정보 팝업을 표시한다. 이미 열린 팝업이 있으면 먼저 파괴한다.
+   * @param {object} toolDef - TOOL_DEFS 항목
+   * @param {number} currentLevel - 현재 보유 레벨
+   * @private
+   */
+  _showToolInfoPopup(toolDef, currentLevel) {
+    // 기존 팝업 파괴
+    if (this._infoPopupElements) {
+      this._infoPopupElements.forEach(el => el.destroy());
+      this._infoPopupElements = null;
+    }
+
+    this._popupOpen = true;
+    const elements = [];
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+
+    // 반투명 오버레이
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+      .setDepth(100).setInteractive();
+    elements.push(overlay);
+
+    // 팝업 배경 (300x340)
+    const popBg = this.add.rectangle(cx, cy, 300, 340, 0x221100)
+      .setDepth(101).setStrokeStyle(2, toolDef.color);
+    elements.push(popBg);
+
+    // 헤더: 아이콘 + 이름
+    const icon = TOOL_ICONS[toolDef.id] || '\uD83D\uDD27';
+    const titleText = this.add.text(cx - 100, cy - 150, `${icon} ${toolDef.nameKo}`, {
+      fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 2,
+    }).setDepth(102);
+    elements.push(titleText);
+
+    // 닫기 버튼 (X)
+    const closeBtn = this.add.rectangle(cx + 125, cy - 150, 36, 24, 0xcc2222)
+      .setInteractive({ useHandCursor: true }).setDepth(102);
+    elements.push(closeBtn);
+    const closeTxt = this.add.text(cx + 125, cy - 150, '\u2715', {
+      fontSize: '14px', color: '#ffffff',
+    }).setOrigin(0.5).setDepth(102);
+    elements.push(closeTxt);
+
+    // 구분선 1
+    const sep1 = this.add.rectangle(cx, cy - 128, 260, 1, 0x444444).setDepth(102);
+    elements.push(sep1);
+
+    // 기능 설명 (descKo)
+    const descText = this.add.text(cx, cy - 110, toolDef.descKo || '', {
+      fontSize: '13px', color: '#cccccc', wordWrap: { width: 260 }, lineSpacing: 3,
+    }).setOrigin(0.5, 0).setDepth(102);
+    elements.push(descText);
+
+    // 구분선 2
+    const sep2 = this.add.rectangle(cx, cy - 70, 260, 1, 0x444444).setDepth(102);
+    elements.push(sep2);
+
+    // 현재 레벨 표시
+    const lvText = this.add.text(cx - 120, cy - 58, `\uD604\uC7AC Lv: ${currentLevel}`, {
+      fontSize: '12px', fontStyle: 'bold', color: '#ffd700',
+    }).setDepth(102);
+    elements.push(lvText);
+
+    // 스탯 바 렌더링
+    const stats = toolDef.stats[currentLevel];
+    let barY = cy - 36;
+    const barX = cx - 30;
+
+    // 공격력 (attack 카테고리만)
+    if (toolDef.category === 'attack') {
+      this._drawStatBar(elements, '\uACF5\uACA9\uB825', stats.damage, 50, barX, barY);
+      barY += 24;
+    }
+
+    // 사거리 (항상)
+    this._drawStatBar(elements, '\uC0AC\uAC70\uB9AC', stats.range, 150, barX, barY);
+    barY += 24;
+
+    // 공격속도 (attack 카테고리만, 역수 비율)
+    if (toolDef.category === 'attack') {
+      const speedRatio = 1 - stats.fireRate / 1500;
+      this._drawStatBar(elements, '\uACF5\uACA9\uC18D\uB3C4', speedRatio, 1, barX, barY, `${stats.fireRate}ms`);
+      barY += 24;
+    }
+
+    // 특수 스탯 (우선순위에 따라 1개)
+    const specialStat = this._getSpecialStat(stats);
+    if (specialStat) {
+      this._drawStatBar(elements, specialStat.label, specialStat.value, specialStat.max, barX, barY, specialStat.display);
+      barY += 24;
+    }
+
+    // 구분선 3
+    const sep3 = this.add.rectangle(cx, barY + 4, 260, 1, 0x444444).setDepth(102);
+    elements.push(sep3);
+
+    // 로어 (loreKo)
+    const loreText = this.add.text(cx, barY + 16, toolDef.loreKo || '', {
+      fontSize: '11px', fontStyle: 'italic', color: '#aaaaaa',
+      wordWrap: { width: 260 }, lineSpacing: 2,
+    }).setOrigin(0.5, 0).setDepth(102);
+    elements.push(loreText);
+
+    // 닫기 콜백
+    const closePopup = () => {
+      elements.forEach(el => el.destroy());
+      this._infoPopupElements = null;
+      this._popupOpen = false;
+    };
+    closeBtn.on('pointerdown', closePopup);
+    overlay.on('pointerdown', closePopup);
+
+    this._infoPopupElements = elements;
+  }
+
+  /**
+   * 스탯 바 1줄을 렌더링한다.
+   * @param {Array} elements - 파괴 대상 요소 배열
+   * @param {string} labelStr - 스탯 이름
+   * @param {number} value - 현재 값 (또는 비율)
+   * @param {number} maxValue - 최대 기준값 (또는 1)
+   * @param {number} x - 바 시작 X
+   * @param {number} y - 바 중심 Y
+   * @param {string} [displayStr] - 수치 표시 문자열 (생략 시 value 사용)
+   * @private
+   */
+  _drawStatBar(elements, labelStr, value, maxValue, x, y, displayStr) {
+    const cx = GAME_WIDTH / 2;
+    // 레이블 (바 왼쪽)
+    const label = this.add.text(x - 60, y, labelStr, {
+      fontSize: '11px', color: '#aaaaaa',
+    }).setOrigin(1, 0.5).setDepth(102);
+    elements.push(label);
+
+    // 바 배경
+    const barBg = this.add.rectangle(x + 50, y, 100, 8, 0x333333)
+      .setOrigin(0.5, 0.5).setDepth(102);
+    elements.push(barBg);
+
+    // 채움 바
+    const ratio = Math.min(value / maxValue, 1);
+    const fillW = Math.max(Math.floor(ratio * 100), 1);
+    const barFill = this.add.rectangle(x + 50 - 50 + fillW / 2, y, fillW, 8, 0x44aaff)
+      .setOrigin(0.5, 0.5).setDepth(102);
+    elements.push(barFill);
+
+    // 수치 텍스트
+    const valStr = displayStr !== undefined ? displayStr : String(Math.round(value));
+    const valText = this.add.text(x + 110, y, valStr, {
+      fontSize: '10px', color: '#ffffff',
+    }).setOrigin(0, 0.5).setDepth(102);
+    elements.push(valText);
+  }
+
+  /**
+   * 도구 스탯에서 특수 스탯 1개를 추출한다 (우선순위 기반).
+   * @param {object} stats - 도구 레벨별 스탯 객체
+   * @returns {{ label: string, value: number, max: number, display: string }|null}
+   * @private
+   */
+  _getSpecialStat(stats) {
+    if (stats.slowFactor !== undefined) {
+      return { label: '\uB454\uD654', value: stats.slowFactor, max: 1, display: `${Math.round(stats.slowFactor * 100)}%` };
+    }
+    if (stats.burnDamage !== undefined) {
+      return { label: '\uD654\uC0C1', value: stats.burnDamage, max: 15, display: `${stats.burnDamage}dmg` };
+    }
+    if (stats.freezeDuration !== undefined) {
+      return { label: '\uBE59\uACB0', value: stats.freezeDuration / 1000, max: 3, display: `${stats.freezeDuration / 1000}s` };
+    }
+    if (stats.collectInterval !== undefined) {
+      return { label: '\uC218\uC9D1', value: 1 - stats.collectInterval / 3000, max: 1, display: `${stats.collectInterval / 1000}s` };
+    }
+    if (stats.auraEffect !== undefined) {
+      return { label: '\uBC84\uD504', value: stats.auraEffect, max: 0.3, display: `${Math.round(stats.auraEffect * 100)}%` };
+    }
+    if (stats.splashRadius !== undefined) {
+      return { label: '\uBC94\uC704', value: stats.splashRadius, max: 60, display: `${stats.splashRadius}px` };
+    }
+    if (stats.dotDamage !== undefined) {
+      return { label: 'DoT', value: stats.dotDamage, max: 15, display: `${stats.dotDamage}dmg` };
+    }
+    return null;
   }
 
   // ── UI 갱신 ────────────────────────────────────────────────────────

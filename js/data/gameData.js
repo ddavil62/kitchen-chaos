@@ -366,6 +366,8 @@ export const TOOL_DEFS = {
     },
     color: 0xc0c0c0,
     category: 'attack',
+    descKo: '기본 근거리 공격 도구. 빠른 공격속도로 전방의 적을 안정적으로 제압한다.',
+    loreKo: '미미의 할머니가 첫 번째 식란 때 직접 벼려 만든 미력사 가문의 시조 도구.',
   },
   salt: {
     id: 'salt',
@@ -382,6 +384,8 @@ export const TOOL_DEFS = {
     },
     color: 0x87ceeb,
     category: 'attack',
+    descKo: '적에게 소금을 분사해 이동 속도를 줄인다. 밀가루 유령처럼 보이지 않는 적도 감지 가능.',
+    loreKo: '"뿌리면 보인다!" — 포코가 1,000년 된 소금통에 직접 적은 취급 주의 문구.',
   },
   grill: {
     id: 'grill',
@@ -398,6 +402,8 @@ export const TOOL_DEFS = {
     },
     color: 0xff4500,
     category: 'attack',
+    descKo: '적에게 화염 투사체를 발사하고 화상 상태를 부여한다. 지속 피해로 높은 누적 DPS를 발휘한다.',
+    loreKo: '미력사 가문에 전해지는 "정화염(淨化炎)" 조리법이 깃든 그릴. 태우면 정화된다는 단순한 진리.',
   },
   delivery: {
     id: 'delivery',
@@ -414,6 +420,8 @@ export const TOOL_DEFS = {
     },
     color: 0x00cc88,
     category: 'support',
+    descKo: '공격하지 않는 대신 주변 재료 드롭을 자동 수집한다. 수집 반경과 속도가 레벨에 따라 향상된다.',
+    loreKo: '포코가 비밀리에 미력을 주입한 배달 로봇. "효율이 최고다"는 그의 철학이 하드코딩되어 있다.',
   },
   freezer: {
     id: 'freezer',
@@ -430,6 +438,8 @@ export const TOOL_DEFS = {
     },
     color: 0x00bfff,
     category: 'attack',
+    descKo: '적을 빙결시켜 일시 정지 상태로 만든다. 투명 적도 탐지·공격 가능한 유일한 도구 유형.',
+    loreKo: '식란 정화 도중 국물이 식어 얼어버린 솥에서 힌트를 얻었다는 설이 있는 전설의 냉동고.',
   },
   soup_pot: {
     id: 'soup_pot',
@@ -446,6 +456,8 @@ export const TOOL_DEFS = {
     },
     color: 0x32cd32,
     category: 'support',
+    descKo: '공격하지 않는 버프 도구. 주변 타워의 공격속도를 주기적으로 증가시키는 오라를 발산한다.',
+    loreKo: '끓이면 끓일수록 맛이 깊어지듯, 오래 배치할수록 주변 도구들의 미력을 자극한다고 전해진다.',
   },
   // ── Phase 19-1: 시즌 2 신규 도구 ──
   wasabi_cannon: {
@@ -463,6 +475,8 @@ export const TOOL_DEFS = {
     },
     color: 0x7cfc00,
     category: 'attack',
+    descKo: '와사비 탄환을 발사하여 착탄 지점 주변 범위 피해와 광역 둔화를 동시에 가한다.',
+    loreKo: '유키의 스승이 남긴 시즌2 비전 도구. "눈물 없이는 쓸 수 없다"는 경고가 포신에 새겨져 있다.',
   },
   spice_grinder: {
     id: 'spice_grinder',
@@ -479,6 +493,8 @@ export const TOOL_DEFS = {
     },
     color: 0xff8c00,
     category: 'attack',
+    descKo: '향신료 분말을 발사해 기본 피해 외에 지속 독 피해(DoT)를 부여한다.',
+    loreKo: '라오의 웍 철학을 담은 시즌2 도구. "한 방에 끝내지 않는다, 향신료처럼 서서히 스며든다."',
   },
 };
 
