@@ -188,7 +188,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
 
       // 클릭 → 상세
       border.setInteractive({ useHandCursor: true });
-      border.on('pointerdown', () => this._showDetail(recipe, unlocked));
+      border.on('pointerup', () => this._showDetail(recipe, unlocked));
     });
   }
 
@@ -338,7 +338,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
 
       // 셀 클릭 → 상세 팝업
       cellBg.setInteractive({ useHandCursor: true });
-      cellBg.on('pointerdown', () => this._showToolDetail(def));
+      cellBg.on('pointerup', () => this._showToolDetail(def));
     });
   }
 
