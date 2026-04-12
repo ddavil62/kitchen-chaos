@@ -95,9 +95,9 @@ const ENEMY_WALK_HASHES = {
   tomato_bomber: 'walking-0dd2efa9',
   sushi_ninja: null,    // PixelLab 생성 후 hash 기입
   tempura_monk: null,   // PixelLab 생성 후 hash 기입
-  dumpling_warrior: null,  // Phase 21: PixelLab 생성 후 hash 기입
-  mini_dumpling: null,     // Phase 21: PixelLab 생성 후 hash 기입
-  wok_phantom: null,       // Phase 21: PixelLab 생성 후 hash 기입
+  dumpling_warrior: 'animating-1e8cfa3d',  // Phase 21
+  mini_dumpling: 'animating-8123f320',     // Phase 21
+  wok_phantom: 'animating-4a4ef775',       // Phase 21
 };
 
 const BOSS_WALK_HASHES = {
@@ -108,7 +108,7 @@ const BOSS_WALK_HASHES = {
   pasta_boss: 'walking-49c92768',
   seafood_kraken: 'walking-f85ec5ca',
   sake_oni: null,       // PixelLab 생성 후 hash 기입
-  dragon_wok: null,     // Phase 21: PixelLab 생성 후 hash 기입
+  dragon_wok: 'animating-8efd2218',     // Phase 21
 };
 
 /** 걷기 애니메이션 방향 목록 */
