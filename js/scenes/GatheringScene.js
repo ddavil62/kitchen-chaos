@@ -222,13 +222,6 @@ export class GatheringScene extends Phaser.Scene {
     const hudBg = this.add.rectangle(GAME_WIDTH / 2, HUD_HEIGHT / 2, GAME_WIDTH, HUD_HEIGHT, 0x1a1a2e);
     hudBg.setDepth(100);
 
-    // 골드 대신 도구 수량 표시 (배치된/보유)
-    const inventory = ToolManager.getToolInventory();
-    const totalOwned = Object.values(inventory).reduce((s, t) => s + t.count, 0);
-    this.toolCountText = this.add.text(10, 10, `\uD83D\uDD27 0/${totalOwned}`, {
-      fontSize: '14px', color: '#88ccff', fontStyle: 'bold',
-    }).setDepth(101);
-
     this.waveText = this.add.text(GAME_WIDTH / 2, 10, '\uC6E8\uC774\uBE0C 0/8', {
       fontSize: '13px', color: '#ffffff',
     }).setOrigin(0.5, 0).setDepth(101);
@@ -247,10 +240,6 @@ export class GatheringScene extends Phaser.Scene {
    * 골드 대신 배치된 도구 수 / 보유 도구 수를 표시한다.
    */
   _updateHUD() {
-    const inventory = ToolManager.getToolInventory();
-    const totalOwned = Object.values(inventory).reduce((s, t) => s + t.count, 0);
-    const totalDeployed = Object.values(this.deployedCounts).reduce((s, n) => s + n, 0);
-    this.toolCountText.setText(`\uD83D\uDD27 ${totalDeployed}/${totalOwned}`);
     this.livesText.setText(`\u2764\uFE0F ${this.lives}`);
   }
 
