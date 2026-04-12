@@ -1,6 +1,7 @@
 /**
  * @fileoverview Kitchen Chaos Tycoon 게임 데이터 정의.
  * Phase 10: 적 22종(일반 16 + 보스 6), 타워 6종, 재료 15종, 레시피 12종, 30 스테이지.
+ * Phase 20: 적 25종(일반 18 + 보스 7), 재료 17종, 서빙 레시피 14종, 버프 레시피 8종.
  */
 
 // ── 적 타입 정의 ──
@@ -265,6 +266,67 @@ export const ENEMY_TYPES = {
     phase3ShieldHp: 500,
     bossReward: 500,
     bossDrops: [{ ingredient: 'meat', count: 5 }, { ingredient: 'cheese', count: 5 }, { ingredient: 'butter', count: 4 }],  // Phase 13-3
+  },
+  // ── Phase 20 신규 적 ──
+  sushi_ninja: {
+    id: 'sushi_ninja',
+    nameKo: '초밥 닌자',
+    hp: 250,
+    speed: 80,
+    ingredient: 'sashimi_tuna',
+    bodyColor: 0x2f2f4f,
+    // 은신 메카닉: stealthInterval마다 투명 전환, stealthDuration 동안 도구 타겟팅 불가
+    // 재출현 시 인접 도구(backAttackRadius 이내)에 공격속도 디버프 적용
+    stealth: true,
+    stealthInterval: 4000,     // 4초마다 은신 시작
+    stealthDuration: 2500,     // 2.5초 동안 투명 (알파 0.1, 타겟 불가)
+    backAttackRadius: 60,      // 재출현 시 60px 이내 도구에 백어택
+    backAttackDamage: 30,      // 백어택 디버프 강도 (공격속도 -30%, 2초)
+  },
+  tempura_monk: {
+    id: 'tempura_monk',
+    nameKo: '튀김 수도승',
+    hp: 300,
+    speed: 45,
+    ingredient: 'wasabi',
+    bodyColor: 0xf4a460,
+    // 배리어 메카닉: HP barrierThreshold 이하로 떨어지면 배리어 활성
+    // 배리어 활성 중 피해 완전 무효, barrierDuration 후 해제
+    barrier: true,
+    barrierThreshold: 0.5,     // HP 50% 이하 시 배리어 활성
+    barrierDuration: 3000,     // 3초 후 배리어 자동 해제
+    barrierCooldown: 10000,    // 해제 후 10초간 재발동 불가
+  },
+  // Phase 20 보스
+  sake_oni: {
+    id: 'sake_oni',
+    nameKo: '사케 오니',
+    hp: 6000,
+    speed: 25,
+    ingredient: null,
+    bodyColor: 0xff4488,
+    isBoss: true,
+    // 취권(드렁크 워크) 패턴:
+    // drunkInterval마다 현재 진행 방향에서 랜덤 각도로 일시 이탈
+    // drunkDuration 동안 랜덤 방향으로 이동한 후 경로 재복귀
+    drunkWalk: true,
+    drunkInterval: 5000,       // 5초마다 취권 발동
+    drunkDuration: 2000,       // 2초간 경로 이탈 (랜덤 방향 이동)
+    drunkAngle: 90,            // +-90도 범위 랜덤 방향
+    drunkSpeed: 60,            // 취권 중 이동 속도
+    // 아군 버프: auraRadius 이내 적에게 속도 +auraSpeedBonus, HP auraHealRate/초 회복
+    aura: true,
+    auraRadius: 180,           // 180px 이내 적에게 버프 적용
+    auraSpeedBonus: 0.20,      // 속도 +20%
+    auraHealRate: 5,           // 5 HP/초 회복
+    auraInterval: 1000,        // 1초 단위로 버프 갱신
+    // 분노 패턴: HP enrageHpThreshold 이하 -> drunkInterval 절반으로 단축
+    enrageHpThreshold: 0.3,    // HP 30% 이하
+    bossReward: 350,
+    bossDrops: [
+      { ingredient: 'sashimi_tuna', count: 4 },
+      { ingredient: 'wasabi', count: 3 },
+    ],
   },
 };
 
@@ -594,6 +656,19 @@ export const INGREDIENT_TYPES = {
     color: 0xffffff,
     icon: '🥛',
   },
+  // ── Phase 20 신규 재료 ──
+  sashimi_tuna: {
+    id: 'sashimi_tuna',
+    nameKo: '참치',
+    color: 0xff6b81,
+    icon: '🍣',
+  },
+  wasabi: {
+    id: 'wasabi',
+    nameKo: '와사비',
+    color: 0x7fff00,
+    icon: '🌿',
+  },
 };
 
 // ── 서빙 레시피 (손님 주문용, Phase 3: cookTime 추가) ──
@@ -651,6 +726,79 @@ export const SERVING_RECIPES = [
     icon: '🧀',
     color: 0xffd700,
     cookTime: 9000,
+  },
+  // ── Phase 20 신규 서빙 레시피 ──
+  {
+    id: 'sashimi_plate',
+    nameKo: '사시미 정식',
+    ingredients: { sashimi_tuna: 2 },
+    baseReward: 55,
+    icon: '🍣',
+    color: 0xff6b81,
+    cookTime: 6000,
+  },
+  {
+    id: 'wasabi_roll',
+    nameKo: '와사비롤',
+    ingredients: { sashimi_tuna: 1, wasabi: 1 },
+    baseReward: 65,
+    icon: '🌀',
+    color: 0x9acd32,
+    cookTime: 7000,
+  },
+  {
+    id: 'nigiri_sushi',
+    nameKo: '니기리 스시',
+    ingredients: { sashimi_tuna: 1, rice: 1 },
+    baseReward: 70,
+    icon: '🍱',
+    color: 0xffb347,
+    cookTime: 7500,
+  },
+  {
+    id: 'wasabi_tempura',
+    nameKo: '와사비 튀김',
+    ingredients: { wasabi: 1, shrimp: 1 },
+    baseReward: 60,
+    icon: '🍤',
+    color: 0xffd700,
+    cookTime: 6500,
+  },
+  {
+    id: 'tuna_rice_bowl',
+    nameKo: '참치 덮밥',
+    ingredients: { sashimi_tuna: 2, rice: 2 },
+    baseReward: 85,
+    icon: '🥢',
+    color: 0xff4466,
+    cookTime: 9000,
+  },
+  {
+    id: 'wasabi_miso_soup',
+    nameKo: '와사비 된장국',
+    ingredients: { wasabi: 1, mushroom: 1 },
+    baseReward: 50,
+    icon: '🍜',
+    color: 0x8b7355,
+    cookTime: 5500,
+  },
+  {
+    id: 'sakura_kaiseki',
+    nameKo: '사쿠라 가이세키',
+    ingredients: { sashimi_tuna: 2, wasabi: 1, rice: 2 },
+    baseReward: 110,
+    icon: '🌸',
+    color: 0xff69b4,
+    cookTime: 12000,
+  },
+  {
+    id: 'izakaya_platter',
+    nameKo: '이자카야 플래터',
+    ingredients: { sashimi_tuna: 1, wasabi: 1, shrimp: 2, fish: 1 },
+    baseReward: 95,
+    icon: '🍽️',
+    color: 0x4682b4,
+    cookTime: 11000,
   },
 ];
 
@@ -720,6 +868,27 @@ export const BUFF_RECIPES = [
     effectValue: 0.30,
     duration: 50000,
     color: 0xdeb887,
+  },
+  // ── Phase 20 신규 버프 레시피 ──
+  {
+    id: 'wasabi_kick',
+    nameKo: '와사비 킥',
+    ingredients: { wasabi: 2 },
+    effectDesc: '공격력 +35% (55초)',
+    effectType: 'buff_damage',
+    effectValue: 0.35,
+    duration: 55000,
+    color: 0x7fff00,
+  },
+  {
+    id: 'tuna_precision',
+    nameKo: '참치 정밀타',
+    ingredients: { sashimi_tuna: 1, wasabi: 1 },
+    effectDesc: '공격력+속도 +20% (50초)',
+    effectType: 'buff_both',
+    effectValue: 0.20,
+    duration: 50000,
+    color: 0xff6b81,
   },
 ];
 

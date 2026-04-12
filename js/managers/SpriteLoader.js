@@ -4,6 +4,7 @@
  * Phase 9-4: south 방향 정지 이미지만 우선 로드.
  * Phase 12: 적/보스 8방향 걷기 애니메이션 프레임 로드 + Phaser anim 등록.
  * Phase 19-4: 서비스씬 에셋 (테이블 5종, 손님 5종, 바닥, 카운터) 로드.
+ * Phase 20: 7장 적 2종(sushi_ninja, tempura_monk), 보스 1종(sake_oni), 타일셋 1종(sakura_izakaya), 재료 2종(sashimi_tuna, wasabi) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -22,18 +23,20 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (16종) ──
+// ── 적 ID 목록 (18종, Phase 20: sushi_ninja, tempura_monk 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
   'fish_knight', 'mushroom_scout', 'cheese_rat', 'shrimp_samurai',
   'tomato_bomber', 'butter_ghost', 'sugar_fairy', 'milk_phantom',
+  'sushi_ninja', 'tempura_monk',
 ];
 
-// ── 보스 ID 목록 (6종) ──
+// ── 보스 ID 목록 (7종, Phase 20: sake_oni 추가) ──
 const BOSS_IDS = [
   'pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem',
   'master_patissier', 'cuisine_god',
+  'sake_oni',
 ];
 
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
@@ -60,6 +63,8 @@ const INGREDIENT_FILE_MAP = {
   butter: 'butter',
   sugar: 'sugar',
   milk: 'milk',
+  sashimi_tuna: 'sashimi_tuna',
+  wasabi: 'wasabi',
 };
 
 // ── 재료 ID 목록 (15종, 게임 내 ID 기준) ──
@@ -83,6 +88,8 @@ const ENEMY_WALK_HASHES = {
   shrimp_samurai: 'walking-52be561d',
   sugar_fairy: 'walking-83b51e9e',
   tomato_bomber: 'walking-0dd2efa9',
+  sushi_ninja: null,    // PixelLab 생성 후 hash 기입
+  tempura_monk: null,   // PixelLab 생성 후 hash 기입
 };
 
 const BOSS_WALK_HASHES = {
@@ -92,6 +99,7 @@ const BOSS_WALK_HASHES = {
   master_patissier: 'walking-b21b062a',
   pasta_boss: 'walking-49c92768',
   seafood_kraken: 'walking-f85ec5ca',
+  sake_oni: null,       // PixelLab 생성 후 hash 기입
 };
 
 /** 걷기 애니메이션 방향 목록 */
@@ -102,10 +110,11 @@ const WALK_FRAME_COUNT = 6;
 // ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가) ──
 const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao'];
 
-// ── 타일셋 ID 목록 (6종) ──
+// ── 타일셋 ID 목록 (7종, Phase 20: sakura_izakaya 추가) ──
 const TILESET_IDS = [
   'pasta_field', 'oriental_bamboo', 'seafood_beach', 'volcano_lava',
   'dessert_cafe', 'grand_finale',
+  'sakura_izakaya',
 ];
 
 // ── 서비스씬 에셋 경로 (Phase 19-4) ──

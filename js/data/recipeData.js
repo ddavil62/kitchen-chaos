@@ -1,6 +1,7 @@
 /**
  * @fileoverview 레시피 컬렉션 데이터.
  * Phase 10: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 + Phase 9 23종 + Phase 10 17종 = 106종.
+ * Phase 20: + 서빙 8종 + 버프 2종 = 116종 (7장 사쿠라 이자카야).
  * 향후 120종까지 확장 예정.
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
@@ -519,6 +520,48 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { meat: 1, shrimp: 1, sugar: 1, milk: 1, egg: 1, flour: 1, butter: 1 }, baseReward: 220, cookTime: 18000,
     unlockCost: 350, gateStage: '6-3',
   },
+
+  // ── Phase 20 신규 서빙 레시피 (7장 사쿠라 이자카야) ──
+  {
+    id: 'sashimi_plate', nameKo: '사시미 정식', icon: '🍣', category: 'special',
+    tier: 2, ingredients: { sashimi_tuna: 2 }, baseReward: 55, cookTime: 6000,
+    unlockCost: 40, gateStage: '7-1',
+  },
+  {
+    id: 'wasabi_roll', nameKo: '와사비롤', icon: '🌀', category: 'special',
+    tier: 3, ingredients: { sashimi_tuna: 1, wasabi: 1 }, baseReward: 65, cookTime: 7000,
+    unlockCost: 55, gateStage: '7-1',
+  },
+  {
+    id: 'nigiri_sushi', nameKo: '니기리 스시', icon: '🍱', category: 'special',
+    tier: 3, ingredients: { sashimi_tuna: 1, rice: 1 }, baseReward: 70, cookTime: 7500,
+    unlockCost: 60, gateStage: '7-2',
+  },
+  {
+    id: 'wasabi_tempura', nameKo: '와사비 튀김', icon: '🍤', category: 'fry',
+    tier: 2, ingredients: { wasabi: 1, shrimp: 1 }, baseReward: 60, cookTime: 6500,
+    unlockCost: 45, gateStage: '7-1',
+  },
+  {
+    id: 'tuna_rice_bowl', nameKo: '참치 덮밥', icon: '🥢', category: 'special',
+    tier: 4, ingredients: { sashimi_tuna: 2, rice: 2 }, baseReward: 85, cookTime: 9000,
+    unlockCost: 80, gateStage: '7-3',
+  },
+  {
+    id: 'wasabi_miso_soup', nameKo: '와사비 된장국', icon: '🍜', category: 'soup',
+    tier: 2, ingredients: { wasabi: 1, mushroom: 1 }, baseReward: 50, cookTime: 5500,
+    unlockCost: 35, gateStage: '7-1',
+  },
+  {
+    id: 'sakura_kaiseki', nameKo: '사쿠라 가이세키', icon: '🌸', category: 'special',
+    tier: 5, ingredients: { sashimi_tuna: 2, wasabi: 1, rice: 2 }, baseReward: 110, cookTime: 12000,
+    unlockCost: 150, gateStage: '7-5',
+  },
+  {
+    id: 'izakaya_platter', nameKo: '이자카야 플래터', icon: '🍽️', category: 'special',
+    tier: 4, ingredients: { sashimi_tuna: 1, wasabi: 1, shrimp: 2, fish: 1 }, baseReward: 95, cookTime: 11000,
+    unlockCost: 100, gateStage: '7-4',
+  },
 ];
 
 /**
@@ -655,6 +698,20 @@ export const ALL_BUFF_RECIPES = [
     tier: 4, ingredients: { meat: 1, shrimp: 1, sugar: 1, butter: 1 },
     effectDesc: '공격력 +30% 공격속도 +20% 드롭률 +30% (3웨이브)', effectType: 'buff_all', effectValue: 0.30,
     duration: 3, durationUnit: 'wave', unlockCost: 100, gateStage: '6-2',
+  },
+
+  // ── Phase 20 신규 버프 2종 (7장 사쿠라 이자카야) ──
+  {
+    id: 'wasabi_kick', nameKo: '와사비 킥', icon: '🌿', category: 'buff',
+    tier: 2, ingredients: { wasabi: 2 },
+    effectDesc: '공격력 +35% (55초)', effectType: 'buff_damage', effectValue: 0.35,
+    duration: 55000, unlockCost: 45, gateStage: '7-1',
+  },
+  {
+    id: 'tuna_precision', nameKo: '참치 정밀타', icon: '🍣', category: 'buff',
+    tier: 3, ingredients: { sashimi_tuna: 1, wasabi: 1 },
+    effectDesc: '공격력+속도 +20% (50초)', effectType: 'buff_both', effectValue: 0.20,
+    duration: 50000, unlockCost: 55, gateStage: '7-2',
   },
 ];
 

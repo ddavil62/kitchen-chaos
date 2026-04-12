@@ -174,7 +174,10 @@ export class Tower extends Phaser.GameObjects.Container {
     enemyGroup.getChildren().forEach(enemy => {
       if (!enemy.active || enemy.isDead) return;
 
-      // 투명 적: 타겟 불가 (피격으로 드러난 상태는 예외)
+      // Phase 20: 은신 적 타겟 불가 (canTargetInvisible 도구는 예외)
+      if (enemy.canBeTargeted === false && !canSeeInvisible) return;
+
+      // 투명 적: 타��� 불가 (피격으로 드러난 상태는 예외)
       if (enemy.isInvisible && enemy.visibleTimer <= 0 && !canSeeInvisible) return;
 
       const dist = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);

@@ -140,6 +140,7 @@ export class GatheringScene extends Phaser.Scene {
     this.events.on('boss_killed', this._onBossKilled, this);
     this.events.on('spore_debuff', this._onSporeDebuff, this);
     this.events.on('boss_debuff', this._onBossDebuff, this);
+    this.events.on('stealth_back_attack', this._onStealthBackAttack, this);
 
     // ── 재료 수거 시 인벤토리에 누적 ──
     this.events.on('inventory_changed', this._onInventoryChanged, this);
@@ -1353,6 +1354,42 @@ export class GatheringScene extends Phaser.Scene {
     });
   }
 
+  /**
+   * Phase 20: 은신 백어택 이벤트 - 범위 내 도구에 공격속도 디버프.
+   * sushi_ninja가 은신 해제 시 발동한다.
+   * @param {{ x: number, y: number, radius: number, duration: number }} data
+   */
+  _onStealthBackAttack({ x, y, radius, duration }) {
+    this.towers.getChildren().forEach(tower => {
+      if (!tower.active) return;
+      if (tower.data_?.id === 'delivery' || tower.data_?.id === 'soup_pot') return;
+      const dist = Phaser.Math.Distance.Between(x, y, tower.x, tower.y);
+      if (dist > radius) return;
+
+      if (tower.applyBuff) tower.applyBuff('speed', -0.30);
+
+      this.tweens.add({
+        targets: tower, alpha: 0.5,
+        duration: 150, yoyo: true,
+      });
+
+      this.time.delayedCall(duration, () => {
+        if (tower.active && tower.removeBuff) tower.removeBuff();
+        if (this._currentBuff) this._applyBuffToTower(tower, this._currentBuff);
+      });
+    });
+
+    const popup = this.add.text(x, y - 20, '\uD83D\uDDE1\uFE0F \uBC31\uC5B4\uD0DD!', {
+      fontSize: '11px', color: '#2f2f4f',
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(115);
+    this.tweens.add({
+      targets: popup, y: popup.y - 25, alpha: 0,
+      duration: 800,
+      onComplete: () => popup.destroy(),
+    });
+  }
+
   // ── 버프 적용 ──────────────────────────────────────────────────
 
   /**
@@ -1855,6 +1892,7 @@ export class GatheringScene extends Phaser.Scene {
     this.events.off('boss_killed', this._onBossKilled, this);
     this.events.off('spore_debuff', this._onSporeDebuff, this);
     this.events.off('boss_debuff', this._onBossDebuff, this);
+    this.events.off('stealth_back_attack', this._onStealthBackAttack, this);
     this.events.off('wave_started', this._onWaveStarted, this);
     this.events.off('inventory_changed', this._onInventoryChanged, this);
     this.events.off('ingredient_collected_for_order', this._onIngredientCollectedForOrder, this);

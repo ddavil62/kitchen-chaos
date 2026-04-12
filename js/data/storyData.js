@@ -4,6 +4,7 @@
  * Phase 15: 챕터 2~6 트리거 13개 추가.
  * Phase 16: 튜토리얼 2개, 영업 이벤트 3개, 선택지 샘플 1개 트리거 추가.
  * Phase 19-3: 시즌 2 프롤로그 트리거 3건 추가 (prologue, yuki_intro, lao_intro).
+ * Phase 20: 7장 사쿠라 이자카야 트리거 4건 추가 + stage_first_clear 제외 목록 갱신.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -228,7 +229,10 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '5-3' &&
       ctx.stageId !== '5-6' &&
       ctx.stageId !== '6-2' &&
-      ctx.stageId !== '6-3',
+      ctx.stageId !== '6-3' &&
+      ctx.stageId !== '7-1' &&   // chapter7_intro 별도 처리
+      ctx.stageId !== '7-3' &&   // chapter7_yuki_joins 별도 처리
+      ctx.stageId !== '7-6',     // chapter7_clear 별도 처리
     delay: 800,
   },
 
@@ -284,6 +288,54 @@ export const STORY_TRIGGERS = [
     once: true,
     condition: (ctx) => ctx.eventType === 'kitchen_accident',
     delay: 1500,
+  },
+
+  // ── 시즌 2: 7장 사쿠라 이자카야 (Phase 20) ─────────────────────────
+  // 7-1 입장 시 chapter7_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter7_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '7-1',
+    delay: 400,
+  },
+  // 7-3 첫 클리어 시 chapter7_yuki_joins
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter7_yuki_joins',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '7-3',
+    delay: 800,
+  },
+  // 7-6 첫 클리어 시 chapter7_clear
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter7_clear',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '7-6',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter7_cleared = true;
+      if (data.storyProgress.currentChapter < 8) {
+        data.storyProgress.currentChapter = 8;
+      }
+      SaveManager.save(data);
+    },
+  },
+  // merchant_enter 에서 yuki_side_7 (7장 클리어 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'yuki_side_7',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter7_cleared === true &&
+      !save.seenDialogues?.includes('yuki_side_7'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────

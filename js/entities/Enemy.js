@@ -5,6 +5,7 @@
  * Phase 4: 밀가루 유령(투명) + 빙결 상태이상.
  * Phase 9-4: 도형 → 스프라이트 이미지 교체 (fallback 유지).
  * Phase 12: 8방향 걷기 애니메이션 + 크기 25% 증가.
+ * Phase 20: 은신(stealth), 배리어(barrier), 취권(drunkWalk), 아우라(aura) 메카닉.
  */
 
 import Phaser from 'phaser';
@@ -77,6 +78,39 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── 신선도 타이머 ──
     this.freshnessTimer = FRESHNESS_WINDOW_MS;
     this.isFresh = true;
+
+    // ── Phase 20: 은신 (sushi_ninja) ──
+    /** @type {boolean} 타겟팅 가능 여부 (은신 중 false) */
+    this.canBeTargeted = true;
+    if (enemyData.stealth) {
+      this._stealthTimer = 0;
+      this._isInStealth = false;
+      this._stealthElapsed = 0;
+    }
+
+    // ── Phase 20: 배리어 (tempura_monk) ──
+    if (enemyData.barrier) {
+      this._barrierActive = false;
+      this._barrierTriggered = false;
+      this._barrierCooldownTimer = 0;
+    }
+
+    // ── Phase 20: 취권 (sake_oni) ──
+    if (enemyData.drunkWalk) {
+      this._drunkTimer = 0;
+      this._isDrunk = false;
+      this._drunkElapsed = 0;
+      this._drunkVx = 0;
+      this._drunkVy = 0;
+    }
+
+    // ── Phase 20: 아우라 (sake_oni) ──
+    if (enemyData.aura) {
+      this._auraTimer = 0;
+    }
+
+    // ── Phase 20: 아우라 속도 버프 (다른 적에게서 받는 버프) ──
+    this._auraSpeedBuff = 0;
 
     // ── 비주얼 ──
     this._buildVisual(enemyData);
@@ -161,16 +195,17 @@ export class Enemy extends Phaser.GameObjects.Container {
   _buildShapeFallback(data, color, id) {
     // 몸체
     if (id === 'pasta_boss' || id === 'dragon_ramen'
-        || id === 'seafood_kraken' || id === 'lava_dessert_golem') {
+        || id === 'seafood_kraken' || id === 'lava_dessert_golem'
+        || id === 'sake_oni') {
       const body = this.scene.add.rectangle(0, 0, 40, 40, color);
       this.add(body);
     } else if (id === 'cheese_golem') {
       const body = this.scene.add.rectangle(0, 0, 28, 28, color);
       this.add(body);
-    } else if (id === 'fish_knight') {
+    } else if (id === 'fish_knight' || id === 'tempura_monk') {
       const body = this.scene.add.rectangle(0, 0, 26, 26, color);
       this.add(body);
-    } else if (id === 'mushroom_scout' || id === 'cheese_rat') {
+    } else if (id === 'mushroom_scout' || id === 'cheese_rat' || id === 'sushi_ninja') {
       const body = this.scene.add.circle(0, 0, 10, color);
       this.add(body);
     } else {
@@ -331,8 +366,231 @@ export class Enemy extends Phaser.GameObjects.Container {
       }
     }
 
+    // ── Phase 20: 은신 (sushi_ninja) ──
+    if (this.data_.stealth) {
+      this._updateStealth(delta);
+    }
+
+    // ── Phase 20: 배리어 쿨다운 (tempura_monk) ──
+    if (this.data_.barrier && this._barrierTriggered && this._barrierCooldownTimer > 0) {
+      this._barrierCooldownTimer -= delta;
+      if (this._barrierCooldownTimer <= 0) {
+        this._barrierTriggered = false;
+      }
+    }
+
+    // ── Phase 20: 취권 (sake_oni) ──
+    if (this.data_.drunkWalk) {
+      this._updateDrunkWalk(delta);
+      return; // 취권 로직이 이동을 자체 처리하므로 _moveAlongPath 스킵
+    }
+
+    // ── Phase 20: 아우라 (sake_oni) ──
+    if (this.data_.aura) {
+      this._updateAura(delta);
+    }
+
     // ── 이동 ──
     this._moveAlongPath(delta);
+  }
+
+  // ── Phase 20: 은신 메카닉 ─────────────────────────────────────────
+
+  /**
+   * 은신 업데이트 (sushi_ninja).
+   * stealthInterval마다 은신 시작, stealthDuration 후 해제.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateStealth(delta) {
+    if (this._isInStealth) {
+      this._stealthElapsed += delta;
+      if (this._stealthElapsed >= this.data_.stealthDuration) {
+        this._endStealth();
+      }
+    } else {
+      this._stealthTimer += delta;
+      if (this._stealthTimer >= this.data_.stealthInterval) {
+        this._startStealth();
+      }
+    }
+  }
+
+  /**
+   * 은신 시작: 투명화 + 타겟팅 불가.
+   * @private
+   */
+  _startStealth() {
+    this._isInStealth = true;
+    this._stealthElapsed = 0;
+    this._stealthTimer = 0;
+    this.canBeTargeted = false;
+    this.setAlpha(0.1);
+  }
+
+  /**
+   * 은신 해제: 투명 복구 + 백어택 이벤트 발사.
+   * @private
+   */
+  _endStealth() {
+    this._isInStealth = false;
+    this._stealthElapsed = 0;
+    this._stealthTimer = 0;
+    this.canBeTargeted = true;
+    this.setAlpha(1.0);
+
+    // 백어택: 재출현 시 주변 도구에 디버프 적용
+    if (this.data_.backAttackRadius && this.scene?.towers) {
+      this.scene.events.emit('stealth_back_attack', {
+        x: this.x,
+        y: this.y,
+        radius: this.data_.backAttackRadius,
+        duration: 2000, // 2초간 공격속도 디버프
+      });
+    }
+  }
+
+  // ── Phase 20: 배리어 메카닉 ────────────────────────────────────────
+
+  /**
+   * 배리어 활성화 (tempura_monk).
+   * @private
+   */
+  _activateBarrier() {
+    this._barrierActive = true;
+    this.setTint(0xaaddff); // 청백 틴트
+  }
+
+  /**
+   * 배리어 비활성화.
+   * @private
+   */
+  _deactivateBarrier() {
+    this._barrierActive = false;
+    this._barrierTriggered = true;
+    this._barrierCooldownTimer = this.data_.barrierCooldown || 10000;
+    // 틴트 원복 (다른 상태 틴트가 없으면 해제)
+    if (!this.isFrozen && !this._enraged) {
+      this.clearTint();
+    }
+  }
+
+  // ── Phase 20: 취권 메카닉 ──────────────────────────────────────────
+
+  /**
+   * 취권 업데이트 (sake_oni).
+   * drunkInterval마다 랜덤 방향 이탈, drunkDuration 후 경로 복귀.
+   * 아우라 갱신도 포함.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateDrunkWalk(delta) {
+    // 아우라 갱신
+    if (this.data_.aura) {
+      this._updateAura(delta);
+    }
+
+    // sake_oni 분노: drunkInterval 절반
+    const effectiveInterval = this._enraged
+      ? this.data_.drunkInterval / 2
+      : this.data_.drunkInterval;
+
+    if (this._isDrunk) {
+      // 취권 상태: 랜덤 방향 이동
+      this._drunkElapsed += delta;
+      this.x += this._drunkVx * (delta / 1000);
+      this.y += this._drunkVy * (delta / 1000);
+      // depth 갱신
+      this.setDepth(10 + Math.floor(this.y));
+
+      if (this._drunkElapsed >= this.data_.drunkDuration) {
+        this._endDrunk();
+      }
+    } else {
+      this._drunkTimer += delta;
+      if (this._drunkTimer >= effectiveInterval) {
+        this._startDrunk();
+      } else {
+        // 정상 경로 이동
+        this._moveAlongPath(delta);
+      }
+    }
+  }
+
+  /**
+   * 취권 시작: 랜덤 각도 이동.
+   * @private
+   */
+  _startDrunk() {
+    this._isDrunk = true;
+    this._drunkElapsed = 0;
+    this._drunkTimer = 0;
+    const angle = Math.random() * 2 * Math.PI;
+    const spd = this.data_.drunkSpeed || 60;
+    this._drunkVx = Math.cos(angle) * spd;
+    this._drunkVy = Math.sin(angle) * spd;
+  }
+
+  /**
+   * 취권 종료: 가장 가까운 경로 포인트로 스냅하여 복귀.
+   * @private
+   */
+  _endDrunk() {
+    this._isDrunk = false;
+    this._drunkElapsed = 0;
+
+    // 가장 가까운 웨이포인트 탐색 후 복귀
+    let bestIdx = this.waypointIndex;
+    let bestDist = Infinity;
+    for (let i = 1; i < this._waypoints.length; i++) {
+      const wp = this._waypoints[i];
+      const d = Phaser.Math.Distance.Between(this.x, this.y, wp.x, wp.y);
+      if (d < bestDist) {
+        bestDist = d;
+        bestIdx = i;
+      }
+    }
+    // 최소한 현재 웨이포인트 이상으로 설정 (역행 방지)
+    if (bestIdx < this.waypointIndex) {
+      bestIdx = this.waypointIndex;
+    }
+    this.waypointIndex = bestIdx;
+  }
+
+  // ── Phase 20: 아우라 메카닉 ────────────────────────────────────────
+
+  /**
+   * 아우라 갱신 (sake_oni): 주변 아군 적에게 속도 버프 + HP 회복.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateAura(delta) {
+    this._auraTimer += delta;
+    if (this._auraTimer < this.data_.auraInterval) return;
+    this._auraTimer = 0;
+
+    if (!this.scene?.enemies) return;
+    const radius = this.data_.auraRadius;
+    const speedBonus = this.data_.auraSpeedBonus;
+    const healRate = this.data_.auraHealRate;
+
+    this.scene.enemies.getChildren().forEach(enemy => {
+      if (!enemy.active || enemy === this || enemy.isDead) return;
+      const dist = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
+      if (dist > radius) return;
+
+      // 속도 버프 적용
+      enemy._auraSpeedBuff = speedBonus;
+
+      // HP 회복
+      if (enemy.hp < enemy.maxHp) {
+        enemy.hp = Math.min(enemy.maxHp, enemy.hp + healRate);
+        const ratio = enemy.hp / enemy.maxHp;
+        enemy.hpBar.width = 26 * ratio;
+        if (ratio >= 0.7) enemy.hpBar.setFillStyle(0x44ff44);
+        else if (ratio >= 0.4) enemy.hpBar.setFillStyle(0xffaa00);
+      }
+    });
   }
 
   /** @private */
@@ -346,7 +604,9 @@ export class Enemy extends Phaser.GameObjects.Container {
     const dx = target.x - this.x;
     const dy = target.y - this.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const moveAmount = this.speed * this.slowFactor * (delta / 1000);
+    // 아우라 속도 버프 적용
+    const auraMultiplier = 1 + (this._auraSpeedBuff || 0);
+    const moveAmount = this.speed * this.slowFactor * auraMultiplier * (delta / 1000);
 
     // Phase 12: 이동 방향에 따라 걷기 애니메이션 전환
     if (this._hasWalkAnim && dist > 0.1) {
@@ -398,6 +658,9 @@ export class Enemy extends Phaser.GameObjects.Container {
   takeDamage(amount) {
     if (this.isDead) return;
 
+    // Phase 20: 배리어 활성 시 피해 무효
+    if (this._barrierActive) return;
+
     // 생선 기사: 전면 피해 50% 감소 (이동 방향 기준, 진행 중이면 전면 피격으로 간주)
     if (this.data_.shieldFront && this.waypointIndex < this._waypoints.length) {
       amount *= (1 - this.data_.shieldFront);
@@ -413,6 +676,18 @@ export class Enemy extends Phaser.GameObjects.Container {
     if (this.isInvisible) {
       this.setAlpha(0.8);
       this.visibleTimer = 2000;
+    }
+
+    // Phase 20: 배리어 트리거 (tempura_monk) — HP가 임계치 이하로 떨어지면 활성화
+    if (this.data_.barrier && !this._barrierActive && !this._barrierTriggered &&
+        this.hp > 0 && ratio <= this.data_.barrierThreshold) {
+      this._activateBarrier();
+      // barrierDuration 후 자동 해제
+      this.scene.time.delayedCall(this.data_.barrierDuration, () => {
+        if (!this.isDead && this._barrierActive) {
+          this._deactivateBarrier();
+        }
+      });
     }
 
     if (this.hp <= 0) this._die();
@@ -496,6 +771,18 @@ export class Enemy extends Phaser.GameObjects.Container {
         x: this.x, y: this.y,
         healPercent: this.data_.healOnDeath,
         radius: this.data_.healRadius || 80,
+      });
+    }
+
+    // Phase 20: sake_oni 사망 시 범위 내 적의 아우라 속도 버프 초기화
+    if (this.data_.aura && this.scene?.enemies) {
+      const radius = this.data_.auraRadius;
+      this.scene.enemies.getChildren().forEach(enemy => {
+        if (!enemy.active || enemy === this || enemy.isDead) return;
+        const dist = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
+        if (dist <= radius) {
+          enemy._auraSpeedBuff = 0;
+        }
       });
     }
 

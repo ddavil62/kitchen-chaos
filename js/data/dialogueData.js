@@ -7,6 +7,7 @@
  * Phase 16: 튜토리얼 연동 2종, 영업 이벤트 3종, 선택지 샘플 1종 추가.
  * Phase 19-1: 시즌 2 캐릭터 2종(유키, 라오) CHARACTERS에 추가.
  * Phase 19-3: 시즌 2 프롤로그 대화 3종 추가 (season2_prologue, season2_yuki_intro, season2_lao_intro).
+ * Phase 20: 7장 사쿠라 이자카야 대화 4종 추가 (chapter7_intro, chapter7_yuki_joins, chapter7_clear, yuki_side_7).
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -533,6 +534,67 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '내 가문의 용 웍이 식란에 오염됐다... 도와달라!' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '라오 씨! 당연히 도와드릴게요!' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '또 새 동료야? 밥값은 내라구! ...농담이야~' },
+    ],
+  },
+
+  // ── 시즌 2: 7장 사쿠라 이자카야 (Phase 20) ──
+
+  chapter7_intro: {
+    id: 'chapter7_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '일본 어딘가, 벚꽃이 흩날리는 전통 이자카야 마을.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '여기야... 내 고향이야.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '이자카야 거리 전체가 식란에 잠식됐어. 동료들도 연락이 끊겼고.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '유키 씨... 힘들겠다. 같이 찾아줄게, 동료들!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '식란이 이자카야 재료들을 뒤틀어놨군. 초밥이 칼 들고 나오는 건 좀 과한데...' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '이 마을의 미력사 길드가 모두 쓰러졌어. 우리가 마지막이야.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '마지막이라도 포기하면 안 되지. 자, 가자!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '참, 이자카야 재료를 정화하면 최상급 일식 식재료가 돼! ...아, 지금 그 얘기 아닌가?' },
+    ],
+  },
+  chapter7_yuki_joins: {
+    id: 'chapter7_yuki_joins',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '7-3 클리어 직후. 유키가 고향 마을의 폐허가 된 길드 본부 앞에 선다.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...여기가 길드 훈련소였어. 내가 처음 정화를 배운 곳이야.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '유키 씨, 괜찮아? 많이 힘들어 보여.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '(고개를 끄덕이며) ...괜찮아. 감상에 잠길 시간이 없어. 사케 오니가 이 모든 걸 일으킨 주범이야.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '미미... 나도 같이 싸울게. 처음부터 그러고 싶었지만, 혼자 처리해야 한다고 생각했어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '혼자 처리할 필요 없잖아! 우리 팀이잖아, 유키 씨.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '환영해, 유키! 그나저나 새 동료 특별 도구 세트가\u2014' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '(차갑게) 지금은 됐어요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(작게) 역시 성격이 차갑다...' },
+    ],
+  },
+  chapter7_clear: {
+    id: 'chapter7_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '사케 오니가 정화되었다. 이자카야 마을에 평화가 돌아온다.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '해냈다! 사케 오니 정화 완료!' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...고마워. 혼자였다면 절대 못 했을 거야.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '(마을을 둘러보며) 이제 재건할 수 있겠어. 미력사 길드도 다시 세울 수 있고.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '정화된 사케... 이게 최상급 주류가 되겠군. 이자카야 다시 열면 대박 날 텐데~' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '아직 8장이 남아 있어. 라오 씨 고향도 도와야 해!' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '당연하지. 같이 가자.' },
+      { speaker: 'narrator', portrait: '', text: '7장 클리어. 유키가 정식으로 미미 팀의 일원이 되었다.' },
+    ],
+  },
+  yuki_side_7: {
+    id: 'yuki_side_7',
+    skippable: true,
+    lines: [
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '미미, 잠깐 좋을까.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '응? 무슨 일이야, 유키 씨?' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...내가 왜 혼자 처리하려 했는지 알아? 동료를 잃을 게 두려웠어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '유키 씨...' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '길드 동료들이 식란에 당했을 때, 내가 곁에 없었거든. 그래서 다음엔 혼자 다 막겠다고 생각했어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '그건 유키 씨 잘못이 아니야. 그리고 혼자 전부 막을 수 있는 사람은 없어.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...알아. 이제는 알 것 같아. 함께라서 이길 수 있었던 거니까.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(뒤에서 훌쩍) 좋은 얘기다... 참, 동료 할인 이벤트\u2014' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '포코 씨. 저리 가 줄래요.' },
     ],
   },
 };
