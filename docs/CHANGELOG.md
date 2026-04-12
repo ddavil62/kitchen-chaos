@@ -1,5 +1,99 @@
 # Changelog
 
+## [2026-04-12] - Phase 21 8장 용의 주방 (중식)
+
+### 추가
+
+- **재료 2종** (`js/data/gameData.js` INGREDIENT_TYPES)
+  - tofu (두부): color 0xF5F5DC, icon 재료 아이콘
+  - cilantro (고수): color 0x228B22, icon 재료 아이콘
+  - 누적: 19종
+
+- **적 3종 + 보스 1종** (`js/data/gameData.js` ENEMY_TYPES)
+  - dumpling_warrior (만두 전사): HP 280, speed 50, 분열 기믹 (split:true, splitCount:2, splitType:'mini_dumpling')
+  - mini_dumpling (미니 만두): HP 60, speed 65, split:false (무한 분열 방지)
+  - wok_phantom (웍 유령): HP 320, speed 40, 화염 장판 기믹 (fireZoneInterval:4000, fireZoneRadius:55, fireZoneDuration:3500)
+  - dragon_wok (드래곤 웍): HP 7000, speed 22, isBoss, 3페이즈 화염 브레스
+    - 페이즈 1 (HP 100~70%): 브레스 간격 5000ms, 각도 60도, 반경 90
+    - 페이즈 2 (HP 70~35%): 브레스 간격 3500ms, speedBonus +15%, mini_dumpling 3마리 1회 소환
+    - 페이즈 3 (HP 35% 이하): 브레스 간격 2500ms, 각도 90도, 즉발 fireZone 2개, speed +30%
+    - bossReward: 400, bossDrops: tofu 4 + cilantro 4
+  - 누적: 29종 (일반 21 + 보스 8)
+
+- **Enemy.js 특수 메커닉 3종** (`js/entities/Enemy.js`)
+  - 분열(split): _die()에서 split===true 시 `enemy_deterministic_split` 이벤트 발사, splitCount만큼 splitType 스폰, 부모 waypointIndex 이어받기
+  - 화염 장판(fireZone): _fireZoneTimer 기반 주기적 장판 생성, Graphics 원(빨강, alpha 0.35), fireZoneDuration 후 자동 제거
+  - 화염 브레스+3페이즈(fireBreath): _phase 상태 머신, hpRatio 기반 페이즈 전환, 이동 방향 부채꼴 범위 내 도구에 공격속도 디버프
+  - BUG-01 방지: 페이즈 전환 로직을 update() 내 타이머 조건 완전 외부에 배치
+  - 분열 이벤트: 기존 egg_sprite의 확률적 `enemy_split`과 구분하기 위해 `enemy_deterministic_split` 신규 이벤트 사용
+
+- **GatheringScene 이벤트 핸들러 3종** (`js/scenes/GatheringScene.js`)
+  - `enemy_deterministic_split`: 분열 스폰 처리 (waypointIndex 이어받기)
+  - `enemy_fire_zone`: 화염 장판 Graphics 생성 + _fireZones 배열 관리
+  - `dragon_fire_breath`: 화염 브레스 범위 내 도구 디버프 적용
+  - `_updateFireZones()`: 주기적 장판 순회, 범위 내 도구에 speed -0.20 디버프
+  - shutdown()에서 gfx.destroy() + timer.remove() + _fireZones=[] 정리
+
+- **스테이지 8-1~8-6 웨이브 교체** (`js/data/stageData.js`)
+  - 기존 스켈레톤을 dumpling_warrior/wok_phantom/dragon_wok 기반으로 전면 교체
+  - theme: 'chinese_palace_kitchen'
+  - customerPatience 27~21초 (7장 28~22초 대비 1초 감소)
+  - 8-6: 4웨이브 사전 소환 파도 + 최종 웨이브 dragon_wok(count:1)
+
+- **서빙 레시피 8종** (`js/data/gameData.js` SERVING_RECIPES, `js/data/recipeData.js`)
+  - mapo_tofu (마파두부): tofu x2, 70g, 8000ms, ★★★
+  - cilantro_tofu_steam (고수두부찜): tofu+cilantro, 55g, 6500ms, ★★
+  - dim_sum (딤섬): tofu+flour, 50g, 5500ms, ★★
+  - wok_noodles (웍 볶음면): cilantro+egg, 45g, 5000ms, ★★
+  - tofu_hotpot (두부 훠궈): tofu x2+mushroom, 75g, 9000ms, ★★★
+  - cilantro_shrimp_soup (고수 탕수): cilantro x2+shrimp, 75g, 9000ms, ★★★
+  - peking_duck (베이징 덕): tofu+cilantro+butter, 90g, 10000ms, ★★★★
+  - dragon_feast (용의 만찬): tofu x2+cilantro x2+meat, 130g, 13000ms, ★★★★★
+
+- **버프 레시피 2종** (`js/data/gameData.js` BUFF_RECIPES)
+  - dragon_qi (용기): tofu x2+cilantro, buff_damage +30%, 55초
+  - wok_aura (웍 오라): tofu+cilantro x2, buff_both +25%, 50초 *(스펙 buff_attack_speed -> 기존 미구현으로 buff_both 대체)*
+
+- **대화 스크립트 4종** (`js/data/dialogueData.js`)
+  - chapter8_intro (8줄): 궁전 주방 도착, 라오 가문 소개, 드래곤 웍 설명
+  - chapter8_lao_joins (10줄): 8-3 클리어 후 라오 정식 합류 선언
+  - chapter8_clear (9줄): 드래곤 웍 정화, 라오 가족 회복, 파리 복선
+  - lao_side_8 (9줄): 라오의 웍 철학, 팀 케미 심화
+  - 누적: 43종
+
+- **스토리 트리거 4건** (`js/data/storyData.js`)
+  - chapter8_intro: gathering_enter, stageId==='8-1', once:true
+  - chapter8_lao_joins: result_clear, isFirstClear && stageId==='8-3', once:true
+  - chapter8_clear: result_clear, isFirstClear && stageId==='8-6', once:true, onComplete -> chapter8_cleared=true + currentChapter=9
+  - lao_side_8: merchant_enter, storyFlags.chapter8_cleared, once:true
+  - stage_first_clear 제외 목록에 8-1/8-3/8-6 추가
+  - 누적: 42항목
+
+- **SpriteLoader 등록** (`js/managers/SpriteLoader.js`)
+  - ENEMY_IDS +3 (dumpling_warrior, mini_dumpling, wok_phantom)
+  - BOSS_IDS +1 (dragon_wok)
+  - TILESET_IDS +1 (chinese_palace_kitchen)
+  - INGREDIENT_FILE_MAP +2 (tofu, cilantro)
+  - ENEMY_WALK_HASHES +3(null), BOSS_WALK_HASHES +1(null) -- 에셋 생성 후 기입 예정
+
+- **recipeData.js 레시피 컬렉션 등록** (`js/data/recipeData.js`)
+  - ALL_SERVING_RECIPES 8종 (tier/category/gateStage 포함, gateStage: 8-1~8-5)
+  - ALL_BUFF_RECIPES 2종
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-12-kitchen-chaos-phase21-scope.md`
+- 리포트: `.claude/specs/2026-04-12-kitchen-chaos-phase21-report.md`
+- QA: `.claude/specs/2026-04-12-phase21-qa.md`
+- visual_change: art (에셋은 미생성, 코드 로직만 구현)
+- QA: PASS (수용 기준 20/20, 예외 시나리오 8/8, Playwright 57/57, 시각적 1/1)
+- 스펙 대비 변경: wok_aura buff_attack_speed -> buff_both (기존 effectType 미구현), 분열 이벤트 enemy_split -> enemy_deterministic_split (기존 확률적 분열과 충돌 방지)
+- SaveManager 버전업 없음 (v13 유지, storyFlags에 chapter8_cleared 키 추가만)
+- PixelLab 에셋 7종 미생성 (MCP 도구 미사용 가능). walk hash null, fallback 도형 렌더링 정상 동작
+- LOW 이슈 3건: cilantro/wasabi 이모지 동일(색상으로 구분), HP 급락 시 phase 2/3 동시 발동(현실적 불가능), scene 참조 패턴(기존 관례 유지)
+
+---
+
 ## [2026-04-12] - Phase 20 도구 정보 팝업 + 도감 도구 탭
 
 ### 추가
