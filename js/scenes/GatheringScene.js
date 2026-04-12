@@ -96,8 +96,10 @@ export class GatheringScene extends Phaser.Scene {
     // ── 매니저 ──
     this.ingredientManager = new IngredientManager(this);
     this.inventoryManager = new InventoryManager();
+    // 스토리 스테이지는 모든 웨이브를 단일 연속 웨이브로 병합한다
+    const storyWaves = this.stageData?.waves;
     this.waveManager = new WaveManager(this, this.enemies, {
-      waves: this.stageData?.waves,
+      waves: storyWaves ? WaveManager.mergeWaves(storyWaves) : undefined,
       waypoints: this.stageWaypoints,
     });
 
@@ -1038,27 +1040,26 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _onWaveStarted(waveNum) {
-    this.waveText.setText(`\uC6E8\uC774\uBE0C ${waveNum}/${this.waveManager.totalWaves}`);
+    // 단일 웨이브이므로 "채집 중"으로 표시
+    this.waveText.setText('채집 중');
     this.waitingForNextWave = false;
     this._setWaveButtonEnabled(false);
     SoundManager.playSFX('sfx_wave_start');
-    // VFX: 웨이브 시작 알림 + 흰 플래시
     this.vfx.waveAnnounce(waveNum);
     this.vfx.screenFlash(0xffffff, 0.3, 200);
 
     // ── Phase 21: 웨이브 시작 시 타워 이동 모드 자동 해제 ──
-    // 이동/회수 액션 패널과 이동 가능 셀 오버레이를 정리한다.
     this._deselectTower();
 
-    // ── Phase 11-3b: 보스 웨이브 BGM 전환 ──
+    // ── 보스 적 포함 여부로 BGM 전환 ──
     this._checkBossWaveBGM(waveNum);
 
-    // ── 오더 생성 시도 (이번 웨이브 적 총 수 전달로 달성 불가 오더 방지) ──
-    const waveDef = this.waveManager._waves[waveNum - 1];
+    // ── 오더 생성 시도 (병합된 웨이브의 실제 적 총 수 계산, __pause__ 제외) ──
+    const waveDef = this.waveManager._waves[0];
     const maxEnemyCount = waveDef
-      ? waveDef.enemies.reduce((sum, g) => sum + g.count, 0)
+      ? waveDef.enemies.filter(g => g.type !== '__pause__').reduce((sum, g) => sum + g.count, 0)
       : Infinity;
-    const order = this.orderManager.tryGenerateOrder(waveNum, maxEnemyCount);
+    const order = this.orderManager.tryGenerateOrder(1, maxEnemyCount);
     this._updateOrderHUD();
     if (order) {
       this._showMessage(`[오더] ${order.descKo}`, 2000);
@@ -1394,30 +1395,8 @@ export class GatheringScene extends Phaser.Scene {
     // ── 오더 판정 ──
     this._resolveOrderOnWaveClear();
 
-    if (this.waveManager.isLastWave()) {
-      this._triggerVictory();
-      return;
-    }
-
-    // 웨이브 클리어 팝업 (골드 보너스 제거)
-    const popup = this.add.text(GAME_WIDTH / 2, GAME_AREA_Y + 20, '웨이브 클리어!', {
-      fontSize: '14px', color: '#44ff44',
-      stroke: '#000000', strokeThickness: 2,
-    }).setOrigin(0.5).setDepth(110);
-
-    this.tweens.add({
-      targets: popup, y: popup.y - 30, alpha: 0,
-      duration: 1200,
-      onComplete: () => popup.destroy(),
-    });
-
-    this.waitingForNextWave = true;
-    this._showMessage(`\uC6E8\uC774\uBE0C ${this.waveManager.currentWave} 클리어!`, 2000);
-
-    // 수동 웨이브 버튼 활성화
-    this.time.delayedCall(1500, () => {
-      this._setWaveButtonEnabled(true);
-    });
+    // 단일 웨이브이므로 항상 채집 완료 → 승리
+    this._triggerVictory();
   }
 
   // ── 게임 종료 ───────────────────────────────────────────────────
@@ -1535,8 +1514,7 @@ export class GatheringScene extends Phaser.Scene {
     if (enabled) {
       this._waveBtnBg.setFillStyle(0xff6b35).setAlpha(1);
       this._waveBtnText.setAlpha(1);
-      const nextWave = this.waveManager.currentWave + 1;
-      this._waveBtnText.setText(nextWave <= 1 ? '\uC6E8\uC774\uBE0C \uC2DC\uC791 \u25B6' : `\uC6E8\uC774\uBE0C ${nextWave} \u25B6`);
+      this._waveBtnText.setText('채집 시작 ▶');
       this._waveBtnBg.setVisible(true);
       this._waveBtnText.setVisible(true);
       // 펄스 애니메이션

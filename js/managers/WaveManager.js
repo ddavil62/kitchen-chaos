@@ -49,6 +49,7 @@ export class WaveManager {
 
   /**
    * 웨이브 정의에서 스폰 대기열 구성.
+   * __pause__ 타입은 실제 스폰 없이 딜레이만 소비한다.
    * @private
    */
   _buildSpawnQueue(waveDef) {
@@ -58,7 +59,8 @@ export class WaveManager {
     waveDef.enemies.forEach(group => {
       for (let i = 0; i < group.count; i++) {
         this._spawnQueue.push({ type: group.type, delay: group.interval });
-        this._totalToSpawn++;
+        // __pause__는 실제 적이 아니므로 총 스폰 수에서 제외
+        if (group.type !== '__pause__') this._totalToSpawn++;
       }
     });
 
@@ -78,11 +80,33 @@ export class WaveManager {
     const nextSpawn = this._spawnQueue[this._spawnIndex];
 
     if (this._spawnTimer >= nextSpawn.delay) {
-      this._spawnEnemy(nextSpawn.type);
+      // __pause__는 딜레이만 소비하고 스폰 없이 넘어간다
+      if (nextSpawn.type !== '__pause__') {
+        this._spawnEnemy(nextSpawn.type);
+        this._enemiesSpawned++;
+      }
       this._spawnTimer = 0;
       this._spawnIndex++;
-      this._enemiesSpawned++;
     }
+  }
+
+  /**
+   * 여러 웨이브 배열을 단일 웨이브로 병합한다.
+   * 각 원래 웨이브 사이에 gapMs 만큼의 무스폰 구간(__pause__)을 삽입한다.
+   * @param {object[]} waves - stageData.waves 배열
+   * @param {number} [gapMs=5000] - 웨이브 간 갭 (ms)
+   * @returns {object[]} 단일 요소 배열 (WaveManager 생성자 형식)
+   */
+  static mergeWaves(waves, gapMs = 5000) {
+    const mergedEnemies = [];
+    waves.forEach((wave, idx) => {
+      // 두 번째 웨이브부터 갭 삽입
+      if (idx > 0) {
+        mergedEnemies.push({ type: '__pause__', count: 1, interval: gapMs });
+      }
+      mergedEnemies.push(...wave.enemies);
+    });
+    return [{ wave: 1, enemies: mergedEnemies }];
   }
 
   /**
