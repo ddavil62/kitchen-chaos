@@ -6,6 +6,7 @@
  * Phase 19-3: 시즌 2 프롤로그 트리거 3건 추가 (prologue, yuki_intro, lao_intro).
  * Phase 20: 7장 사쿠라 이자카야 트리거 4건 추가 + stage_first_clear 제외 목록 갱신.
  * Phase 21: 8장 용의 주방 트리거 4건 추가 + stage_first_clear 제외 목록 갱신.
+ * Phase 22-1: 8장 추가 트리거 3건 추가 + stage_first_clear 제외 목록 갱신 (8-4, 8-5 추가).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -236,6 +237,8 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '7-6' &&   // chapter7_clear 별도 처리
       ctx.stageId !== '8-1' &&   // chapter8_intro 별도 처리
       ctx.stageId !== '8-3' &&   // chapter8_lao_joins 별도 처리
+      ctx.stageId !== '8-4' &&   // chapter8_yuki_clue 별도 처리
+      ctx.stageId !== '8-5' &&   // chapter8_mid 별도 처리
       ctx.stageId !== '8-6',     // chapter8_clear 별도 처리
     delay: 800,
   },
@@ -388,6 +391,43 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.storyFlags?.chapter8_cleared === true &&
       !save.seenDialogues?.includes('lao_side_8'),
+  },
+
+  // ── 시즌 2: 8장 추가 스토리 (Phase 22-1) ─────────────────────────────
+  // 8-4 첫 클리어 시 chapter8_yuki_clue
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter8_yuki_clue',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-4',
+    delay: 800,
+  },
+  // 8-5 첫 클리어 시 chapter8_mid
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter8_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-5',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter8_mid_seen = true;
+      SaveManager.save(data);
+    },
+  },
+  // merchant_enter 에서 yuki_side_8 (chapter8_mid 이후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'yuki_side_8',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter8_mid_seen === true &&
+      !save.seenDialogues?.includes('yuki_side_8'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────

@@ -7,6 +7,7 @@
  * Phase 12: 8방향 걷기 애니메이션 + 크기 25% 증가.
  * Phase 20: 은신(stealth), 배리어(barrier), 취권(drunkWalk), 아우라(aura) 메카닉.
  * Phase 21: 분열(split), 화염 장판(fireZone), 화염 브레스+3페이즈(fireBreath) 메카닉.
+ * Phase 22-1: 전령 소환(heraldSummon) + 분노 속도 증가(enrageSpeedMultiplier) 메카닉.
  */
 
 import Phaser from 'phaser';
@@ -130,6 +131,12 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._phaseTransitioned = { 2: false, 3: false };
     }
 
+    // ── Phase 22-1: 전령 소환 (oni_herald) ──
+    if (enemyData.heraldSummon) {
+      this._heraldSummonTimer = 0;
+      this._heraldEnraged = false;
+    }
+
     // ── 비주얼 ──
     this._buildVisual(enemyData);
 
@@ -149,9 +156,10 @@ export class Enemy extends Phaser.GameObjects.Container {
     const color = data.bodyColor || 0xff6b35;
     const id = data.id;
 
-    // ── 스프라이트 키 결정 (보스/일반) ──
+    // ── 스프라이트 키 결정 (보스/미니보스/일반) ──
     const isBoss = !!data.isBoss;
-    const prefix = isBoss ? 'boss' : 'enemy';
+    const isMidBoss = !!data.isMidBoss;
+    const prefix = (isBoss || isMidBoss) ? 'boss' : 'enemy';
     const spriteKey = `${prefix}_${id}`;
     const hasSprite = SpriteLoader.hasTexture(this.scene, spriteKey);
 
@@ -162,8 +170,8 @@ export class Enemy extends Phaser.GameObjects.Container {
     this._hasWalkAnim = hasWalkAnim;
     this._currentDir = 'south';
 
-    // Phase 12: 크기 25% 증가 (적: 28→35, 보스: 40→50)
-    const targetSize = isBoss ? 50 : 35;
+    // Phase 12: 크기 25% 증가 (적: 28→35, 미니보스: 42, 보스: 40→50)
+    const targetSize = isBoss ? 50 : (isMidBoss ? 42 : 35);
 
     if (hasWalkAnim) {
       // ── 걷기 애니메이션 스프라이트 사용 ──
@@ -187,7 +195,7 @@ export class Enemy extends Phaser.GameObjects.Container {
     }
 
     // HP 바 (스프라이트/도형 공통)
-    const hpBarY = isBoss ? -30 : -22;
+    const hpBarY = isBoss ? -30 : (isMidBoss ? -26 : -22);
     this.hpBarBg = this.scene.add.rectangle(0, hpBarY, 26, 3, 0x333333);
     this.add(this.hpBarBg);
     this.hpBar = this.scene.add.rectangle(-13, hpBarY, 26, 3, 0x44ff44);
@@ -212,7 +220,16 @@ export class Enemy extends Phaser.GameObjects.Container {
    */
   _buildShapeFallback(data, color, id) {
     // 몸체
-    if (id === 'pasta_boss' || id === 'dragon_ramen'
+    if (data.isMidBoss) {
+      // Phase 22-1: 미니보스 전용 다이아몬드 도형
+      const gfx = this.scene.add.graphics();
+      gfx.fillStyle(color, 1);
+      gfx.fillPoints([
+        { x: 0, y: -18 }, { x: 18, y: 0 },
+        { x: 0, y: 18 },  { x: -18, y: 0 },
+      ], true);
+      this.add(gfx);
+    } else if (id === 'pasta_boss' || id === 'dragon_ramen'
         || id === 'seafood_kraken' || id === 'lava_dessert_golem'
         || id === 'sake_oni' || id === 'dragon_wok') {
       const body = this.scene.add.rectangle(0, 0, 40, 40, color);
@@ -420,6 +437,11 @@ export class Enemy extends Phaser.GameObjects.Container {
       if (this._phase < 2 && hpRatio <= 0.70) this._enterPhase(2);
       if (this._phase < 3 && hpRatio <= 0.35) this._enterPhase(3);
       this._updateFireBreath(delta);
+    }
+
+    // ── Phase 22-1: 전령 소환 + 분노 (oni_herald) ──
+    if (this.data_.heraldSummon) {
+      this._updateHeraldSummon(delta);
     }
 
     // ── 이동 ──
@@ -876,6 +898,39 @@ export class Enemy extends Phaser.GameObjects.Container {
       interval,
       timer: interval,  // 첫 틱은 interval 후에 발동
     });
+  }
+
+  // ── Phase 22-1: 전령 소환 메카닉 ────────────────────────────────────
+
+  /**
+   * 전령 소환 업데이트 (oni_herald).
+   * heraldSummonInterval마다 heraldSummonType 적을 heraldSummonCount만큼 소환.
+   * HP enrageHpThreshold 이하 시 속도 enrageSpeedMultiplier배 증가.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateHeraldSummon(delta) {
+    // 분노 체크: HP 임계 이하 시 속도 증가
+    if (!this._heraldEnraged && this.data_.enrageHpThreshold &&
+        this.hp / this.maxHp <= this.data_.enrageHpThreshold) {
+      this._heraldEnraged = true;
+      const mult = this.data_.enrageSpeedMultiplier || 1.5;
+      this.speed = this.data_.speed * mult;
+      this.setTint(0xff4444);
+    }
+
+    // 소환 타이머
+    this._heraldSummonTimer += delta;
+    if (this._heraldSummonTimer >= this.data_.heraldSummonInterval) {
+      this._heraldSummonTimer = 0;
+      const count = this.data_.heraldSummonCount || 1;
+      for (let i = 0; i < count; i++) {
+        this.scene.events.emit('boss_summon', {
+          type: this.data_.heraldSummonType,
+          x: this.x, y: this.y,
+        });
+      }
+    }
   }
 
   /** @private */

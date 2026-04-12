@@ -4381,7 +4381,7 @@ export const STAGES = {
         { type: 'cheese_golem', count: 8, interval: 1900 },
       ]},
       { wave: 5, enemies: [
-        { type: 'sake_oni', count: 1, interval: 0 },
+        { type: 'oni_herald', count: 1, interval: 0 },
         { type: 'sushi_ninja', count: 16, interval: 850 },
         { type: 'tempura_monk', count: 10, interval: 1600 },
         { type: 'shrimp_samurai', count: 18, interval: 700 },

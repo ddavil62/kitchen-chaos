@@ -9,6 +9,7 @@
  * Phase 19-3: 시즌 2 프롤로그 대화 3종 추가 (season2_prologue, season2_yuki_intro, season2_lao_intro).
  * Phase 20: 7장 사쿠라 이자카야 대화 4종 추가 (chapter7_intro, chapter7_yuki_joins, chapter7_clear, yuki_side_7).
  * Phase 21: 8장 용의 주방 대화 4종 추가 (chapter8_intro, chapter8_lao_joins, chapter8_clear, lao_side_8).
+ * Phase 22-1: chapter7_clear 복선 대사 삽입, 8장 추가 대화 3종 추가 (chapter8_yuki_clue, chapter8_mid, yuki_side_8).
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -580,6 +581,9 @@ export const DIALOGUES = {
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '정화된 사케... 이게 최상급 주류가 되겠군. 이자카야 다시 열면 대박 날 텐데~' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '아직 8장이 남아 있어. 라오 씨 고향도 도와야 해!' },
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '당연하지. 같이 가자.' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...그런데 한 가지 신경 쓰이는 게 있어. 이자카야 아래 지하 구조물 — 봉인의 핵심이 거기 있을 수 있어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '봉인의 핵심? 그게 뭔데?' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '자세한 건 나도 몰라. 하지만 미력사 길드 고문서에 그런 기록이 있어. 지금은 일단 라오 씨를 도우러 가자.' },
       { speaker: 'narrator', portrait: '', text: '7장 클리어. 유키가 정식으로 미미 팀의 일원이 되었다.' },
     ],
   },
@@ -659,6 +663,53 @@ export const DIALOGUES = {
       { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(감동받은 척) 진짜 멋있어. 그 정신으로 도구 업그레이드도\u2014' },
       { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(무표정) ...포코 씨는 항상 거기서 나오네.' },
       { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(작게) 포코를 대하는 방법이 나랑 비슷하네, 라오.' },
+    ],
+  },
+
+  // ── 시즌 2: 8장 추가 스토리 (Phase 22-1) ──
+
+  chapter8_yuki_clue: {
+    id: 'chapter8_yuki_clue',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '8-4 클리어 직후. 유키가 홀로 궁전 기둥에 새겨진 문양을 들여다보고 있다.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(문양을 손으로 짚으며) ...이 문양. 일본 이자카야 지하에서 본 것과 같아.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '유키 씨, 뭐야?' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '미미. 식란의 원점이 지하 어딘가에 있을 것 같아. 이 문양이 봉인 표식이야.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(다가서며) ...우리 가문 고서에도 있었어. "용의 주방 아래, 봉인이 잠든다"는 구절이.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '그럼 여기도?!' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '아직 확신은 없어. 하지만 \u2014 계속 싸우면서 단서를 모아야 해.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(진지하게) ...이번엔 나도 쉽게 넘길 얘기가 아닌 것 같군.' },
+    ],
+  },
+  chapter8_mid: {
+    id: 'chapter8_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '8-5 클리어 직후. 드래곤 웍이 가까워지며 팀 내 긴장이 고조된다.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '라오. 나 혼자 선두로 들어갈게. 봉인 지점을 먼저 확인해야 해.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(차분하게) 안 돼. 여기는 내 가문의 주방이야. 내가 선두다.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '...봉인에 대해 가장 많이 아는 건 나야. 판단은 내가 해.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '잠깐, 둘 다! 싸울 시간 없어. 같이 들어가면 되잖아!' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(잠시 침묵 후) ...미미가 맞아. 혼자 행동하는 건 내 나쁜 버릇이야.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(끄덕이며) 나도 마찬가지야. 같이 가자, 유키.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(눈물 닦으며) 이 팀... 진짜 성장하고 있어. 감동이야.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '포코 씨. 지금 상황이 그런 상황이 아닌 거 알죠.' },
+    ],
+  },
+  yuki_side_8: {
+    id: 'yuki_side_8',
+    skippable: true,
+    lines: [
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '미미, 잠깐 좋을까.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '응? 무슨 일이야, 유키 씨?' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '...아까 라오랑 다퉜던 거. 내가 너무 혼자 결정하려 했어. 나쁜 버릇이라는 건 알지만.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '유키 씨가 봉인에 대해 걱정되니까 그런 거잖아. 알아.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '미력사 길드가 무너졌을 때, 나 혼자 모든 정보를 짊어졌어. 그 버릇이 아직 남아 있나봐.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '이제는 우리가 다 같이 짊어지면 돼. 봉인 정보도, 싸움도, 전부.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(작게 웃으며) ...그렇군. 팀이라는 게 그런 거구나.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(지나가며) 맞아, 유키. 웍도 혼자 들면 무거워.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '...라오, 그 비유 되게 마음에 들어.' },
     ],
   },
 };

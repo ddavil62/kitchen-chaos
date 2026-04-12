@@ -1105,7 +1105,7 @@ export class GatheringScene extends Phaser.Scene {
     if (!waveDef) return;
 
     const hasBoss = waveDef.enemies.some(
-      (e) => ENEMY_TYPES[e.type]?.isBoss
+      (e) => ENEMY_TYPES[e.type]?.isBoss || ENEMY_TYPES[e.type]?.isMidBoss
     );
 
     if (hasBoss) {
@@ -1126,7 +1126,7 @@ export class GatheringScene extends Phaser.Scene {
     SoundManager.playSFX('sfx_enemy_death');
     // VFX: 적 사망 파티클
     if (enemy && enemy.x !== undefined) {
-      const isBoss = !!enemy.data_?.isBoss;
+      const isBoss = !!(enemy.data_?.isBoss || enemy.data_?.isMidBoss);
       const color = enemy.data_?.bodyColor || 0xffffff;
       this.vfx.enemyDeath(enemy.x, enemy.y, color, isBoss);
     }

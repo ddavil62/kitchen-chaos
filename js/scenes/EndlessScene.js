@@ -397,7 +397,7 @@ export class EndlessScene extends GatheringScene {
     // SFX + VFX
     SoundManager.playSFX('sfx_enemy_death');
     if (this.vfx && enemy && enemy.x !== undefined) {
-      const isBoss = !!enemy.data_?.isBoss;
+      const isBoss = !!(enemy.data_?.isBoss || enemy.data_?.isMidBoss);
       const color = enemy.data_?.bodyColor || 0xffffff;
       this.vfx.enemyDeath(enemy.x, enemy.y, color, isBoss);
     }

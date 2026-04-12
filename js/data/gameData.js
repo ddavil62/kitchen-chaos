@@ -3,6 +3,7 @@
  * Phase 10: 적 22종(일반 16 + 보스 6), 타워 6종, 재료 15종, 레시피 12종, 30 스테이지.
  * Phase 20: 적 25종(일반 18 + 보스 7), 재료 17종, 서빙 레시피 14종, 버프 레시피 8종.
  * Phase 21: 적 29종(일반 21 + 보스 8), 재료 19종, 서빙 레시피 22종, 버프 레시피 10종.
+ * Phase 22-1: oni_herald 미니보스 추가 (HP 800, 전령 소환 + 분노 기믹).
  */
 
 // ── 적 타입 정의 ──
@@ -297,6 +298,29 @@ export const ENEMY_TYPES = {
     barrierThreshold: 0.5,     // HP 50% 이하 시 배리어 활성
     barrierDuration: 3000,     // 3초 후 배리어 자동 해제
     barrierCooldown: 10000,    // 해제 후 10초간 재발동 불가
+  },
+  // ── Phase 22-1 미니보스 ──
+  oni_herald: {
+    id: 'oni_herald',
+    nameKo: '오니 전령',
+    hp: 800,
+    speed: 30,
+    ingredient: null,
+    bodyColor: 0xcc44aa,
+    isMidBoss: true,
+    // 전령 소환 패턴: heraldSummonInterval마다 shrimp_samurai 2마리 소환
+    heraldSummon: true,
+    heraldSummonInterval: 6000,   // 6초마다 소환
+    heraldSummonType: 'shrimp_samurai',
+    heraldSummonCount: 2,
+    // 분노: HP enrageHpThreshold 이하 시 속도 1.5배
+    enrageHpThreshold: 0.4,       // HP 40% 이하
+    enrageSpeedMultiplier: 1.5,
+    bossReward: 120,
+    bossDrops: [
+      { ingredient: 'wasabi', count: 2 },
+      { ingredient: 'sashimi_tuna', count: 2 },
+    ],
   },
   // Phase 20 보스
   sake_oni: {
