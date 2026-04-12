@@ -145,6 +145,9 @@ export class SoundManager {
       // ── 모바일 AudioContext resume (사용자 제스처 필요) ──
       SoundManager._setupResumeOnGesture();
 
+      // ── 백그라운드/포그라운드 전환 처리 ──
+      SoundManager._setupVisibilityHandler();
+
       // ── GameEventBus 이벤트 연동 ──
       SoundManager._bindEvents();
 
@@ -152,6 +155,43 @@ export class SoundManager {
     } catch (e) {
       console.warn('[SoundManager] 초기화 실패:', e);
     }
+  }
+
+  /**
+   * visibilitychange 이벤트 핸들러.
+   * 백그라운드 진입 시 BGM 타이머 정지 + AudioContext suspend,
+   * 포그라운드 복귀 시 resume 후 BGM 재시작하여 오실레이터 중복 방지.
+   * @private
+   */
+  static _setupVisibilityHandler() {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        // 백그라운드: BGM 루프 타이머 정지, AudioContext 일시정지
+        if (SoundManager._bgmState?.timerId) {
+          clearTimeout(SoundManager._bgmState.timerId);
+          SoundManager._bgmState.timerId = null;
+        }
+        if (SoundManager._ctx?.state === 'running') {
+          SoundManager._ctx.suspend();
+        }
+      } else {
+        // 포그라운드 복귀: AudioContext resume 후 BGM 클린 재시작
+        const restartBGM = () => {
+          const id = SoundManager._currentBGMId;
+          if (id) {
+            SoundManager._stopBGMInternal(0);
+            SoundManager._currentBGMId = null;
+            SoundManager.playBGM(id);
+          }
+        };
+
+        if (SoundManager._ctx?.state === 'suspended') {
+          SoundManager._ctx.resume().then(restartBGM).catch(() => restartBGM());
+        } else {
+          restartBGM();
+        }
+      }
+    });
   }
 
   /**
