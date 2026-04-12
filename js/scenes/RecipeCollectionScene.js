@@ -271,7 +271,7 @@ export class RecipeCollectionScene extends Phaser.Scene {
       fontSize: '14px', color: '#ffffff',
     }).setOrigin(0.5);
     container.add(closeText);
-    closeBtn.on('pointerdown', () => {
+    closeBtn.on('pointerup', () => {
       container.destroy();
       this._detailContainer = null;
     });
@@ -457,10 +457,10 @@ export class RecipeCollectionScene extends Phaser.Scene {
       container.destroy();
       this._detailContainer = null;
     };
-    closeBtn.on('pointerdown', closeFn);
+    closeBtn.on('pointerup', closeFn);
     closeBtn.on('pointerover', () => closeBtn.setFillStyle(0xff3333));
     closeBtn.on('pointerout', () => closeBtn.setFillStyle(0xcc2222));
-    overlay.on('pointerdown', closeFn);
+    overlay.on('pointerup', closeFn);
 
     this._detailContainer = container;
   }
