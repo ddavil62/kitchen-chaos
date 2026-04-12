@@ -173,16 +173,29 @@ export function buildWaypointsFromSegments(segments) {
 
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
-    let startCell, endCell;
+    // 세그먼트의 두 끝점 계산
+    let ptA, ptB;
     if (seg.type === 'vertical') {
-      startCell = { col: seg.col, row: seg.rowStart };
-      endCell = { col: seg.col, row: seg.rowEnd };
+      ptA = cellToWorld(seg.col, seg.rowStart);
+      ptB = cellToWorld(seg.col, seg.rowEnd);
     } else {
-      startCell = { col: seg.colStart, row: seg.row };
-      endCell = { col: seg.colEnd, row: seg.row };
+      ptA = cellToWorld(seg.colStart, seg.row);
+      ptB = cellToWorld(seg.colEnd, seg.row);
     }
-    if (i === 0) points.push(cellToWorld(startCell.col, startCell.row));
-    points.push(cellToWorld(endCell.col, endCell.row));
+
+    if (i === 0) {
+      // 첫 세그먼트: ptA가 진입, ptB가 출구
+      points.push(ptA);
+      points.push(ptB);
+    } else {
+      // 이전 세그먼트 출구와 가까운 끝을 진입점으로 판정,
+      // 반대쪽 끝을 새 웨이포인트로 추가한다.
+      // (경로가 꺾여 되돌아오는 구간에서 colStart/colEnd 순서가 역전될 수 있음)
+      const prev = points[points.length - 1];
+      const dA = (ptA.x - prev.x) ** 2 + (ptA.y - prev.y) ** 2;
+      const dB = (ptB.x - prev.x) ** 2 + (ptB.y - prev.y) ** 2;
+      points.push(dA <= dB ? ptB : ptA);
+    }
   }
 
   const entry = points[0];
