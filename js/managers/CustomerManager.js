@@ -140,12 +140,17 @@ export class CustomerManager {
 
   /**
    * 매 프레임 호출 — 인내심 감소 + 퇴장 처리.
+   * 조리 중인 요리와 일치하는 손님은 인내심 감소를 일시 정지한다.
    * @param {number} delta - ms
+   * @param {object|null} cookingSlot - 현재 조리 슬롯 (recipeId 포함)
    */
-  update(delta) {
+  update(delta, cookingSlot = null) {
     for (let i = 0; i < this.slots.length; i++) {
       const cust = this.slots[i];
       if (!cust) continue;
+
+      // 해당 요리를 조리 중이면 인내심 감소 일시 정지
+      if (cookingSlot && cookingSlot.recipeId === cust.dish) continue;
 
       cust.patience -= delta;
 

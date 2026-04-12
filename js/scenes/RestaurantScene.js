@@ -182,8 +182,8 @@ export class RestaurantScene extends Phaser.Scene {
   // ── 메인 루프 ──
 
   update(time, delta) {
-    // 손님 인내심 감소
-    this.customerManager.update(delta);
+    // 손님 인내심 감소 (조리 중인 요리 주문 손님은 일시 정지)
+    this.customerManager.update(delta, this.cookingSlot);
     this.customerZoneUI.update();
 
     // 조리 타이머
