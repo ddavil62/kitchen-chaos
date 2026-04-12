@@ -276,8 +276,8 @@ export class GatheringScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(104).setVisible(false);
 
-    // 클릭 이벤트
-    this._skillBtnBg.on('pointerup', () => {
+    // 클릭 이벤트 (pointerdown — 쿨다운 중엔 removeInteractive로 원천 차단)
+    this._skillBtnBg.on('pointerdown', () => {
       if (this.isGameOver || this.isVictory) return;
       if (!this._skillReady) return;
       this._activateChefSkill();
@@ -328,8 +328,9 @@ export class GatheringScene extends Phaser.Scene {
       this._showMessage(`${this._chefData.skillName}!\n전체 적 빙결!`, 1500);
     }
 
-    // 쿨다운 시작
+    // 쿨다운 시작 (버튼 비활성화로 원천 차단)
     this._skillReady = false;
+    this._skillBtnBg.removeInteractive();
     this._skillCooldownTimer = this._chefData.skillCooldown;
     this._skillCooldownOverlay.setVisible(true);
     this._skillCooldownText.setVisible(true);
@@ -359,6 +360,8 @@ export class GatheringScene extends Phaser.Scene {
       this._skillCooldownTimer = 0;
       this._skillCooldownOverlay.setVisible(false);
       this._skillCooldownText.setVisible(false);
+      // 버튼 인터랙션 복원
+      this._skillBtnBg.setInteractive({ useHandCursor: true });
 
       // 준비 완료 연출
       this.tweens.add({
