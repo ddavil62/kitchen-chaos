@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-12 (Phase 21 완료)
+> 최종 업데이트: 2026-04-13 (Phase 22-1 완료)
 
 ## 프로젝트 개요
 
@@ -109,8 +109,8 @@ kitchen-chaos/
       gameData.js            # 적/도구(TOOL_DEFS)/재료 정의
       stageData.js           # 스테이지 데이터 66개 (시즌1 30 + 시즌2 36, 8장 웨이브 교체 완료)
       recipeData.js          # 레시피 126종 정의
-      dialogueData.js        # 대화 스크립트 43종 + 캐릭터 7종 정의 (시즌2 7~8장 8종 포함)
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 42항목 (triggerPoint 8종, import SaveManager)
+      dialogueData.js        # 대화 스크립트 46종 + 캐릭터 7종 정의 (시즌2 7~8장 11종 포함)
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 45항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
@@ -131,8 +131,8 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (다이아몬드 격자+depth sorting+홀 데코), 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 43종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 42항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 46종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 45항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v13 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
@@ -166,17 +166,17 @@ kitchen-chaos/
 | 도구 시스템 | 영구 도구 8종(+wasabi_cannon 범위/둔화, +spice_grinder DoT), 구매/판매/업그레이드, ToolManager, freezer canTargetInvisible | 완료 |
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
-| 대화/스토리 | DialogueManager+StoryManager, 스크립트 43종, 트리거 42항목, 선택지 분기, 초상화 6종, 7캐릭터 | 완료 |
+| 대화/스토리 | DialogueManager+StoryManager, 스크립트 46종, 트리거 45항목, 선택지 분기, 초상화 6종, 7캐릭터 | 완료 |
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코 3종, 웜 다크 팔레트) + fallback | 완료 |
 | 도구 도감/팝업 | 행상인 ℹ 팝업(스탯바+로어), 도감 도구 탭(3열 그리드+Lv테이블) | 완료 |
-| 7장 사쿠라 이자카야 | 적 3종(sushi_ninja/tempura_monk/sake_oni), 재료 2종, 레시피 10종, 스토리 4종, 은신/배리어/취권/아우라 메커닉 | 완료 |
-| 8장 용의 주방 | 적 3종(dumpling_warrior/wok_phantom/mini_dumpling)+보스(dragon_wok), 재료 2종, 레시피 10종, 스토리 4종, 분열/화염장판/3페이즈 메커닉 | 완료 |
+| 7장 사쿠라 이자카야 | 적 3종(sushi_ninja/tempura_monk/sake_oni)+미니보스(oni_herald), 재료 2종, 레시피 10종, 스토리 4종+복선 1종, 은신/배리어/취권/아우라/전령소환 메커닉 | 완료 |
+| 8장 용의 주방 | 적 3종(dumpling_warrior/wok_phantom/mini_dumpling)+보스(dragon_wok), 재료 2종, 레시피 10종, 스토리 7종, 분열/화염장판/3페이즈 메커닉 | 완료 |
 
 ## 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 29종 (일반 21 + 보스 8) |
+| 적 | 30종 (일반 21 + 미니보스 1 + 보스 8) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
 | 재료 | 19종 |
 | 레시피 | 126종 (서빙 102 + 버프 24) |
@@ -196,7 +196,7 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 21 완료 (8장 용의 주방 -- 적 3종+보스 1종, 재료 2종, 레시피 10종, 스토리 4종, 분열/화염장판/3페이즈 메커닉).
+- Phase 22-1 완료 (7-6 미니보스 oni_herald 교체, 8장 스토리 대화 3종 추가, 트리거 3건 추가).
 - 챕터 확장 로드맵: 그룹1(1~6장, 완료) → 그룹2(7~15장, 일식·중식·양식, Phase 22~30) → 그룹3(16~24장, 인도·멕시칸·디저트, Phase 31~40).
-- Phase 22 다음 작업: 8장 이자카야 심층부 + 7장 보스(sake_oni) 9장 재편.
+- Phase 22-2 다음 작업: 8장 신규 적 에셋 생성 (sake_specter, oni_minion, 이자카야 지하 타일셋).
 - 상세: `docs/ROADMAP.md` 참조

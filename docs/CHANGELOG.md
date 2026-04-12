@@ -1,5 +1,53 @@
 # Changelog
 
+## [2026-04-13] - Phase 22-1 스크립트 & 7장 보스 재편
+
+### 추가
+
+- **미니보스 oni_herald** (`js/data/gameData.js` ENEMY_TYPES)
+  - HP 800, speed 30, bodyColor 0xcc44aa, isMidBoss: true
+  - heraldSummon: 6초마다 shrimp_samurai 2마리 소환 (boss_summon 이벤트)
+  - enrage: HP 40% 이하 시 속도 1.5배 + 적색 틴트
+  - bossReward: 120, bossDrops: wasabi x2 + sashimi_tuna x2
+  - 누적: 30종 (일반 21 + 미니보스 1 + 보스 8)
+
+- **Enemy.js isMidBoss 지원** (`js/entities/Enemy.js`)
+  - _buildVisual: isMidBoss 전용 다이아몬드 도형 42px + HP 바 위치 조정
+  - _updateHeraldSummon: 전령 소환 타이머 (heraldSummonInterval 기반)
+  - enrage 로직: enrageHpThreshold 이하 시 enrageSpeedMultiplier 적용 + _heraldEnraged 1회 제한
+  - 생성자에 heraldSummon 관련 프로퍼티 초기화
+
+- **GatheringScene/EndlessScene isMidBoss 지원**
+  - _onEnemyDied: isMidBoss도 보스 VFX 적용
+  - _checkBossWaveBGM: isMidBoss도 보스 BGM 전환
+
+- **대화 스크립트 3종** (`js/data/dialogueData.js`)
+  - chapter8_yuki_clue: 8-4 클리어 후 유키 봉인 문양 단서 발견 (8줄)
+  - chapter8_mid: 8-5 클리어 후 팀 갈등 -- 유키/라오 선두 다툼, 미미 중재 (9줄)
+  - yuki_side_8: merchant_enter 시 유키 사이드 대화 -- 혼자 행동하는 버릇 (9줄)
+  - 누적: 46종
+
+- **스토리 트리거 3건** (`js/data/storyData.js`)
+  - 8-4 result_clear: chapter8_yuki_clue (isFirstClear, stars>0)
+  - 8-5 result_clear: chapter8_mid (isFirstClear, stars>0) + onComplete에서 chapter8_mid_seen 플래그 저장
+  - merchant_enter: yuki_side_8 (chapter8_mid_seen 조건)
+  - 누적: 45항목
+
+### 변경
+
+- **stageData.js**: 7-6 wave 5 첫 적 sake_oni -> oni_herald 교체 (L4384)
+- **dialogueData.js**: chapter7_clear에 유키 복선 대사 3줄 삽입 ("봉인의 핵심이 거기 있을 수 있어")
+- **storyData.js**: stage_first_clear 범용 트리거 제외 목록에 8-4, 8-5 추가
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-phase22-1-scope.md`
+- 리포트: `.claude/specs/2026-04-13-phase22-1-report.md`
+- QA: `.claude/specs/2026-04-13-phase22-1-qa.md`
+- 스펙 AC #6은 "유키 복선 대사 4줄"로 기재되었으나, 스펙 상세 구현 섹션에는 3줄(유키/미미/유키)로 명시. 구현은 상세 섹션과 일치.
+- 스펙의 chapter8_intro는 기존 Phase 21 대화 ID와 충돌하므로 chapter8_yuki_clue로 신규 작성됨.
+
+---
+
 ## [2026-04-12] - Phase 21 8장 용의 주방 (중식)
 
 ### 추가

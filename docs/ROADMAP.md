@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-12
-> 기준: Phase 21 완료
+> 최종 업데이트: 2026-04-13
+> 기준: Phase 22-1 완료
 
 ---
 
@@ -32,7 +32,7 @@
 | Phase 19 | 시즌 2 기반 인프라 (월드맵 확장, 신규 캐릭터, 세이브) | ✅ 완료 |
 | Phase 20 | 7장 — 사쿠라 이자카야 (일식) | ✅ 완료 |
 | Phase 21 | 8장 — 용의 주방 (중식) | ✅ 완료 |
-| Phase 22 | 8장 — 이자카야 심층부 (일식 2장) + 7장 보스 재편 | 📋 계획 |
+| Phase 22 | 8장 — 이자카야 심층부 (일식 2장) + 7장 보스 재편 | 🔄 진행중 (22-1 완료) |
 | Phase 23 | 9장 — 사케 오니 최종전 (일식 3장) | 📋 계획 |
 | Phase 24 | 기존 8장→10장 번호 재편 + WorldMapScene 24챕터 확장 | 📋 계획 |
 | Phase 25 | 11장 — 용의 주방 심층부 (중식 2장) | 📋 계획 |
@@ -696,16 +696,22 @@
 
 ---
 
-## Phase 22-1 — 스크립트 & 7장 보스 재편
+## Phase 22-1 — 스크립트 & 7장 보스 재편 ✅ 완료
 
 > `visual_change: none` | 스토리 대사 집필 + stageData 수정
 > 에셋 생성 없음. 빠른 파이프라인.
+> 완료: 2026-04-13
 
-- [ ] stageData.js: 7-6 sake_oni 제거 → 미니보스(oni_herald, HP ~800) 배치
-- [ ] 7장 격퇴 대화(chapter7_clear) 재조정 — "봉인의 핵심이 지하에 있다" 복선
-- [ ] dialogueData.js: chapter8_intro 작성 (유키 지하 단서 발견)
-- [ ] dialogueData.js: chapter8_mid 작성 (팀 갈등 — 유키 단독 행동 vs 협력)
-- [ ] dialogueData.js: 사이드 대화 1종 (yuki_side_8)
+- [x] stageData.js: 7-6 wave 5 sake_oni 제거 → oni_herald(HP 800, isMidBoss) 배치
+- [x] gameData.js: oni_herald ENEMY_TYPES 등록 (heraldSummon 소환 + enrage 분노 기믹)
+- [x] Enemy.js: isMidBoss 다이아몬드 폴백 도형 + _updateHeraldSummon 소환 메서드
+- [x] chapter7_clear 복선 대사 3줄 삽입 ("봉인의 핵심이 지하에 있다")
+- [x] dialogueData.js: chapter8_yuki_clue 작성 (유키 봉인 문양 단서 발견, 8줄) *(스펙에서 chapter8_intro로 기재되었으나 기존 chapter8_intro와 충돌 방지를 위해 chapter8_yuki_clue로 변경)*
+- [x] dialogueData.js: chapter8_mid 작성 (팀 갈등 -- 유키 단독 행동 vs 협력, 9줄)
+- [x] dialogueData.js: yuki_side_8 작성 (유키 사이드 대화, 9줄)
+- [x] storyData.js: 트리거 3건 (8-4 result_clear, 8-5 result_clear, merchant_enter)
+- [x] storyData.js: stage_first_clear 제외 목록에 8-4, 8-5 추가
+- [x] GatheringScene/EndlessScene: isMidBoss 보스 VFX/BGM 지원
 
 ---
 
