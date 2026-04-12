@@ -782,129 +782,145 @@
 
 ---
 
-## Phase 25 — 11장: 용의 주방 심층부 (중식 2장)
+## Phase 25-1 — 스크립트 (11장: 용의 주방 심층부)
 
-> 테마: 용이 잠든 주방 지하 깊숙이. 라오의 과거.
-> 스토리: 라오가 드래곤 웍의 봉인이 풀린 원인을 추적. 내면 갈등.
+> `visual_change: none` | 스토리 대사 집필만
 
-### 25-1. 신규 재료/적
-
-- [ ] 재료 1종: 팔각(star_anise) — 누적 21종
-- [ ] 적 2종: shadow_dragon_spawn (HP ~380, 어둠 디버프), wok_guardian (HP ~450, 방어 특화)
-- [ ] PixelLab 스프라이트
-
-### 25-2. 스테이지 11-1 ~ 11-5
-
-- [ ] 5스테이지 (11-6은 Phase 26에서 드래곤 웍)
-- [ ] 용의 주방 심층부 타일셋
-- [ ] 서비스 설정
-
-### 25-3. 스토리 스크립트
-
-- [ ] chapter11_intro (라오 과거 회상)
-- [ ] chapter11_mid (봉인 해제의 진실)
-- [ ] 사이드 대화 1종
+- [ ] dialogueData.js: chapter11_intro 작성 (라오 과거 회상 — 봉인의 실패)
+- [ ] dialogueData.js: chapter11_mid 작성 (봉인 해제의 진실, 라오 죄책감)
+- [ ] 사이드 대화 1종 (lao_side_11)
 
 ---
 
-## Phase 26 — 12장: 드래곤 웍 최종전 (중식 3장)
+## Phase 25-2 — 에셋 생성 (11장 신규 적)
 
-> 테마: 드래곤 웍과의 최종 결전. 중식 아크 마무리.
-> 스토리: 라오가 드래곤 웍을 다시 봉인, 자신의 미력사 사명 재확인.
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
 
-### 26-1. 스테이지 12-1 ~ 12-6
+- [ ] shadow_dragon_spawn: HP ~380, 어둠 디버프 — PixelLab 생성
+- [ ] wok_guardian: HP ~450, 방어 특화 — PixelLab 생성
+- [ ] 용의 주방 심층부 타일셋 — PixelLab tiles
+- [ ] 재료 아이콘: 팔각(star_anise) 32px
 
-- [ ] 5스테이지 + 보스전 12-6
-- [ ] 보스: dragon_wok (HP 7500, 불꽃+폭발, 3페이즈)
-- [ ] PixelLab 보스 스프라이트 (업데이트)
+---
 
-### 26-2. 레시피 확장 (~10종)
+## Phase 25-3 — 11장 스테이지 + 레시피 구현
 
-- [ ] 서빙 8~9종 (팔각+기존 중식 재료 조합)
-- [ ] 버프 1~2종
-- [ ] 누적 ~146종
+> `visual_change: none` | 25-2 에셋 완성 후 진행
 
-### 26-3. 스토리 스크립트
+- [ ] ingredientData.js: 팔각(star_anise) 추가 — 누적 21종
+- [ ] enemyData.js: shadow_dragon_spawn, wok_guardian 등록
+- [ ] stageData.js: 스테이지 11-1 ~ 11-5 배치 (11-6은 Phase 26-1에서 dragon_wok)
+- [ ] recipeData.js: 팔각 조합 레시피 ~10종 (팔각 육수 라면, 마파두부 등)
+- [ ] 서비스 설정 (11장 손님 패턴)
 
-- [ ] chapter12_boss (드래곤 웍 최종전 전 대사)
-- [ ] chapter12_clear (라오 성장, 중식 아크 엔딩)
+---
+
+## Phase 26-1 — 에셋 + 스크립트 (12장: 드래곤 웍 최종전)
+
+> `visual_change: art` | 보스 스프라이트 + 대사
+
+- [ ] dragon_wok 보스 스프라이트 업데이트 (PixelLab, 64px pro)
+- [ ] dialogueData.js: chapter12_boss 작성 (드래곤 웍 — "나는 네 과오의 산물")
+- [ ] dialogueData.js: chapter12_clear 작성 (라오 성장, 봉인 재확인)
 - [ ] 사이드 대화 1~2종
 
 ---
 
-## Phase 27 — 13장: 별빛 비스트로 (양식 1장)
+## Phase 26-2 — 12장 스테이지 구현 (중식 아크 완성)
 
-> 테마: 파리풍 고급 레스토랑. 우아하지만 치명적인 적들.
-> 스토리: WCA 유럽 지부장의 요청. 미슐랭 레스토랑이 식란의 진원지.
+> `visual_change: none` | 26-1 에셋 완성 후 진행
 
-### 27-1. 신규 재료/적
-
-- [ ] 재료 1종: 트러플(truffle) — 누적 22종
-- [ ] 적 2종: wine_specter (HP ~350, 취기 디버프), foie_gras_knight (HP ~400, 방어 특화)
-- [ ] PixelLab 스프라이트
-
-### 27-2. 스테이지 13-1 ~ 13-5
-
-- [ ] 5스테이지 (13-6은 Phase 29에서 셰프 누아르)
-- [ ] 양식 비스트로 타일셋
-- [ ] 서비스 설정
-
-### 27-3. 레시피 확장 (~10종)
-
-- [ ] 서빙 8~9종 (트러플+기존 재료 조합: 트러플 파스타, 꽁피 등)
-- [ ] 버프 1~2종
-- [ ] 누적 ~156종
-
-### 27-4. 스토리 스크립트
-
-- [ ] chapter13_intro (파리 도착, WCA 유럽 지부)
-- [ ] chapter13_mid (미미와 프랑스 미력사의 만남)
-- [ ] 사이드 대화 1종
+- [ ] stageData.js: 스테이지 12-1 ~ 12-5 + 12-6 dragon_wok 보스전
+- [ ] recipeData.js: 팔각 조합 추가분 (누적 ~146종)
+- [ ] 중식 아크 밸런스 점검 (10~12장 DPS 커브)
 
 ---
 
-## Phase 28 — 14장: 비스트로 심층부 (양식 2장)
+## Phase 27-1 — 스크립트 (13장: 별빛 비스트로)
 
-> 테마: 레스토랑 지하 와인 셀러. 셰프 누아르의 과거.
-> 스토리: 셰프 누아르의 요리 철학과 식란 이용의 이유가 드러남.
+> `visual_change: none` | 스토리 대사 집필만
 
-### 28-1. 신규 재료/적
-
-- [ ] 재료 1종: 허브(herb_bundle) — 누적 23종
-- [ ] 적 2종: cellar_phantom (HP ~400, 잠복+기습), sommelier_wraith (HP ~380, 버프 해제)
-- [ ] PixelLab 스프라이트
-
-### 28-2. 스테이지 14-1 ~ 14-5
-
-- [ ] 5스테이지
-- [ ] 와인 셀러 타일셋
-- [ ] 서비스 설정
-
-### 28-3. 스토리 스크립트
-
-- [ ] chapter14_intro (셰프 누아르의 진심)
-- [ ] chapter14_mid (팀의 갈등 — 악인인가 피해자인가)
-- [ ] 사이드 대화 1종
+- [ ] dialogueData.js: chapter13_intro 작성 (파리 도착, WCA 유럽 지부장과의 첫 대면)
+- [ ] dialogueData.js: chapter13_mid 작성 (미미와 프랑스 미력사의 만남, 셰프 누아르 첫 언급)
+- [ ] 사이드 대화 1종 (mimi_side_13)
 
 ---
 
-## Phase 29 — 15장: 셰프 누아르 최종전 (양식 3장)
+## Phase 27-2 — 에셋 생성 (13장 신규 적)
 
-> 테마: 셰프 누아르와의 최종 결전. 양식 아크 마무리.
-> 스토리: 미미가 누아르를 설득하거나 격퇴. 그룹2(7~15장) 에필로그.
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
 
-### 29-1. 스테이지 15-1 ~ 15-6
+- [ ] wine_specter: HP ~350, 취기 디버프 — PixelLab 생성
+- [ ] foie_gras_knight: HP ~400, 방어 특화 — PixelLab 생성
+- [ ] 양식 비스트로 타일셋 (파리풍 인테리어) — PixelLab tiles
+- [ ] 재료 아이콘: 트러플(truffle) 32px
 
-- [ ] 5스테이지 + 보스전 15-6
-- [ ] 보스: chef_noir (HP 8000, 다크 쿠진+소환, 3페이즈)
-- [ ] PixelLab 보스 스프라이트
+---
 
-### 29-2. 스토리 스크립트
+## Phase 27-3 — 13장 스테이지 + 레시피 구현
 
-- [ ] chapter15_boss (셰프 누아르 최종전 전 대사)
-- [ ] chapter15_clear (누아르 결말, 양식 아크 엔딩)
-- [ ] chapter15_epilogue (그룹2 에필로그 — WCA와의 관계 변화)
+> `visual_change: none` | 27-2 에셋 완성 후 진행
+
+- [ ] ingredientData.js: 트러플(truffle) 추가 — 누적 22종
+- [ ] enemyData.js: wine_specter, foie_gras_knight 등록
+- [ ] stageData.js: 스테이지 13-1 ~ 13-5 배치 (13-6은 Phase 29-1에서 chef_noir)
+- [ ] recipeData.js: 트러플 조합 레시피 ~10종 (트러플 파스타, 꽁피 드 카나르 등)
+- [ ] 서비스 설정 (13장 손님 패턴)
+
+---
+
+## Phase 28-1 — 스크립트 (14장: 비스트로 심층부)
+
+> `visual_change: none` | 스토리 대사 집필만
+
+- [ ] dialogueData.js: chapter14_intro 작성 (셰프 누아르의 진심 — 요리 철학과 식란 이용의 이유)
+- [ ] dialogueData.js: chapter14_mid 작성 (팀의 갈등 — 악인인가 피해자인가)
+- [ ] 사이드 대화 1종 (team_side_14)
+
+---
+
+## Phase 28-2 — 에셋 생성 (14장 신규 적)
+
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
+
+- [ ] cellar_phantom: HP ~400, 잠복+기습 — PixelLab 생성
+- [ ] sommelier_wraith: HP ~380, 버프 해제 — PixelLab 생성
+- [ ] 와인 셀러 타일셋 (지하 창고) — PixelLab tiles
+- [ ] 재료 아이콘: 허브 번들(herb_bundle) 32px
+
+---
+
+## Phase 28-3 — 14장 스테이지 + 레시피 구현
+
+> `visual_change: none` | 28-2 에셋 완성 후 진행
+
+- [ ] ingredientData.js: 허브 번들(herb_bundle) 추가 — 누적 23종
+- [ ] enemyData.js: cellar_phantom, sommelier_wraith 등록
+- [ ] stageData.js: 스테이지 14-1 ~ 14-5 배치
+- [ ] recipeData.js: 허브 조합 레시피 ~10종 (부야베스, 에르브 드 프로방스 등)
+- [ ] 서비스 설정 (14장 손님 패턴)
+
+---
+
+## Phase 29-1 — 에셋 + 스크립트 (15장: 셰프 누아르 최종전)
+
+> `visual_change: art` | 보스 스프라이트 + 대사 + 그룹2 에필로그
+
+- [ ] chef_noir 보스 스프라이트 (PixelLab, 64px pro)
+- [ ] dialogueData.js: chapter15_boss 작성 (누아르 — "요리는 지배다")
+- [ ] dialogueData.js: chapter15_clear 작성 (누아르 결말, 양식 아크 엔딩)
+- [ ] dialogueData.js: chapter15_epilogue 작성 (그룹2 에필로그 — WCA와의 관계 변화)
 - [ ] 사이드 대화 2~3종 (전원 집합, 다음 여정 암시)
+
+---
+
+## Phase 29-2 — 15장 스테이지 구현 (양식 아크 완성)
+
+> `visual_change: none` | 29-1 에셋 완성 후 진행
+
+- [ ] stageData.js: 스테이지 15-1 ~ 15-5 + 15-6 chef_noir 보스전
+- [ ] recipeData.js: 허브 조합 추가분 (누적 ~186종)
+- [ ] 양식 아크 밸런스 점검 (13~15장 DPS 커브)
 
 ---
 
@@ -921,192 +937,265 @@
 
 ---
 
-## Phase 31 — 16장: 향신료 궁전 (인도 1장)
+## Phase 31-1 — 스크립트 (16장: 향신료 궁전)
 
-> 테마: 화려한 향신료 시장과 궁전. 강렬한 향과 색채.
-> 스토리: 인도 미력사 가문의 비밀 향신료가 식란을 증폭시키고 있다.
+> `visual_change: none` | 스토리 대사 집필만
 
-### 31-1. 신규 재료/적
+- [ ] dialogueData.js: chapter16_intro 작성 (향신료 시장 탐사, 강렬한 냄새)
+- [ ] dialogueData.js: chapter16_mid 작성 (인도 미력사 가문과의 첫 접촉)
+- [ ] 사이드 대화 1종 (team_side_16)
 
-- [ ] 재료 2종: 커리잎(curry_leaf), 사프란(saffron) — 누적 25종
-- [ ] 적 2종: curry_djinn (HP ~380, 텔레포트), naan_golem (HP ~450, 자가 회복)
-- [ ] PixelLab 스프라이트
+---
 
-### 31-2. 스테이지 16-1 ~ 16-5
+## Phase 31-2 — 에셋 생성 (16장 신규 적)
 
-- [ ] 5스테이지
-- [ ] 인도 궁전 타일셋
-- [ ] 서비스 설정
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
 
-### 31-3. 레시피 확장 (~10종)
+- [ ] curry_djinn: HP ~380, 텔레포트 — PixelLab 생성
+- [ ] naan_golem: HP ~450, 자가 회복 — PixelLab 생성
+- [ ] 인도 궁전 타일셋 (화려한 색채+패턴) — PixelLab tiles
+- [ ] 재료 아이콘: 커리잎(curry_leaf), 사프란(saffron) 32px
 
-- [ ] 서빙 8~9종 (커리잎+사프란 조합: 버터치킨, 탄두리, 비리야니 등)
-- [ ] 버프 1~2종
-- [ ] 누적 ~166종
+---
 
-### 31-4. 스토리 스크립트
+## Phase 31-3 — 16장 스테이지 + 레시피 구현
 
-- [ ] chapter16_intro (향신료 시장 탐사)
-- [ ] chapter16_mid (인도 미력사 가문과의 첫 접촉)
+> `visual_change: none` | 31-2 에셋 완성 후 진행
+
+- [ ] ingredientData.js: 커리잎(curry_leaf), 사프란(saffron) 추가 — 누적 25종
+- [ ] enemyData.js: curry_djinn, naan_golem 등록
+- [ ] stageData.js: 스테이지 16-1 ~ 16-5 배치
+- [ ] recipeData.js: 커리잎+사프란 조합 레시피 ~10종 (버터치킨, 탄두리, 비리야니 등)
+- [ ] 서비스 설정 (16장 손님 패턴)
+
+---
+
+## Phase 32-1 — 스크립트 (17장: 향신료 궁전 심층부)
+
+> `visual_change: none` | 스토리 대사 집필만
+
+- [ ] dialogueData.js: chapter17_intro 작성 (가문의 비밀 — 향신료 금고 발견)
+- [ ] dialogueData.js: chapter17_mid 작성 (마하라자의 음모 일부 공개)
 - [ ] 사이드 대화 1종
 
 ---
 
-## Phase 32 — 17장: 향신료 궁전 심층부 (인도 2장)
+## Phase 32-2 — 에셋 생성 (17장 신규 적)
 
-### 32-1. 신규 재료/적
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
 
-- [ ] 재료 1종: 차이(chai) — 누적 26종
-- [ ] 적 2종: incense_specter (HP ~420, 혼란 디버프), spice_elemental (HP ~500, 원소 저항)
-- [ ] PixelLab 스프라이트
-
-### 32-2. 스테이지 17-1 ~ 17-5
-
-- [ ] 5스테이지
-- [ ] 궁전 내부 타일셋
-- [ ] 서비스 설정
-
-### 32-3. 스토리 스크립트
-
-- [ ] chapter17_intro (가문의 비밀)
-- [ ] chapter17_mid (마하라자의 음모 일부 공개)
+- [ ] incense_specter: HP ~420, 혼란 디버프 — PixelLab 생성
+- [ ] spice_elemental: HP ~500, 원소 저항 — PixelLab 생성
+- [ ] 궁전 내부 타일셋 (금빛 실내) — PixelLab tiles
+- [ ] 재료 아이콘: 차이(chai) 32px
 
 ---
 
-## Phase 33 — 18장: 향신료 마하라자 최종전 (인도 3장)
+## Phase 32-3 — 17장 스테이지 + 레시피 구현
 
-### 33-1. 스테이지 18-1 ~ 18-6
+> `visual_change: none` | 32-2 에셋 완성 후 진행
 
-- [ ] 5스테이지 + 보스전 18-6
-- [ ] 보스: spice_maharaja (HP 9000, 향신료 폭풍+디버프 중첩, 3페이즈)
-
-### 33-2. 스토리 스크립트
-
-- [ ] chapter18_boss (마하라자 최종전 전 대사)
-- [ ] chapter18_clear (향신료 비밀 해명, 인도 아크 엔딩)
+- [ ] ingredientData.js: 차이(chai) 추가 — 누적 26종
+- [ ] enemyData.js: incense_specter, spice_elemental 등록
+- [ ] stageData.js: 스테이지 17-1 ~ 17-5 배치
+- [ ] recipeData.js: 차이 조합 레시피 ~10종 (마살라 차이, 라씨 등)
+- [ ] 서비스 설정 (17장 손님 패턴)
 
 ---
 
-## Phase 34 — 19장: 선인장 칸티나 (멕시칸 1장)
+## Phase 33-1 — 에셋 + 스크립트 (18장: 향신료 마하라자 최종전)
 
-> 테마: 사막 한가운데 네온 칸티나. 매운맛과 축제 분위기.
-> 스토리: 멕시코 미력사가 실종. 칸티나 지하에 식란 균열 발견.
+> `visual_change: art` | 보스 스프라이트 + 대사
 
-### 34-1. 신규 재료/적
-
-- [ ] 재료 1종: 할라피뇨(jalapeno) — 누적 27종
-- [ ] 적 2종: taco_bandit (HP ~400, 빠른 이동+회피), burrito_juggernaut (HP ~500, 고HP 돌진)
-- [ ] PixelLab 스프라이트
-
-### 34-2. 스테이지 19-1 ~ 19-5
-
-- [ ] 5스테이지
-- [ ] 멕시칸 타일셋 (사막+네온)
-- [ ] 서비스 설정
-
-### 34-3. 스토리 스크립트
-
-- [ ] chapter19_intro (사막 도착, 실종 미력사 단서)
-- [ ] chapter19_mid (칸티나 지하 탐색)
+- [ ] spice_maharaja 보스 스프라이트 (PixelLab, 64px pro)
+- [ ] dialogueData.js: chapter18_boss 작성 (마하라자 — "향신료는 지배의 언어다")
+- [ ] dialogueData.js: chapter18_clear 작성 (향신료 비밀 해명, 인도 아크 엔딩)
+- [ ] 사이드 대화 1~2종
 
 ---
 
-## Phase 35 — 20장: 칸티나 심층부 (멕시칸 2장)
+## Phase 33-2 — 18장 스테이지 구현 (인도 아크 완성)
 
-### 35-1. 신규 재료/적
+> `visual_change: none` | 33-1 에셋 완성 후 진행
 
-- [ ] 재료 1종: 아보카도(avocado) — 누적 28종
-- [ ] 적 2종: cactus_wraith (HP ~430, 가시 반격), luchador_ghost (HP ~460, 도발+회피)
-- [ ] PixelLab 스프라이트
-
-### 35-2. 스테이지 20-1 ~ 20-5
-
-- [ ] 5스테이지
-- [ ] 칸티나 지하 타일셋
-- [ ] 서비스 설정
-
-### 35-3. 스토리 스크립트
-
-- [ ] chapter20_intro (균열 근원지 접근)
-- [ ] chapter20_mid (엘 디아블로의 등장)
+- [ ] stageData.js: 스테이지 18-1 ~ 18-5 + 18-6 spice_maharaja 보스전
+- [ ] recipeData.js: 차이 조합 추가분 (누적 ~216종)
+- [ ] 인도 아크 밸런스 점검 (16~18장 DPS 커브)
 
 ---
 
-## Phase 36 — 21장: 엘 디아블로 최종전 (멕시칸 3장)
+## Phase 34-1 — 스크립트 (19장: 선인장 칸티나)
 
-### 36-1. 스테이지 21-1 ~ 21-6
+> `visual_change: none` | 스토리 대사 집필만
 
-- [ ] 5스테이지 + 보스전 21-6
-- [ ] 보스: el_diablo_pepper (HP 9500, 화염+폭발+분열, 3페이즈)
-
-### 36-2. 스토리 스크립트
-
-- [ ] chapter21_boss (엘 디아블로 최종전 전 대사)
-- [ ] chapter21_clear (균열 봉인, 멕시칸 아크 엔딩)
+- [ ] dialogueData.js: chapter19_intro 작성 (사막 도착, 실종 미력사 단서)
+- [ ] dialogueData.js: chapter19_mid 작성 (칸티나 지하 탐색, 균열 감지)
+- [ ] 사이드 대화 1종
 
 ---
 
-## Phase 37 — 22장: 슈가 드림랜드 (디저트 1장)
+## Phase 34-2 — 에셋 생성 (19장 신규 적)
 
-> 테마: 과자와 사탕으로 이루어진 이세계. 식란의 진원지 탐색.
-> 스토리: 미각의 여왕의 영역에 도달. 그러나 입구만 확인.
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
 
-### 37-1. 신규 재료/적
-
-- [ ] 재료 2종: 카카오(cacao), 바닐라(vanilla) — 누적 30종
-- [ ] 적 2종: candy_soldier (HP ~450, 경화 방어), cake_witch (HP ~500, 소환+버프)
-- [ ] PixelLab 스프라이트
-
-### 37-2. 스테이지 22-1 ~ 22-5
-
-- [ ] 5스테이지
-- [ ] 디저트 월드 타일셋 (과자/사탕 환경)
-- [ ] 서비스 설정
-
-### 37-3. 스토리 스크립트
-
-- [ ] chapter22_intro (드림랜드 진입)
-- [ ] chapter22_mid (미각의 여왕 존재 암시)
+- [ ] taco_bandit: HP ~400, 빠른 이동+회피 — PixelLab 생성
+- [ ] burrito_juggernaut: HP ~500, 고HP 돌진 — PixelLab 생성
+- [ ] 멕시칸 칸티나 타일셋 (사막+네온) — PixelLab tiles
+- [ ] 재료 아이콘: 할라피뇨(jalapeno) 32px
 
 ---
 
-## Phase 38 — 23장: 드림랜드 심층부 (디저트 2장)
+## Phase 34-3 — 19장 스테이지 + 레시피 구현
 
-### 38-1. 신규 재료/적
+> `visual_change: none` | 34-2 에셋 완성 후 진행
 
-- [ ] 재료 1종: 크림(cream) — 누적 31종
-- [ ] 적 2종: macaron_knight (HP ~500, 마법 방어), sugar_specter (HP ~480, 분열)
-- [ ] PixelLab 스프라이트
-
-### 38-2. 스테이지 23-1 ~ 23-5
-
-- [ ] 5스테이지
-- [ ] 드림랜드 심층 타일셋
-
-### 38-3. 스토리 스크립트
-
-- [ ] chapter23_intro (여왕의 실체 접근)
-- [ ] chapter23_mid (최종 결전 준비)
+- [ ] ingredientData.js: 할라피뇨(jalapeno) 추가 — 누적 27종
+- [ ] enemyData.js: taco_bandit, burrito_juggernaut 등록
+- [ ] stageData.js: 스테이지 19-1 ~ 19-5 배치
+- [ ] recipeData.js: 할라피뇨 조합 레시피 ~10종 (타코, 나초, 과카몰리 등)
+- [ ] 서비스 설정 (19장 손님 패턴)
 
 ---
 
-## Phase 39 — 24장: 미각의 여왕 최종전 (최종 챕터)
+## Phase 35-1 — 스크립트 (20장: 칸티나 심층부)
 
-> 테마: 모든 식란의 배후. 최종 결전.
-> 스토리: 미각의 여왕의 정체와 식란의 진짜 원인 해명. 엔딩.
+> `visual_change: none` | 스토리 대사 집필만
 
-### 39-1. 스테이지 24-1 ~ 24-6
+- [ ] dialogueData.js: chapter20_intro 작성 (균열 근원지 접근)
+- [ ] dialogueData.js: chapter20_mid 작성 (엘 디아블로의 등장 — 압도적 위기감)
+- [ ] 사이드 대화 1종
 
-- [ ] 5스테이지 + 최종 보스전 24-6
-- [ ] 보스: queen_of_taste (HP 12000, 3페이즈, 전 속성 공격, 부활 1회)
-- [ ] PixelLab 보스 스프라이트 (64px pro)
+---
 
-### 39-2. 스토리 스크립트
+## Phase 35-2 — 에셋 생성 (20장 신규 적)
 
-- [ ] chapter24_boss (최종 결전 전 대사)
-- [ ] chapter24_final_battle (미각의 여왕 3페이즈)
-- [ ] chapter24_ending (진 엔딩 — 식란의 원인, 팀의 미래)
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
+
+- [ ] cactus_wraith: HP ~430, 가시 반격 — PixelLab 생성
+- [ ] luchador_ghost: HP ~460, 도발+회피 — PixelLab 생성
+- [ ] 칸티나 지하 타일셋 (균열+암석) — PixelLab tiles
+- [ ] 재료 아이콘: 아보카도(avocado) 32px
+
+---
+
+## Phase 35-3 — 20장 스테이지 + 레시피 구현
+
+> `visual_change: none` | 35-2 에셋 완성 후 진행
+
+- [ ] ingredientData.js: 아보카도(avocado) 추가 — 누적 28종
+- [ ] enemyData.js: cactus_wraith, luchador_ghost 등록
+- [ ] stageData.js: 스테이지 20-1 ~ 20-5 배치
+- [ ] recipeData.js: 아보카도 조합 레시피 ~10종 (부리토, 과카몰리 2.0 등)
+- [ ] 서비스 설정 (20장 손님 패턴)
+
+---
+
+## Phase 36-1 — 에셋 + 스크립트 (21장: 엘 디아블로 최종전)
+
+> `visual_change: art` | 보스 스프라이트 + 대사
+
+- [ ] el_diablo_pepper 보스 스프라이트 (PixelLab, 64px pro)
+- [ ] dialogueData.js: chapter21_boss 작성 (엘 디아블로 — "맵고 뜨거운 것이 진짜다")
+- [ ] dialogueData.js: chapter21_clear 작성 (균열 봉인, 멕시칸 아크 엔딩)
+- [ ] 사이드 대화 1~2종
+
+---
+
+## Phase 36-2 — 21장 스테이지 구현 (멕시칸 아크 완성)
+
+> `visual_change: none` | 36-1 에셋 완성 후 진행
+
+- [ ] stageData.js: 스테이지 21-1 ~ 21-5 + 21-6 el_diablo_pepper 보스전
+- [ ] recipeData.js: 아보카도 조합 추가분 (누적 ~236종)
+- [ ] 멕시칸 아크 밸런스 점검 (19~21장 DPS 커브)
+
+---
+
+## Phase 37-1 — 스크립트 (22장: 슈가 드림랜드)
+
+> `visual_change: none` | 스토리 대사 집필만
+
+- [ ] dialogueData.js: chapter22_intro 작성 (드림랜드 진입 — 이세계의 위화감)
+- [ ] dialogueData.js: chapter22_mid 작성 (미각의 여왕 존재 암시, 팀의 불안)
+- [ ] 사이드 대화 1종
+
+---
+
+## Phase 37-2 — 에셋 생성 (22장 신규 적)
+
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
+
+- [ ] candy_soldier: HP ~450, 경화 방어 — PixelLab 생성
+- [ ] cake_witch: HP ~500, 소환+버프 — PixelLab 생성
+- [ ] 드림랜드 타일셋 (과자+사탕+파스텔) — PixelLab tiles
+- [ ] 재료 아이콘: 카카오(cacao), 바닐라(vanilla) 32px
+
+---
+
+## Phase 37-3 — 22장 스테이지 + 레시피 구현
+
+> `visual_change: none` | 37-2 에셋 완성 후 진행
+
+- [ ] ingredientData.js: 카카오(cacao), 바닐라(vanilla) 추가 — 누적 30종
+- [ ] enemyData.js: candy_soldier, cake_witch 등록
+- [ ] stageData.js: 스테이지 22-1 ~ 22-5 배치
+- [ ] recipeData.js: 카카오+바닐라 조합 레시피 ~10종 (트러플 초콜릿, 바닐라 크림 등)
+- [ ] 서비스 설정 (22장 손님 패턴)
+
+---
+
+## Phase 38-1 — 스크립트 (23장: 드림랜드 심층부)
+
+> `visual_change: none` | 스토리 대사 집필만
+
+- [ ] dialogueData.js: chapter23_intro 작성 (여왕의 실체 접근 — 드림랜드의 진실)
+- [ ] dialogueData.js: chapter23_mid 작성 (최종 결전 준비, 팀의 결의)
+- [ ] 사이드 대화 1종
+
+---
+
+## Phase 38-2 — 에셋 생성 (23장 신규 적)
+
+> `visual_change: art` | PixelLab 스프라이트 + 타일셋
+
+- [ ] macaron_knight: HP ~500, 마법 방어 — PixelLab 생성
+- [ ] sugar_specter: HP ~480, 분열 — PixelLab 생성
+- [ ] 드림랜드 심층 타일셋 (어두워지는 과자 세계) — PixelLab tiles
+- [ ] 재료 아이콘: 크림(cream) 32px
+
+---
+
+## Phase 38-3 — 23장 스테이지 + 레시피 구현
+
+> `visual_change: none` | 38-2 에셋 완성 후 진행
+
+- [ ] ingredientData.js: 크림(cream) 추가 — 누적 31종
+- [ ] enemyData.js: macaron_knight, sugar_specter 등록
+- [ ] stageData.js: 스테이지 23-1 ~ 23-5 배치
+- [ ] recipeData.js: 크림 조합 레시피 ~10종 (크렘 브륄레, 마카롱, 파르페 등)
+- [ ] 서비스 설정 (23장 손님 패턴)
+
+---
+
+## Phase 39-1 — 에셋 + 스크립트 (24장: 미각의 여왕 최종전)
+
+> `visual_change: art` | 최종 보스 스프라이트 + 전체 엔딩 대사
+
+- [ ] queen_of_taste 보스 스프라이트 (PixelLab, 64px pro — 3페이즈 별도 이미지)
+- [ ] dialogueData.js: chapter24_boss 작성 (여왕 — "식란은 내가 만든 게 아니야")
+- [ ] dialogueData.js: chapter24_final_battle 작성 (3페이즈 전환 대사)
+- [ ] dialogueData.js: chapter24_ending 작성 (진 엔딩 — 식란의 원인, 팀의 미래)
 - [ ] 사이드 대화 2~3종 (전원 회상, 각자 에필로그)
+
+---
+
+## Phase 39-2 — 24장 스테이지 구현 (최종 완성)
+
+> `visual_change: none` | 39-1 에셋 완성 후 진행
+
+- [ ] stageData.js: 스테이지 24-1 ~ 24-5 + 24-6 queen_of_taste 3페이즈 보스전
+- [ ] recipeData.js: 크림 조합 추가분 (누적 ~266종)
+- [ ] 최종 보스 3페이즈 밸런스 집중 점검
 
 ---
 
@@ -1122,16 +1211,24 @@
 
 ---
 
-## Phase 41 — 업적 시스템
+## Phase 41-1 — 업적 데이터 + 로직
 
-> 목표: 30~50개 업적, 보상 체계, 업적 UI. 전체 콘텐츠 완성 이후 메타 요소로 추가.
+> `visual_change: none` | 데이터 설계 + 매니저 구현
 
-- [ ] 업적 데이터 설계 (achievementData.js): 30~50개 (스토리/전투/수집/경제/엔드리스 카테고리)
-- [ ] AchievementManager.js: 업적 해금 조건 판정, 진행도 추적, 보상 지급
-- [ ] 업적 UI (AchievementScene 또는 팝업): 카테고리 탭, 진행률 바, 보상 수령 버튼
+- [ ] achievementData.js: 30~50개 정의 (스토리/전투/수집/경제/엔드리스 카테고리)
+- [ ] AchievementManager.js: 해금 조건 판정, 진행도 추적, 보상 지급
+- [ ] SaveManager 버전업: achievements 필드 추가 + 마이그레이션
 - [ ] 업적 달성 알림 (플로팅 토스트, SFX)
-- [ ] SaveManager 버전업: achievements 필드 추가
-- [ ] 업적 보상: 코인, 골드, 한정 레시피, 셰프 스킨 등
+
+---
+
+## Phase 41-2 — 업적 UI 구현
+
+> `visual_change: ui` | AchievementScene + 보상 버튼
+
+- [ ] AchievementScene (또는 팝업): 카테고리 탭, 진행률 바, 잠금 해제 표시
+- [ ] 보상 수령 버튼 + 애니메이션
+- [ ] 업적 보상 종류: 코인, 골드, 한정 레시피, 셰프 스킨 등
 
 ---
 
@@ -1149,14 +1246,14 @@
 - 해외 미력사 조직 "세계 미력사 연합(WCA)"의 구원 요청
 - 각국 요리 테마: 일식(7~9장), 중식(10~12장), 양식(13~15장)
 - +54스테이지, +60레시피, +10재료, +15적+9보스
-- 완료 시: 84스테이지, ~166레시피, 25재료, 37적, 8도구, 5셰프
+- 완료 시: 84스테이지, ~186레시피, 25재료, 37적, 8도구, 5셰프
 
 ### 그룹3 — 식란의 근원 (챕터 16~24, Phase 31~40)
 
 - 인도(16~18장), 멕시칸(19~21장), 디저트·최종(22~24장)
 - 최종 보스: 미각의 여왕 (HP 12000, 3페이즈)
-- +54스테이지, 신규 재료 ~10종, 레시피 ~60종, 적 ~12종
-- 완료 시: 144스테이지, ~226레시피, 35재료, 49적
+- +54스테이지, 신규 재료 ~10종, 레시피 ~80종, 적 ~12종
+- 완료 시: 144스테이지, ~266레시피, 35재료, 49적
 
 ### 엔드리스 확장
 
@@ -1192,30 +1289,54 @@
 | ~~19~~ | ~~그룹2 기반 (월드맵 24챕터 준비, 셰프 2종, 도구 2종)~~ | 106 | 15 | ✅ 완료 |
 | ~~20~~ | ~~7장 사쿠라 이자카야 (참치, 와사비)~~ | 116 | 17 | ✅ 완료 |
 | ~~21~~ | ~~8장 용의 주방 (두부, 고수)~~ | 126 | 19 | ✅ 완료 |
-| 22-1 | 스크립트 & 7장 보스 재편 (stageData+대사) | 126 | 19 | 📋 계획 |
+| 22-1 | 스크립트 & 7장 보스 재편 | 126 | 19 | 📋 계획 |
 | 22-2 | 에셋 생성 (sake_specter, oni_minion, 타일셋) | 126 | 19 | 📋 계획 |
 | 22-3 | 8장 스테이지 + 레시피 구현 | ~126 | 20 | 📋 계획 |
 | 23-1 | 에셋 + 스크립트 (sake_oni 보스, 9장 대사) | ~126 | 20 | 📋 계획 |
 | 23-2 | 9장 스테이지 구현 (일식 아크 완성) | ~136 | 20 | 📋 계획 |
 | 24 | 인프라: 8장→10장 재편 + WorldMapScene 24챕터 | ~136 | 20 | 📋 계획 |
-| 25 | 11장 용의 주방 심층부 | ~146 | 21 | 📋 계획 |
-| 26 | 12장 드래곤 웍 최종전 | ~156 | 21 | 📋 계획 |
-| 27 | 13장 별빛 비스트로 (트러플) | ~166 | 22 | 📋 계획 |
-| 28 | 14장 비스트로 심층부 (허브) | ~176 | 23 | 📋 계획 |
-| 29 | 15장 셰프 누아르 최종전 | ~186 | 23 | 📋 계획 |
+| 25-1 | 스크립트 (chapter11 대사) | ~136 | 20 | 📋 계획 |
+| 25-2 | 에셋 생성 (shadow_dragon_spawn, wok_guardian, 타일셋) | ~136 | 20 | 📋 계획 |
+| 25-3 | 11장 스테이지 + 레시피 | ~136 | 21 | 📋 계획 |
+| 26-1 | 에셋 + 스크립트 (dragon_wok, chapter12) | ~136 | 21 | 📋 계획 |
+| 26-2 | 12장 스테이지 (중식 아크 완성) | ~146 | 21 | 📋 계획 |
+| 27-1 | 스크립트 (chapter13 대사) | ~146 | 21 | 📋 계획 |
+| 27-2 | 에셋 생성 (wine_specter, foie_gras_knight, 타일셋) | ~146 | 21 | 📋 계획 |
+| 27-3 | 13장 스테이지 + 레시피 | ~156 | 22 | 📋 계획 |
+| 28-1 | 스크립트 (chapter14 대사) | ~156 | 22 | 📋 계획 |
+| 28-2 | 에셋 생성 (cellar_phantom, sommelier_wraith, 타일셋) | ~156 | 22 | 📋 계획 |
+| 28-3 | 14장 스테이지 + 레시피 | ~166 | 23 | 📋 계획 |
+| 29-1 | 에셋 + 스크립트 (chef_noir, chapter15, 에필로그) | ~166 | 23 | 📋 계획 |
+| 29-2 | 15장 스테이지 (양식 아크 완성) | ~186 | 23 | 📋 계획 |
 | 30 | 챕터 7~15 밸런스 QA | ~186 | 23 | 📋 계획 |
-| 31 | 16장 향신료 궁전 (커리잎, 사프란) | ~196 | 25 | 📋 계획 |
-| 32 | 17장 향신료 궁전 심층부 (차이) | ~206 | 26 | 📋 계획 |
-| 33 | 18장 향신료 마하라자 최종전 | ~206 | 26 | 📋 계획 |
-| 34 | 19장 선인장 칸티나 (할라피뇨) | ~216 | 27 | 📋 계획 |
-| 35 | 20장 칸티나 심층부 (아보카도) | ~226 | 28 | 📋 계획 |
-| 36 | 21장 엘 디아블로 최종전 | ~226 | 28 | 📋 계획 |
-| 37 | 22장 슈가 드림랜드 (카카오, 바닐라) | ~236 | 30 | 📋 계획 |
-| 38 | 23장 드림랜드 심층부 (크림) | ~246 | 31 | 📋 계획 |
-| 39 | 24장 미각의 여왕 최종전 — 최종 | ~256 | 31 | 📋 계획 |
-| 40 | 챕터 16~24 밸런스 QA | ~256 | 31 | 📋 계획 |
-| 41 | 업적 시스템 (30~50개, 보상 UI) | ~256 | 31 | 📋 계획 |
-| 42 | 아트 리워크 (전체 스프라이트 64px 재생성) | ~256 | 31 | 🎨 예정 |
+| 31-1 | 스크립트 (chapter16 대사) | ~186 | 23 | 📋 계획 |
+| 31-2 | 에셋 생성 (curry_djinn, naan_golem, 타일셋) | ~186 | 23 | 📋 계획 |
+| 31-3 | 16장 스테이지 + 레시피 | ~196 | 25 | 📋 계획 |
+| 32-1 | 스크립트 (chapter17 대사) | ~196 | 25 | 📋 계획 |
+| 32-2 | 에셋 생성 (incense_specter, spice_elemental, 타일셋) | ~196 | 25 | 📋 계획 |
+| 32-3 | 17장 스테이지 + 레시피 | ~206 | 26 | 📋 계획 |
+| 33-1 | 에셋 + 스크립트 (spice_maharaja, chapter18) | ~206 | 26 | 📋 계획 |
+| 33-2 | 18장 스테이지 (인도 아크 완성) | ~216 | 26 | 📋 계획 |
+| 34-1 | 스크립트 (chapter19 대사) | ~216 | 26 | 📋 계획 |
+| 34-2 | 에셋 생성 (taco_bandit, burrito_juggernaut, 타일셋) | ~216 | 26 | 📋 계획 |
+| 34-3 | 19장 스테이지 + 레시피 | ~226 | 27 | 📋 계획 |
+| 35-1 | 스크립트 (chapter20 대사) | ~226 | 27 | 📋 계획 |
+| 35-2 | 에셋 생성 (cactus_wraith, luchador_ghost, 타일셋) | ~226 | 27 | 📋 계획 |
+| 35-3 | 20장 스테이지 + 레시피 | ~236 | 28 | 📋 계획 |
+| 36-1 | 에셋 + 스크립트 (el_diablo_pepper, chapter21) | ~236 | 28 | 📋 계획 |
+| 36-2 | 21장 스테이지 (멕시칸 아크 완성) | ~246 | 28 | 📋 계획 |
+| 37-1 | 스크립트 (chapter22 대사) | ~246 | 28 | 📋 계획 |
+| 37-2 | 에셋 생성 (candy_soldier, cake_witch, 타일셋) | ~246 | 28 | 📋 계획 |
+| 37-3 | 22장 스테이지 + 레시피 | ~256 | 30 | 📋 계획 |
+| 38-1 | 스크립트 (chapter23 대사) | ~256 | 30 | 📋 계획 |
+| 38-2 | 에셋 생성 (macaron_knight, sugar_specter, 타일셋) | ~256 | 30 | 📋 계획 |
+| 38-3 | 23장 스테이지 + 레시피 | ~266 | 31 | 📋 계획 |
+| 39-1 | 에셋 + 스크립트 (queen_of_taste 3페이즈, 엔딩) | ~266 | 31 | 📋 계획 |
+| 39-2 | 24장 스테이지 (최종 완성) | ~266 | 31 | 📋 계획 |
+| 40 | 챕터 16~24 밸런스 QA | ~266 | 31 | 📋 계획 |
+| 41-1 | 업적 데이터 설계 + 로직 | ~266 | 31 | 📋 계획 |
+| 41-2 | 업적 UI 구현 | ~266 | 31 | 📋 계획 |
+| 42 | 아트 리워크 (전체 스프라이트 64px 재생성) | ~266 | 31 | 🎨 예정 |
 
 ---
 
