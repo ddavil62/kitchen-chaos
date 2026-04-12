@@ -149,7 +149,7 @@ export class RestaurantScene extends Phaser.Scene {
       duration: recipe.duration,
     });
 
-    this.kitchenPanelUI.showActiveBuff(recipe.nameKo);
+    this.kitchenPanelUI.showActiveBuff(recipe.nameKo, recipe.effectDesc);
     this.kitchenPanelUI.updateIngredients();
     this._updateAllButtons();
   }

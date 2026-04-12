@@ -131,6 +131,8 @@ export class KitchenPanelUI {
       if (type === 'serve') {
         this.callbacks.onServeRecipe(recipe.id);
       } else {
+        // 탭 즉시 효과 설명 미리보기 표시 (조리 전 확인용)
+        this._buffActiveText.setText(`📖 ${recipe.nameKo}\n${recipe.effectDesc}`);
         this.callbacks.onBuffRecipe(recipe.id);
       }
     });
@@ -242,8 +244,13 @@ export class KitchenPanelUI {
    * 버프 활성 텍스트 표시.
    * @param {string} buffName
    */
-  showActiveBuff(buffName) {
-    this._buffActiveText.setText(`⚡ ${buffName}`);
+  /**
+   * @param {string} buffName
+   * @param {string} [effectDesc]
+   */
+  showActiveBuff(buffName, effectDesc) {
+    const desc = effectDesc ? `\n${effectDesc}` : '';
+    this._buffActiveText.setText(`⚡ ${buffName}${desc}`);
   }
 
   clearBuffText() {
