@@ -288,7 +288,7 @@ export class GatheringScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(104).setVisible(false);
 
     // 클릭 이벤트
-    this._skillBtnBg.on('pointerdown', () => {
+    this._skillBtnBg.on('pointerup', () => {
       if (this.isGameOver || this.isVictory) return;
       if (!this._skillReady) return;
       this._activateChefSkill();
