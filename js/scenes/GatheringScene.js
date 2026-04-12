@@ -233,6 +233,16 @@ export class GatheringScene extends Phaser.Scene {
     this.comboText = this.add.text(GAME_WIDTH / 2, 26, '', {
       fontSize: '11px', color: '#ffcc00', fontStyle: 'bold',
     }).setOrigin(0.5, 0).setDepth(101);
+
+    // 메뉴(나가기) 버튼 — HUD 좌측 상단
+    this._menuBtn = this.add.rectangle(18, HUD_HEIGHT / 2, 28, 26, 0x333355)
+      .setDepth(101).setInteractive({ useHandCursor: true })
+      .setStrokeStyle(1, 0x6666aa);
+    this.add.text(18, HUD_HEIGHT / 2 - 2, '≡', {
+      fontSize: '14px', color: '#ccccff',
+    }).setOrigin(0.5).setDepth(102);
+
+    this._menuBtn.on('pointerdown', () => this._showMenuPopup());
   }
 
   /**
@@ -326,6 +336,25 @@ export class GatheringScene extends Phaser.Scene {
         enemy.applyFreeze(duration);
       });
       this._showMessage(`${this._chefData.skillName}!\n전체 적 빙결!`, 1500);
+    } else if (type === 'cryo_execute') {
+      // 유키: 빙결된 적 전부 즉시 처치
+      let killCount = 0;
+      this.enemies.getChildren().forEach(enemy => {
+        if (!enemy.active || enemy.isDead) return;
+        if (enemy.isFrozen) {
+          enemy.takeDamage(enemy.maxHp * 999);
+          killCount++;
+        }
+      });
+      const msg = killCount > 0
+        ? `${this._chefData.skillName}!\n빙결 적 ${killCount}마리 처치!`
+        : `${this._chefData.skillName}!\n빙결된 적이 없습니다`;
+      this._showMessage(msg, 1500);
+    } else if (type === 'power_surge') {
+      // 라오: 전 도구 5초간 공격력 2배
+      const val = this._chefData.skillValue;
+      ChefManager.activatePowerSurge(val.multiplier, val.duration);
+      this._showMessage(`${this._chefData.skillName}!\n${val.duration / 1000}초간 공격력 2배!`, 1500);
     }
 
     // 쿨다운 시작 (버튼 비활성화로 원천 차단)
@@ -1631,6 +1660,64 @@ export class GatheringScene extends Phaser.Scene {
     this.vfx.ingredientCollect(x, y);
   }
 
+  // ── 메뉴 팝업 ───────────────────────────────────────────────────
+
+  /**
+   * 채집씬 메뉴 팝업 (나가기 / 계속) 표시.
+   * @private
+   */
+  _showMenuPopup() {
+    if (this._menuPopup) return;  // 중복 방지
+
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+
+    // 반투명 전체 오버레이 (터치 블록)
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5)
+      .setDepth(300).setInteractive();
+
+    // 팝업 배경
+    const popBg = this.add.rectangle(cx, cy, 200, 120, 0x1a1a2e)
+      .setDepth(301).setStrokeStyle(2, 0x6666aa);
+
+    const title = this.add.text(cx, cy - 36, '일시 정지', {
+      fontSize: '14px', color: '#ffffff', fontStyle: 'bold',
+    }).setOrigin(0.5).setDepth(302);
+
+    // [계속하기] 버튼
+    const resumeBg = this.add.rectangle(cx, cy - 4, 160, 28, 0x225522)
+      .setDepth(301).setInteractive({ useHandCursor: true });
+    const resumeLabel = this.add.text(cx, cy - 4, '계속하기', {
+      fontSize: '13px', color: '#88ff88',
+    }).setOrigin(0.5).setDepth(302);
+
+    // [메뉴로 나가기] 버튼
+    const exitBg = this.add.rectangle(cx, cy + 30, 160, 28, 0x552222)
+      .setDepth(301).setInteractive({ useHandCursor: true });
+    const exitLabel = this.add.text(cx, cy + 30, '메뉴로 나가기', {
+      fontSize: '13px', color: '#ff8888',
+    }).setOrigin(0.5).setDepth(302);
+
+    this._menuPopup = this.add.container(0, 0,
+      [overlay, popBg, title, resumeBg, resumeLabel, exitBg, exitLabel],
+    ).setDepth(300);
+
+    const close = () => {
+      this._menuPopup?.destroy();
+      this._menuPopup = null;
+    };
+
+    overlay.on('pointerdown', close);
+    resumeBg.on('pointerdown', close);
+
+    exitBg.on('pointerdown', () => {
+      close();
+      SoundManager.stopBGM();
+      // 진행 중 재료는 유지 (InventoryManager는 씬 간 공유 인스턴스)
+      this.scene.start('WorldMapScene');
+    });
+  }
+
   // ── 유틸리티 ────────────────────────────────────────────────────
 
   _showMessage(message, duration) {
@@ -1702,6 +1789,9 @@ export class GatheringScene extends Phaser.Scene {
 
     // 셰프 스킬 쿨다운
     this._updateChefSkillCooldown(delta);
+
+    // lao_chef power_surge 타이머
+    ChefManager.tickPowerSurge(delta);
 
     // 내부 버프 타이머
     if (this._currentBuff && this._buffTimer > 0) {

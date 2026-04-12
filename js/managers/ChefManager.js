@@ -2,12 +2,19 @@
  * @fileoverview 셰프 관리자. 선택, 패시브 조회, 스킬 발동.
  * Phase 7-2: 영업 패시브 메서드 추가 (조리시간, 그릴보상, 인내심).
  * Phase 8-6: 영업 액티브 스킬 조회 (getServiceSkill).
+ * Phase 19-1: 유키 cook_time 패시브, 라오 tower_damage 패시브 + power_surge 상태 추가.
  */
 
 import { CHEF_TYPES } from '../data/chefData.js';
 import { SaveManager } from './SaveManager.js';
 
 export class ChefManager {
+  // ── power_surge 정적 상태 (lao_chef 스킬) ──
+  /** @type {number} 남은 파워 서지 지속시간 (ms) */
+  static _powerSurgeTimer = 0;
+  /** @type {number} 파워 서지 공격력 배율 */
+  static _powerSurgeMultiplier = 2.0;
+
   /** 현재 선택된 셰프 ID 반환 */
   static getSelectedChef() {
     return SaveManager.load().selectedChef || null;
@@ -71,12 +78,23 @@ export class ChefManager {
   // ── 영업 패시브 (Phase 7-2) ──
 
   /**
-   * 조리 시간 배율 (petit_chef 선택 시 -15%).
-   * @returns {number} 0.85 또는 1.0
+   * 조리 시간 배율 (petit_chef -15%, yuki_chef -20%).
+   * @returns {number} 0.80~1.0
    */
   static getCookTimeBonus() {
     const id = ChefManager.getSelectedChef();
-    return id === 'petit_chef' ? 0.85 : 1.0;
+    if (id === 'petit_chef') return 0.85;
+    if (id === 'yuki_chef') return 0.80;
+    return 1.0;
+  }
+
+  /**
+   * 전체 도구 공격력 보너스 (lao_chef 선택 시 +15%).
+   * @returns {number} 1.15 또는 1.0
+   */
+  static getTowerDamageBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'lao_chef' ? 1.15 : 1.0;
   }
 
   /**
@@ -95,6 +113,44 @@ export class ChefManager {
   static getPatienceBonus() {
     const id = ChefManager.getSelectedChef();
     return id === 'ice_chef' ? 1.20 : 1.0;
+  }
+
+  // ── power_surge (lao_chef 채집 스킬) ──
+
+  /**
+   * 파워 서지 활성화.
+   * @param {number} multiplier - 공격력 배율
+   * @param {number} duration - 지속시간 (ms)
+   */
+  static activatePowerSurge(multiplier, duration) {
+    ChefManager._powerSurgeTimer = duration;
+    ChefManager._powerSurgeMultiplier = multiplier;
+  }
+
+  /**
+   * 매 프레임 파워 서지 타이머 감소.
+   * @param {number} delta - ms
+   */
+  static tickPowerSurge(delta) {
+    if (ChefManager._powerSurgeTimer > 0) {
+      ChefManager._powerSurgeTimer = Math.max(0, ChefManager._powerSurgeTimer - delta);
+    }
+  }
+
+  /**
+   * 현재 파워 서지 배율 반환 (비활성 시 1.0).
+   * @returns {number}
+   */
+  static getPowerSurgeMultiplier() {
+    return ChefManager._powerSurgeTimer > 0 ? ChefManager._powerSurgeMultiplier : 1.0;
+  }
+
+  /**
+   * 파워 서지 활성 여부.
+   * @returns {boolean}
+   */
+  static isPowerSurgeActive() {
+    return ChefManager._powerSurgeTimer > 0;
   }
 
   // ── 영업 액티브 스킬 (Phase 8-6) ──

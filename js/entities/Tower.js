@@ -206,6 +206,12 @@ export class Tower extends Phaser.GameObjects.Container {
       projData.damage = Math.round(projData.damage * ChefManager.getGrillDamageBonus());
     }
 
+    // lao_chef 패시브: 전 도구 공격력 보너스 (+15%)
+    projData.damage = Math.round(projData.damage * ChefManager.getTowerDamageBonus());
+
+    // lao_chef 스킬: power_surge 활성 시 추가 배율 적용
+    projData.damage = Math.round(projData.damage * ChefManager.getPowerSurgeMultiplier());
+
     // 화상/둔화 배율 적용
     if (projData.burnDamage) {
       projData.burnDamage = Math.round(projData.burnDamage * this.burnMultiplier);

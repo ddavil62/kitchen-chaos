@@ -305,6 +305,9 @@ export class ServiceScene extends Phaser.Scene {
     /** 얼음 요리장 스킬: 인내심 정지 상태 */
     this.patienceFrozen = false;
     /** 얼음 요리장 스킬: 정지 남은 시간 (ms) */
+    // ── Phase 19-1: 유키/라오 스킬 상태 ──
+    /** 유키 precision_cut: 남은 즉시 조리 횟수 */
+    this._precisionCutRemaining = 0;
     this.freezeTimeLeft = 0;
 
     // ── Phase 8-5: 영업 이벤트 시스템 ──
@@ -1111,6 +1114,16 @@ export class ServiceScene extends Phaser.Scene {
         this._activateFreezePatience(skill.value); // 10000ms
         this._showMessage('\u2744\uFE0F \uC2DC\uAC04 \uB3D9\uACB0! 10\uCD08\uAC04 \uC778\uB0B4\uC2EC \uC815\uC9C0');
         break;
+      case 'precision_cut':
+        // 유키: 다음 N개 요리 조리시간 0
+        this._precisionCutRemaining = skill.count || 5;
+        this._showMessage(`${chefData.icon} \uC815\uBC00 \uC808\uB2E8! \uB2E4\uC74C ${this._precisionCutRemaining}\uAC1C \uC694\uB9AC \uc989\uc2dc \uc644\uc131`);
+        break;
+      case 'flame_wok':
+        // 라오: 전 테이블 주문 즉시 완성 (조리 중인 모든 슬롯 완성)
+        this._activateInstantCook();
+        this._showMessage(`${chefData.icon} \uBD88\uAF43 \uC6F9! \uBAA8\uB4E0 \uC694\uB9AC \uC989\uC2DC \uC644\uC131!`);
+        break;
     }
   }
 
@@ -1772,22 +1785,29 @@ export class ServiceScene extends Phaser.Scene {
     this.inventoryManager.consumeRecipe(recipe.ingredients);
     this._updateInventoryPanel();
     this._updateRecipeQuickSlots();
-    // 재고 소진으로 주문 불가한 착석 손님 즉시 퇴장 (패널티 없음)
-    this._dismissSoldOutCustomers();
 
     // 조리 시작 — Phase 8-3: 인테리어 오픈키친 보너스 적용
     const cookTimeBonus = ChefManager.getCookTimeBonus();
     const kitchenBonus = KITCHEN_COOK_BONUS[this.interiorKitchen] || 0;
-    const totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus);
+    // precision_cut(유키 serviceSkill): 남은 카운트가 있으면 즉시 조리
+    let totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus);
+    if (this._precisionCutRemaining > 0) {
+      totalTime = 0;
+      this._precisionCutRemaining--;
+    }
     this.cookingSlots[emptySlot] = {
       recipe: recipe,
       timeLeft: totalTime,
       totalTime: totalTime,
-      ready: false,
+      ready: totalTime === 0,
       washing: false,
       washTimeLeft: 0,
     };
     this._updateCookSlotUI(emptySlot);
+
+    // 재고 소진으로 주문 불가한 착석 손님 즉시 퇴장 (패널티 없음)
+    // ⚠️ cookingSlots 할당 후 호출해야 조리 중인 레시피가 제외됨
+    this._dismissSoldOutCustomers();
   }
 
   // ── 테이블 탭 → 서빙 ──────────────────────────────────────────────
@@ -2489,6 +2509,7 @@ export class ServiceScene extends Phaser.Scene {
     this.patienceResetRemaining = 0;
     this.patienceFrozen = false;
     this.freezeTimeLeft = 0;
+    this._precisionCutRemaining = 0;
     this.skillBtnBg = null;
     this.skillBtnText = null;
     // Phase 11-3a: 튜토리얼 정리
