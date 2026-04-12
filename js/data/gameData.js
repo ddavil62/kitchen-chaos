@@ -2,6 +2,7 @@
  * @fileoverview Kitchen Chaos Tycoon 게임 데이터 정의.
  * Phase 10: 적 22종(일반 16 + 보스 6), 타워 6종, 재료 15종, 레시피 12종, 30 스테이지.
  * Phase 20: 적 25종(일반 18 + 보스 7), 재료 17종, 서빙 레시피 14종, 버프 레시피 8종.
+ * Phase 21: 적 29종(일반 21 + 보스 8), 재료 19종, 서빙 레시피 22종, 버프 레시피 10종.
  */
 
 // ── 적 타입 정의 ──
@@ -326,6 +327,65 @@ export const ENEMY_TYPES = {
     bossDrops: [
       { ingredient: 'sashimi_tuna', count: 4 },
       { ingredient: 'wasabi', count: 3 },
+    ],
+  },
+  // ── Phase 21 신규 적 ──
+  dumpling_warrior: {
+    id: 'dumpling_warrior',
+    nameKo: '만두 전사',
+    hp: 280,
+    speed: 50,
+    ingredient: 'tofu',
+    bodyColor: 0xf5cba7,
+    // 분열 기믹: 처치 시 splitCount만큼 splitType 적 스폰
+    split: true,
+    splitCount: 2,
+    splitType: 'mini_dumpling',
+  },
+  mini_dumpling: {
+    id: 'mini_dumpling',
+    nameKo: '미니 만두',
+    hp: 60,
+    speed: 65,
+    ingredient: 'tofu',
+    bodyColor: 0xf5cba7,
+    split: false,   // 무한 분열 방지 필수
+  },
+  wok_phantom: {
+    id: 'wok_phantom',
+    nameKo: '웍 유령',
+    hp: 320,
+    speed: 40,
+    ingredient: 'cilantro',
+    bodyColor: 0x1a1a2e,
+    // 화염 장판 기믹: fireZoneInterval마다 현재 위치에 화염 장판 생성
+    fireZone: true,
+    fireZoneInterval: 4000,       // 4초마다 화염 장판 생성
+    fireZoneRadius: 55,           // 장판 반경
+    fireZoneDuration: 3500,       // 장판 지속 시간
+    fireZoneDebuffDuration: 2500, // 도구 디버프 지속 시간
+  },
+  // Phase 21 보스
+  dragon_wok: {
+    id: 'dragon_wok',
+    nameKo: '드래곤 웍',
+    hp: 7000,
+    speed: 22,
+    ingredient: null,
+    bodyColor: 0xc0392b,
+    isBoss: true,
+    // 화염 브레스 + 3페이즈 기믹
+    fireBreath: true,
+    fireBreathPhases: [
+      { hpThreshold: 1.0, interval: 5000, angle: 60, radius: 90 },
+      { hpThreshold: 0.70, interval: 3500, angle: 60, radius: 90, speedBonus: 0.15, summonMini: 3 },
+      { hpThreshold: 0.35, interval: 2500, angle: 90, radius: 90, instantFireZones: 2 },
+    ],
+    enrageHpThreshold: 0.35,
+    bossReward: 400,
+    bossDrops: [
+      { ingredient: 'tofu', count: 4 },
+      { ingredient: 'cilantro', count: 4 },
     ],
   },
 };
@@ -669,6 +729,19 @@ export const INGREDIENT_TYPES = {
     color: 0x7fff00,
     icon: '🌿',
   },
+  // ── Phase 21 신규 재료 ──
+  tofu: {
+    id: 'tofu',
+    nameKo: '두부',
+    color: 0xf5f5dc,
+    icon: '🧊',
+  },
+  cilantro: {
+    id: 'cilantro',
+    nameKo: '고수',
+    color: 0x228b22,
+    icon: '🌿',
+  },
 };
 
 // ── 서빙 레시피 (손님 주문용, Phase 3: cookTime 추가) ──
@@ -800,6 +873,79 @@ export const SERVING_RECIPES = [
     color: 0x4682b4,
     cookTime: 11000,
   },
+  // ── Phase 21 신규 서빙 레시피 ──
+  {
+    id: 'mapo_tofu',
+    nameKo: '마파두부',
+    ingredients: { tofu: 2 },
+    baseReward: 70,
+    icon: '🍲',
+    color: 0xc0392b,
+    cookTime: 8000,
+  },
+  {
+    id: 'cilantro_tofu_steam',
+    nameKo: '고수두부찜',
+    ingredients: { tofu: 1, cilantro: 1 },
+    baseReward: 55,
+    icon: '🥘',
+    color: 0x228b22,
+    cookTime: 6500,
+  },
+  {
+    id: 'dim_sum',
+    nameKo: '딤섬',
+    ingredients: { tofu: 1, flour: 1 },
+    baseReward: 50,
+    icon: '🥟',
+    color: 0xf5cba7,
+    cookTime: 5500,
+  },
+  {
+    id: 'wok_noodles',
+    nameKo: '웍 볶음면',
+    ingredients: { cilantro: 1, egg: 1 },
+    baseReward: 45,
+    icon: '🍜',
+    color: 0xdaa520,
+    cookTime: 5000,
+  },
+  {
+    id: 'tofu_hotpot',
+    nameKo: '두부 훠궈',
+    ingredients: { tofu: 2, mushroom: 1 },
+    baseReward: 75,
+    icon: '🫕',
+    color: 0xff4500,
+    cookTime: 9000,
+  },
+  {
+    id: 'cilantro_shrimp_soup',
+    nameKo: '고수 탕수',
+    ingredients: { cilantro: 2, shrimp: 1 },
+    baseReward: 75,
+    icon: '🍲',
+    color: 0x2e8b57,
+    cookTime: 9000,
+  },
+  {
+    id: 'peking_duck',
+    nameKo: '베이징 덕',
+    ingredients: { tofu: 1, cilantro: 1, butter: 1 },
+    baseReward: 90,
+    icon: '🦆',
+    color: 0x8b4513,
+    cookTime: 10000,
+  },
+  {
+    id: 'dragon_feast',
+    nameKo: '용의 만찬',
+    ingredients: { tofu: 2, cilantro: 2, meat: 1 },
+    baseReward: 130,
+    icon: '🐉',
+    color: 0xffd700,
+    cookTime: 13000,
+  },
 ];
 
 /** 서빙 레시피를 ID로 빠르게 조회하기 위한 맵 */
@@ -889,6 +1035,27 @@ export const BUFF_RECIPES = [
     effectValue: 0.20,
     duration: 50000,
     color: 0xff6b81,
+  },
+  // ── Phase 21 신규 버프 레시피 ──
+  {
+    id: 'dragon_qi',
+    nameKo: '용기(龍氣)',
+    ingredients: { tofu: 2, cilantro: 1 },
+    effectDesc: '공격력 +30% (55초)',
+    effectType: 'buff_damage',
+    effectValue: 0.30,
+    duration: 55000,
+    color: 0xc0392b,
+  },
+  {
+    id: 'wok_aura',
+    nameKo: '웍 오라',
+    ingredients: { tofu: 1, cilantro: 2 },
+    effectDesc: '공격력+속도 +25% (50초)',
+    effectType: 'buff_both',
+    effectValue: 0.25,
+    duration: 50000,
+    color: 0xff6b35,
   },
 ];
 

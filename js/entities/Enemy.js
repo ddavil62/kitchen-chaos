@@ -6,6 +6,7 @@
  * Phase 9-4: 도형 → 스프라이트 이미지 교체 (fallback 유지).
  * Phase 12: 8방향 걷기 애니메이션 + 크기 25% 증가.
  * Phase 20: 은신(stealth), 배리어(barrier), 취권(drunkWalk), 아우라(aura) 메카닉.
+ * Phase 21: 분열(split), 화염 장판(fireZone), 화염 브레스+3페이즈(fireBreath) 메카닉.
  */
 
 import Phaser from 'phaser';
@@ -112,6 +113,23 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── Phase 20: 아우라 속도 버프 (다른 적에게서 받는 버프) ──
     this._auraSpeedBuff = 0;
 
+    // ── Phase 21: 분열 (dumpling_warrior) ──
+    if (enemyData.split) {
+      this._splitExecuted = false;
+    }
+
+    // ── Phase 21: 화염 장판 (wok_phantom) ──
+    if (enemyData.fireZone) {
+      this._fireZoneTimer = 0;
+    }
+
+    // ── Phase 21: 화염 브레스 + 3페이즈 (dragon_wok) ──
+    if (enemyData.fireBreath) {
+      this._phase = 1;
+      this._fireBreathTimer = 0;
+      this._phaseTransitioned = { 2: false, 3: false };
+    }
+
     // ── 비주얼 ──
     this._buildVisual(enemyData);
 
@@ -196,16 +214,16 @@ export class Enemy extends Phaser.GameObjects.Container {
     // 몸체
     if (id === 'pasta_boss' || id === 'dragon_ramen'
         || id === 'seafood_kraken' || id === 'lava_dessert_golem'
-        || id === 'sake_oni') {
+        || id === 'sake_oni' || id === 'dragon_wok') {
       const body = this.scene.add.rectangle(0, 0, 40, 40, color);
       this.add(body);
     } else if (id === 'cheese_golem') {
       const body = this.scene.add.rectangle(0, 0, 28, 28, color);
       this.add(body);
-    } else if (id === 'fish_knight' || id === 'tempura_monk') {
+    } else if (id === 'fish_knight' || id === 'tempura_monk' || id === 'dumpling_warrior' || id === 'wok_phantom') {
       const body = this.scene.add.rectangle(0, 0, 26, 26, color);
       this.add(body);
-    } else if (id === 'mushroom_scout' || id === 'cheese_rat' || id === 'sushi_ninja') {
+    } else if (id === 'mushroom_scout' || id === 'cheese_rat' || id === 'sushi_ninja' || id === 'mini_dumpling') {
       const body = this.scene.add.circle(0, 0, 10, color);
       this.add(body);
     } else {
@@ -388,6 +406,20 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── Phase 20: 아우라 (sake_oni) ──
     if (this.data_.aura) {
       this._updateAura(delta);
+    }
+
+    // ── Phase 21: 화염 장판 (wok_phantom) ──
+    if (this.data_.fireZone) {
+      this._updateFireZone(delta);
+    }
+
+    // ── Phase 21: 화염 브레스 + 3페이즈 (dragon_wok) ──
+    // BUG-01 방지: HP 비율 체크를 타이머 조건 밖, 업데이트 최상단에서 처리
+    if (this.data_.fireBreath) {
+      const hpRatio = this.hp / this.maxHp;
+      if (this._phase < 2 && hpRatio <= 0.70) this._enterPhase(2);
+      if (this._phase < 3 && hpRatio <= 0.35) this._enterPhase(3);
+      this._updateFireBreath(delta);
     }
 
     // ── 이동 ──
@@ -593,6 +625,112 @@ export class Enemy extends Phaser.GameObjects.Container {
     });
   }
 
+  // ── Phase 21: 화염 장판 메카닉 ───────────────────────────────────
+
+  /**
+   * 화염 장판 업데이트 (wok_phantom).
+   * fireZoneInterval마다 현재 위치에 화염 장판 이벤트를 발사한다.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateFireZone(delta) {
+    this._fireZoneTimer += delta;
+    if (this._fireZoneTimer >= this.data_.fireZoneInterval) {
+      this._fireZoneTimer = 0;
+      this.scene.events.emit('enemy_fire_zone', {
+        x: this.x,
+        y: this.y,
+        radius: this.data_.fireZoneRadius,
+        duration: this.data_.fireZoneDuration,
+        debuffDuration: this.data_.fireZoneDebuffDuration,
+      });
+    }
+  }
+
+  // ── Phase 21: 화염 브레스 + 3페이즈 메카닉 ─────────────────────
+
+  /**
+   * 페이즈 전환 (dragon_wok).
+   * @param {number} phase - 전환 대상 페이즈 (2 또는 3)
+   * @private
+   */
+  _enterPhase(phase) {
+    if (this._phaseTransitioned[phase]) return;
+    this._phaseTransitioned[phase] = true;
+    this._phase = phase;
+    this._fireBreathTimer = 0; // 페이즈 전환 시 타이머 리셋
+
+    // 카메라 셰이크 + VFX 연출
+    if (this.scene?.cameras?.main) {
+      this.scene.cameras.main.shake(400, 0.005);
+    }
+    if (this.scene?.vfx?.screenFlash) {
+      this.scene.vfx.screenFlash(0xff4400, 200);
+    }
+
+    if (phase === 2) {
+      // 페이즈 2: 속도 +15%, mini_dumpling 3마리 1회 소환
+      this.speed = this.data_.speed * 1.15;
+      const summonCount = this.data_.fireBreathPhases[1]?.summonMini || 3;
+      for (let i = 0; i < summonCount; i++) {
+        this.scene.events.emit('enemy_deterministic_split', {
+          type: 'mini_dumpling',
+          x: this.x + Phaser.Math.Between(-20, 20),
+          y: this.y + Phaser.Math.Between(-10, 10),
+          waypointIndex: this.waypointIndex,
+        });
+      }
+      this.setTint(0xff6600);
+    } else if (phase === 3) {
+      // 페이즈 3: 즉발 fireZone 2개 현재 위치에 생성
+      this.speed = this.data_.speed * 1.30;
+      const fireZoneCount = this.data_.fireBreathPhases[2]?.instantFireZones || 2;
+      for (let i = 0; i < fireZoneCount; i++) {
+        this.scene.events.emit('enemy_fire_zone', {
+          x: this.x + Phaser.Math.Between(-30, 30),
+          y: this.y + Phaser.Math.Between(-15, 15),
+          radius: 55,
+          duration: 4000,
+          debuffDuration: 2500,
+        });
+      }
+      this._enraged = true;
+      this.setTint(0xff2200);
+    }
+  }
+
+  /**
+   * 화염 브레스 업데이트 (dragon_wok).
+   * 현재 페이즈의 interval로 브레스를 발동하여 전방 부채꼴 범위 내 도구에 디버프를 적용한다.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateFireBreath(delta) {
+    const phaseConfig = this.data_.fireBreathPhases[this._phase - 1];
+    if (!phaseConfig) return;
+
+    this._fireBreathTimer += delta;
+    if (this._fireBreathTimer < phaseConfig.interval) return;
+    this._fireBreathTimer = 0;
+
+    // 화염 브레스: 이동 방향 기준 부채꼴 범위 내 도구에 공격속도 디버프
+    this.scene.events.emit('dragon_fire_breath', {
+      x: this.x,
+      y: this.y,
+      angle: phaseConfig.angle,
+      radius: phaseConfig.radius,
+      debuffValue: -0.25,
+      debuffDuration: 3000,
+      // 이동 방향 전달
+      dx: this._waypoints[this.waypointIndex]
+        ? this._waypoints[this.waypointIndex].x - this.x
+        : 0,
+      dy: this._waypoints[this.waypointIndex]
+        ? this._waypoints[this.waypointIndex].y - this.y
+        : 1,
+    });
+  }
+
   /** @private */
   _moveAlongPath(delta) {
     if (this.waypointIndex >= this._waypoints.length) {
@@ -746,7 +884,7 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.isDead = true;
     this.active = false;
 
-    // 분열 (egg_sprite): 10% 확률로 소형 분열체 생성
+    // 분열 (egg_sprite): 10% 확률로 소형 분열체 ��성
     if (this.data_.splitChance && Math.random() < this.data_.splitChance) {
       this.scene.events.emit('enemy_split', {
         type: this.data_.id,
@@ -754,6 +892,21 @@ export class Enemy extends Phaser.GameObjects.Container {
         hp: this.data_.splitHp || 30,
         waypointIndex: this.waypointIndex,
       });
+    }
+
+    // Phase 21: 확정 분열 (dumpling_warrior) — 처치 시 splitCount만큼 splitType 스폰
+    if (this.data_.split === true && !this._splitExecuted) {
+      this._splitExecuted = true;
+      const count = this.data_.splitCount || 2;
+      const splitType = this.data_.splitType;
+      for (let i = 0; i < count; i++) {
+        this.scene.events.emit('enemy_deterministic_split', {
+          type: splitType,
+          x: this.x + Phaser.Math.Between(-10, 10),
+          y: this.y + Phaser.Math.Between(-5, 5),
+          waypointIndex: this.waypointIndex,
+        });
+      }
     }
 
     // 사망 시 포자 디버프 (mushroom_scout)

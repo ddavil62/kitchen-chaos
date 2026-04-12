@@ -2,7 +2,7 @@
  * @fileoverview 레시피 컬렉션 데이터.
  * Phase 10: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 + Phase 9 23종 + Phase 10 17종 = 106종.
  * Phase 20: + 서빙 8종 + 버프 2종 = 116종 (7장 사쿠라 이자카야).
- * 향후 120종까지 확장 예정.
+ * Phase 21: + 서빙 8종 + 버프 2종 = 126종 (8장 용의 주방).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -562,6 +562,56 @@ export const ALL_SERVING_RECIPES = [
     tier: 4, ingredients: { sashimi_tuna: 1, wasabi: 1, shrimp: 2, fish: 1 }, baseReward: 95, cookTime: 11000,
     unlockCost: 100, gateStage: '7-4',
   },
+
+  // ── Phase 21 신규 서빙 레시피 (8장 용의 주방) ──
+
+  // ★★ 2성 (3종)
+  {
+    id: 'dim_sum', nameKo: '딤섬', icon: '🥟', category: 'special',
+    tier: 2, ingredients: { tofu: 1, flour: 1 }, baseReward: 50, cookTime: 5500,
+    unlockCost: 35, gateStage: '8-1',
+  },
+  {
+    id: 'wok_noodles', nameKo: '웍 볶음면', icon: '🍜', category: 'noodle',
+    tier: 2, ingredients: { cilantro: 1, egg: 1 }, baseReward: 45, cookTime: 5000,
+    unlockCost: 30, gateStage: '8-1',
+  },
+  {
+    id: 'cilantro_tofu_steam', nameKo: '고수두부찜', icon: '🥘', category: 'special',
+    tier: 2, ingredients: { tofu: 1, cilantro: 1 }, baseReward: 55, cookTime: 6500,
+    unlockCost: 40, gateStage: '8-1',
+  },
+
+  // ★★★ 3성 (3종)
+  {
+    id: 'mapo_tofu', nameKo: '마파두부', icon: '🍲', category: 'fry',
+    tier: 3, ingredients: { tofu: 2 }, baseReward: 70, cookTime: 8000,
+    unlockCost: 60, gateStage: '8-2',
+  },
+  {
+    id: 'tofu_hotpot', nameKo: '두부 훠궈', icon: '🫕', category: 'soup',
+    tier: 3, ingredients: { tofu: 2, mushroom: 1 }, baseReward: 75, cookTime: 9000,
+    unlockCost: 65, gateStage: '8-3',
+  },
+  {
+    id: 'cilantro_shrimp_soup', nameKo: '고수 탕수', icon: '🍲', category: 'soup',
+    tier: 3, ingredients: { cilantro: 2, shrimp: 1 }, baseReward: 75, cookTime: 9000,
+    unlockCost: 65, gateStage: '8-3',
+  },
+
+  // ★★★★ 4성 (1종)
+  {
+    id: 'peking_duck', nameKo: '베이징 덕', icon: '🦆', category: 'special',
+    tier: 4, ingredients: { tofu: 1, cilantro: 1, butter: 1 }, baseReward: 90, cookTime: 10000,
+    unlockCost: 100, gateStage: '8-4',
+  },
+
+  // ★★★★★ 5성 (1종)
+  {
+    id: 'dragon_feast', nameKo: '용의 만찬', icon: '🐉', category: 'special',
+    tier: 5, ingredients: { tofu: 2, cilantro: 2, meat: 1 }, baseReward: 130, cookTime: 13000,
+    unlockCost: 180, gateStage: '8-5',
+  },
 ];
 
 /**
@@ -712,6 +762,20 @@ export const ALL_BUFF_RECIPES = [
     tier: 3, ingredients: { sashimi_tuna: 1, wasabi: 1 },
     effectDesc: '공격력+속도 +20% (50초)', effectType: 'buff_both', effectValue: 0.20,
     duration: 50000, unlockCost: 55, gateStage: '7-2',
+  },
+
+  // ── Phase 21 신규 버프 2종 (8장 용의 주방) ──
+  {
+    id: 'dragon_qi', nameKo: '용기(龍氣)', icon: '🐉', category: 'buff',
+    tier: 3, ingredients: { tofu: 2, cilantro: 1 },
+    effectDesc: '공격력 +30% (55초)', effectType: 'buff_damage', effectValue: 0.30,
+    duration: 55000, unlockCost: 60, gateStage: '8-2',
+  },
+  {
+    id: 'wok_aura', nameKo: '웍 오라', icon: '🔥', category: 'buff',
+    tier: 3, ingredients: { tofu: 1, cilantro: 2 },
+    effectDesc: '공격력+속도 +25% (50초)', effectType: 'buff_both', effectValue: 0.25,
+    duration: 50000, unlockCost: 60, gateStage: '8-2',
   },
 ];
 

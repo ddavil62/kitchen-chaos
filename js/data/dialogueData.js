@@ -8,6 +8,7 @@
  * Phase 19-1: 시즌 2 캐릭터 2종(유키, 라오) CHARACTERS에 추가.
  * Phase 19-3: 시즌 2 프롤로그 대화 3종 추가 (season2_prologue, season2_yuki_intro, season2_lao_intro).
  * Phase 20: 7장 사쿠라 이자카야 대화 4종 추가 (chapter7_intro, chapter7_yuki_joins, chapter7_clear, yuki_side_7).
+ * Phase 21: 8장 용의 주방 대화 4종 추가 (chapter8_intro, chapter8_lao_joins, chapter8_clear, lao_side_8).
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -595,6 +596,69 @@ export const DIALOGUES = {
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...알아. 이제는 알 것 같아. 함께라서 이길 수 있었던 거니까.' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(뒤에서 훌쩍) 좋은 얘기다... 참, 동료 할인 이벤트\u2014' },
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '포코 씨. 저리 가 줄래요.' },
+    ],
+  },
+
+  // ── 시즌 2: 8장 용의 주방 (Phase 21) ──
+
+  chapter8_intro: {
+    id: 'chapter8_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '중국 어딘가, 황금빛 용이 새겨진 거대한 궁전 주방.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '...(발걸음을 멈추며) 여기야. 우리 가문의 주방이야.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '우아, 진짜 크다! 이게 다 라오 씨 가문 거야?' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '대대로 내려온 웍이 있어. 그게 지금 식란에 오염됐어. 드래곤 웍이라고 불리는 보스가 취하고 있는 거야.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '용 형상의 웍이 폭주했군. 장관이긴 한데... 좀 위험해 보이는데?' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '원래 혼자 처리하려 했어. 하지만... 팀이 있으니까.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '맞아! 같이 하면 무서울 거 없지. 가자, 라오 씨!' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(고개를 끄덕이며) ...응. 같이 가자.' },
+    ],
+  },
+  chapter8_lao_joins: {
+    id: 'chapter8_lao_joins',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '8-3 클리어 직후. 라오가 오래된 웍 앞에 멈춰 선다.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '...이 웍으로 할아버지가 첫 요리를 가르쳐줬어.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '라오 씨... 소중한 거구나.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(고개를 들며) 미미, 나 같이 싸울게. 처음부터 혼자 할 생각이었는데, 그게 잘못이었어.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '당연히 같이 해야지! 유키 씨도 처음엔 그랬는데, 이젠 우리 팀이잖아.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(차갑게) ...나는 그런 말 한 적 없어.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '했어.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '환영해, 라오! 신규 멤버 특별 웍 세트가\u2014' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(담담하게) 됐어요.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(작게) 이 팀 분위기가 왜 이렇지...' },
+    ],
+  },
+  chapter8_clear: {
+    id: 'chapter8_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '드래곤 웍이 정화되었다. 가문의 주방에 평화가 돌아온다.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '드래곤 웍 정화 완료! 라오 씨, 해냈어!' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(웍을 어루만지며) ...할아버지의 웍이 돌아왔어. 감사합니다.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '...라오. 가족이 있어서 다행이야.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(미소를 지으며) 유키도 마찬가지야. 이제 우리 모두 가족이야.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '팀이 점점 커지네! 다음엔 어디야, 포코 씨?' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '다음은 유럽 쪽에서 연락이 왔어. 파리의 고급 레스토랑이 식란의 진원지라고 하더군.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '파리... 양식을 배울 기회군.' },
+      { speaker: 'narrator', portrait: '', text: '8장 클리어. 라오가 정식으로 미미 팀의 일원이 되었다.' },
+    ],
+  },
+  lao_side_8: {
+    id: 'lao_side_8',
+    skippable: true,
+    lines: [
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '미미, 잠깐 좋을까.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '응? 무슨 일이야, 라오 씨?' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '웍이라는 건 말이야... 불과 재료와 요리사가 하나가 되는 순간이야. 그 웍이 오염됐을 때, 내가 얼마나 무서웠는지 몰라.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '그래서 혼자 처리하려 한 거야?' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '응. 하지만 이제 알아. 요리도 싸움도 혼자가 아니야. 팀이 있어야 진짜 웍의 불길이 살아나는 거야.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '뭔가 멋있는 말 같은데... 맞는 말인 것 같기도 해!' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(감동받은 척) 진짜 멋있어. 그 정신으로 도구 업그레이드도\u2014' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(무표정) ...포코 씨는 항상 거기서 나오네.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(작게) 포코를 대하는 방법이 나랑 비슷하네, 라오.' },
     ],
   },
 };

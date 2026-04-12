@@ -141,6 +141,12 @@ export class GatheringScene extends Phaser.Scene {
     this.events.on('spore_debuff', this._onSporeDebuff, this);
     this.events.on('boss_debuff', this._onBossDebuff, this);
     this.events.on('stealth_back_attack', this._onStealthBackAttack, this);
+    // ── Phase 21: 분열/화염 장판/화염 브레스 이벤트 ──
+    this.events.on('enemy_deterministic_split', this._onDeterministicSplit, this);
+    this.events.on('enemy_fire_zone', this._onEnemyFireZone, this);
+    this.events.on('dragon_fire_breath', this._onDragonFireBreath, this);
+    /** @type {Array<{gfx: Phaser.GameObjects.Graphics, x: number, y: number, radius: number, debuffDuration: number, timer: Phaser.Time.TimerEvent}>} */
+    this._fireZones = [];
 
     // ── 재료 수거 시 인벤토리에 누적 ──
     this.events.on('inventory_changed', this._onInventoryChanged, this);
@@ -1390,6 +1396,126 @@ export class GatheringScene extends Phaser.Scene {
     });
   }
 
+  // ── Phase 21: 확정 분열 (dumpling_warrior) ──────────────────────
+
+  /**
+   * dumpling_warrior 처치 시 splitType 적을 경로에 스폰한다.
+   * @param {{ type: string, x: number, y: number, waypointIndex: number }} data
+   * @private
+   */
+  _onDeterministicSplit({ type, x, y, waypointIndex }) {
+    const enemyData = ENEMY_TYPES[type];
+    if (!enemyData) return;
+    const waypoints = this.stageWaypoints || undefined;
+    const enemy = new Enemy(this.scene || this, enemyData, waypoints);
+    enemy.x = x;
+    enemy.y = y;
+    enemy.waypointIndex = waypointIndex;
+    this.enemies.add(enemy);
+  }
+
+  // ── Phase 21: 화염 장판 관리 ──────────────────────────────────────
+
+  /**
+   * 화염 장판 이벤트 수신 - Phaser Graphics 원 생성, _fireZones 배열에 추가.
+   * @param {{ x: number, y: number, radius: number, duration: number, debuffDuration: number }} data
+   * @private
+   */
+  _onEnemyFireZone({ x, y, radius, duration, debuffDuration }) {
+    const gfx = this.add.graphics();
+    gfx.fillStyle(0xff3300, 0.35);
+    gfx.fillCircle(0, 0, radius);
+    gfx.setPosition(x, y);
+    gfx.setDepth(5);
+
+    const zoneData = { gfx, x, y, radius, debuffDuration };
+
+    // duration 후 자동 제거
+    const timer = this.time.delayedCall(duration, () => {
+      const idx = this._fireZones.indexOf(zoneData);
+      if (idx >= 0) this._fireZones.splice(idx, 1);
+      gfx.destroy();
+    });
+    zoneData.timer = timer;
+    this._fireZones.push(zoneData);
+  }
+
+  /**
+   * 매 프레임 화염 장판 범위 내 도구에 공격속도 -20% 디버프를 적용한다.
+   * @private
+   */
+  _updateFireZones() {
+    if (!this._fireZones || this._fireZones.length === 0) return;
+    this._fireZones.forEach(zone => {
+      this.towers.getChildren().forEach(tower => {
+        if (!tower.active) return;
+        if (tower.data_?.id === 'delivery' || tower.data_?.id === 'soup_pot') return;
+        const dist = Phaser.Math.Distance.Between(zone.x, zone.y, tower.x, tower.y);
+        if (dist > zone.radius) return;
+        // 이미 디버프가 걸려 있으면 스킵 (중복 방지)
+        if (tower._fireZoneDebuffed) return;
+        tower._fireZoneDebuffed = true;
+        if (tower.applyBuff) tower.applyBuff('speed', -0.20);
+        this.time.delayedCall(zone.debuffDuration, () => {
+          if (tower.active) {
+            tower._fireZoneDebuffed = false;
+            if (tower.removeBuff) tower.removeBuff();
+            if (this._currentBuff) this._applyBuffToTower(tower, this._currentBuff);
+          }
+        });
+      });
+    });
+  }
+
+  // ── Phase 21: 화염 브레스 (dragon_wok) ────────────────────────────
+
+  /**
+   * dragon_wok 화염 브레스 이벤트 수신 - 부채꼴 범위 내 도구에 공격속도 디버프 적용.
+   * @param {{ x: number, y: number, angle: number, radius: number, debuffValue: number, debuffDuration: number, dx: number, dy: number }} data
+   * @private
+   */
+  _onDragonFireBreath({ x, y, angle, radius, debuffValue, debuffDuration, dx, dy }) {
+    // 이동 방향 각도 계산
+    const moveAngle = Math.atan2(dy, dx);
+    const halfAngle = (angle / 2) * (Math.PI / 180);
+
+    this.towers.getChildren().forEach(tower => {
+      if (!tower.active) return;
+      if (tower.data_?.id === 'delivery' || tower.data_?.id === 'soup_pot') return;
+      const dist = Phaser.Math.Distance.Between(x, y, tower.x, tower.y);
+      if (dist > radius) return;
+
+      // 부채꼴 범위 체크
+      const towerAngle = Math.atan2(tower.y - y, tower.x - x);
+      let angleDiff = towerAngle - moveAngle;
+      // -PI ~ PI 범위로 정규화
+      while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+      while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+      if (Math.abs(angleDiff) > halfAngle) return;
+
+      if (tower.applyBuff) tower.applyBuff('speed', debuffValue);
+      this.tweens.add({
+        targets: tower, alpha: 0.5,
+        duration: 150, yoyo: true,
+      });
+      this.time.delayedCall(debuffDuration, () => {
+        if (tower.active && tower.removeBuff) tower.removeBuff();
+        if (this._currentBuff) this._applyBuffToTower(tower, this._currentBuff);
+      });
+    });
+
+    // VFX: 브레스 텍스트 팝업
+    const popup = this.add.text(x, y - 20, '\uD83D\uDD25 \uBE0C\uB808\uC2A4!', {
+      fontSize: '11px', color: '#ff4400',
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(115);
+    this.tweens.add({
+      targets: popup, y: popup.y - 25, alpha: 0,
+      duration: 800,
+      onComplete: () => popup.destroy(),
+    });
+  }
+
   // ── 버프 적용 ──────────────────────────────────────────────────
 
   /**
@@ -1830,6 +1956,9 @@ export class GatheringScene extends Phaser.Scene {
     // lao_chef power_surge 타이머
     ChefManager.tickPowerSurge(delta);
 
+    // Phase 21: 화염 장판 범위 내 도구 디버프 적용
+    this._updateFireZones();
+
     // 내부 버프 타이머
     if (this._currentBuff && this._buffTimer > 0) {
       this._buffTimer -= delta;
@@ -1893,6 +2022,17 @@ export class GatheringScene extends Phaser.Scene {
     this.events.off('spore_debuff', this._onSporeDebuff, this);
     this.events.off('boss_debuff', this._onBossDebuff, this);
     this.events.off('stealth_back_attack', this._onStealthBackAttack, this);
+    // Phase 21: 이벤트 해제 + 화염 장판 정리
+    this.events.off('enemy_deterministic_split', this._onDeterministicSplit, this);
+    this.events.off('enemy_fire_zone', this._onEnemyFireZone, this);
+    this.events.off('dragon_fire_breath', this._onDragonFireBreath, this);
+    if (this._fireZones) {
+      this._fireZones.forEach(zone => {
+        zone.gfx?.destroy();
+        zone.timer?.remove?.();
+      });
+      this._fireZones = [];
+    }
     this.events.off('wave_started', this._onWaveStarted, this);
     this.events.off('inventory_changed', this._onInventoryChanged, this);
     this.events.off('ingredient_collected_for_order', this._onIngredientCollectedForOrder, this);

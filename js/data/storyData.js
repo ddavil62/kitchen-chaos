@@ -5,6 +5,7 @@
  * Phase 16: 튜토리얼 2개, 영업 이벤트 3개, 선택지 샘플 1개 트리거 추가.
  * Phase 19-3: 시즌 2 프롤로그 트리거 3건 추가 (prologue, yuki_intro, lao_intro).
  * Phase 20: 7장 사쿠라 이자카야 트리거 4건 추가 + stage_first_clear 제외 목록 갱신.
+ * Phase 21: 8장 용의 주방 트리거 4건 추가 + stage_first_clear 제외 목록 갱신.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -232,7 +233,10 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '6-3' &&
       ctx.stageId !== '7-1' &&   // chapter7_intro 별도 처리
       ctx.stageId !== '7-3' &&   // chapter7_yuki_joins 별도 처리
-      ctx.stageId !== '7-6',     // chapter7_clear 별도 처리
+      ctx.stageId !== '7-6' &&   // chapter7_clear 별도 처리
+      ctx.stageId !== '8-1' &&   // chapter8_intro 별도 처리
+      ctx.stageId !== '8-3' &&   // chapter8_lao_joins 별도 처리
+      ctx.stageId !== '8-6',     // chapter8_clear 별도 처리
     delay: 800,
   },
 
@@ -336,6 +340,54 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.storyFlags?.chapter7_cleared === true &&
       !save.seenDialogues?.includes('yuki_side_7'),
+  },
+
+  // ── 시즌 2: 8장 용의 주방 (Phase 21) ─────────────────────────────────
+  // 8-1 입장 시 chapter8_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter8_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '8-1',
+    delay: 400,
+  },
+  // 8-3 첫 클리어 시 chapter8_lao_joins
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter8_lao_joins',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-3',
+    delay: 800,
+  },
+  // 8-6 첫 클리어 시 chapter8_clear + 플래그 설정
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter8_clear',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-6',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter8_cleared = true;
+      if (data.storyProgress.currentChapter < 9) {
+        data.storyProgress.currentChapter = 9;
+      }
+      SaveManager.save(data);
+    },
+  },
+  // merchant_enter 에서 lao_side_8 (8장 클리어 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'lao_side_8',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter8_cleared === true &&
+      !save.seenDialogues?.includes('lao_side_8'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────
