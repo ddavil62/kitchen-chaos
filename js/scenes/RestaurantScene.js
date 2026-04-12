@@ -103,6 +103,30 @@ export class RestaurantScene extends Phaser.Scene {
 
     this.kitchenPanelUI.updateIngredients();
     this._updateAllButtons();
+
+    // 재료 소비 후 솔드아웃 체크 — 더 이상 조리 불가 시 초과 손님 퇴장
+    this._checkSoldOut(recipeId);
+  }
+
+  /**
+   * 해당 요리가 솔드아웃 상태인지 확인하고 초과 손님을 퇴장시킨다.
+   * 조리 가능 여부를 확인 후, 받을 수 있는 수량(완성 + 조리 중)을 초과하는 손님을 내보낸다.
+   * @param {string} recipeId
+   * @private
+   */
+  _checkSoldOut(recipeId) {
+    const recipe = SERVING_RECIPE_MAP[recipeId];
+    if (!recipe) return;
+    // 아직 조리 가능하면 솔드아웃 아님
+    if (this.ingredientManager.canCook(recipe)) return;
+
+    // 가용 수량: 완성된 요리 + 현재 조리 중
+    const readyCount = this.readyDishes.filter(d => d === recipeId).length;
+    const cookingCount = this.cookingSlot?.recipeId === recipeId ? 1 : 0;
+    const available = readyCount + cookingCount;
+
+    this.customerManager.dismissSoldOut(recipeId, available);
+    this._updateAllButtons();
   }
 
   /**
@@ -182,8 +206,8 @@ export class RestaurantScene extends Phaser.Scene {
   // ── 메인 루프 ──
 
   update(time, delta) {
-    // 손님 인내심 감소 (조리 중인 요리 주문 손님은 일시 정지)
-    this.customerManager.update(delta, this.cookingSlot);
+    // 손님 인내심 감소
+    this.customerManager.update(delta);
     this.customerZoneUI.update();
 
     // 조리 타이머

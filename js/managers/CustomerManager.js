@@ -140,17 +140,12 @@ export class CustomerManager {
 
   /**
    * 매 프레임 호출 — 인내심 감소 + 퇴장 처리.
-   * 조리 중인 요리와 일치하는 손님은 인내심 감소를 일시 정지한다.
    * @param {number} delta - ms
-   * @param {object|null} cookingSlot - 현재 조리 슬롯 (recipeId 포함)
    */
-  update(delta, cookingSlot = null) {
+  update(delta) {
     for (let i = 0; i < this.slots.length; i++) {
       const cust = this.slots[i];
       if (!cust) continue;
-
-      // 해당 요리를 조리 중이면 인내심 감소 일시 정지
-      if (cookingSlot && cookingSlot.recipeId === cust.dish) continue;
 
       cust.patience -= delta;
 
@@ -163,6 +158,42 @@ export class CustomerManager {
         this.scene.events.emit('customer_left', { slotIndex: i });
         this._promoteFromQueue(i);
       }
+    }
+  }
+
+  /**
+   * 솔드아웃 시 초과 손님 퇴장.
+   * 해당 요리를 받을 수 있는 손님(keepCount)만 남기고 나머지는 즉시 퇴장시킨다.
+   * 대기열의 해당 요리 손님도 모두 제거한 뒤 빈 슬롯을 타 요리 대기열로 채운다.
+   * @param {string} dishId - 솔드아웃된 요리 ID
+   * @param {number} keepCount - 유지할 손님 수 (완성된 요리 + 조리 중 수량)
+   */
+  dismissSoldOut(dishId, keepCount) {
+    let kept = 0;
+
+    // 활성 슬롯에서 초과 손님 퇴장
+    for (let i = 0; i < this.slots.length; i++) {
+      const cust = this.slots[i];
+      if (!cust || cust.dish !== dishId) continue;
+
+      if (kept < keepCount) {
+        kept++;
+        continue;
+      }
+
+      // 초과 손님 퇴장 (대기열 프로모션은 아래 일괄 처리)
+      this.slots[i] = null;
+      this.totalLeft++;
+      this.comboCount = 0;
+      this.scene.events.emit('customer_left', { slotIndex: i, reason: 'sold_out' });
+    }
+
+    // 대기열에서 해당 요리 손님 전부 제거
+    this.waitQueue = this.waitQueue.filter(c => c.dish !== dishId);
+
+    // 빈 슬롯에 대기열 프로모션 (타 요리 손님)
+    for (let i = 0; i < this.slots.length; i++) {
+      if (this.slots[i] === null) this._promoteFromQueue(i);
     }
   }
 
