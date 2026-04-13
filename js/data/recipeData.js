@@ -4,6 +4,7 @@
  * Phase 20: + 서빙 8종 + 버프 2종 = 116종 (7장 사쿠라 이자카야).
  * Phase 21: + 서빙 8종 + 버프 2종 = 126종 (8장 용의 주방).
  * Phase 22-3: + 서빙 8종 + 버프 2종 = 136종 (8장 이자카야 심층부).
+ * Phase 25-1: + 서빙 8종 + 버프 2종 = 146종 (11장 용의 주방 심층부).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -665,6 +666,56 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { sake: 2, sashimi_tuna: 1, wasabi: 1, tofu: 1 }, baseReward: 140, cookTime: 13000,
     unlockCost: 190, gateStage: '10-5',
   },
+
+  // ── Phase 25-1 신규 서빙 레시피 (11장 용의 주방 심층부) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'star_anise_broth_ramen', nameKo: '팔각 육수 라멘', icon: '🍜', category: 'noodle',
+    tier: 2, ingredients: { star_anise: 1, tofu: 1 }, baseReward: 58, cookTime: 6000,
+    unlockCost: 42, gateStage: '11-1',
+  },
+  {
+    id: 'five_spice_stir_fry', nameKo: '오향 볶음', icon: '🍳', category: 'fry',
+    tier: 2, ingredients: { star_anise: 1, meat: 1 }, baseReward: 55, cookTime: 5500,
+    unlockCost: 38, gateStage: '11-1',
+  },
+
+  // ★★★ 3성 (3종)
+  {
+    id: 'mapo_star_anise_steam', nameKo: '마파 팔각찜', icon: '🥘', category: 'special',
+    tier: 3, ingredients: { star_anise: 1, tofu: 2 }, baseReward: 78, cookTime: 8500,
+    unlockCost: 68, gateStage: '11-2',
+  },
+  {
+    id: 'star_anise_hotpot', nameKo: '팔각 훠궈', icon: '🫕', category: 'soup',
+    tier: 3, ingredients: { star_anise: 1, tofu: 1, mushroom: 1 }, baseReward: 84, cookTime: 9500,
+    unlockCost: 75, gateStage: '11-2',
+  },
+  {
+    id: 'star_anise_wok_noodle', nameKo: '팔각 웍볶음면', icon: '🍜', category: 'noodle',
+    tier: 3, ingredients: { star_anise: 1, cilantro: 1, egg: 1 }, baseReward: 80, cookTime: 8000,
+    unlockCost: 70, gateStage: '11-3',
+  },
+
+  // ★★★★ 4성 (2종)
+  {
+    id: 'dragon_spice_banquet', nameKo: '용향 연회', icon: '🐉', category: 'special',
+    tier: 4, ingredients: { star_anise: 2, tofu: 1, cilantro: 1 }, baseReward: 112, cookTime: 11000,
+    unlockCost: 122, gateStage: '11-3',
+  },
+  {
+    id: 'star_anise_duck_roast', nameKo: '팔각 오리 구이', icon: '🦆', category: 'grill',
+    tier: 4, ingredients: { star_anise: 1, meat: 2, butter: 1 }, baseReward: 108, cookTime: 10500,
+    unlockCost: 118, gateStage: '11-4',
+  },
+
+  // ★★★★★ 5성 (1종)
+  {
+    id: 'legendary_star_anise_course', nameKo: '전설의 오향 풀코스', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { star_anise: 2, tofu: 2, cilantro: 1, meat: 1 }, baseReward: 155, cookTime: 14000,
+    unlockCost: 220, gateStage: '11-4',
+  },
 ];
 
 /**
@@ -849,6 +900,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.25,
     duration: 2, durationUnit: 'wave',
     unlockCost: 85, gateStage: '10-3',
+  },
+
+  // ── Phase 25-1 신규 버프 레시피 (11장 용의 주방 심층부) ──
+  {
+    id: 'star_anise_ward', nameKo: '팔각 결계', icon: '✨', category: 'buff',
+    tier: 3, ingredients: { star_anise: 2 },
+    effectDesc: '어둠 디버프 면역 + 공격력 +15% (3웨이브)',
+    effectType: 'buff_dark_immunity',
+    effectValue: 0.15,
+    duration: 3, durationUnit: 'wave',
+    unlockCost: 70, gateStage: '11-2',
+  },
+  {
+    id: 'dragon_five_spice', nameKo: '용의 오향', icon: '🐉', category: 'buff',
+    tier: 4, ingredients: { star_anise: 1, cilantro: 1, tofu: 1 },
+    effectDesc: '공격력 +30% 공격속도 +20% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.30,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 95, gateStage: '11-3',
   },
 ];
 

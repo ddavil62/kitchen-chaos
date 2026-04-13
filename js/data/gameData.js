@@ -5,6 +5,7 @@
  * Phase 21: 적 29종(일반 21 + 보스 8), 재료 19종, 서빙 레시피 22종, 버프 레시피 10종.
  * Phase 22-1: oni_herald 미니보스 추가 (HP 800, 전령 소환 + 분노 기믹).
  * Phase 22-3: sake_specter(마취), oni_minion(돌진) 등록. sake 재료 추가 (누적 20종).
+ * Phase 25-1: 적 2종(shadow_dragon_spawn, wok_guardian), 재료 1종(star_anise) 추가. 누적 적 25종.
  */
 
 // ── 적 타입 정의 ──
@@ -443,6 +444,33 @@ export const ENEMY_TYPES = {
     chargeDuration: 2000,        // 2초간 돌진
     chargeInterval: 8000,        // 8초 쿨다운 (재돌진 대기)
   },
+  // ── Phase 25-1 신규 적 (11장 용의 주방 심층부) ──
+  shadow_dragon_spawn: {
+    id: 'shadow_dragon_spawn',
+    nameKo: '그림자 용 새끼',
+    hp: 380,
+    speed: 60,
+    ingredient: 'star_anise',
+    bodyColor: 0x2a0a3a,
+    // 어둠 디버프: darkInterval마다 범위 내 도구에 공격력 감소 디버프 적용
+    // darkRadius 이내 도구에 darkEffect(공격력 -20%), darkDuration(5초) 부여
+    darkDebuff: true,
+    darkInterval: 5000,    // 5초마다 어둠 발동
+    darkRadius: 80,        // 80px 범위
+    darkEffect: { damageReduction: 0.20, duration: 5000 },
+  },
+  wok_guardian: {
+    id: 'wok_guardian',
+    nameKo: '웍 수호자',
+    hp: 450,
+    speed: 40,
+    ingredient: 'star_anise',
+    bodyColor: 0x8b4513,
+    // 전방 방어 특화: 이동 방향(전면) 피해 70% 감소, 측면/후면은 정상 피해
+    // fish_knight의 shieldFront(50%)보다 강화된 버전 (70%)
+    // Enemy.js takeDamage()에서 shieldFrontHeavy 플래그로 분기 처리
+    shieldFrontHeavy: 0.70,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -803,6 +831,13 @@ export const INGREDIENT_TYPES = {
     nameKo: '사케',
     color: 0xc8a2c8,   // 연보라 (사케 도쿠리 청자/보라 색조)
     icon: '🍶',
+  },
+  // ── Phase 25-1 신규 재료 ──
+  star_anise: {
+    id: 'star_anise',
+    nameKo: '팔각',
+    color: 0x8b1a1a,   // 짙은 적갈색
+    icon: '✨',         // 임시. 실제 아이콘은 별형 향신료 이미지로 교체
   },
 };
 

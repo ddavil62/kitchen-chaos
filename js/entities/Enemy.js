@@ -8,6 +8,7 @@
  * Phase 20: 은신(stealth), 배리어(barrier), 취권(drunkWalk), 아우라(aura) 메카닉.
  * Phase 21: 분열(split), 화염 장판(fireZone), 화염 브레스+3페이즈(fireBreath) 메카닉.
  * Phase 22-1: 전령 소환(heraldSummon) + 분노 속도 증가(enrageSpeedMultiplier) 메카닉.
+ * Phase 25-1: 어둠 디버프(darkDebuff) + wok_guardian 전면 방어 70%(shieldFrontHeavy) 메카닉.
  */
 
 import Phaser from 'phaser';
@@ -137,6 +138,11 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._heraldEnraged = false;
     }
 
+    // ── Phase 25-1: 어둠 디버프 (shadow_dragon_spawn) ──
+    if (enemyData.darkDebuff) {
+      this._darkDebuffTimer = 0;
+    }
+
     // ── 비주얼 ──
     this._buildVisual(enemyData);
 
@@ -237,7 +243,7 @@ export class Enemy extends Phaser.GameObjects.Container {
     } else if (id === 'cheese_golem') {
       const body = this.scene.add.rectangle(0, 0, 28, 28, color);
       this.add(body);
-    } else if (id === 'fish_knight' || id === 'tempura_monk' || id === 'dumpling_warrior' || id === 'wok_phantom') {
+    } else if (id === 'fish_knight' || id === 'tempura_monk' || id === 'dumpling_warrior' || id === 'wok_phantom' || id === 'wok_guardian') {
       const body = this.scene.add.rectangle(0, 0, 26, 26, color);
       this.add(body);
     } else if (id === 'mushroom_scout' || id === 'cheese_rat' || id === 'sushi_ninja' || id === 'mini_dumpling') {
@@ -442,6 +448,11 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── Phase 22-1: 전령 소환 + 분노 (oni_herald) ──
     if (this.data_.heraldSummon) {
       this._updateHeraldSummon(delta);
+    }
+
+    // ── Phase 25-1: 어둠 디버프 (shadow_dragon_spawn) ──
+    if (this.data_.darkDebuff) {
+      this._updateDarkDebuff(delta);
     }
 
     // ── 이동 ──
@@ -826,6 +837,11 @@ export class Enemy extends Phaser.GameObjects.Container {
       amount *= (1 - this.data_.shieldFront);
     }
 
+    // wok_guardian: 전면 피해 70% 감소 (이동 방향 기준, 전면 피격으로 간주)
+    if (this.data_.shieldFrontHeavy && this.waypointIndex < this._waypoints.length) {
+      amount *= (1 - this.data_.shieldFrontHeavy);
+    }
+
     this.hp -= amount;
     const ratio = Math.max(0, this.hp / this.maxHp);
     this.hpBar.width = 26 * ratio;
@@ -930,6 +946,27 @@ export class Enemy extends Phaser.GameObjects.Container {
           x: this.x, y: this.y,
         });
       }
+    }
+  }
+
+  // ── Phase 25-1: 어둠 디버프 메카닉 ────────────────────────────────────
+  /**
+   * 어둠 디버프 업데이트 (shadow_dragon_spawn).
+   * darkInterval마다 범위 내 도구에 공격력 감소 디버프를 적용한다.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateDarkDebuff(delta) {
+    this._darkDebuffTimer += delta;
+    if (this._darkDebuffTimer >= this.data_.darkInterval) {
+      this._darkDebuffTimer = 0;
+      this.scene.events.emit('dark_debuff', {
+        x: this.x,
+        y: this.y,
+        radius: this.data_.darkRadius,
+        damageReduction: this.data_.darkEffect.damageReduction,
+        duration: this.data_.darkEffect.duration,
+      });
     }
   }
 

@@ -9,6 +9,7 @@
  * Phase 22-1: 8장 추가 트리거 3건 추가 + stage_first_clear 제외 목록 갱신 (8-4, 8-5 추가).
  * Phase 23-1: 9장 트리거 3건 추가 (chapter9_intro, chapter9_boss, chapter9_clear) + stage_first_clear 제외 목록 갱신.
  * Phase 24-1: 8장 트리거 전체 10장으로 번호 이동. season2_lao_intro 조건 currentChapter >= 10으로 확정.
+ * Phase 25-1: 11장 트리거 3건 추가 (chapter11_intro, chapter11_mid, lao_side_11) + stage_first_clear 제외 목록 갱신.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -243,7 +244,9 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '10-5' &&   // chapter10_mid 별도 처리
       ctx.stageId !== '10-6' &&   // chapter10_clear 별도 처리
       ctx.stageId !== '9-1' &&   // chapter9_intro 별도 처리
-      ctx.stageId !== '9-6',     // chapter9_boss / chapter9_clear 별도 처리
+      ctx.stageId !== '9-6' &&   // chapter9_boss / chapter9_clear 별도 처리
+      ctx.stageId !== '11-1' &&   // chapter11_intro 별도 처리
+      ctx.stageId !== '11-4',     // chapter11_mid 별도 처리
     delay: 800,
   },
 
@@ -470,6 +473,42 @@ export const STORY_TRIGGERS = [
       }
       SaveManager.save(data);
     },
+  },
+
+  // ── 시즌 2: 11장 용의 주방 심층부 (Phase 25-1) ─────────────────────────────
+  // 11-1 입장 시 chapter11_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter11_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '11-1',
+    delay: 400,
+  },
+  // 11-4 첫 클리어 시 chapter11_mid
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter11_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '11-4',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter11_mid_seen = true;
+      SaveManager.save(data);
+    },
+  },
+  // merchant_enter 에서 lao_side_11 (chapter11_mid 이후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'lao_side_11',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter11_mid_seen === true &&
+      !save.seenDialogues?.includes('lao_side_11'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────

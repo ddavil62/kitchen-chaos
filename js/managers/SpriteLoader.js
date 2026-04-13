@@ -7,6 +7,7 @@
  * Phase 20: 7장 적 2종(sushi_ninja, tempura_monk), 보스 1종(sake_oni), 타일셋 1종(sakura_izakaya), 재료 2종(sashimi_tuna, wasabi) 추가.
  * Phase 21: 8장 적 3종(dumpling_warrior, mini_dumpling, wok_phantom), 보스 1종(dragon_wok), 타일셋 1종(chinese_palace_kitchen), 재료 2종(tofu, cilantro) 추가.
  * Phase 22-3: 적 2종(sake_specter, oni_minion), 타일셋 1종(izakaya_underground, 16px), 재료 1종(sake) 추가.
+ * Phase 25-1: 11장 적 2종(shadow_dragon_spawn, wok_guardian), 타일셋 1종(dragon_lair), 재료 1종(star_anise) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -34,6 +35,7 @@ const ENEMY_IDS = [
   'sushi_ninja', 'tempura_monk',
   'dumpling_warrior', 'mini_dumpling', 'wok_phantom',
   'sake_specter', 'oni_minion',
+  'shadow_dragon_spawn', 'wok_guardian',  // Phase 25-1
 ];
 
 // ── 보스 ID 목록 (8종, Phase 21: dragon_wok 추가) ──
@@ -73,6 +75,7 @@ const INGREDIENT_FILE_MAP = {
   tofu: 'tofu',
   cilantro: 'cilantro',
   sake: 'sake',                            // Phase 22-3
+  star_anise: 'star_anise',   // Phase 25-1
 };
 
 // ── 재료 ID 목록 (15종, 게임 내 ID 기준) ──
@@ -103,6 +106,8 @@ const ENEMY_WALK_HASHES = {
   wok_phantom: 'animating-4a4ef775',       // Phase 21
   sake_specter: 'walking-e2f2a098',        // Phase 22-3
   oni_minion:   'walking-3d25e8be',        // Phase 22-3
+  shadow_dragon_spawn: null,  // Phase 25-1: PixelLab 생성 후 hash 기입
+  wok_guardian: null,         // Phase 25-1: PixelLab 생성 후 hash 기입
 };
 
 const BOSS_WALK_HASHES = {
@@ -131,6 +136,7 @@ const TILESET_IDS = [
   'sakura_izakaya',
   'chinese_palace_kitchen',
   'izakaya_underground',
+  'dragon_lair',   // Phase 25-1
 ];
 
 // ── 서비스씬 에셋 경로 (Phase 19-4) ──

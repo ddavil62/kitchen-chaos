@@ -12,6 +12,7 @@
  * Phase 22-1: chapter7_clear 복선 대사 삽입, 10장 추가 대화 3종 추가 (chapter10_yuki_clue, chapter10_mid, yuki_side_8).
  * Phase 24-1: chapter8_* → chapter10_* 번호 이동.
  * Phase 23-1: chapter9_intro, chapter9_boss, chapter9_clear 추가. CHARACTERS에 sake_oni 추가.
+ * Phase 25-1: 11장 용의 주방 심층부 대화 3종 추가 (chapter11_intro, chapter11_mid, lao_side_11).
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -765,6 +766,53 @@ export const DIALOGUES = {
       { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(부드럽게) 포코 씨. 5초만 조용히 있어줘요.' },
       { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(소곤) ...3초는 안 돼?' },
       { speaker: 'narrator', portrait: '', text: '9장 클리어. 일식 아크 완결. 이자카야의 봉인이 해제되었다.' },
+    ],
+  },
+
+  // ── 시즌 2: 11장 용의 주방 심층부 (Phase 25-1) ──
+
+  chapter11_intro: {
+    id: 'chapter11_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '사케 오니의 봉인이 해제된 후. 라오가 이끄는 팀이 가문 주방 아래 심층부로 들어선다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(멈추며) ...이 아래가 진짜 심층부야. 할아버지도 이곳엔 거의 들어오지 않았다고 하셨어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '공기가 달라. 향신료 냄새가 엄청나게 진해.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(벽에 새겨진 문양을 보며) 팔각 문양이야. 중국 미력사가 봉인에 사용하던 표식이에요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(작게) ...가문 문서에 있었어. "심층부 팔각 봉인은 용의 미력을 가두는 마지막 방어선"이라고.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(긴장하며) 그 봉인이 지금 흔들리고 있다는 거군. 그림자 드래곤들이 심층부를 점령했어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '그럼 시작하자. 우리가 여기까지 왔잖아!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(결의에 차서) 응. 이 심층부는 내가 책임진다. 같이 가자.' },
+    ],
+  },
+  chapter11_mid: {
+    id: 'chapter11_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '11-4 클리어 직후. 웍 수호자들이 물러서고 심층부 최심층이 눈앞에 열린다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(숨을 고르며) 웍 수호자들... 예전에는 이 주방을 지키던 미력 존재였을 텐데. 이렇게 됐구나.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '봉인이 많이 약해졌어. 드래곤 웍이 심층부 미력을 다 흡수하고 있는 것 같아.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '라오 씨, 이 주방을 되찾는 거야. 그러려면 마지막 방으로 들어가야 해.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(고개를 끄덕이며) 알아. ...사실 이 방에 대한 기억이 있어. 아이였을 때, 할아버지가 말했어.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '"심층부는 네가 지켜야 한다. 언젠가 네가 혼자가 아닐 때 들어가라." 그때가 지금인 것 같아.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(눈이 빛나며) 맞아. 지금이야! 우리 같이 들어가자!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(작게) ...라오 할아버지, 지켜보고 있겠지.' },
+    ],
+  },
+  lao_side_11: {
+    id: 'lao_side_11',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '미미, 잠깐 괜찮아?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '응? 무슨 일이야, 라오 씨?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '팔각 향. 어릴 때 할아버지가 이 냄새 나는 주방에서 요리를 가르쳐줬어. 웍에 팔각 넣고 볶으면 향이 온 집 안을 가득 채운다고 했지.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '그래서 팔각이 봉인 재료가 된 거야? 가문 요리와 연관이 있어서?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(끄덕이며) 아마도. 미력과 요리는 분리할 수 없어. 가장 강한 향신료가 가장 강한 봉인이 되는 거야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(옆에서 듣다가) ...그것과 비슷한 이야기가 일식 고문서에도 있어. 가장 짙은 맛이 가장 강한 정화를 만든다고.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(유키를 보며) 유키, 언제부터 거기 있었어?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '처음부터.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(끼어들며) 감동적인 대화에 방해하는 건 아닌데... 저 팔각 장수에게 레시피 얻으면 대박 나지 않을까요?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(무표정) ...포코 씨는 역시 변하지 않네.' },
     ],
   },
 };
