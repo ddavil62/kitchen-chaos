@@ -8,6 +8,7 @@
  * Phase 21: 8장 용의 주방 트리거 4건 추가 + stage_first_clear 제외 목록 갱신.
  * Phase 22-1: 8장 추가 트리거 3건 추가 + stage_first_clear 제외 목록 갱신 (8-4, 8-5 추가).
  * Phase 23-1: 9장 트리거 3건 추가 (chapter9_intro, chapter9_boss, chapter9_clear) + stage_first_clear 제외 목록 갱신.
+ * Phase 24-1: 8장 트리거 전체 10장으로 번호 이동. season2_lao_intro 조건 currentChapter >= 10으로 확정.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -236,11 +237,11 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '7-1' &&   // chapter7_intro 별도 처리
       ctx.stageId !== '7-3' &&   // chapter7_yuki_joins 별도 처리
       ctx.stageId !== '7-6' &&   // chapter7_clear 별도 처리
-      ctx.stageId !== '8-1' &&   // chapter8_intro 별도 처리
-      ctx.stageId !== '8-3' &&   // chapter8_lao_joins 별도 처리
-      ctx.stageId !== '8-4' &&   // chapter8_yuki_clue 별도 처리
-      ctx.stageId !== '8-5' &&   // chapter8_mid 별도 처리
-      ctx.stageId !== '8-6' &&   // chapter8_clear 별도 처리
+      ctx.stageId !== '10-1' &&   // chapter10_intro 별도 처리
+      ctx.stageId !== '10-3' &&   // chapter10_lao_joins 별도 처리
+      ctx.stageId !== '10-4' &&   // chapter10_yuki_clue 별도 처리
+      ctx.stageId !== '10-5' &&   // chapter10_mid 별도 처리
+      ctx.stageId !== '10-6' &&   // chapter10_clear 별도 처리
       ctx.stageId !== '9-1' &&   // chapter9_intro 별도 처리
       ctx.stageId !== '9-6',     // chapter9_boss / chapter9_clear 별도 처리
     delay: 800,
@@ -348,88 +349,88 @@ export const STORY_TRIGGERS = [
       !save.seenDialogues?.includes('yuki_side_7'),
   },
 
-  // ── 시즌 2: 8장 용의 주방 (Phase 21) ─────────────────────────────────
-  // 8-1 입장 시 chapter8_intro
+  // ── 시즌 2: 10장 용의 주방 (Phase 21/24-1) ─────────────────────────────────
+  // 10-1 입장 시 chapter10_intro
   {
     triggerPoint: 'gathering_enter',
-    dialogueId: 'chapter8_intro',
+    dialogueId: 'chapter10_intro',
     once: true,
-    condition: (ctx) => ctx.stageId === '8-1',
+    condition: (ctx) => ctx.stageId === '10-1',
     delay: 400,
   },
-  // 8-3 첫 클리어 시 chapter8_lao_joins
+  // 10-3 첫 클리어 시 chapter10_lao_joins
   {
     triggerPoint: 'result_clear',
-    dialogueId: 'chapter8_lao_joins',
+    dialogueId: 'chapter10_lao_joins',
     once: true,
     condition: (ctx) =>
-      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-3',
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '10-3',
     delay: 800,
   },
-  // 8-6 첫 클리어 시 chapter8_clear + 플래그 설정
+  // 10-6 첫 클리어 시 chapter10_clear + 플래그 설정
   {
     triggerPoint: 'result_clear',
-    dialogueId: 'chapter8_clear',
+    dialogueId: 'chapter10_clear',
     once: true,
     condition: (ctx) =>
-      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-6',
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '10-6',
     delay: 800,
     onComplete: () => {
       const data = SaveManager.load();
       if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
         data.storyProgress.storyFlags = {};
       }
-      data.storyProgress.storyFlags.chapter8_cleared = true;
-      if (data.storyProgress.currentChapter < 9) {
-        data.storyProgress.currentChapter = 9;
+      data.storyProgress.storyFlags.chapter10_cleared = true;
+      if (data.storyProgress.currentChapter < 11) {
+        data.storyProgress.currentChapter = 11;
       }
       SaveManager.save(data);
     },
   },
-  // merchant_enter 에서 lao_side_8 (8장 클리어 후 1회)
+  // merchant_enter 에서 lao_side_8 (10장 클리어 후 1회)
   {
     triggerPoint: 'merchant_enter',
     dialogueId: 'lao_side_8',
     once: true,
     condition: (ctx, save) =>
-      save.storyFlags?.chapter8_cleared === true &&
+      save.storyFlags?.chapter10_cleared === true &&
       !save.seenDialogues?.includes('lao_side_8'),
   },
 
-  // ── 시즌 2: 8장 추가 스토리 (Phase 22-1) ─────────────────────────────
-  // 8-4 첫 클리어 시 chapter8_yuki_clue
+  // ── 시즌 2: 10장 추가 스토리 (Phase 22-1/24-1) ─────────────────────────────
+  // 10-4 첫 클리어 시 chapter10_yuki_clue
   {
     triggerPoint: 'result_clear',
-    dialogueId: 'chapter8_yuki_clue',
+    dialogueId: 'chapter10_yuki_clue',
     once: true,
     condition: (ctx) =>
-      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-4',
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '10-4',
     delay: 800,
   },
-  // 8-5 첫 클리어 시 chapter8_mid
+  // 10-5 첫 클리어 시 chapter10_mid
   {
     triggerPoint: 'result_clear',
-    dialogueId: 'chapter8_mid',
+    dialogueId: 'chapter10_mid',
     once: true,
     condition: (ctx) =>
-      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '8-5',
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '10-5',
     delay: 800,
     onComplete: () => {
       const data = SaveManager.load();
       if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
         data.storyProgress.storyFlags = {};
       }
-      data.storyProgress.storyFlags.chapter8_mid_seen = true;
+      data.storyProgress.storyFlags.chapter10_mid_seen = true;
       SaveManager.save(data);
     },
   },
-  // merchant_enter 에서 yuki_side_8 (chapter8_mid 이후 1회)
+  // merchant_enter 에서 yuki_side_8 (chapter10_mid 이후 1회)
   {
     triggerPoint: 'merchant_enter',
     dialogueId: 'yuki_side_8',
     once: true,
     condition: (ctx, save) =>
-      save.storyFlags?.chapter8_mid_seen === true &&
+      save.storyFlags?.chapter10_mid_seen === true &&
       !save.seenDialogues?.includes('yuki_side_8'),
   },
 
@@ -508,9 +509,8 @@ export const STORY_TRIGGERS = [
     triggerPoint: 'worldmap_enter',
     dialogueId: 'season2_lao_intro',
     once: true,
-    // TODO Phase 24: 8~9장(일식) 완성 후 currentChapter >= 10 으로 변경
     condition: (ctx, save) =>
-      save.season2Unlocked && save.currentChapter >= 8 &&
+      save.season2Unlocked && save.currentChapter >= 10 &&
       !save.storyFlags?.lao_joined,
     onComplete: () => {
       const data = SaveManager.load();

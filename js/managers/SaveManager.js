@@ -18,7 +18,7 @@
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 14;
+const SAVE_VERSION = 15;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -743,6 +743,22 @@ export class SaveManager {
         data.tools.pan.count = 4;
       }
       data.version = 14;
+    }
+
+    // v14 → v15: chapter8 storyFlags 키를 chapter10으로 이전 (챕터 번호 재편)
+    if (data.version < 15) {
+      if (data.storyProgress?.storyFlags) {
+        const flags = data.storyProgress.storyFlags;
+        if ('chapter8_cleared' in flags) {
+          flags.chapter10_cleared = flags.chapter8_cleared;
+          delete flags.chapter8_cleared;
+        }
+        if ('chapter8_mid_seen' in flags) {
+          flags.chapter10_mid_seen = flags.chapter8_mid_seen;
+          delete flags.chapter8_mid_seen;
+        }
+      }
+      data.version = 15;
     }
 
     return data;

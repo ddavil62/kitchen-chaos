@@ -570,48 +570,48 @@ export const ALL_SERVING_RECIPES = [
   {
     id: 'dim_sum', nameKo: '딤섬', icon: '🥟', category: 'special',
     tier: 2, ingredients: { tofu: 1, flour: 1 }, baseReward: 50, cookTime: 5500,
-    unlockCost: 35, gateStage: '8-1',
+    unlockCost: 35, gateStage: '10-1',
   },
   {
     id: 'wok_noodles', nameKo: '웍 볶음면', icon: '🍜', category: 'noodle',
     tier: 2, ingredients: { cilantro: 1, egg: 1 }, baseReward: 45, cookTime: 5000,
-    unlockCost: 30, gateStage: '8-1',
+    unlockCost: 30, gateStage: '10-1',
   },
   {
     id: 'cilantro_tofu_steam', nameKo: '고수두부찜', icon: '🥘', category: 'special',
     tier: 2, ingredients: { tofu: 1, cilantro: 1 }, baseReward: 55, cookTime: 6500,
-    unlockCost: 40, gateStage: '8-1',
+    unlockCost: 40, gateStage: '10-1',
   },
 
   // ★★★ 3성 (3종)
   {
     id: 'mapo_tofu', nameKo: '마파두부', icon: '🍲', category: 'fry',
     tier: 3, ingredients: { tofu: 2 }, baseReward: 70, cookTime: 8000,
-    unlockCost: 60, gateStage: '8-2',
+    unlockCost: 60, gateStage: '10-2',
   },
   {
     id: 'tofu_hotpot', nameKo: '두부 훠궈', icon: '🫕', category: 'soup',
     tier: 3, ingredients: { tofu: 2, mushroom: 1 }, baseReward: 75, cookTime: 9000,
-    unlockCost: 65, gateStage: '8-3',
+    unlockCost: 65, gateStage: '10-3',
   },
   {
     id: 'cilantro_shrimp_soup', nameKo: '고수 탕수', icon: '🍲', category: 'soup',
     tier: 3, ingredients: { cilantro: 2, shrimp: 1 }, baseReward: 75, cookTime: 9000,
-    unlockCost: 65, gateStage: '8-3',
+    unlockCost: 65, gateStage: '10-3',
   },
 
   // ★★★★ 4성 (1종)
   {
     id: 'peking_duck', nameKo: '베이징 덕', icon: '🦆', category: 'special',
     tier: 4, ingredients: { tofu: 1, cilantro: 1, butter: 1 }, baseReward: 90, cookTime: 10000,
-    unlockCost: 100, gateStage: '8-4',
+    unlockCost: 100, gateStage: '10-4',
   },
 
   // ★★★★★ 5성 (1종)
   {
     id: 'dragon_feast', nameKo: '용의 만찬', icon: '🐉', category: 'special',
     tier: 5, ingredients: { tofu: 2, cilantro: 2, meat: 1 }, baseReward: 130, cookTime: 13000,
-    unlockCost: 180, gateStage: '8-5',
+    unlockCost: 180, gateStage: '10-5',
   },
 
   // ── Phase 22-3 신규 서빙 레시피 (8장 이자카야 심층부) ──
@@ -620,50 +620,50 @@ export const ALL_SERVING_RECIPES = [
   {
     id: 'sake_cocktail', nameKo: '사케 칵테일', icon: '🍶', category: 'special',
     tier: 1, ingredients: { sake: 1 }, baseReward: 30, cookTime: 3000,
-    unlockCost: 20, gateStage: '8-1',
+    unlockCost: 20, gateStage: '10-1',
   },
 
   // ★★ 2성 (2종)
   {
     id: 'sake_bowl', nameKo: '사케 덮밥', icon: '🥢', category: 'special',
     tier: 2, ingredients: { sake: 1, rice: 1 }, baseReward: 52, cookTime: 5500,
-    unlockCost: 38, gateStage: '8-1',
+    unlockCost: 38, gateStage: '10-1',
   },
   {
     id: 'sake_shrimp', nameKo: '사케 새우구이', icon: '🦐', category: 'grill',
     tier: 2, ingredients: { sake: 1, shrimp: 1 }, baseReward: 55, cookTime: 5500,
-    unlockCost: 40, gateStage: '8-2',
+    unlockCost: 40, gateStage: '10-2',
   },
 
   // ★★★ 3성 (3종)
   {
     id: 'sake_sashimi', nameKo: '사케 사시미', icon: '🍣', category: 'special',
     tier: 3, ingredients: { sake: 1, sashimi_tuna: 1 }, baseReward: 75, cookTime: 7500,
-    unlockCost: 65, gateStage: '8-2',
+    unlockCost: 65, gateStage: '10-2',
   },
   {
     id: 'sake_ramen', nameKo: '사케 라멘', icon: '🍜', category: 'noodle',
     tier: 3, ingredients: { sake: 1, tofu: 1, mushroom: 1 }, baseReward: 80, cookTime: 8500,
-    unlockCost: 72, gateStage: '8-3',
+    unlockCost: 72, gateStage: '10-3',
   },
   {
     id: 'sake_hotpot', nameKo: '사케 전골', icon: '🫕', category: 'soup',
     tier: 3, ingredients: { sake: 1, tofu: 1, shrimp: 1 }, baseReward: 82, cookTime: 9000,
-    unlockCost: 75, gateStage: '8-3',
+    unlockCost: 75, gateStage: '10-3',
   },
 
   // ★★★★ 4성 (1종)
   {
     id: 'sake_oden', nameKo: '사케 오뎅', icon: '🍢', category: 'soup',
     tier: 4, ingredients: { sake: 1, tofu: 1, cilantro: 1, mushroom: 1 }, baseReward: 105, cookTime: 10500,
-    unlockCost: 115, gateStage: '8-4',
+    unlockCost: 115, gateStage: '10-4',
   },
 
   // ★★★★★ 5성 (1종)
   {
     id: 'sake_kaiseki', nameKo: '사케 가이세키', icon: '🌸', category: 'special',
     tier: 5, ingredients: { sake: 2, sashimi_tuna: 1, wasabi: 1, tofu: 1 }, baseReward: 140, cookTime: 13000,
-    unlockCost: 190, gateStage: '8-5',
+    unlockCost: 190, gateStage: '10-5',
   },
 ];
 
@@ -822,13 +822,13 @@ export const ALL_BUFF_RECIPES = [
     id: 'dragon_qi', nameKo: '용기(龍氣)', icon: '🐉', category: 'buff',
     tier: 3, ingredients: { tofu: 2, cilantro: 1 },
     effectDesc: '공격력 +30% (55초)', effectType: 'buff_damage', effectValue: 0.30,
-    duration: 55000, unlockCost: 60, gateStage: '8-2',
+    duration: 55000, unlockCost: 60, gateStage: '10-2',
   },
   {
     id: 'wok_aura', nameKo: '웍 오라', icon: '🔥', category: 'buff',
     tier: 3, ingredients: { tofu: 1, cilantro: 2 },
     effectDesc: '공격력+속도 +25% (50초)', effectType: 'buff_both', effectValue: 0.25,
-    duration: 50000, unlockCost: 60, gateStage: '8-2',
+    duration: 50000, unlockCost: 60, gateStage: '10-2',
   },
 
   // ── Phase 22-3 신규 버프 레시피 (8장 이자카야 심층부) ──
@@ -839,7 +839,7 @@ export const ALL_BUFF_RECIPES = [
     effectType: 'buff_narcotize_immunity',
     effectValue: 0.15,
     duration: 3, durationUnit: 'wave',
-    unlockCost: 65, gateStage: '8-2',
+    unlockCost: 65, gateStage: '10-2',
   },
   {
     id: 'sake_oni_spirit', nameKo: '오니 정기', icon: '👹', category: 'buff',
@@ -848,7 +848,7 @@ export const ALL_BUFF_RECIPES = [
     effectType: 'buff_both',
     effectValue: 0.25,
     duration: 2, durationUnit: 'wave',
-    unlockCost: 85, gateStage: '8-3',
+    unlockCost: 85, gateStage: '10-3',
   },
 ];
 

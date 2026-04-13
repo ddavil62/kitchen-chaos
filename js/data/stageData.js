@@ -4399,11 +4399,11 @@ export const STAGES = {
   },
 
   // ══════════════════════════════════════════════════════════════
-  // ── 시즌 2: 8장 용의 주방 ──
+  // ── 시즌 2: 10장 용의 주방 ──
   // ══════════════════════════════════════════════════════════════
 
-  '8-1': {
-    id: '8-1', nameKo: '이자카야 심층부 입구', theme: 'izakaya_underground',
+  '10-1': {
+    id: '10-1', nameKo: '이자카야 심층부 입구', theme: 'izakaya_underground',
     availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
     gridCols: 9, gridRows: 10,
     pathSegments: [
@@ -4449,8 +4449,8 @@ export const STAGES = {
     starThresholds: { three: 18, two: 13 },
     service: { duration: 240, customerInterval: 3.5, maxCustomers: 35, customerPatience: 27 },
   },
-  '8-2': {
-    id: '8-2', nameKo: '사케 저장고', theme: 'izakaya_underground',
+  '10-2': {
+    id: '10-2', nameKo: '사케 저장고', theme: 'izakaya_underground',
     availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
     gridCols: 9, gridRows: 10,
     pathSegments: [
@@ -4498,8 +4498,8 @@ export const STAGES = {
     starThresholds: { three: 19, two: 14 },
     service: { duration: 250, customerInterval: 3.3, maxCustomers: 38, customerPatience: 26 },
   },
-  '8-3': {
-    id: '8-3', nameKo: '지하 통로', theme: 'izakaya_underground',
+  '10-3': {
+    id: '10-3', nameKo: '지하 통로', theme: 'izakaya_underground',
     availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
     gridCols: 9, gridRows: 10,
     pathSegments: [
@@ -4555,8 +4555,8 @@ export const STAGES = {
     starThresholds: { three: 20, two: 15 },
     service: { duration: 260, customerInterval: 3.0, maxCustomers: 40, customerPatience: 26 },
   },
-  '8-4': {
-    id: '8-4', nameKo: '봉인 전실', theme: 'izakaya_underground',
+  '10-4': {
+    id: '10-4', nameKo: '봉인 전실', theme: 'izakaya_underground',
     availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
     gridCols: 9, gridRows: 10,
     pathSegments: [
@@ -4612,8 +4612,8 @@ export const STAGES = {
     starThresholds: { three: 21, two: 15 },
     service: { duration: 270, customerInterval: 2.8, maxCustomers: 42, customerPatience: 25 },
   },
-  '8-5': {
-    id: '8-5', nameKo: '심층부 제단', theme: 'izakaya_underground',
+  '10-5': {
+    id: '10-5', nameKo: '심층부 제단', theme: 'izakaya_underground',
     availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
     gridCols: 9, gridRows: 10,
     pathSegments: [
@@ -4670,8 +4670,8 @@ export const STAGES = {
     starThresholds: { three: 22, two: 16 },
     service: { duration: 280, customerInterval: 2.6, maxCustomers: 44, customerPatience: 24 },
   },
-  '8-6': {
-    id: '8-6', nameKo: '용의 주방 \u2014 결전 (보스)', theme: 'chinese_palace_kitchen',
+  '10-6': {
+    id: '10-6', nameKo: '용의 주방 \u2014 결전 (보스)', theme: 'chinese_palace_kitchen',
     availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
     gridCols: 9, gridRows: 10,
     pathSegments: [
@@ -4878,529 +4878,62 @@ export const STAGES = {
   },
 
   // ══════════════════════════════════════════════════════════════
-  // ── 시즌 2: 10장 향신료 궁전 ──
+  // ── 시즌 2: 11장 (미구현) ──
   // ══════════════════════════════════════════════════════════════
 
-  '10-1': {
-    id: '10-1', nameKo: '궁전 대문', theme: 'spice_palace',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
-      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 36, interval: 420 }, { type: 'shrimp_samurai', count: 22, interval: 640 }] },
-      { wave: 2, enemies: [{ type: 'tomato_bomber', count: 22, interval: 620 }, { type: 'chili_demon', count: 24, interval: 580 }, { type: 'cheese_golem', count: 8, interval: 2000 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 44, interval: 300 }, { type: 'fish_knight', count: 18, interval: 850 }, { type: 'milk_phantom', count: 18, interval: 880 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 24, interval: 660 }, { type: 'octopus_mage', count: 16, interval: 950 }, { type: 'flour_ghost', count: 18, interval: 800 }, { type: 'rice_slime', count: 8, interval: 1600 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 52, interval: 260 }, { type: 'cheese_golem', count: 12, interval: 1300 }, { type: 'mushroom_scout', count: 16, interval: 900 }, { type: 'butter_ghost', count: 26, interval: 560 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 9000, baseReward: 75, tipMultiplier: 1.5 }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 85, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 28, two: 20 },
-    service: { duration: 320, customerInterval: 2.0, maxCustomers: 52, customerPatience: 23 },
-  },
-  '10-2': {
-    id: '10-2', nameKo: '카레 분수대', theme: 'spice_palace',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'horizontal', row: 1, colStart: 0, colEnd: 4 },
-      { type: 'vertical', col: 4, rowStart: 1, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 4, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 5, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'carrot_goblin', count: 32, interval: 500 }, { type: 'butter_ghost', count: 20, interval: 700 }] },
-      { wave: 2, enemies: [{ type: 'sugar_fairy', count: 40, interval: 320 }, { type: 'milk_phantom', count: 16, interval: 950 }, { type: 'cheese_golem', count: 8, interval: 2000 }] },
-      { wave: 3, enemies: [{ type: 'shrimp_samurai', count: 26, interval: 560 }, { type: 'chili_demon', count: 24, interval: 580 }, { type: 'flour_ghost', count: 18, interval: 800 }] },
-      { wave: 4, enemies: [{ type: 'fish_knight', count: 20, interval: 800 }, { type: 'meat_ogre', count: 26, interval: 640 }, { type: 'octopus_mage', count: 16, interval: 950 }, { type: 'rice_slime', count: 8, interval: 1600 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 54, interval: 255 }, { type: 'cheese_golem', count: 12, interval: 1300 }, { type: 'egg_sprite', count: 26, interval: 540 }, { type: 'mushroom_scout', count: 16, interval: 900 }] },
-      { wave: 6, enemies: [{ type: 'carrot_goblin', count: 52, interval: 265 }, { type: 'shrimp_samurai', count: 30, interval: 500 }, { type: 'meat_ogre', count: 26, interval: 640 }, { type: 'cheese_golem', count: 12, interval: 1300 }, { type: 'milk_phantom', count: 22, interval: 740 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 9000, baseReward: 75, tipMultiplier: 1.5 }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 85, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
-      { wave: 6, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 29, two: 21 },
-    service: { duration: 330, customerInterval: 1.9, maxCustomers: 54, customerPatience: 22 },
-  },
-  '10-3': {
-    id: '10-3', nameKo: '사프란 정원', theme: 'spice_palace',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 0, colEnd: 4 },
-      { type: 'vertical', col: 4, rowStart: 3, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 4, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 6, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 38, interval: 400 }, { type: 'tomato_bomber', count: 22, interval: 620 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 28, interval: 530 }, { type: 'chili_demon', count: 26, interval: 560 }, { type: 'cheese_golem', count: 9, interval: 1800 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 46, interval: 290 }, { type: 'fish_knight', count: 20, interval: 800 }, { type: 'milk_phantom', count: 18, interval: 880 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 26, interval: 640 }, { type: 'octopus_mage', count: 18, interval: 900 }, { type: 'flour_ghost', count: 18, interval: 800 }, { type: 'rice_slime', count: 9, interval: 1500 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 54, interval: 255 }, { type: 'cheese_golem', count: 14, interval: 1200 }, { type: 'butter_ghost', count: 26, interval: 560 }, { type: 'egg_sprite', count: 28, interval: 520 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 9000, baseReward: 75, tipMultiplier: 1.5 }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 90, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 105, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 135, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 30, two: 22 },
-    service: { duration: 340, customerInterval: 1.8, maxCustomers: 56, customerPatience: 22 },
-  },
-  '10-4': {
-    id: '10-4', nameKo: '계피 회랑', theme: 'spice_palace',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 6, rowStart: 3, rowEnd: 7 },
-      { type: 'horizontal', row: 7, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 2, rowStart: 7, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'carrot_goblin', count: 34, interval: 480 }, { type: 'shrimp_samurai', count: 24, interval: 600 }] },
-      { wave: 2, enemies: [{ type: 'sugar_fairy', count: 42, interval: 310 }, { type: 'chili_demon', count: 26, interval: 560 }, { type: 'milk_phantom', count: 18, interval: 880 }] },
-      { wave: 3, enemies: [{ type: 'tomato_bomber', count: 24, interval: 580 }, { type: 'fish_knight', count: 20, interval: 800 }, { type: 'cheese_golem', count: 10, interval: 1600 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 28, interval: 620 }, { type: 'octopus_mage', count: 18, interval: 900 }, { type: 'flour_ghost', count: 20, interval: 750 }, { type: 'rice_slime', count: 9, interval: 1500 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 56, interval: 250 }, { type: 'cheese_golem', count: 14, interval: 1200 }, { type: 'mushroom_scout', count: 18, interval: 850 }, { type: 'butter_ghost', count: 28, interval: 540 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 80, tipMultiplier: 1.5, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 90, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 105, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 31, two: 23 },
-    service: { duration: 350, customerInterval: 1.7, maxCustomers: 58, customerPatience: 21 },
-  },
-  '10-5': {
-    id: '10-5', nameKo: '후추 탑', theme: 'spice_palace',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 2 },
-      { type: 'horizontal', row: 2, colStart: 1, colEnd: 4 },
-      { type: 'vertical', col: 1, rowStart: 2, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 6, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 40, interval: 380 }, { type: 'butter_ghost', count: 22, interval: 640 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 28, interval: 530 }, { type: 'chili_demon', count: 28, interval: 540 }, { type: 'cheese_golem', count: 10, interval: 1600 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 48, interval: 280 }, { type: 'fish_knight', count: 20, interval: 800 }, { type: 'milk_phantom', count: 20, interval: 830 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 28, interval: 620 }, { type: 'tomato_bomber', count: 26, interval: 560 }, { type: 'octopus_mage', count: 18, interval: 900 }, { type: 'rice_slime', count: 10, interval: 1400 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 58, interval: 245 }, { type: 'cheese_golem', count: 14, interval: 1200 }, { type: 'flour_ghost', count: 22, interval: 720 }, { type: 'egg_sprite', count: 30, interval: 500 }] },
-      { wave: 6, enemies: [{ type: 'carrot_goblin', count: 56, interval: 250 }, { type: 'shrimp_samurai', count: 32, interval: 480 }, { type: 'meat_ogre', count: 28, interval: 620 }, { type: 'cheese_golem', count: 14, interval: 1200 }, { type: 'milk_phantom', count: 24, interval: 700 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 80, tipMultiplier: 1.5, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 95, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 110, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 125, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
-      { wave: 6, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 150, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 32, two: 24 },
-    service: { duration: 360, customerInterval: 1.6, maxCustomers: 60, customerPatience: 21 },
-  },
-  '10-6': {
-    id: '10-6', nameKo: '향신료왕의 연회 (보스)', theme: 'spice_palace',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 2 },
-      { type: 'horizontal', row: 2, colStart: 4, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 2, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 1, rowStart: 5, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 42, interval: 360 }, { type: 'carrot_goblin', count: 38, interval: 390 }, { type: 'milk_phantom', count: 16, interval: 980 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 30, interval: 500 }, { type: 'tomato_bomber', count: 28, interval: 530 }, { type: 'butter_ghost', count: 26, interval: 560 }, { type: 'cheese_golem', count: 12, interval: 1400 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 50, interval: 270 }, { type: 'chili_demon', count: 28, interval: 540 }, { type: 'fish_knight', count: 20, interval: 800 }, { type: 'egg_sprite', count: 28, interval: 520 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 30, interval: 600 }, { type: 'octopus_mage', count: 20, interval: 850 }, { type: 'mushroom_scout', count: 18, interval: 850 }, { type: 'rice_slime', count: 10, interval: 1400 }, { type: 'cheese_golem', count: 14, interval: 1200 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 60, interval: 240 }, { type: 'carrot_goblin', count: 54, interval: 255 }, { type: 'cheese_golem', count: 16, interval: 1100 }, { type: 'flour_ghost', count: 24, interval: 680 }, { type: 'milk_phantom', count: 24, interval: 700 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 85, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 135, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 34, two: 25 },
-    service: { duration: 380, customerInterval: 1.5, maxCustomers: 65, customerPatience: 20 },
-  },
+  '11-1': { id: '11-1', nameKo: '미구현', theme: 'placeholder' },
+  '11-2': { id: '11-2', nameKo: '미구현', theme: 'placeholder' },
+  '11-3': { id: '11-3', nameKo: '미구현', theme: 'placeholder' },
+  '11-4': { id: '11-4', nameKo: '미구현', theme: 'placeholder' },
+  '11-5': { id: '11-5', nameKo: '미구현', theme: 'placeholder' },
+  '11-6': { id: '11-6', nameKo: '미구현', theme: 'placeholder' },
 
   // ══════════════════════════════════════════════════════════════
-  // ── 시즌 2: 11장 선인장 칸티나 ──
+  // ── 시즌 2: 12장 (미구현) ──
   // ══════════════════════════════════════════════════════════════
 
-  '11-1': {
-    id: '11-1', nameKo: '사막 입구', theme: 'cactus_cantina',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
-      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 40, interval: 380 }, { type: 'shrimp_samurai', count: 24, interval: 600 }] },
-      { wave: 2, enemies: [{ type: 'tomato_bomber', count: 24, interval: 580 }, { type: 'chili_demon', count: 28, interval: 540 }, { type: 'cheese_golem', count: 10, interval: 1600 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 48, interval: 280 }, { type: 'fish_knight', count: 20, interval: 800 }, { type: 'milk_phantom', count: 20, interval: 830 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 28, interval: 620 }, { type: 'octopus_mage', count: 18, interval: 900 }, { type: 'flour_ghost', count: 20, interval: 750 }, { type: 'rice_slime', count: 10, interval: 1400 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 56, interval: 250 }, { type: 'cheese_golem', count: 14, interval: 1200 }, { type: 'mushroom_scout', count: 18, interval: 850 }, { type: 'butter_ghost', count: 28, interval: 540 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 80, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 95, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 110, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 145, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 32, two: 24 },
-    service: { duration: 360, customerInterval: 1.6, maxCustomers: 60, customerPatience: 21 },
-  },
-  '11-2': {
-    id: '11-2', nameKo: '선인장 농장', theme: 'cactus_cantina',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'horizontal', row: 1, colStart: 0, colEnd: 4 },
-      { type: 'vertical', col: 4, rowStart: 1, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 4, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 5, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'carrot_goblin', count: 36, interval: 450 }, { type: 'butter_ghost', count: 22, interval: 640 }] },
-      { wave: 2, enemies: [{ type: 'sugar_fairy', count: 44, interval: 300 }, { type: 'milk_phantom', count: 18, interval: 880 }, { type: 'cheese_golem', count: 10, interval: 1600 }] },
-      { wave: 3, enemies: [{ type: 'shrimp_samurai', count: 28, interval: 530 }, { type: 'chili_demon', count: 28, interval: 540 }, { type: 'flour_ghost', count: 20, interval: 750 }] },
-      { wave: 4, enemies: [{ type: 'fish_knight', count: 22, interval: 780 }, { type: 'meat_ogre', count: 28, interval: 620 }, { type: 'octopus_mage', count: 18, interval: 900 }, { type: 'rice_slime', count: 10, interval: 1400 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 58, interval: 245 }, { type: 'cheese_golem', count: 14, interval: 1200 }, { type: 'egg_sprite', count: 30, interval: 500 }, { type: 'mushroom_scout', count: 18, interval: 850 }] },
-      { wave: 6, enemies: [{ type: 'carrot_goblin', count: 58, interval: 240 }, { type: 'shrimp_samurai', count: 34, interval: 460 }, { type: 'meat_ogre', count: 28, interval: 620 }, { type: 'cheese_golem', count: 14, interval: 1200 }, { type: 'milk_phantom', count: 24, interval: 700 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 85, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 145, tipMultiplier: 2.0, vip: true }] },
-      { wave: 6, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 33, two: 24 },
-    service: { duration: 370, customerInterval: 1.5, maxCustomers: 62, customerPatience: 20 },
-  },
-  '11-3': {
-    id: '11-3', nameKo: '테킬라 양조장', theme: 'cactus_cantina',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 0, colEnd: 4 },
-      { type: 'vertical', col: 4, rowStart: 3, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 4, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 6, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 42, interval: 360 }, { type: 'tomato_bomber', count: 24, interval: 580 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 30, interval: 500 }, { type: 'chili_demon', count: 28, interval: 540 }, { type: 'cheese_golem', count: 10, interval: 1600 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 50, interval: 270 }, { type: 'fish_knight', count: 22, interval: 780 }, { type: 'milk_phantom', count: 20, interval: 830 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 30, interval: 600 }, { type: 'octopus_mage', count: 20, interval: 850 }, { type: 'flour_ghost', count: 22, interval: 720 }, { type: 'rice_slime', count: 10, interval: 1400 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 60, interval: 240 }, { type: 'cheese_golem', count: 16, interval: 1100 }, { type: 'butter_ghost', count: 30, interval: 520 }, { type: 'egg_sprite', count: 30, interval: 500 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 85, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 135, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 150, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 34, two: 25 },
-    service: { duration: 380, customerInterval: 1.5, maxCustomers: 64, customerPatience: 20 },
-  },
-  '11-4': {
-    id: '11-4', nameKo: '모래 바람 홀', theme: 'cactus_cantina',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 4 },
-      { type: 'horizontal', row: 4, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 6, rowStart: 4, rowEnd: 7 },
-      { type: 'horizontal', row: 7, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 2, rowStart: 7, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'carrot_goblin', count: 38, interval: 420 }, { type: 'shrimp_samurai', count: 26, interval: 570 }] },
-      { wave: 2, enemies: [{ type: 'sugar_fairy', count: 46, interval: 290 }, { type: 'chili_demon', count: 30, interval: 520 }, { type: 'milk_phantom', count: 20, interval: 830 }] },
-      { wave: 3, enemies: [{ type: 'tomato_bomber', count: 26, interval: 560 }, { type: 'fish_knight', count: 22, interval: 780 }, { type: 'cheese_golem', count: 12, interval: 1400 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 30, interval: 600 }, { type: 'octopus_mage', count: 20, interval: 850 }, { type: 'flour_ghost', count: 22, interval: 720 }, { type: 'rice_slime', count: 10, interval: 1400 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 62, interval: 235 }, { type: 'cheese_golem', count: 16, interval: 1100 }, { type: 'mushroom_scout', count: 20, interval: 820 }, { type: 'butter_ghost', count: 30, interval: 520 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 90, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 105, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 35, two: 26 },
-    service: { duration: 390, customerInterval: 1.4, maxCustomers: 66, customerPatience: 20 },
-  },
-  '11-5': {
-    id: '11-5', nameKo: '오아시스 주방', theme: 'cactus_cantina',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 2 },
-      { type: 'horizontal', row: 2, colStart: 1, colEnd: 4 },
-      { type: 'vertical', col: 1, rowStart: 2, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 6, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 44, interval: 340 }, { type: 'butter_ghost', count: 24, interval: 600 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 30, interval: 500 }, { type: 'chili_demon', count: 30, interval: 520 }, { type: 'cheese_golem', count: 12, interval: 1400 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 52, interval: 265 }, { type: 'fish_knight', count: 22, interval: 780 }, { type: 'milk_phantom', count: 22, interval: 780 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 32, interval: 580 }, { type: 'tomato_bomber', count: 28, interval: 540 }, { type: 'octopus_mage', count: 20, interval: 850 }, { type: 'rice_slime', count: 10, interval: 1400 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 64, interval: 230 }, { type: 'cheese_golem', count: 16, interval: 1100 }, { type: 'flour_ghost', count: 24, interval: 680 }, { type: 'egg_sprite', count: 32, interval: 480 }] },
-      { wave: 6, enemies: [{ type: 'carrot_goblin', count: 62, interval: 235 }, { type: 'shrimp_samurai', count: 36, interval: 440 }, { type: 'meat_ogre', count: 32, interval: 580 }, { type: 'cheese_golem', count: 16, interval: 1100 }, { type: 'milk_phantom', count: 26, interval: 660 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 90, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 110, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 125, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 145, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
-      { wave: 6, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 165, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 36, two: 27 },
-    service: { duration: 400, customerInterval: 1.3, maxCustomers: 68, customerPatience: 19 },
-  },
-  '11-6': {
-    id: '11-6', nameKo: '칸티나 보스 (보스)', theme: 'cactus_cantina',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 2 },
-      { type: 'horizontal', row: 2, colStart: 4, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 2, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 1, rowStart: 5, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 46, interval: 320 }, { type: 'carrot_goblin', count: 42, interval: 340 }, { type: 'milk_phantom', count: 18, interval: 900 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 32, interval: 480 }, { type: 'tomato_bomber', count: 30, interval: 500 }, { type: 'butter_ghost', count: 28, interval: 540 }, { type: 'cheese_golem', count: 14, interval: 1200 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 54, interval: 255 }, { type: 'chili_demon', count: 30, interval: 520 }, { type: 'fish_knight', count: 22, interval: 780 }, { type: 'egg_sprite', count: 30, interval: 500 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 34, interval: 560 }, { type: 'octopus_mage', count: 22, interval: 800 }, { type: 'mushroom_scout', count: 20, interval: 820 }, { type: 'rice_slime', count: 12, interval: 1300 }, { type: 'cheese_golem', count: 16, interval: 1100 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 66, interval: 225 }, { type: 'carrot_goblin', count: 60, interval: 240 }, { type: 'cheese_golem', count: 18, interval: 1000 }, { type: 'flour_ghost', count: 26, interval: 650 }, { type: 'milk_phantom', count: 28, interval: 630 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 95, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 150, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 170, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 38, two: 28 },
-    service: { duration: 420, customerInterval: 1.2, maxCustomers: 70, customerPatience: 19 },
-  },
+  '12-1': { id: '12-1', nameKo: '미구현', theme: 'placeholder' },
+  '12-2': { id: '12-2', nameKo: '미구현', theme: 'placeholder' },
+  '12-3': { id: '12-3', nameKo: '미구현', theme: 'placeholder' },
+  '12-4': { id: '12-4', nameKo: '미구현', theme: 'placeholder' },
+  '12-5': { id: '12-5', nameKo: '미구현', theme: 'placeholder' },
+  '12-6': { id: '12-6', nameKo: '미구현', theme: 'placeholder' },
 
   // ══════════════════════════════════════════════════════════════
-  // ── 시즌 2: 12장 슈가 드림랜드 ──
+  // ── 시즌 2: 13장 (미구현) ──
   // ══════════════════════════════════════════════════════════════
 
-  '12-1': {
-    id: '12-1', nameKo: '캔디 게이트', theme: 'sugar_dreamland',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
-      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 44, interval: 340 }, { type: 'shrimp_samurai', count: 26, interval: 570 }] },
-      { wave: 2, enemies: [{ type: 'tomato_bomber', count: 28, interval: 540 }, { type: 'chili_demon', count: 30, interval: 520 }, { type: 'cheese_golem', count: 12, interval: 1400 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 52, interval: 265 }, { type: 'fish_knight', count: 22, interval: 780 }, { type: 'milk_phantom', count: 22, interval: 780 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 32, interval: 580 }, { type: 'octopus_mage', count: 22, interval: 800 }, { type: 'flour_ghost', count: 24, interval: 680 }, { type: 'rice_slime', count: 12, interval: 1300 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 64, interval: 230 }, { type: 'cheese_golem', count: 16, interval: 1100 }, { type: 'mushroom_scout', count: 20, interval: 820 }, { type: 'butter_ghost', count: 30, interval: 520 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 90, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 110, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 125, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 145, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 160, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 36, two: 27 },
-    service: { duration: 400, customerInterval: 1.3, maxCustomers: 68, customerPatience: 19 },
-  },
-  '12-2': {
-    id: '12-2', nameKo: '초콜릿 강', theme: 'sugar_dreamland',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'horizontal', row: 1, colStart: 0, colEnd: 4 },
-      { type: 'vertical', col: 4, rowStart: 1, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 4, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 5, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'carrot_goblin', count: 40, interval: 400 }, { type: 'butter_ghost', count: 26, interval: 570 }] },
-      { wave: 2, enemies: [{ type: 'sugar_fairy', count: 48, interval: 280 }, { type: 'milk_phantom', count: 20, interval: 830 }, { type: 'cheese_golem', count: 12, interval: 1400 }] },
-      { wave: 3, enemies: [{ type: 'shrimp_samurai', count: 32, interval: 480 }, { type: 'chili_demon', count: 30, interval: 520 }, { type: 'flour_ghost', count: 22, interval: 720 }] },
-      { wave: 4, enemies: [{ type: 'fish_knight', count: 24, interval: 750 }, { type: 'meat_ogre', count: 32, interval: 580 }, { type: 'octopus_mage', count: 22, interval: 800 }, { type: 'rice_slime', count: 12, interval: 1300 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 66, interval: 225 }, { type: 'cheese_golem', count: 16, interval: 1100 }, { type: 'egg_sprite', count: 34, interval: 460 }, { type: 'mushroom_scout', count: 20, interval: 820 }] },
-      { wave: 6, enemies: [{ type: 'carrot_goblin', count: 64, interval: 230 }, { type: 'shrimp_samurai', count: 36, interval: 440 }, { type: 'meat_ogre', count: 34, interval: 560 }, { type: 'cheese_golem', count: 18, interval: 1000 }, { type: 'milk_phantom', count: 28, interval: 630 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 95, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 110, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 150, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 165, tipMultiplier: 2.0, vip: true }] },
-      { wave: 6, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 175, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 37, two: 28 },
-    service: { duration: 410, customerInterval: 1.2, maxCustomers: 70, customerPatience: 19 },
-  },
-  '12-3': {
-    id: '12-3', nameKo: '마카롱 미로', theme: 'sugar_dreamland',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 0, colEnd: 4 },
-      { type: 'vertical', col: 4, rowStart: 3, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 4, colEnd: 8 },
-      { type: 'vertical', col: 8, rowStart: 6, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 46, interval: 320 }, { type: 'tomato_bomber', count: 28, interval: 540 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 32, interval: 480 }, { type: 'chili_demon', count: 32, interval: 500 }, { type: 'cheese_golem', count: 14, interval: 1200 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 54, interval: 255 }, { type: 'fish_knight', count: 24, interval: 750 }, { type: 'milk_phantom', count: 22, interval: 780 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 34, interval: 560 }, { type: 'octopus_mage', count: 22, interval: 800 }, { type: 'flour_ghost', count: 24, interval: 680 }, { type: 'rice_slime', count: 12, interval: 1300 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 68, interval: 220 }, { type: 'cheese_golem', count: 18, interval: 1000 }, { type: 'butter_ghost', count: 32, interval: 500 }, { type: 'egg_sprite', count: 34, interval: 460 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 95, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 135, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 175, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 38, two: 28 },
-    service: { duration: 420, customerInterval: 1.2, maxCustomers: 72, customerPatience: 18 },
-  },
-  '12-4': {
-    id: '12-4', nameKo: '슈크림 극장', theme: 'sugar_dreamland',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 3 },
-      { type: 'horizontal', row: 3, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 6, rowStart: 3, rowEnd: 7 },
-      { type: 'horizontal', row: 7, colStart: 2, colEnd: 6 },
-      { type: 'vertical', col: 2, rowStart: 7, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'carrot_goblin', count: 42, interval: 380 }, { type: 'shrimp_samurai', count: 30, interval: 510 }] },
-      { wave: 2, enemies: [{ type: 'sugar_fairy', count: 50, interval: 270 }, { type: 'chili_demon', count: 32, interval: 500 }, { type: 'milk_phantom', count: 22, interval: 780 }] },
-      { wave: 3, enemies: [{ type: 'tomato_bomber', count: 30, interval: 510 }, { type: 'fish_knight', count: 24, interval: 750 }, { type: 'cheese_golem', count: 14, interval: 1200 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 36, interval: 540 }, { type: 'octopus_mage', count: 24, interval: 750 }, { type: 'flour_ghost', count: 24, interval: 680 }, { type: 'rice_slime', count: 12, interval: 1300 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 70, interval: 215 }, { type: 'cheese_golem', count: 18, interval: 1000 }, { type: 'mushroom_scout', count: 22, interval: 800 }, { type: 'butter_ghost', count: 32, interval: 500 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 160, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 180, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 40, two: 30 },
-    service: { duration: 440, customerInterval: 1.1, maxCustomers: 74, customerPatience: 18 },
-  },
-  '12-5': {
-    id: '12-5', nameKo: '와플 성벽', theme: 'sugar_dreamland',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 2 },
-      { type: 'horizontal', row: 2, colStart: 1, colEnd: 4 },
-      { type: 'vertical', col: 1, rowStart: 2, rowEnd: 6 },
-      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 6, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 48, interval: 300 }, { type: 'butter_ghost', count: 28, interval: 540 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 34, interval: 460 }, { type: 'chili_demon', count: 34, interval: 480 }, { type: 'cheese_golem', count: 14, interval: 1200 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 56, interval: 250 }, { type: 'fish_knight', count: 24, interval: 750 }, { type: 'milk_phantom', count: 24, interval: 740 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 36, interval: 540 }, { type: 'tomato_bomber', count: 32, interval: 500 }, { type: 'octopus_mage', count: 24, interval: 750 }, { type: 'rice_slime', count: 14, interval: 1200 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 72, interval: 210 }, { type: 'cheese_golem', count: 18, interval: 1000 }, { type: 'flour_ghost', count: 28, interval: 630 }, { type: 'egg_sprite', count: 36, interval: 440 }] },
-      { wave: 6, enemies: [{ type: 'carrot_goblin', count: 70, interval: 215 }, { type: 'shrimp_samurai', count: 38, interval: 420 }, { type: 'meat_ogre', count: 36, interval: 540 }, { type: 'cheese_golem', count: 20, interval: 950 }, { type: 'milk_phantom', count: 30, interval: 600 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 165, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 185, tipMultiplier: 2.0, vip: true }] },
-      { wave: 6, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 200, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 42, two: 32 },
-    service: { duration: 460, customerInterval: 1.0, maxCustomers: 78, customerPatience: 18 },
-  },
-  '12-6': {
-    id: '12-6', nameKo: '슈가 드림 (최종 보스)', theme: 'sugar_dreamland',
-    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
-    gridCols: 9, gridRows: 10,
-    pathSegments: [
-      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 2 },
-      { type: 'horizontal', row: 2, colStart: 4, colEnd: 7 },
-      { type: 'vertical', col: 7, rowStart: 2, rowEnd: 5 },
-      { type: 'horizontal', row: 5, colStart: 1, colEnd: 7 },
-      { type: 'vertical', col: 1, rowStart: 5, rowEnd: 9 },
-    ],
-    waves: [
-      { wave: 1, enemies: [{ type: 'sugar_fairy', count: 50, interval: 280 }, { type: 'carrot_goblin', count: 46, interval: 300 }, { type: 'milk_phantom', count: 20, interval: 830 }] },
-      { wave: 2, enemies: [{ type: 'shrimp_samurai', count: 36, interval: 440 }, { type: 'tomato_bomber', count: 34, interval: 460 }, { type: 'butter_ghost', count: 32, interval: 500 }, { type: 'cheese_golem', count: 16, interval: 1100 }] },
-      { wave: 3, enemies: [{ type: 'sugar_fairy', count: 60, interval: 240 }, { type: 'chili_demon', count: 34, interval: 480 }, { type: 'fish_knight', count: 26, interval: 720 }, { type: 'egg_sprite', count: 34, interval: 460 }] },
-      { wave: 4, enemies: [{ type: 'meat_ogre', count: 38, interval: 520 }, { type: 'octopus_mage', count: 26, interval: 720 }, { type: 'mushroom_scout', count: 24, interval: 750 }, { type: 'rice_slime', count: 14, interval: 1200 }, { type: 'cheese_golem', count: 18, interval: 1000 }] },
-      { wave: 5, enemies: [{ type: 'sugar_fairy', count: 76, interval: 200 }, { type: 'carrot_goblin', count: 70, interval: 210 }, { type: 'cheese_golem', count: 20, interval: 950 }, { type: 'flour_ghost', count: 30, interval: 600 }, { type: 'milk_phantom', count: 32, interval: 580 }] },
-    ],
-    customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 8000, baseReward: 110, tipMultiplier: 2.0, vip: true }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 180, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 220, tipMultiplier: 2.0, vip: true }] },
-    ],
-    starThresholds: { three: 45, two: 34 },
-    service: { duration: 480, customerInterval: 1.0, maxCustomers: 80, customerPatience: 18 },
-  },
+  '13-1': { id: '13-1', nameKo: '미구현', theme: 'placeholder' },
+  '13-2': { id: '13-2', nameKo: '미구현', theme: 'placeholder' },
+  '13-3': { id: '13-3', nameKo: '미구현', theme: 'placeholder' },
+  '13-4': { id: '13-4', nameKo: '미구현', theme: 'placeholder' },
+  '13-5': { id: '13-5', nameKo: '미구현', theme: 'placeholder' },
+  '13-6': { id: '13-6', nameKo: '미구현', theme: 'placeholder' },
+
+  // ══════════════════════════════════════════════════════════════
+  // ── 시즌 2: 14장 (미구현) ──
+  // ══════════════════════════════════════════════════════════════
+
+  '14-1': { id: '14-1', nameKo: '미구현', theme: 'placeholder' },
+  '14-2': { id: '14-2', nameKo: '미구현', theme: 'placeholder' },
+  '14-3': { id: '14-3', nameKo: '미구현', theme: 'placeholder' },
+  '14-4': { id: '14-4', nameKo: '미구현', theme: 'placeholder' },
+  '14-5': { id: '14-5', nameKo: '미구현', theme: 'placeholder' },
+  '14-6': { id: '14-6', nameKo: '미구현', theme: 'placeholder' },
+
+  // ══════════════════════════════════════════════════════════════
+  // ── 시즌 2: 15장 (미구현) ──
+  // ══════════════════════════════════════════════════════════════
+
+  '15-1': { id: '15-1', nameKo: '미구현', theme: 'placeholder' },
+  '15-2': { id: '15-2', nameKo: '미구현', theme: 'placeholder' },
+  '15-3': { id: '15-3', nameKo: '미구현', theme: 'placeholder' },
+  '15-4': { id: '15-4', nameKo: '미구현', theme: 'placeholder' },
+  '15-5': { id: '15-5', nameKo: '미구현', theme: 'placeholder' },
+  '15-6': { id: '15-6', nameKo: '미구현', theme: 'placeholder' },
 };
 
-/** 스테이지 순서 */
+/** 스테이지 순서 (시즌1 30슬롯 + 시즌2 54슬롯 = 84슬롯) */
 export const STAGE_ORDER = [
   '1-1', '1-2', '1-3', '1-4', '1-5', '1-6',
   '2-1', '2-2', '2-3',
@@ -5410,9 +4943,11 @@ export const STAGE_ORDER = [
   '6-1', '6-2', '6-3',
   // ── 시즌 2 ──
   '7-1', '7-2', '7-3', '7-4', '7-5', '7-6',
-  '8-1', '8-2', '8-3', '8-4', '8-5', '8-6',
   '9-1', '9-2', '9-3', '9-4', '9-5', '9-6',
   '10-1', '10-2', '10-3', '10-4', '10-5', '10-6',
   '11-1', '11-2', '11-3', '11-4', '11-5', '11-6',
   '12-1', '12-2', '12-3', '12-4', '12-5', '12-6',
+  '13-1', '13-2', '13-3', '13-4', '13-5', '13-6',
+  '14-1', '14-2', '14-3', '14-4', '14-5', '14-6',
+  '15-1', '15-2', '15-3', '15-4', '15-5', '15-6',
 ];

@@ -28,11 +28,10 @@ const CHAPTERS = [
   { id: 'ch6', nameKo: '6장: 그랑 가스트로노미', themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#886600', icon: '\uD83D\uDC68\u200D\uD83C\uDF73', stages: ['6-1', '6-2', '6-3'] },
   // 시즌 2 (ch7~ch12)
   { id: 'ch7',  nameKo: '7장: 사쿠라 이자카야',    themeColor: '#ffb7c5', themeHex: 0xffb7c5, strokeColor: '#994466', icon: '\uD83C\uDF38', stages: ['7-1', '7-2', '7-3', '7-4', '7-5', '7-6'] },
-  { id: 'ch8',  nameKo: '8장: 용의 주방',           themeColor: '#ff4500', themeHex: 0xff4500, strokeColor: '#882200', icon: '\uD83D\uDC09', stages: ['8-1', '8-2', '8-3', '8-4', '8-5', '8-6'] },
-  { id: 'ch9',  nameKo: '9장: 별빛 비스트로',       themeColor: '#4169e1', themeHex: 0x4169e1, strokeColor: '#223388', icon: '\u2B50', stages: ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6'] },
-  { id: 'ch10', nameKo: '10장: 향신료 궁전',        themeColor: '#daa520', themeHex: 0xdaa520, strokeColor: '#886600', icon: '\uD83C\uDFF0', stages: ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6'] },
-  { id: 'ch11', nameKo: '11장: 선인장 칸티나',      themeColor: '#228b22', themeHex: 0x228b22, strokeColor: '#114411', icon: '\uD83C\uDF35', stages: ['11-1', '11-2', '11-3', '11-4', '11-5', '11-6'] },
-  { id: 'ch12', nameKo: '12장: 슈가 드림랜드',      themeColor: '#ff69b4', themeHex: 0xff69b4, strokeColor: '#993366', icon: '\uD83C\uDF6C', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'] },
+  { id: 'ch9',  nameKo: '9장: 사케 오니 최종전',   themeColor: '#cc3333', themeHex: 0xcc3333, strokeColor: '#881111', icon: '\uD83C\uDF76', stages: ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6'] },
+  { id: 'ch10', nameKo: '10장: 용의 주방',          themeColor: '#ff4500', themeHex: 0xff4500, strokeColor: '#882200', icon: '\uD83D\uDC09', stages: ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6'] },
+  { id: 'ch11', nameKo: '11장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['11-1', '11-2', '11-3', '11-4', '11-5', '11-6'] },
+  { id: 'ch12', nameKo: '12장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'] },
 ];
 
 // ── 노드 위치 좌표 (2열 3행 지그재그, Phase 19-2: y +10 조정) ──

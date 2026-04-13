@@ -1,5 +1,65 @@
 # Changelog
 
+## [2026-04-13] - Phase 24-1 데이터 재편 (chapter8→10 번호 치환 + stageData 78슬롯 + 세이브 v15)
+
+### 변경
+
+- **dialogueData.js** (`js/data/dialogueData.js`)
+  - chapter8_intro/chapter8_lao_joins/chapter8_clear/chapter8_yuki_clue/chapter8_mid → chapter10_* 전면 치환 (5건)
+  - lao_side_8, yuki_side_8은 캐릭터 사이드 스토리 ID로 유지
+  - @fileoverview 및 섹션 주석 갱신 (Phase 24-1 기록)
+
+- **storyData.js** (`js/data/storyData.js`)
+  - gathering_enter/result_clear 트리거의 stageId 조건 8-x → 10-x 치환
+  - dialogueId 참조 chapter8_* → chapter10_* 치환
+  - storyFlags 키 chapter8_cleared → chapter10_cleared, chapter8_mid_seen → chapter10_mid_seen
+  - stage_first_clear 제외 목록 8-x → 10-x
+  - season2_lao_intro 조건 currentChapter >= 8 → >= 10, TODO 주석 삭제
+  - chapter8_clear onComplete: currentChapter < 9 → < 11 승격
+
+- **stageData.js** (`js/data/stageData.js`)
+  - STAGES 키 '8-1'~'8-6' → '10-1'~'10-6' 재키잉 (id 필드 포함)
+  - 기존 10~12장 플레이스홀더 18개(spice_palace/cactus_cantina/sugar_dreamland) 삭제
+  - 11~15장 스텁 엔트리 30개 추가 (theme: 'placeholder')
+  - STAGE_ORDER에서 '8-1'~'8-6' 제거, '13-1'~'15-6' 추가 → 전체 78슬롯
+  - 시즌2 구간(7~15장, 8장 부재): 48슬롯
+
+- **recipeData.js** (`js/data/recipeData.js`)
+  - gateStage '8-1'~'8-5' → '10-1'~'10-5' 치환 (20건)
+  - QA에서 발견된 연쇄 영향 — 스펙 범위 외 추가 수정
+
+- **WorldMapScene.js** (`js/scenes/WorldMapScene.js`)
+  - ch8 엔트리 삭제 (STAGES에 없는 '8-x' ID 참조 제거)
+  - ch10: nameKo '10장: 용의 주방', stages ['10-1',...,'10-6']
+  - ch11/ch12: nameKo '미구현'으로 갱신
+  - QA에서 발견된 연쇄 영향 — 스펙 범위 외 추가 수정
+
+- **SaveManager.js** (`js/managers/SaveManager.js`)
+  - SAVE_VERSION 14 → 15
+  - v14→v15 마이그레이션: chapter8_cleared → chapter10_cleared, chapter8_mid_seen → chapter10_mid_seen (멱등성 보장)
+
+- **DevHelper.js** (`js/DevHelper.js`)
+  - SAVE_VERSION 14 → 15
+  - STAGE_ORDER에서 8-x 제거, 10-x~15-x 반영
+  - CHAPTER_FLAGS: chapter8_cleared/chapter8_mid_seen → chapter10_*
+  - skipStory() dialogueIds: chapter8_* → chapter10_*
+
+- **saveFixtures.js** (`tests/fixtures/saveFixtures.js`)
+  - SAVE_VERSION, STAGE_ORDER, CHAPTER_FLAGS, dialogueIds 동일 갱신
+
+- **dev-launcher.html** (`public/dev-launcher.html`)
+  - 8장 버튼 제거, 10장 버튼 추가
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-kc-phase24-1-scope.md`
+- 구현 리포트: `.claude/specs/2026-04-13-kc-phase24-1-impl.md`
+- QA: `.claude/specs/2026-04-13-phase24-1-qa.md`
+- QA 초기 판정 PARTIAL — 스펙 범위 4개 파일은 전수 PASS, 스펙 누락으로 연쇄 영향 파일 5개(recipeData, WorldMapScene, DevHelper, saveFixtures, dev-launcher.html) 미수정. 이후 전수 수정 완료.
+- 스펙에서 "54슬롯"은 시즌2(7~15장) 구간만의 수치. 실제 STAGE_ORDER는 시즌1 포함 78슬롯. 8장은 키만 제거되어 시즌2 실제 슬롯은 48개.
+- dragon_wok 보스 스테이지 12-6 이동은 Phase 26에서 처리 예정 (24-1에서는 10-6 유지).
+
+---
+
 ## [2026-04-13] - Phase 23-1 사케 오니 최종전 에셋 + 스크립트 구현
 
 ### 추가

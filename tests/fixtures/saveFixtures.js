@@ -12,7 +12,7 @@
  */
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 14;
+const SAVE_VERSION = 15;
 
 // ── 스테이지 순서 ──
 const STAGE_ORDER = [
@@ -23,15 +23,15 @@ const STAGE_ORDER = [
   '5-1','5-2','5-3','5-4','5-5','5-6',
   '6-1','6-2','6-3',
   '7-1','7-2','7-3','7-4','7-5','7-6',
-  '8-1','8-2','8-3','8-4','8-5','8-6',
   '9-1','9-2','9-3','9-4','9-5','9-6',
+  '10-1','10-2','10-3','10-4','10-5','10-6',
 ];
 
 const CHAPTER_FLAGS = {
-  7: {},
-  8: { chapter7_cleared: true, yuki_joined: true },
-  9: { chapter7_cleared: true, chapter8_cleared: true, chapter8_mid_seen: true, lao_joined: true, yuki_joined: true },
-  10: { chapter7_cleared: true, chapter8_cleared: true, chapter8_mid_seen: true, lao_joined: true, yuki_joined: true, chapter9_cleared: true },
+  7:  {},
+  9:  { chapter7_cleared: true, yuki_joined: true },
+  10: { chapter7_cleared: true, chapter9_cleared: true, chapter10_cleared: true, chapter10_mid_seen: true, lao_joined: true, yuki_joined: true },
+  11: { chapter7_cleared: true, chapter9_cleared: true, chapter10_cleared: true, chapter10_mid_seen: true, lao_joined: true, yuki_joined: true },
 };
 
 /**
@@ -92,14 +92,14 @@ export const FIXTURES = {
   /** 7장 시작 직전 (6-3 클리어 직후) */
   ch7_start: buildSaveForStage('7-1'),
 
-  /** 8장 시작 직전 (7-6 클리어 직후) */
-  ch8_start: buildSaveForStage('8-1'),
-
-  /** 8장 중반 (8-3 직전) */
-  ch8_mid: buildSaveForStage('8-3'),
-
-  /** 9장 시작 직전 (8-6 클리어 직후) */
+  /** 9장 시작 직전 (7-6 클리어 직후) */
   ch9_start: buildSaveForStage('9-1'),
+
+  /** 10장 시작 직전 (9-6 클리어 직후) */
+  ch10_start: buildSaveForStage('10-1'),
+
+  /** 10장 중반 (10-3 직전) */
+  ch10_mid: buildSaveForStage('10-3'),
 
   /** 9장 보스 직전 (9-5 클리어 직후) */
   ch9_boss: buildSaveForStage('9-6'),

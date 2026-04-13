@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-13
-> 기준: Phase 23-1 완료
+> 기준: Phase 24-1 완료
 
 ---
 
@@ -34,7 +34,7 @@
 | Phase 21 | 8장 — 용의 주방 (중식) | ✅ 완료 |
 | Phase 22 | 8장 — 이자카야 심층부 (일식 2장) + 7장 보스 재편 | ✅ 완료 |
 | Phase 23 | 9장 — 사케 오니 최종전 (일식 3장) | 🔄 진행중 (23-1 완료) |
-| Phase 24 | 기존 8장→10장 번호 재편 + WorldMapScene 24챕터 확장 | 📋 계획 |
+| Phase 24 | 기존 8장→10장 번호 재편 + WorldMapScene 24챕터 확장 | 🔄 진행중 (24-1 완료) |
 | Phase 25 | 11장 — 용의 주방 심층부 (중식 2장) | 📋 계획 |
 | Phase 26 | 12장 — 드래곤 웍 최종전 (중식 3장) | 📋 계획 |
 | Phase 27 | 13장 — 별빛 비스트로 (양식 1장) | 📋 계획 |
@@ -740,14 +740,15 @@
 
 ---
 
-## Phase 23-1 — 에셋 + 스크립트 (사케 오니 최종전)
+## ~~Phase 23-1 — 에셋 + 스크립트 (사케 오니 최종전)~~ ✅
 
 > `visual_change: art` | 보스 스프라이트 + 대사 집필
+> 완료: 2026-04-13
 
-- [ ] sake_oni 보스 스프라이트 업데이트 (PixelLab, 64px pro)
-- [ ] dialogueData.js: chapter9_boss 작성 (사케 오니 정체 — 타락한 옛 미력사)
-- [ ] dialogueData.js: chapter9_clear 작성 (유키 감정 해소, 일식 아크 엔딩)
-- [ ] 사이드 대화 1~2종 (팀 유대 확인)
+- [x] sake_oni 보스 스프라이트 (PixelLab pro, 124x124px 8방향 walking)
+- [x] dialogueData.js: chapter9_intro/chapter9_boss/chapter9_clear 3종 작성
+- [x] storyData.js: 9장 트리거 3건 추가 (누적 48항목)
+- [x] CHARACTERS.sake_oni 캐릭터 등록 (누적 8종)
 
 ---
 
@@ -763,17 +764,25 @@
 
 ---
 
-## Phase 24 — 인프라: 8장→10장 번호 재편 + WorldMapScene 24챕터 확장
+## ~~Phase 24 — 인프라: 8장→10장 번호 재편 + WorldMapScene 24챕터 확장~~ 🔄
 
 > 목표: 기존 8장(용의 주방)을 10장으로 이동, 시스템을 24챕터 구조로 확장.
 > 코드 전면 인프라 작업 — 스토리/에셋 추가 없음.
 
-### 24-1. 데이터 재편
+### ~~24-1. 데이터 재편~~ ✅
 
-- [ ] dialogueData.js: chapter8_* ID → chapter10_* 로 일괄 변경
-- [ ] storyData.js: 트리거 챕터 번호 8→10 수정
-- [ ] stageData.js: 36슬롯 → 54슬롯 확장 (챕터 7~15, 6스테이지씩)
-- [ ] dragon_wok 보스 스테이지: 10-6 → 12-6 으로 이동
+> 완료: 2026-04-13
+
+- [x] dialogueData.js: chapter8_* ID → chapter10_* 전면 치환 (5건)
+- [x] storyData.js: 트리거 stageId/dialogueId/storyFlags 8→10 치환
+- [x] stageData.js: 8-1~8-6 → 10-1~10-6 재키잉, STAGE_ORDER에서 8-x 제거, 11~15장 스텁 추가 (전체 78슬롯)
+- [x] recipeData.js: gateStage 8-x → 10-x 치환 (20건) *(QA 연쇄 영향으로 스펙 범위 외 추가 수정)*
+- [x] WorldMapScene.js: ch8 엔트리 제거, ch10='용의 주방', ch11/12='미구현' *(QA 연쇄 영향으로 스펙 범위 외 추가 수정)*
+- [x] SaveManager.js: SAVE_VERSION 14→15, v15 마이그레이션 (chapter8_cleared→chapter10_cleared)
+- [x] DevHelper.js: SAVE_VERSION/STAGE_ORDER/CHAPTER_FLAGS/skipStory dialogueIds 갱신 *(QA 연쇄 영향으로 스펙 범위 외 추가 수정)*
+- [x] saveFixtures.js: 동일 갱신 *(QA 연쇄 영향으로 스펙 범위 외 추가 수정)*
+- [x] dev-launcher.html: 8장 제거, 10장 추가 *(QA 연쇄 영향으로 스펙 범위 외 추가 수정)*
+- [ ] ~~dragon_wok 보스 스테이지: 10-6 → 12-6 으로 이동~~ *(Phase 26에서 처리 예정, 24-1에서는 10-6 유지)*
 
 ### 24-2. WorldMapScene 확장
 

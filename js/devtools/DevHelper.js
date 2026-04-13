@@ -6,7 +6,7 @@
  */
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 14;
+const SAVE_VERSION = 15;
 
 // ── 전체 스테이지 순서 (stageData.js 기준) ──
 const STAGE_ORDER = [
@@ -17,15 +17,16 @@ const STAGE_ORDER = [
   '5-1','5-2','5-3','5-4','5-5','5-6',
   '6-1','6-2','6-3',
   '7-1','7-2','7-3','7-4','7-5','7-6',
-  '8-1','8-2','8-3','8-4','8-5','8-6',
   '9-1','9-2','9-3','9-4','9-5','9-6',
+  '10-1','10-2','10-3','10-4','10-5','10-6',
 ];
 
 // ── 챕터별 완료 시 설정되는 storyFlags ──
 const CHAPTER_FLAGS = {
-  7: { chapter7_cleared: true },
-  8: { chapter7_cleared: true, chapter8_cleared: true, chapter8_mid_seen: true, lao_joined: true },
-  9: { chapter7_cleared: true, chapter8_cleared: true, chapter8_mid_seen: true, lao_joined: true, chapter9_cleared: true },
+  7:  { chapter7_cleared: true },
+  9:  { chapter7_cleared: true, chapter9_cleared: true },
+  10: { chapter7_cleared: true, chapter9_cleared: true, chapter10_cleared: true, chapter10_mid_seen: true, lao_joined: true },
+  11: { chapter7_cleared: true, chapter9_cleared: true, chapter10_cleared: true, chapter10_mid_seen: true, lao_joined: true },
 };
 
 /**
@@ -162,7 +163,7 @@ window.__kc = {
     const allIds = [
       'season2_prologue','season2_yuki_intro','season2_lao_intro',
       'chapter7_intro','chapter7_clear','chapter7_boss',
-      'chapter8_intro','chapter8_lao_joins','chapter8_clear','chapter8_mid','chapter8_yuki_clue',
+      'chapter10_intro','chapter10_lao_joins','chapter10_clear','chapter10_mid','chapter10_yuki_clue',
       'chapter9_intro','chapter9_boss','chapter9_clear',
     ];
     const seen = new Set(data.seenDialogues || []);

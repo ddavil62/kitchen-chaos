@@ -8,8 +8,9 @@
  * Phase 19-1: 시즌 2 캐릭터 2종(유키, 라오) CHARACTERS에 추가.
  * Phase 19-3: 시즌 2 프롤로그 대화 3종 추가 (season2_prologue, season2_yuki_intro, season2_lao_intro).
  * Phase 20: 7장 사쿠라 이자카야 대화 4종 추가 (chapter7_intro, chapter7_yuki_joins, chapter7_clear, yuki_side_7).
- * Phase 21: 8장 용의 주방 대화 4종 추가 (chapter8_intro, chapter8_lao_joins, chapter8_clear, lao_side_8).
- * Phase 22-1: chapter7_clear 복선 대사 삽입, 8장 추가 대화 3종 추가 (chapter8_yuki_clue, chapter8_mid, yuki_side_8).
+ * Phase 21: 10장 용의 주방 대화 4종 추가 (chapter10_intro, chapter10_lao_joins, chapter10_clear, lao_side_8).
+ * Phase 22-1: chapter7_clear 복선 대사 삽입, 10장 추가 대화 3종 추가 (chapter10_yuki_clue, chapter10_mid, yuki_side_8).
+ * Phase 24-1: chapter8_* → chapter10_* 번호 이동.
  * Phase 23-1: chapter9_intro, chapter9_boss, chapter9_clear 추가. CHARACTERS에 sake_oni 추가.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
@@ -607,10 +608,10 @@ export const DIALOGUES = {
     ],
   },
 
-  // ── 시즌 2: 8장 용의 주방 (Phase 21) ──
+  // ── 시즌 2: 10장 용의 주방 (Phase 21/24-1) ──
 
-  chapter8_intro: {
-    id: 'chapter8_intro',
+  chapter10_intro: {
+    id: 'chapter10_intro',
     skippable: true,
     lines: [
       { speaker: 'narrator', portrait: '', text: '중국 어딘가. 황금빛 용이 새겨진 거대한 궁전 주방 앞, 한 사람이 기다리고 있었다.' },
@@ -623,8 +624,8 @@ export const DIALOGUES = {
       { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(긴장하며) 용 형상의 웍... 이건 예사 보스가 아니겠군.' },
     ],
   },
-  chapter8_lao_joins: {
-    id: 'chapter8_lao_joins',
+  chapter10_lao_joins: {
+    id: 'chapter10_lao_joins',
     skippable: true,
     lines: [
       { speaker: 'narrator', portrait: '', text: '8-3 클리어 직후. 라오가 오래된 웍 앞에서 발걸음을 멈췄다.' },
@@ -640,8 +641,8 @@ export const DIALOGUES = {
       { speaker: 'narrator', portrait: '', text: '라오가 정식으로 미미 팀의 일원이 되었다.' },
     ],
   },
-  chapter8_clear: {
-    id: 'chapter8_clear',
+  chapter10_clear: {
+    id: 'chapter10_clear',
     skippable: true,
     lines: [
       { speaker: 'narrator', portrait: '', text: '드래곤 웍이 정화되었다. 가문의 주방에 평화가 돌아온다.' },
@@ -671,10 +672,10 @@ export const DIALOGUES = {
     ],
   },
 
-  // ── 시즌 2: 8장 추가 스토리 (Phase 22-1) ──
+  // ── 시즌 2: 10장 추가 스토리 (Phase 22-1/24-1) ──
 
-  chapter8_yuki_clue: {
-    id: 'chapter8_yuki_clue',
+  chapter10_yuki_clue: {
+    id: 'chapter10_yuki_clue',
     skippable: true,
     lines: [
       { speaker: 'narrator', portrait: '', text: '8-4 클리어 직후. 유키가 홀로 궁전 기둥에 새겨진 문양을 들여다보고 있다.' },
@@ -687,8 +688,8 @@ export const DIALOGUES = {
       { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(진지하게) ...이번엔 나도 쉽게 넘길 얘기가 아닌 것 같군.' },
     ],
   },
-  chapter8_mid: {
-    id: 'chapter8_mid',
+  chapter10_mid: {
+    id: 'chapter10_mid',
     skippable: true,
     lines: [
       { speaker: 'narrator', portrait: '', text: '8-5 클리어 직후. 드래곤 웍이 가까워지며 팀 내 긴장이 고조된다.' },
