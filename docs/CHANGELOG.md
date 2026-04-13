@@ -1,5 +1,90 @@
 # Changelog
 
+## [2026-04-13] - Phase 26 dragon_wok 리워크 + 12장 중식 아크 완성
+
+### 추가
+
+- **sake_master 보스** (`js/data/gameData.js`)
+  - id: sake_master, hp: 7500, speed: 18, isBoss: true, bodyColor: 0x8844bb
+  - brewCycle 기믹: 6초마다 90px 범위 도구에 발효 디버프(공격력 -25%, 4초) + 150px 범위 아군 적 80 HP 회복
+  - 봉인 방어막: HP 55% 이하 시 1500 HP 방어막 활성화, 초과 피해 본체 전달
+  - 분노: HP 30% 이하 시 brewInterval 3초로 단축 + range_reduction 이벤트 emit
+  - bossReward: 420, bossDrops: sake x5, sashimi_tuna x3
+
+- **Enemy.js 기믹 구현** (`js/entities/Enemy.js`)
+  - `_updateBrewCycle()` + `_onBrewCycleActivate()`: brewCycle 기믹 로직
+  - `takeDamage()`에 sealShield 방어막 흡수 로직 추가
+  - enrage 로직: brewInterval 절반 + `range_reduction` 이벤트 emit
+  - `hpOverride` 스폰 파라미터: constructor 4번째 인자 spawnData에서 maxHp/hp 덮어쓰기
+
+- **WaveManager.js hpOverride 전달 체인** (`js/managers/WaveManager.js`)
+  - `_buildSpawnQueue` -> `update` -> `_spawnEnemy` -> `Enemy constructor`로 hpOverride 전달
+
+- **12장 레시피 10종** (`js/data/recipeData.js`, 누적 156종 = 서빙 126 + 버프 30)
+  - 서빙 8종: dragon_soup(88), wok_flame_rice(80), dragon_dim_sum(72), fire_wok_noodle(95), palace_hotpot(120), imperial_tofu_feast(110), dragon_wok_banquet(145), final_dragon_course(180)
+  - 버프 2종: dragon_fire_boost(화염 +50%, 2웨이브), dragon_wok_aura(공격력+속도 +35%, 2웨이브)
+  - gateStage: 12-1 ~ 12-5 범위
+
+- **chapter12 대화 5종** (`js/data/dialogueData.js`, 누적 57종)
+  - chapter12_intro: 12-1 입장, 라오 용의 궁전 진입 결의
+  - chapter12_lao_mid: 12-3 클리어, 라오 과거 회상 (dragon_wok 각성 고백)
+  - chapter12_boss: 12-6 입장, dragon_wok 최후 대면
+  - chapter12_clear: 12-6 클리어, dragon_wok 정화 완료, 중식 아크 완결, currentChapter -> 13
+  - lao_side_12: 행상인 방문 시, 라오 감사 사이드 대화
+
+- **CHARACTERS에 sake_master 추가** (`js/data/dialogueData.js`)
+  - nameKo: '주조 달인', portrait: emoji, role: boss
+
+- **SpriteLoader.js 보스 등록** (`js/managers/SpriteLoader.js`)
+  - BOSS_IDS에 'sake_master' 추가 (누적 9종)
+  - BOSS_WALK_HASHES: sake_master = 'animating-8d3d020e', dragon_wok = 'animating-30e6c64f' (신규)
+
+- **보스 에셋 2종** (`assets/sprites/bosses/`)
+  - `sake_master/animations/animating-8d3d020e/`: 64px, 8방향 x 8프레임 (보라-청자 계열 양조 노인)
+  - `dragon_wok/animations/animating-30e6c64f/`: 64px, 8방향 x 8프레임 (붉은 드래곤 보스, 화염 디테일)
+
+- **stageData 8개 스테이지 교체/완성** (`js/data/stageData.js`)
+  - 10-6: sake_master 보스전으로 교체 (dragon_wok 제거), theme: izakaya_underground, 5웨이브
+  - 11-6: dragon_wok 약화 선등장 미니전 완성, theme: dragon_lair, 6웨이브 (wave 6: dragon_wok hpOverride:2500)
+  - 12-1: 용의 궁전 입구 (5웨이브)
+  - 12-2: 용의 가문 훈련장 (5웨이브)
+  - 12-3: 용의 불꽃 정원 (6웨이브)
+  - 12-4: 용의 궁전 내전 (6웨이브)
+  - 12-5: 용의 왕좌 앞 (6웨이브)
+  - 12-6: 드래곤 웍 최후의 결전 (보스, 5웨이브, dragon_wok 정식 보스전)
+
+- **chapter12 스토리 트리거 5건** (`js/data/storyData.js`, 누적 56항목)
+  - gathering_enter 12-1 -> chapter12_intro
+  - result_clear 12-3 -> chapter12_lao_mid + chapter12_mid_seen 플래그
+  - gathering_enter 12-6 -> chapter12_boss
+  - result_clear 12-6 -> chapter12_clear + chapter12_cleared 플래그 + currentChapter 13
+  - merchant_enter -> lao_side_12 (12장 클리어 후 1회)
+  - stage_first_clear 제외 목록에 12-1, 12-3, 12-6 추가
+
+- **SaveManager v16 마이그레이션** (`js/managers/SaveManager.js`)
+  - SAVE_VERSION: 15 -> 16
+  - v15->v16 블록: storyFlags 객체 보장, chapter12_cleared: false, chapter12_mid_seen: false 기본값 추가
+  - 10-6 기존 클리어 기록은 스테이지 데이터 변경과 독립적이므로 별도 처리 불필요
+
+- **WorldMapScene 12장 활성화** (`js/scenes/WorldMapScene.js`)
+  - ch12 nameKo: '12장: (미구현)' -> '12장: 용의 궁전'
+
+### 변경
+
+- **dragon_wok 스프라이트 해시 교체** (`js/managers/SpriteLoader.js`)
+  - BOSS_WALK_HASHES.dragon_wok: `animating-8efd2218` (Phase 21) -> `animating-30e6c64f` (Phase 26)
+  - 기존 에셋 폴더 디스크 잔존 (dead asset, 코드 참조 없음)
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-kc-phase26-impl.md`
+- QA 26-1: `.claude/specs/2026-04-13-kc-phase26-1-qa.md` (45/45 PASS)
+- QA 26-2: `.claude/specs/2026-04-13-kc-phase26-2-qa.md` (30/30 PASS)
+- 스펙 대비 차이: lao_side_12 동시 대사("라오+미미: '안 돼!'")를 별도 lines로 분리 (대화 시스템 동시 표시 미지원)
+- LOW 이슈: chapter12_lao_mid onComplete에 storyFlags 안전 가드 누락 (v16 마이그레이션으로 실사용 문제 없음, 코드 일관성 차원에서 후속 정리 권장)
+- LOW 이슈: 기존 dragon_wok 에셋 animating-8efd2218 폴더 디스크 잔존 (빌드 용량 절감 위해 삭제 권장)
+
+---
+
 ## [2026-04-13] - Phase 25-2 11장 walk 애니메이션 + dark_debuff 수신자
 
 ### 추가
