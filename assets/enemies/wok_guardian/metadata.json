@@ -1,0 +1,27 @@
+{
+  "character": {
+    "id": "9c33ea4c-e9b0-4fe3-a09c-5dc97400e416",
+    "name": "Wok Guardian",
+    "description": "wok guardian enemy, chubby chibi Chinese cook holding a large dark iron wok as a shield in front, wearing brown apron and red headband, sturdy defensive stance",
+    "size": { "width": 92, "height": 92 },
+    "template_id": "mannequin",
+    "directions": 8,
+    "view": "low top-down",
+    "proportions": "chibi",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "created_at": "2026-04-13"
+  },
+  "frames": {
+    "rotations": {
+      "south": "rotations/south.png",
+      "south-east": "rotations/south-east.png",
+      "east": "rotations/east.png",
+      "north-east": "rotations/north-east.png",
+      "north": "rotations/north.png",
+      "north-west": "rotations/north-west.png",
+      "west": "rotations/west.png",
+      "south-west": "rotations/south-west.png"
+    }
+  }
+}

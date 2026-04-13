@@ -1,0 +1,27 @@
+{
+  "character": {
+    "id": "08983815-9751-476a-90b6-b5f6a8ee8802",
+    "name": "Shadow Dragon Spawn",
+    "description": "shadow dragon hatchling enemy, small chubby chibi dragon with dark purple-black scales, tiny folded wings, glowing magenta eyes, wispy dark shadow smoke around legs",
+    "size": { "width": 92, "height": 92 },
+    "template_id": "mannequin",
+    "directions": 8,
+    "view": "low top-down",
+    "proportions": "chibi",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "created_at": "2026-04-13"
+  },
+  "frames": {
+    "rotations": {
+      "south": "rotations/south.png",
+      "south-east": "rotations/south-east.png",
+      "east": "rotations/east.png",
+      "north-east": "rotations/north-east.png",
+      "north": "rotations/north.png",
+      "north-west": "rotations/north-west.png",
+      "west": "rotations/west.png",
+      "south-west": "rotations/south-west.png"
+    }
+  }
+}
