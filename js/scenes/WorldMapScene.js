@@ -6,6 +6,7 @@
  * Phase 11-3b: fadeIn 300ms 통일.
  * Phase 11-3d: 버전 표기 APP_VERSION 참조로 변경.
  * Phase 19-2: 시즌 탭 시스템 (12장 = 시즌1 6장 + 시즌2 6장).
+ * Phase 24-2: 3탭(그룹1~3) 9챕터 맵 UI 확장. 24챕터 체계.
  */
 
 import Phaser from 'phaser';
@@ -16,39 +17,63 @@ import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 
-// ── 챕터별 스테이지 분류 (Phase 19-2: 시즌2 6장 추가) ──
+// ── 챕터별 스테이지 분류 (Phase 24-2: 24챕터 3그룹 체계) ──
 
 const CHAPTERS = [
-  // 시즌 1 (ch1~ch6)
-  { id: 'ch1', nameKo: '1장: 파스타 레스토랑',   themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#8b4500', icon: '\uD83C\uDF5D', stages: ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6'] },
-  { id: 'ch2', nameKo: '2장: 동양 요리 식당',     themeColor: '#88ccff', themeHex: 0x88ccff, strokeColor: '#224488', icon: '\uD83C\uDF5C', stages: ['2-1', '2-2', '2-3'] },
-  { id: 'ch3', nameKo: '3장: 씨푸드 바',          themeColor: '#66eeff', themeHex: 0x66eeff, strokeColor: '#1a6688', icon: '\uD83E\uDD9E', stages: ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6'] },
-  { id: 'ch4', nameKo: '4장: 화산 BBQ',           themeColor: '#ff6622', themeHex: 0xff6622, strokeColor: '#881100', icon: '\uD83D\uDD25', stages: ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6'] },
-  { id: 'ch5', nameKo: '5장: 마법사 디저트 카페', themeColor: '#cc88ff', themeHex: 0xcc88ff, strokeColor: '#5522aa', icon: '\uD83E\uDDC1', stages: ['5-1', '5-2', '5-3', '5-4', '5-5', '5-6'] },
-  { id: 'ch6', nameKo: '6장: 그랑 가스트로노미', themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#886600', icon: '\uD83D\uDC68\u200D\uD83C\uDF73', stages: ['6-1', '6-2', '6-3'] },
-  // 시즌 2 (ch7~ch12)
+  // ── 그룹 1 (ch1~ch6) ──
+  { id: 'ch1',  nameKo: '1장: 파스타 레스토랑',   themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#8b4500', icon: '\uD83C\uDF5D', stages: ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6'] },
+  { id: 'ch2',  nameKo: '2장: 동양 요리 식당',     themeColor: '#88ccff', themeHex: 0x88ccff, strokeColor: '#224488', icon: '\uD83C\uDF5C', stages: ['2-1', '2-2', '2-3'] },
+  { id: 'ch3',  nameKo: '3장: 씨푸드 바',          themeColor: '#66eeff', themeHex: 0x66eeff, strokeColor: '#1a6688', icon: '\uD83E\uDD9E', stages: ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6'] },
+  { id: 'ch4',  nameKo: '4장: 화산 BBQ',           themeColor: '#ff6622', themeHex: 0xff6622, strokeColor: '#881100', icon: '\uD83D\uDD25', stages: ['4-1', '4-2', '4-3', '4-4', '4-5', '4-6'] },
+  { id: 'ch5',  nameKo: '5장: 마법사 디저트 카페', themeColor: '#cc88ff', themeHex: 0xcc88ff, strokeColor: '#5522aa', icon: '\uD83E\uDDC1', stages: ['5-1', '5-2', '5-3', '5-4', '5-5', '5-6'] },
+  { id: 'ch6',  nameKo: '6장: 그랑 가스트로노미', themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#886600', icon: '\uD83D\uDC68\u200D\uD83C\uDF73', stages: ['6-1', '6-2', '6-3'] },
+  // ── 그룹 2 (ch7~ch15) ──
   { id: 'ch7',  nameKo: '7장: 사쿠라 이자카야',    themeColor: '#ffb7c5', themeHex: 0xffb7c5, strokeColor: '#994466', icon: '\uD83C\uDF38', stages: ['7-1', '7-2', '7-3', '7-4', '7-5', '7-6'] },
+  { id: 'ch8',  nameKo: '8장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['8-1', '8-2', '8-3', '8-4', '8-5', '8-6'], theme: 'placeholder' },
   { id: 'ch9',  nameKo: '9장: 사케 오니 최종전',   themeColor: '#cc3333', themeHex: 0xcc3333, strokeColor: '#881111', icon: '\uD83C\uDF76', stages: ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6'] },
   { id: 'ch10', nameKo: '10장: 용의 주방',          themeColor: '#ff4500', themeHex: 0xff4500, strokeColor: '#882200', icon: '\uD83D\uDC09', stages: ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6'] },
-  { id: 'ch11', nameKo: '11장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['11-1', '11-2', '11-3', '11-4', '11-5', '11-6'] },
-  { id: 'ch12', nameKo: '12장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'] },
+  { id: 'ch11', nameKo: '11장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['11-1', '11-2', '11-3', '11-4', '11-5', '11-6'], theme: 'placeholder' },
+  { id: 'ch12', nameKo: '12장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'], theme: 'placeholder' },
+  { id: 'ch13', nameKo: '13장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['13-1', '13-2', '13-3', '13-4', '13-5', '13-6'], theme: 'placeholder' },
+  { id: 'ch14', nameKo: '14장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['14-1', '14-2', '14-3', '14-4', '14-5', '14-6'], theme: 'placeholder' },
+  { id: 'ch15', nameKo: '15장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['15-1', '15-2', '15-3', '15-4', '15-5', '15-6'], theme: 'placeholder' },
+  // ── 그룹 3 (ch16~ch24) ──
+  { id: 'ch16', nameKo: '16장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['16-1', '16-2', '16-3', '16-4', '16-5', '16-6'], theme: 'placeholder' },
+  { id: 'ch17', nameKo: '17장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['17-1', '17-2', '17-3', '17-4', '17-5', '17-6'], theme: 'placeholder' },
+  { id: 'ch18', nameKo: '18장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['18-1', '18-2', '18-3', '18-4', '18-5', '18-6'], theme: 'placeholder' },
+  { id: 'ch19', nameKo: '19장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['19-1', '19-2', '19-3', '19-4', '19-5', '19-6'], theme: 'placeholder' },
+  { id: 'ch20', nameKo: '20장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['20-1', '20-2', '20-3', '20-4', '20-5', '20-6'], theme: 'placeholder' },
+  { id: 'ch21', nameKo: '21장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['21-1', '21-2', '21-3', '21-4', '21-5', '21-6'], theme: 'placeholder' },
+  { id: 'ch22', nameKo: '22장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['22-1', '22-2', '22-3', '22-4', '22-5', '22-6'], theme: 'placeholder' },
+  { id: 'ch23', nameKo: '23장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['23-1', '23-2', '23-3', '23-4', '23-5', '23-6'], theme: 'placeholder' },
+  { id: 'ch24', nameKo: '24장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['24-1', '24-2', '24-3', '24-4', '24-5', '24-6'], theme: 'placeholder' },
 ];
 
-// ── 노드 위치 좌표 (2열 3행 지그재그, Phase 19-2: y +10 조정) ──
+// ── 노드 위치 좌표 (3열 3행, Phase 24-2: 9챕터 그룹 맵) ──
 
 const NODE_POSITIONS = [
-  { x: 100, y: 150 },  // 노드 1 (Phase 19-2: 140->150)
-  { x: 260, y: 150 },  // 노드 2
-  { x: 100, y: 280 },  // 노드 3 (Phase 19-2: 270->280)
-  { x: 260, y: 280 },  // 노드 4
-  { x: 100, y: 410 },  // 노드 5 (Phase 19-2: 400->410)
-  { x: 260, y: 410 },  // 노드 6
+  { x: 80,  y: 180 },  // 노드 0 (좌상)
+  { x: 180, y: 180 },  // 노드 1 (중상)
+  { x: 280, y: 180 },  // 노드 2 (우상)
+  { x: 80,  y: 310 },  // 노드 3 (좌중)
+  { x: 180, y: 310 },  // 노드 4 (중중)
+  { x: 280, y: 310 },  // 노드 5 (우중)
+  { x: 80,  y: 440 },  // 노드 6 (좌하)
+  { x: 180, y: 440 },  // 노드 7 (중하)
+  { x: 280, y: 440 },  // 노드 8 (우하)
 ];
 
-// ── 연결선 쌍 (Phase 19-2: CONNECTIONS -> SEASON_CONNECTIONS 이름 변경) ──
+// ── 연결선 쌍 (Phase 24-2: 9노드 3x3 격자 연결) ──
 
-const SEASON_CONNECTIONS = [
-  [0, 1], [0, 2], [1, 3], [2, 3], [2, 4], [3, 5], [4, 5],
+const GROUP_CONNECTIONS = [
+  // 가로 연결 (같은 행)
+  [0, 1], [1, 2],  // 상단 행
+  [3, 4], [4, 5],  // 중간 행
+  [6, 7], [7, 8],  // 하단 행
+  // 세로 연결 (같은 열)
+  [0, 3], [3, 6],  // 왼쪽 열
+  [1, 4], [4, 7],  // 가운데 열
+  [2, 5], [5, 8],  // 오른쪽 열
 ];
 
 export class WorldMapScene extends Phaser.Scene {
@@ -57,8 +82,8 @@ export class WorldMapScene extends Phaser.Scene {
   }
 
   /**
-   * 씬 생성. 배경, 시즌 탭, 챕터 노드, 연결선, HUD, 엔드리스 섹션을 그린다.
-   * Phase 19-2: 시즌 탭 시스템 추가.
+   * 씬 생성. 배경, 그룹 탭, 챕터 노드, 연결선, HUD, 엔드리스 섹션을 그린다.
+   * Phase 24-2: 3탭 그룹 시스템으로 확장.
    */
   create() {
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ─���
@@ -67,16 +92,18 @@ export class WorldMapScene extends Phaser.Scene {
     // 1. 배경
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0a0a1a);
 
-    // 2. 현재 시즌 상태 (Phase 19-2)
-    this._currentSeason = 1;
-    this._season2Unlocked = !!SaveManager.load().season2Unlocked;
+    // 2. 현재 그룹 상태 (Phase 24-2)
+    this._currentGroup = 1;
+    const saveData = SaveManager.load();
+    this._season2Unlocked = !!saveData.season2Unlocked;
+    this._season3Unlocked = !!saveData.season3Unlocked;
 
-    // 3. 시즌 탭 생성 (Phase 19-2)
-    this._createSeasonTabs();
+    // 3. 그룹 탭 생성 (Phase 24-2)
+    this._createGroupTabs();
 
     // 4. 맵 콘텐츠 컨테이너 (탭 전환 시 재생성)
     this._mapContainer = null;
-    this._buildSeasonMap();
+    this._buildGroupMap();
 
     // 5. 상단 HUD
     this._createHUD();
@@ -87,7 +114,7 @@ export class WorldMapScene extends Phaser.Scene {
     // 7. 패널 상태 초기화
     this._panelContainer = null;
 
-    // 8. 대화 트리거 (Phase 14-3: StoryManager 중앙화)
+    // 8. 대화 트리거
     StoryManager.checkTriggers(this, 'worldmap_enter');
   }
 
@@ -109,65 +136,90 @@ export class WorldMapScene extends Phaser.Scene {
     });
   }
 
-  // ── 시즌 탭 (Phase 19-2) ──────────────────────────────────────
+  // ── 그룹 탭 (Phase 24-2) ──────────────────────────────────────
 
   /**
-   * ���즌 1/2 탭 버튼을 생성��다.
+   * 그룹 1/2/3 탭 버튼을 생성한다.
+   * 그룹2는 season2Unlocked 필요, 그룹3는 season3Unlocked 필요.
    * @private
    */
-  _createSeasonTabs() {
+  _createGroupTabs() {
     const tabY = 60;
-    const tabW = 140;
+    const tabW = 100;
     const tabH = 28;
-    const tabGap = 10;
-    const totalW = tabW * 2 + tabGap;
+    const tabGap = 8;
+    const totalW = tabW * 3 + tabGap * 2;
     const startX = (GAME_WIDTH - totalW) / 2 + tabW / 2;
 
-    // 시즌 1 탭
+    // ── 탭 1: 1~6장 (항상 활성) ──
     this._tab1Bg = this.add.rectangle(startX, tabY, tabW, tabH, 0x3344aa)
       .setStrokeStyle(2, 0x5566cc)
       .setInteractive({ useHandCursor: true })
       .setDepth(40);
-    this._tab1Text = this.add.text(startX, tabY, '\uC2DC\uC98C 1', {
-      fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
+    this._tab1Text = this.add.text(startX, tabY, '1~6\uC7A5', {
+      fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5).setDepth(41);
 
     this._tab1Bg.on('pointerdown', () => {
-      if (this._currentSeason === 1) return;
+      if (this._currentGroup === 1) return;
       SoundManager.playSFX('sfx_ui_tap');
-      this._switchSeason(1);
+      this._switchGroup(1);
     });
 
-    // 시즌 2 탭
+    // ── 탭 2: 7~15장 ──
     const tab2X = startX + tabW + tabGap;
-    const tab2Color = this._season2Unlocked ? 0x2a2a44 : 0x222222;
+    const tab2Locked = !this._season2Unlocked;
+    const tab2Color = tab2Locked ? 0x222222 : 0x2a2a44;
     this._tab2Bg = this.add.rectangle(tab2X, tabY, tabW, tabH, tab2Color)
-      .setStrokeStyle(2, this._season2Unlocked ? 0x4444aa : 0x333333)
+      .setStrokeStyle(2, tab2Locked ? 0x333333 : 0x4444aa)
       .setDepth(40);
 
-    const tab2Label = this._season2Unlocked ? '\uC2DC\uC98C 2' : '\uD83D\uDD12 \uC2DC\uC98C 2';
-    const tab2TextColor = this._season2Unlocked ? '#aaaacc' : '#555555';
+    const tab2Label = tab2Locked ? '\uD83D\uDD12 7~15\uC7A5' : '7~15\uC7A5';
+    const tab2TextColor = tab2Locked ? '#555555' : '#aaaacc';
     this._tab2Text = this.add.text(tab2X, tabY, tab2Label, {
-      fontSize: '13px', fontStyle: 'bold', color: tab2TextColor,
+      fontSize: '12px', fontStyle: 'bold', color: tab2TextColor,
     }).setOrigin(0.5).setDepth(41);
 
-    if (this._season2Unlocked) {
+    if (!tab2Locked) {
       this._tab2Bg.setInteractive({ useHandCursor: true });
       this._tab2Bg.on('pointerdown', () => {
-        if (this._currentSeason === 2) return;
+        if (this._currentGroup === 2) return;
         SoundManager.playSFX('sfx_ui_tap');
-        this._switchSeason(2);
+        this._switchGroup(2);
+      });
+    }
+
+    // ── 탭 3: 16~24장 ──
+    const tab3X = tab2X + tabW + tabGap;
+    const tab3Locked = !this._season3Unlocked;
+    const tab3Color = tab3Locked ? 0x222222 : 0x2a2a44;
+    this._tab3Bg = this.add.rectangle(tab3X, tabY, tabW, tabH, tab3Color)
+      .setStrokeStyle(2, tab3Locked ? 0x333333 : 0x4444aa)
+      .setDepth(40);
+
+    const tab3Label = tab3Locked ? '\uD83D\uDD12 16~24\uC7A5' : '16~24\uC7A5';
+    const tab3TextColor = tab3Locked ? '#555555' : '#aaaacc';
+    this._tab3Text = this.add.text(tab3X, tabY, tab3Label, {
+      fontSize: '12px', fontStyle: 'bold', color: tab3TextColor,
+    }).setOrigin(0.5).setDepth(41);
+
+    if (!tab3Locked) {
+      this._tab3Bg.setInteractive({ useHandCursor: true });
+      this._tab3Bg.on('pointerdown', () => {
+        if (this._currentGroup === 3) return;
+        SoundManager.playSFX('sfx_ui_tap');
+        this._switchGroup(3);
       });
     }
   }
 
   /**
-   * 시즌을 전환한다. 맵 콘텐츠를 재생성한다.
-   * @param {number} season - 1 또는 2
+   * 그룹을 전환한다. 맵 콘텐츠를 재생성한다.
+   * @param {number} group - 1, 2, 3
    * @private
    */
-  _switchSeason(season) {
-    this._currentSeason = season;
+  _switchGroup(group) {
+    this._currentGroup = group;
 
     // 기존 패널 닫기
     if (this._panelContainer) {
@@ -175,32 +227,44 @@ export class WorldMapScene extends Phaser.Scene {
       this._panelContainer = null;
     }
 
-    // 탭 하이라이트 갱신
-    this._tab1Bg.setFillStyle(season === 1 ? 0x3344aa : 0x2a2a44);
-    this._tab1Bg.setStrokeStyle(2, season === 1 ? 0x5566cc : 0x4444aa);
-    this._tab1Text.setColor(season === 1 ? '#ffffff' : '#aaaacc');
+    // 탭 하이라이트 갱신 헬퍼
+    const setTab = (bg, text, isActive, isLocked) => {
+      if (isActive) {
+        bg.setFillStyle(0x3344aa);
+        bg.setStrokeStyle(2, 0x5566cc);
+        text.setColor('#ffffff');
+      } else if (isLocked) {
+        bg.setFillStyle(0x222222);
+        bg.setStrokeStyle(2, 0x333333);
+        text.setColor('#555555');
+      } else {
+        bg.setFillStyle(0x2a2a44);
+        bg.setStrokeStyle(2, 0x4444aa);
+        text.setColor('#aaaacc');
+      }
+    };
 
-    this._tab2Bg.setFillStyle(season === 2 ? 0x3344aa : 0x2a2a44);
-    this._tab2Bg.setStrokeStyle(2, season === 2 ? 0x5566cc : 0x4444aa);
-    this._tab2Text.setColor(season === 2 ? '#ffffff' : '#aaaacc');
+    setTab(this._tab1Bg, this._tab1Text, group === 1, false);
+    setTab(this._tab2Bg, this._tab2Text, group === 2, !this._season2Unlocked);
+    setTab(this._tab3Bg, this._tab3Text, group === 3, !this._season3Unlocked);
 
     // 맵 재생성
-    this._buildSeasonMap();
+    this._buildGroupMap();
 
     // HUD 별점 갱신
     if (this._hudStarText) {
-      const { current, max } = SaveManager.getTotalStars(season);
+      const { current, max } = SaveManager.getTotalStars(group);
       this._hudStarText.setText(`\u2B50 ${current}/${max}`);
     }
   }
 
-  // ── 시즌별 맵 빌드 (Phase 19-2) ──────────────────────────────────
+  // ── 그룹별 맵 빌드 (Phase 24-2) ──────────────────────────────────
 
   /**
-   * 현재 시즌에 맞는 챕터 노드/연결선을 생성한다.
+   * 현재 그룹에 맞는 챕터 노드/연결선을 생성한다.
    * @private
    */
-  _buildSeasonMap() {
+  _buildGroupMap() {
     // 기존 맵 컨테이너 파괴
     if (this._mapContainer) {
       this._mapContainer.destroy();
@@ -208,12 +272,27 @@ export class WorldMapScene extends Phaser.Scene {
 
     this._mapContainer = this.add.container(0, 0).setDepth(10);
 
-    const chapters = this._currentSeason === 1
-      ? CHAPTERS.slice(0, 6)
-      : CHAPTERS.slice(6, 12);
+    // 그룹별 챕터 9개 슬라이스
+    let chapterSliceStart, chapterSliceEnd;
+    if (this._currentGroup === 1) {
+      chapterSliceStart = 0;   // ch1~ch6 (6개)
+      chapterSliceEnd   = 6;
+    } else if (this._currentGroup === 2) {
+      chapterSliceStart = 6;   // ch7~ch15 (9개)
+      chapterSliceEnd   = 15;
+    } else {
+      chapterSliceStart = 15;  // ch16~ch24 (9개)
+      chapterSliceEnd   = 24;
+    }
 
-    // 챕터 상태 계산 (현재 시즌 6개만)
+    const chapters = CHAPTERS.slice(chapterSliceStart, chapterSliceEnd);
+
+    // 챕터 상태 계산
     this._chapterStates = chapters.map((chapter) => {
+      // placeholder 챕터는 항상 잠금 + 비활성
+      if (chapter.theme === 'placeholder') {
+        return { unlocked: false, inProgress: false, cleared: false, currentStars: 0, maxStars: chapter.stages.length * 3, placeholder: true };
+      }
       const chapterUnlocked = SaveManager.isUnlocked(chapter.stages[0]);
       let currentStars = 0;
       const maxStars = chapter.stages.length * 3;
@@ -222,7 +301,7 @@ export class WorldMapScene extends Phaser.Scene {
       }
       const cleared = chapterUnlocked && currentStars === maxStars;
       const inProgress = chapterUnlocked && !cleared;
-      return { unlocked: chapterUnlocked, inProgress, cleared, currentStars, maxStars };
+      return { unlocked: chapterUnlocked, inProgress, cleared, currentStars, maxStars, placeholder: false };
     });
 
     // 연결선 렌더링
@@ -237,8 +316,8 @@ export class WorldMapScene extends Phaser.Scene {
   /**
    * 챕터 노드 간 연결선을 그린다.
    * 해금 경로는 밝은 실선, 잠금 경로는 회색 점선.
-   * Phase 19-2: chapters 매개변수 추가, SEASON_CONNECTIONS 사용.
-   * @param {object[]} chapters - 현재 시즌의 챕터 배열 (6개)
+   * Phase 24-2: GROUP_CONNECTIONS 사용, 9노드 3x3 격자.
+   * @param {object[]} chapters - 현재 그룹의 챕터 배열 (6~9개)
    * @private
    */
   _drawConnections(chapters) {
@@ -246,11 +325,13 @@ export class WorldMapScene extends Phaser.Scene {
     this._mapContainer.add(g);
     const chapterStates = this._chapterStates;
 
-    SEASON_CONNECTIONS.forEach(([a, b]) => {
+    GROUP_CONNECTIONS.forEach(([a, b]) => {
       const posA = NODE_POSITIONS[a];
       const posB = NODE_POSITIONS[b];
+      if (!posA || !posB) return;  // 해당 노드가 없으면 연결선 스킵
       const stateA = chapterStates[a];
       const stateB = chapterStates[b];
+      if (!stateA || !stateB) return;  // 그룹1(6챕터)에서 인덱스 6~8 참조 방지
       const bothUnlocked = stateA.unlocked && stateB.unlocked;
 
       if (bothUnlocked) {
@@ -287,16 +368,16 @@ export class WorldMapScene extends Phaser.Scene {
   // ���─ 노드 렌더링 ──────────────────────────────────────────────
 
   /**
-   * 6개 챕터 노드를 그린다.
+   * 챕터 노드를 그린다.
    * 잠금(회색+자물쇠) / 진행중(테마색+glow) / 올클리어(골든 테두리+체크).
-   * Phase 19-2: chapters 매개변수 추가.
-   * @param {object[]} chapters - 현재 시즌의 챕터 배열 (6개)
+   * Phase 24-2: 그룹 기반 오프셋, placeholder 노드 처리.
+   * @param {object[]} chapters - 현재 그룹의 챕터 배열 (6~9개)
    * @private
    */
   _drawNodes(chapters) {
     const chapterStates = this._chapterStates;
-    // Phase 19-2: 시즌 오프셋 — 노드 라벨에 실제 챕터 번호 표시
-    const chapterOffset = this._currentSeason === 1 ? 0 : 6;
+    // 그룹1=0, 그룹2=6, 그룹3=15 기준 절대 챕터 번호 계산
+    const groupBaseChapter = this._currentGroup === 1 ? 1 : (this._currentGroup === 2 ? 7 : 16);
 
     chapters.forEach((chapter, idx) => {
       const pos = NODE_POSITIONS[idx];
@@ -339,7 +420,7 @@ export class WorldMapScene extends Phaser.Scene {
 
       // 4. 챕터 번호 라벨
       const labelColor = state.unlocked ? chapter.themeColor : '#555555';
-      const chapterNum = `${chapterOffset + idx + 1}\uC7A5`;
+      const chapterNum = `${groupBaseChapter + idx}\uC7A5`;
       const labelText = this.add.text(x, y + 18, chapterNum, {
         fontSize: '11px',
         color: labelColor,
@@ -412,7 +493,7 @@ export class WorldMapScene extends Phaser.Scene {
 
   /**
    * 상단 HUD (y=0~40): 뒤로가기, 총 별점, 레시피 수집률.
-   * Phase 19-2: 시즌별 별점 표시 + _hudStarText 멤버 변수 저장.
+   * Phase 24-2: 그룹별 별점 표시 + _hudStarText 멤버 변수 저장.
    * @private
    */
   _createHUD() {
@@ -437,8 +518,8 @@ export class WorldMapScene extends Phaser.Scene {
     backBg.on('pointerover', () => backBg.setFillStyle(0x666666));
     backBg.on('pointerout', () => backBg.setFillStyle(0x444444));
 
-    // 총 별점 (Phase 19-2: 시즌별 필터)
-    const { current, max } = SaveManager.getTotalStars(this._currentSeason);
+    // 총 별점 (Phase 24-2: 그룹별 필터)
+    const { current, max } = SaveManager.getTotalStars(this._currentGroup);
     this._hudStarText = this.add.text(170, 20, `\u2B50 ${current}/${max}`, {
       fontSize: '13px',
       color: '#ffd700',
@@ -514,8 +595,8 @@ export class WorldMapScene extends Phaser.Scene {
 
   /**
    * 챕터의 스테이지 목록을 슬라이���업 패널로 표시한다.
-   * Phase 19-2: 시즌 오프셋 적용.
-   * @param {number} chapterIdx - 현재 시즌 내 챕터 인덱스 (0~5)
+   * Phase 24-2: 그룹 오프셋 적용.
+   * @param {number} chapterIdx - 현재 그룹 내 챕터 인덱스 (0~8)
    * @private
    */
   _openStagePanel(chapterIdx) {
@@ -525,9 +606,9 @@ export class WorldMapScene extends Phaser.Scene {
       this._panelContainer = null;
     }
 
-    // Phase 19-2: 시즌 오프셋 적용
-    const offset = this._currentSeason === 1 ? 0 : 6;
-    const chapter = CHAPTERS[offset + chapterIdx];
+    // Phase 24-2: 그룹 오프셋 적용
+    const groupOffset = this._currentGroup === 1 ? 0 : (this._currentGroup === 2 ? 6 : 15);
+    const chapter = CHAPTERS[groupOffset + chapterIdx];
     const panelH = 400;
     const panelW = 300;
     const panelTargetY = GAME_HEIGHT - panelH;  // 240

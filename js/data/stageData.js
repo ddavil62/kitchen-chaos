@@ -4700,6 +4700,17 @@ export const STAGES = {
   },
 
   // ══════════════════════════════════════════════════════════════
+  // ── 그룹 2: 8장 placeholder ──
+  // ══════════════════════════════════════════════════════════════
+
+  '8-1': { id: '8-1', nameKo: '미구현', theme: 'placeholder' },
+  '8-2': { id: '8-2', nameKo: '미구현', theme: 'placeholder' },
+  '8-3': { id: '8-3', nameKo: '미구현', theme: 'placeholder' },
+  '8-4': { id: '8-4', nameKo: '미구현', theme: 'placeholder' },
+  '8-5': { id: '8-5', nameKo: '미구현', theme: 'placeholder' },
+  '8-6': { id: '8-6', nameKo: '미구현', theme: 'placeholder' },
+
+  // ══════════════════════════════════════════════════════════════
   // ── 시즌 2: 9장 별빛 비스트로 ──
   // ══════════════════════════════════════════════════════════════
 
@@ -4931,9 +4942,65 @@ export const STAGES = {
   '15-4': { id: '15-4', nameKo: '미구현', theme: 'placeholder' },
   '15-5': { id: '15-5', nameKo: '미구현', theme: 'placeholder' },
   '15-6': { id: '15-6', nameKo: '미구현', theme: 'placeholder' },
+
+  // ── 그룹 3 placeholder (16~24장) ──
+  '16-1': { id: '16-1', nameKo: '미구현', theme: 'placeholder' },
+  '16-2': { id: '16-2', nameKo: '미구현', theme: 'placeholder' },
+  '16-3': { id: '16-3', nameKo: '미구현', theme: 'placeholder' },
+  '16-4': { id: '16-4', nameKo: '미구현', theme: 'placeholder' },
+  '16-5': { id: '16-5', nameKo: '미구현', theme: 'placeholder' },
+  '16-6': { id: '16-6', nameKo: '미구현', theme: 'placeholder' },
+  '17-1': { id: '17-1', nameKo: '미구현', theme: 'placeholder' },
+  '17-2': { id: '17-2', nameKo: '미구현', theme: 'placeholder' },
+  '17-3': { id: '17-3', nameKo: '미구현', theme: 'placeholder' },
+  '17-4': { id: '17-4', nameKo: '미구현', theme: 'placeholder' },
+  '17-5': { id: '17-5', nameKo: '미구현', theme: 'placeholder' },
+  '17-6': { id: '17-6', nameKo: '미구현', theme: 'placeholder' },
+  '18-1': { id: '18-1', nameKo: '미구현', theme: 'placeholder' },
+  '18-2': { id: '18-2', nameKo: '미구현', theme: 'placeholder' },
+  '18-3': { id: '18-3', nameKo: '미구현', theme: 'placeholder' },
+  '18-4': { id: '18-4', nameKo: '미구현', theme: 'placeholder' },
+  '18-5': { id: '18-5', nameKo: '미구현', theme: 'placeholder' },
+  '18-6': { id: '18-6', nameKo: '미구현', theme: 'placeholder' },
+  '19-1': { id: '19-1', nameKo: '미구현', theme: 'placeholder' },
+  '19-2': { id: '19-2', nameKo: '미구현', theme: 'placeholder' },
+  '19-3': { id: '19-3', nameKo: '미구현', theme: 'placeholder' },
+  '19-4': { id: '19-4', nameKo: '미구현', theme: 'placeholder' },
+  '19-5': { id: '19-5', nameKo: '미구현', theme: 'placeholder' },
+  '19-6': { id: '19-6', nameKo: '미구현', theme: 'placeholder' },
+  '20-1': { id: '20-1', nameKo: '미구현', theme: 'placeholder' },
+  '20-2': { id: '20-2', nameKo: '미구현', theme: 'placeholder' },
+  '20-3': { id: '20-3', nameKo: '미구현', theme: 'placeholder' },
+  '20-4': { id: '20-4', nameKo: '미구현', theme: 'placeholder' },
+  '20-5': { id: '20-5', nameKo: '미구현', theme: 'placeholder' },
+  '20-6': { id: '20-6', nameKo: '미구현', theme: 'placeholder' },
+  '21-1': { id: '21-1', nameKo: '미구현', theme: 'placeholder' },
+  '21-2': { id: '21-2', nameKo: '미구현', theme: 'placeholder' },
+  '21-3': { id: '21-3', nameKo: '미구현', theme: 'placeholder' },
+  '21-4': { id: '21-4', nameKo: '미구현', theme: 'placeholder' },
+  '21-5': { id: '21-5', nameKo: '미구현', theme: 'placeholder' },
+  '21-6': { id: '21-6', nameKo: '미구현', theme: 'placeholder' },
+  '22-1': { id: '22-1', nameKo: '미구현', theme: 'placeholder' },
+  '22-2': { id: '22-2', nameKo: '미구현', theme: 'placeholder' },
+  '22-3': { id: '22-3', nameKo: '미구현', theme: 'placeholder' },
+  '22-4': { id: '22-4', nameKo: '미구현', theme: 'placeholder' },
+  '22-5': { id: '22-5', nameKo: '미구현', theme: 'placeholder' },
+  '22-6': { id: '22-6', nameKo: '미구현', theme: 'placeholder' },
+  '23-1': { id: '23-1', nameKo: '미구현', theme: 'placeholder' },
+  '23-2': { id: '23-2', nameKo: '미구현', theme: 'placeholder' },
+  '23-3': { id: '23-3', nameKo: '미구현', theme: 'placeholder' },
+  '23-4': { id: '23-4', nameKo: '미구현', theme: 'placeholder' },
+  '23-5': { id: '23-5', nameKo: '미구현', theme: 'placeholder' },
+  '23-6': { id: '23-6', nameKo: '미구현', theme: 'placeholder' },
+  '24-1': { id: '24-1', nameKo: '미구현', theme: 'placeholder' },
+  '24-2': { id: '24-2', nameKo: '미구현', theme: 'placeholder' },
+  '24-3': { id: '24-3', nameKo: '미구현', theme: 'placeholder' },
+  '24-4': { id: '24-4', nameKo: '미구현', theme: 'placeholder' },
+  '24-5': { id: '24-5', nameKo: '미구현', theme: 'placeholder' },
+  '24-6': { id: '24-6', nameKo: '미구현', theme: 'placeholder' },
 };
 
-/** 스테이지 순서 (시즌1 30슬롯 + 시즌2 54슬롯 = 84슬롯) */
+/** 스테이지 순서 (그룹1 30슬롯 + 그룹2 60슬롯 + 그룹3 54슬롯 = 144슬롯) */
 export const STAGE_ORDER = [
   '1-1', '1-2', '1-3', '1-4', '1-5', '1-6',
   '2-1', '2-2', '2-3',
@@ -4941,8 +5008,9 @@ export const STAGE_ORDER = [
   '4-1', '4-2', '4-3', '4-4', '4-5', '4-6',
   '5-1', '5-2', '5-3', '5-4', '5-5', '5-6',
   '6-1', '6-2', '6-3',
-  // ── 시즌 2 ──
+  // ── 그룹 2 (7~15장) ──
   '7-1', '7-2', '7-3', '7-4', '7-5', '7-6',
+  '8-1', '8-2', '8-3', '8-4', '8-5', '8-6',
   '9-1', '9-2', '9-3', '9-4', '9-5', '9-6',
   '10-1', '10-2', '10-3', '10-4', '10-5', '10-6',
   '11-1', '11-2', '11-3', '11-4', '11-5', '11-6',
@@ -4950,4 +5018,14 @@ export const STAGE_ORDER = [
   '13-1', '13-2', '13-3', '13-4', '13-5', '13-6',
   '14-1', '14-2', '14-3', '14-4', '14-5', '14-6',
   '15-1', '15-2', '15-3', '15-4', '15-5', '15-6',
+  // ── 그룹 3 (16~24장) ──
+  '16-1', '16-2', '16-3', '16-4', '16-5', '16-6',
+  '17-1', '17-2', '17-3', '17-4', '17-5', '17-6',
+  '18-1', '18-2', '18-3', '18-4', '18-5', '18-6',
+  '19-1', '19-2', '19-3', '19-4', '19-5', '19-6',
+  '20-1', '20-2', '20-3', '20-4', '20-5', '20-6',
+  '21-1', '21-2', '21-3', '21-4', '21-5', '21-6',
+  '22-1', '22-2', '22-3', '22-4', '22-5', '22-6',
+  '23-1', '23-2', '23-3', '23-4', '23-5', '23-6',
+  '24-1', '24-2', '24-3', '24-4', '24-5', '24-6',
 ];

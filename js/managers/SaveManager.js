@@ -81,6 +81,7 @@ function createDefault() {
     tutorialMerchant: false,  // 행상인 튜토리얼 완료 여부
     // ── Phase 19-1 추가 ──
     season2Unlocked: false,   // 시즌 2 해금 여부
+    season3Unlocked: false,   // 시즌 3 해금 여부 (Phase 24-2)
     // ── Phase 14-1 추가 ──
     seenDialogues: [],        // 시청 완료한 대화 스크립트 ID 목록
     // ── Phase 14-3 추가 ──
@@ -522,18 +523,20 @@ export class SaveManager {
   }
 
   /**
-   * 시즌별 별점 합계.
-   * Phase 19-2: 시즌 필터 파라미터 추가 (기존 호출 호환 유지).
-   * @param {number} [season=0] - 0: 전체, 1: 시즌1(1~6장), 2: 시즌2(7~12장)
+   * 그룹별 별점 합계.
+   * Phase 24-2: 그룹 필터 파라미터로 변경 (기존 season → group).
+   * @param {number} [group=0] - 0: 전체, 1: 그룹1(1~6장), 2: 그룹2(7~15장), 3: 그룹3(16~24장)
    * @returns {{ current: number, max: number }}
    */
-  static getTotalStars(season = 0) {
+  static getTotalStars(group = 0) {
     const data = SaveManager.load();
     let stages;
-    if (season === 1) {
+    if (group === 1) {
       stages = STAGE_ORDER.filter(id => parseInt(id) <= 6);
-    } else if (season === 2) {
-      stages = STAGE_ORDER.filter(id => parseInt(id) >= 7);
+    } else if (group === 2) {
+      stages = STAGE_ORDER.filter(id => parseInt(id) >= 7 && parseInt(id) <= 15);
+    } else if (group === 3) {
+      stages = STAGE_ORDER.filter(id => parseInt(id) >= 16);
     } else {
       stages = STAGE_ORDER;
     }
@@ -745,7 +748,7 @@ export class SaveManager {
       data.version = 14;
     }
 
-    // v14 → v15: chapter8 storyFlags 키를 chapter10으로 이전 (챕터 번호 재편)
+    // v14 → v15: chapter8 storyFlags 키를 chapter10으로 이전 + season3Unlocked 추가 (Phase 24-2)
     if (data.version < 15) {
       if (data.storyProgress?.storyFlags) {
         const flags = data.storyProgress.storyFlags;
@@ -758,6 +761,7 @@ export class SaveManager {
           delete flags.chapter8_mid_seen;
         }
       }
+      if (data.season3Unlocked === undefined) data.season3Unlocked = false;
       data.version = 15;
     }
 
