@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-13 (Phase 22-1 완료)
+> 최종 업데이트: 2026-04-13 (Phase 22-2 완료)
 
 ## 프로젝트 개요
 
@@ -114,7 +114,10 @@ kitchen-chaos/
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
+    sprites/enemies/         # 적 스프라이트 (sake_specter, oni_minion 48px 8방향)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
+    tilesets/                # 타일셋 (izakaya_underground 16x16 Wang 16타일)
+    icons/                   # 재료 아이콘 (sake 32px isometric)
     service/                 # 영업 씬 에셋 15종 (테이블/손님/바닥/카운터/홀 데코)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
@@ -176,9 +179,9 @@ kitchen-chaos/
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 30종 (일반 21 + 미니보스 1 + 보스 8) |
+| 적 | 30종 (일반 21 + 미니보스 1 + 보스 8) + 에셋 준비 2종 (sake_specter, oni_minion) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
-| 재료 | 19종 |
+| 재료 | 19종 + 에셋 준비 1종 (sake 아이콘) |
 | 레시피 | 126종 (서빙 102 + 버프 24) |
 | 스테이지 | 66개 (시즌1: 6장 30개 + 시즌2: 6장 36개) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
@@ -196,7 +199,7 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 22-1 완료 (7-6 미니보스 oni_herald 교체, 8장 스토리 대화 3종 추가, 트리거 3건 추가).
+- Phase 22-2 완료 (8장 에셋: sake_specter, oni_minion 스프라이트, izakaya_underground 타일셋, sake 재료 아이콘).
 - 챕터 확장 로드맵: 그룹1(1~6장, 완료) → 그룹2(7~15장, 일식·중식·양식, Phase 22~30) → 그룹3(16~24장, 인도·멕시칸·디저트, Phase 31~40).
-- Phase 22-2 다음 작업: 8장 신규 적 에셋 생성 (sake_specter, oni_minion, 이자카야 지하 타일셋).
+- Phase 22-3 다음 작업: 8장 스테이지 + 레시피 구현 (sake 재료 등록, 적 등록, 스테이지 8-1~8-5 배치, 사케 레시피 ~10종).
 - 상세: `docs/ROADMAP.md` 참조

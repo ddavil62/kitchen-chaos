@@ -1,5 +1,31 @@
 # Changelog
 
+## [2026-04-13] - Phase 22-2 8장 에셋 생성 (PixelLab)
+
+### 추가
+
+- **sake_specter 스프라이트** (`assets/sprites/enemies/`)
+  - 48px, 8방향 + walking 애니메이션 6프레임
+  - 8장 이자카야 심층부 적, 마취 디버프 메커닉 예정
+
+- **oni_minion 스프라이트** (`assets/sprites/enemies/`)
+  - 48px, 8방향 + walking 애니메이션 6프레임
+  - 8장 이자카야 심층부 적, 돌진 메커닉 예정
+
+- **izakaya_underground 타일셋** (`assets/tilesets/`)
+  - 16x16px Wang tileset, 16타일
+  - 8장 이자카야 지하 스테이지 배경용
+
+- **sake 재료 아이콘** (`assets/icons/`)
+  - 32px isometric 픽셀아트
+  - Phase 22-3에서 ingredientData.js에 등록 예정
+
+### 참고
+- 코드 변경 없음. 에셋 파일만 추가.
+- Phase 22-3에서 게임 로직(적 등록, 스테이지 배치, 레시피)에 통합 예정.
+
+---
+
 ## [2026-04-13] - Phase 22-1 스크립트 & 7장 보스 재편
 
 ### 추가
