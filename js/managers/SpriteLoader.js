@@ -112,7 +112,7 @@ const BOSS_WALK_HASHES = {
   master_patissier: 'walking-b21b062a',
   pasta_boss: 'walking-49c92768',
   seafood_kraken: 'walking-f85ec5ca',
-  sake_oni: null,       // PixelLab 생성 후 hash 기입
+  sake_oni: 'walking-9fa1ac06',  // Phase 23-1
   dragon_wok: 'animating-8efd2218',     // Phase 21
 };
 

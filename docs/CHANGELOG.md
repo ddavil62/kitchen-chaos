@@ -1,5 +1,44 @@
 # Changelog
 
+## [2026-04-13] - Phase 23-1 사케 오니 최종전 에셋 + 스크립트 구현
+
+### 추가
+
+- **sake_oni 보스 스프라이트** (`assets/sprites/bosses/sake_oni/`)
+  - PixelLab pro 모드(size=64), 캔버스 124x124px
+  - 8방향 rotations (south/south-east/east/north-east/north/north-west/west/south-west)
+  - walking 애니메이션 6프레임 x 8방향 = 48파일, 해시: `walking-9fa1ac06`
+  - 마젠타-핑크 색조, 사케 통, 오니 뿔 디자인
+  - AD 모드2 APPROVED
+
+- **SpriteLoader.js 갱신** (`js/managers/SpriteLoader.js`)
+  - BOSS_WALK_HASHES.sake_oni: `null` → `'walking-9fa1ac06'`
+
+- **9장 대사 3종** (`js/data/dialogueData.js`)
+  - chapter9_intro (7대사): 9-1 진입, 이자카야 최심부 봉인의 방 발견
+  - chapter9_boss (10대사): 9-6 진입, 사케 오니 정체 폭로 (타락한 옛 미력사)
+  - chapter9_clear (11대사): 9-6 첫 클리어, 유키 감정 해소 + 일식 아크 완결
+
+- **CHARACTERS.sake_oni** (`js/data/dialogueData.js`)
+  - id: sake_oni, nameKo: '사케 오니', portrait: '🍶', color: 0xff4488, role: 'boss'
+  - desc: '이자카야를 수호하던 식신. 정화된 사케 영기에 중독되어 타락한 옛 미력사.'
+  - 누적 캐릭터: 8종, 누적 대사 스크립트: 49종
+
+- **storyData.js 9장 트리거 3건** (`js/data/storyData.js`)
+  - chapter9_intro: gathering_enter, stageId === '9-1', once: true
+  - chapter9_boss: gathering_enter, stageId === '9-6', once: true
+  - chapter9_clear: result_clear, stageId === '9-6', isFirstClear, onComplete → chapter9_cleared 플래그 + currentChapter 10 승격
+  - stage_first_clear 제외 목록에 9-1, 9-6 추가
+  - 누적 트리거: 48항목
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-kc-phase23-1-scope.md`
+- 리포트: `.claude/specs/2026-04-13-phase23-1-report.md`
+- QA: `.claude/specs/2026-04-13-phase23-1-qa.md`
+- AD 리뷰: `.claude/specs/2026-04-13-phase23-1-art-review.md`
+- 스펙에서는 64px 기준으로 명시했으나, PixelLab pro 모드의 실제 캔버스 크기는 124x124px로 생성됨
+- 구현 리포트 시점에서 PixelLab MCP 도구 사용 불가로 스프라이트 미완료 상태였으나, 이후 세션에서 생성 완료하여 QA 13/13 PASS
+
 ## [2026-04-13] - Phase 22-3 이자카야 심층부 스테이지 + 레시피 구현
 
 ### 추가
