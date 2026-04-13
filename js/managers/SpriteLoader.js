@@ -26,7 +26,7 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (23종, Phase 22-3: sake_specter, oni_minion 추가) ──
+// ── 적 ID 목록 (25종, Phase 25-1: shadow_dragon_spawn, wok_guardian 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
@@ -106,8 +106,8 @@ const ENEMY_WALK_HASHES = {
   wok_phantom: 'animating-4a4ef775',       // Phase 21
   sake_specter: 'walking-e2f2a098',        // Phase 22-3
   oni_minion:   'walking-3d25e8be',        // Phase 22-3
-  shadow_dragon_spawn: null,  // Phase 25-1: PixelLab 생성 후 hash 기입
-  wok_guardian: null,         // Phase 25-1: PixelLab 생성 후 hash 기입
+  shadow_dragon_spawn: 'walking-dde29672',  // Phase 25-2
+  wok_guardian: 'walking-bc1aca17',         // Phase 25-2
 };
 
 const BOSS_WALK_HASHES = {

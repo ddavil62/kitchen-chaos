@@ -139,6 +139,7 @@ export class GatheringScene extends Phaser.Scene {
     this.events.on('enemy_death_heal', this._onEnemyDeathHeal, this);
     this.events.on('boss_killed', this._onBossKilled, this);
     this.events.on('spore_debuff', this._onSporeDebuff, this);
+    this.events.on('dark_debuff', this._onDarkDebuff, this);   // Phase 25-2: 어둠 디버프
     this.events.on('boss_debuff', this._onBossDebuff, this);
     this.events.on('stealth_back_attack', this._onStealthBackAttack, this);
     // ── Phase 21: 분열/화염 장판/화염 브레스 이벤트 ──
@@ -1320,6 +1321,47 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
+   * 어둠 디버프 이벤트 - 범위 내 타워 공격력 임시 감소.
+   * shadow_dragon_spawn이 darkInterval(5초)마다 emit한다.
+   * @param {{ x: number, y: number, radius: number, damageReduction: number, duration: number }} data
+   */
+  _onDarkDebuff({ x, y, radius, damageReduction, duration }) {
+    this.towers.getChildren().forEach(tower => {
+      if (!tower.active) return;
+      if (tower.data_?.id === 'delivery' || tower.data_?.id === 'soup_pot') return;
+      const dist = Phaser.Math.Distance.Between(x, y, tower.x, tower.y);
+      if (dist > radius) return;
+      // 이미 디버프 중이면 스킵 (중복 방지)
+      if (tower._darkDebuffed) return;
+      tower._darkDebuffed = true;
+
+      if (tower.applyBuff) tower.applyBuff('damage', -damageReduction);
+
+      this.tweens.add({
+        targets: tower, alpha: 0.5,
+        duration: 200, yoyo: true,
+      });
+
+      this.time.delayedCall(duration, () => {
+        if (!tower.active) return;
+        tower._darkDebuffed = false;
+        if (tower.removeBuff) tower.removeBuff();
+        if (this._currentBuff) this._applyBuffToTower(tower, this._currentBuff);
+      });
+    });
+
+    const popup = this.add.text(x, y - 20, '\uD83C\uDF11 \uC5B4\uB460!', {
+      fontSize: '12px', color: '#6600cc',
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(115);
+    this.tweens.add({
+      targets: popup, y: popup.y - 30, alpha: 0,
+      duration: 1200, ease: 'Power1',
+      onComplete: () => popup.destroy(),
+    });
+  }
+
+  /**
    * 보스 디버프 이벤트 - 전체 타워 공격속도 임시 감소.
    * @param {{ speedReduction: number, duration: number }} data
    */
@@ -2020,6 +2062,7 @@ export class GatheringScene extends Phaser.Scene {
     this.events.off('enemy_death_heal', this._onEnemyDeathHeal, this);
     this.events.off('boss_killed', this._onBossKilled, this);
     this.events.off('spore_debuff', this._onSporeDebuff, this);
+    this.events.off('dark_debuff', this._onDarkDebuff, this);  // Phase 25-2
     this.events.off('boss_debuff', this._onBossDebuff, this);
     this.events.off('stealth_back_attack', this._onStealthBackAttack, this);
     // Phase 21: 이벤트 해제 + 화염 장판 정리
