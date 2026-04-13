@@ -10,6 +10,7 @@
  * Phase 20: 7장 사쿠라 이자카야 대화 4종 추가 (chapter7_intro, chapter7_yuki_joins, chapter7_clear, yuki_side_7).
  * Phase 21: 8장 용의 주방 대화 4종 추가 (chapter8_intro, chapter8_lao_joins, chapter8_clear, lao_side_8).
  * Phase 22-1: chapter7_clear 복선 대사 삽입, 8장 추가 대화 3종 추가 (chapter8_yuki_clue, chapter8_mid, yuki_side_8).
+ * Phase 23-1: chapter9_intro, chapter9_boss, chapter9_clear 추가. CHARACTERS에 sake_oni 추가.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -716,6 +717,55 @@ export const DIALOGUES = {
       { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '...라오, 그 비유 되게 마음에 들어.' },
     ],
   },
+
+  // ── 시즌 2: 9장 이자카야 최심부 (Phase 23-1) ──
+
+  chapter9_intro: {
+    id: 'chapter9_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '이자카야 지하 최심부. 공기 자체가 발효된 사케 냄새로 가득 차 있다.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(멈추며) ...여기야. 고문서에 나온 봉인의 방이 \u2014 바로 여기야.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '문에 미력이 가득 차 있어. 이게 봉인이야?' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(문을 손으로 짚으며) 오래된 거야. 아주 오래된 봉인. 봉인을 친 사람이 누군지 \u2014' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(긴장하며) 사케 오니가 안에 있어. 문 너머에서 미력이 흘러나오고 있어.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '자, 들어가자. 거기서 끝내는 거야.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(조용히) ...응. 여기서 끝낸다.' },
+    ],
+  },
+  chapter9_boss: {
+    id: 'chapter9_boss',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '봉인의 방 가장 깊은 곳. 뿌연 사케 안개 속에서 거대한 형체가 모습을 드러냈다.' },
+      { speaker: '\uC0AC\uCF00 \uC624\uB2C8', portrait: '\uD83C\uDF76', text: '(낮고 취한 목소리로) ...오셨군요, 미력사들이여. 오래 기다렸습니다.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(충격받아) ...이 미력. 사케 오니 \u2014 당신은, 미력사야?!' },
+      { speaker: '\uC0AC\uCF00 \uC624\uB2C8', portrait: '\uD83C\uDF76', text: '(쓴웃음) 이자카야의 미력사였지요. 이 마을을 지키던 사람이었어요. 하지만 정화하려다 \u2014 스스로 사케 영기에 잠식됐습니다.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '정화하다가... 타락한 거야?' },
+      { speaker: '\uC0AC\uCF00 \uC624\uB2C8', portrait: '\uD83C\uDF76', text: '(목소리가 흔들리며) 더 강하게 정화하려 했어요. 혼자. 아무도 부르지 않고, 아무도 믿지 않고. 그게 \u2014 잘못이었어요.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(이를 악물며) ...그건, 나도 했던 짓이야.' },
+      { speaker: '\uC0AC\uCF00 \uC624\uB2C8', portrait: '\uD83C\uDF76', text: '(조용히) 그래서 당신이 여기까지 온 거겠죠, 유키. 날 정화해 주세요. 제대로 된 방식으로.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '유키 씨...' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(칼을 꺼내며) 알겠어. 같이 끝냅시다.' },
+    ],
+  },
+  chapter9_clear: {
+    id: 'chapter9_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '사케 오니가 정화되었다. 뿌연 안개가 걷히고, 방 안에 맑은 미력이 흐른다.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(떨리는 목소리로) ...끝났어. 정말로 끝났어.' },
+      { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '유키 씨, 괜찮아?' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(눈을 감으며) 응. 괜찮아. 아니, 처음으로 \u2014 진짜 괜찮은 것 같아.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '혼자 끝내려 했다면 나도 저렇게 됐을 거야. 미력에 잠식되어서, 끝내 봉인 안에 갇혀서.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(조용히) ...유키. 수고했어요.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(고개를 끄덕이며) 고마워요, 라오 씨. 미미도, 포코 씨도.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(콧물 훔치며) 나야말로... 감동이야. 참, 클리어 보너스 장비가\u2014' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(부드럽게) 포코 씨. 5초만 조용히 있어줘요.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(소곤) ...3초는 안 돼?' },
+      { speaker: 'narrator', portrait: '', text: '9장 클리어. 일식 아크 완결. 이자카야의 봉인이 해제되었다.' },
+    ],
+  },
 };
 
 // ── 캐릭터 정의 ──
@@ -731,4 +781,6 @@ export const CHARACTERS = {
   // ── Phase 19-1: 시즌 2 캐릭터 ──
   yuki: { id: 'yuki', nameKo: '유키', portrait: '❄️', portraitKey: 'yuki', color: 0x87ceeb, role: 'ally', desc: '일본 출신 미력사. 차분하고 정밀한 칼잡이.' },
   lao: { id: 'lao', nameKo: '라오', portrait: '🐉', portraitKey: 'lao', color: 0xff4500, role: 'ally', desc: '중국 출신 미력사. 호쾌한 웍 마스터.' },
+  // ── Phase 23-1: 9장 보스 캐릭터 ──
+  sake_oni: { id: 'sake_oni', nameKo: '사케 오니', portrait: '🍶', color: 0xff4488, role: 'boss', desc: '이자카야를 수호하던 식신. 정화된 사케 영기에 중독되어 타락한 옛 미력사.' },
 };
