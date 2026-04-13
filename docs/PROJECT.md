@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-13 (Phase 22-2 완료)
+> 최종 업데이트: 2026-04-13 (Phase 22-3 완료)
 
 ## 프로젝트 개요
 
@@ -107,17 +107,17 @@ kitchen-chaos/
       OrderManager.js        # 오더(미션) 시스템
     data/
       gameData.js            # 적/도구(TOOL_DEFS)/재료 정의
-      stageData.js           # 스테이지 데이터 66개 (시즌1 30 + 시즌2 36, 8장 웨이브 교체 완료)
-      recipeData.js          # 레시피 126종 정의
+      stageData.js           # 스테이지 데이터 66개 (시즌1 30 + 시즌2 36, 8장 이자카야 심층부 재구성 완료)
+      recipeData.js          # 레시피 136종 정의
       dialogueData.js        # 대화 스크립트 46종 + 캐릭터 7종 정의 (시즌2 7~8장 11종 포함)
       storyData.js           # STORY_TRIGGERS 트리거 데이터 45항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
-    sprites/enemies/         # 적 스프라이트 (sake_specter, oni_minion 48px 8방향)
+    sprites/enemies/         # 적 스프라이트 23종 (sake_specter, oni_minion 48px 8방향 포함)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
-    tilesets/                # 타일셋 (izakaya_underground 16x16 Wang 16타일)
-    icons/                   # 재료 아이콘 (sake 32px isometric)
+    tilesets/                # 타일셋 9종 (izakaya_underground 16x16 Wang 16타일 포함)
+    icons/                   # 재료 아이콘 20종 (sake 32px isometric 포함)
     service/                 # 영업 씬 에셋 15종 (테이블/손님/바닥/카운터/홀 데코)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
@@ -154,7 +154,7 @@ kitchen-chaos/
 | 코어 TD | 아이소메트릭 그리드, 도구 배치/회수/재배치, 적 AI, 재료 드롭 | 완료 |
 | 3단계 루프 | GatheringScene(재료 채집) + ServiceScene(영업) + MerchantScene(행상인) + ResultScene | 완료 |
 | 캠페인 | 시즌1 6장 30스테이지 + 시즌2 7~8장 12스테이지, 보스 8종, 별점 시스템 | 완료 |
-| 레시피 | 126종 (서빙 102 + 버프 24), 5등급, 도감 | 완료 |
+| 레시피 | 136종 (서빙 110 + 버프 26), 5등급, 도감 | 완료 |
 | 셰프 시스템 | 5종 셰프(유키/라오 데이터 등록+잠금 표시, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
@@ -173,16 +173,16 @@ kitchen-chaos/
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코 3종, 웜 다크 팔레트) + fallback | 완료 |
 | 도구 도감/팝업 | 행상인 ℹ 팝업(스탯바+로어), 도감 도구 탭(3열 그리드+Lv테이블) | 완료 |
 | 7장 사쿠라 이자카야 | 적 3종(sushi_ninja/tempura_monk/sake_oni)+미니보스(oni_herald), 재료 2종, 레시피 10종, 스토리 4종+복선 1종, 은신/배리어/취권/아우라/전령소환 메커닉 | 완료 |
-| 8장 용의 주방 | 적 3종(dumpling_warrior/wok_phantom/mini_dumpling)+보스(dragon_wok), 재료 2종, 레시피 10종, 스토리 7종, 분열/화염장판/3페이즈 메커닉 | 완료 |
+| 8장 용의 주방 | 적 5종(dumpling_warrior/wok_phantom/mini_dumpling/sake_specter/oni_minion)+보스(dragon_wok), 재료 3종, 레시피 20종, 스토리 7종, 분열/화염장판/3페이즈/마취/돌진 메커닉, 8-1~8-5 이자카야 심층부 테마 | 완료 |
 
 ## 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 30종 (일반 21 + 미니보스 1 + 보스 8) + 에셋 준비 2종 (sake_specter, oni_minion) |
+| 적 | 32종 (일반 23 + 미니보스 1 + 보스 8) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
-| 재료 | 19종 + 에셋 준비 1종 (sake 아이콘) |
-| 레시피 | 126종 (서빙 102 + 버프 24) |
+| 재료 | 20종 |
+| 레시피 | 136종 (서빙 110 + 버프 26) |
 | 스테이지 | 66개 (시즌1: 6장 30개 + 시즌2: 6장 36개) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
 | 세이브 버전 | v13 |
@@ -199,7 +199,8 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 22-2 완료 (8장 에셋: sake_specter, oni_minion 스프라이트, izakaya_underground 타일셋, sake 재료 아이콘).
+- Phase 22-3 완료 (8장 이자카야 심층부: 적 2종 코드 등록, sake 재료, 스테이지 8-1~8-5 재구성, 레시피 10종).
 - 챕터 확장 로드맵: 그룹1(1~6장, 완료) → 그룹2(7~15장, 일식·중식·양식, Phase 22~30) → 그룹3(16~24장, 인도·멕시칸·디저트, Phase 31~40).
-- Phase 22-3 다음 작업: 8장 스테이지 + 레시피 구현 (sake 재료 등록, 적 등록, 스테이지 8-1~8-5 배치, 사케 레시피 ~10종).
+- 다음 작업: Phase 23-1 (sake_oni 보스 에셋 + 9장 대사 스크립트).
+- `buff_narcotize_immunity` effectType을 BuffManager에 구현 필요 (sake_clarity 버프 실동작).
 - 상세: `docs/ROADMAP.md` 참조

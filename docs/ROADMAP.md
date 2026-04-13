@@ -727,16 +727,16 @@
 
 ---
 
-## Phase 22-3 — 8장 스테이지 + 레시피 구현
+## ~~Phase 22-3 — 8장 스테이지 + 레시피 구현~~ ✅
 
 > `visual_change: none` | 게임 로직 구현
-> 22-2 에셋이 완성되어야 진행 가능.
+> 완료: 2026-04-13
 
-- [ ] ingredientData.js: 사케(sake) 추가 — 누적 20종
-- [ ] enemyData.js: sake_specter, oni_minion 등록
-- [ ] stageData.js: 스테이지 8-1 ~ 8-5 배치 (8-6은 Phase 23-1에서 sake_oni)
-- [ ] recipeData.js: 사케 조합 레시피 ~10종 (사케 소스 라멘, 미소 사케 조림 등)
-- [ ] 서비스 설정 (8장 손님 패턴)
+- [x] gameData.js: sake 재료 추가 — 누적 20종
+- [x] gameData.js: sake_specter(마취), oni_minion(돌진) ENEMY_TYPES 등록
+- [x] SpriteLoader.js: ENEMY_IDS 23종, TILESET_IDS 9종(izakaya_underground 16px 분기), INGREDIENT_FILE_MAP sake 추가
+- [x] stageData.js: 스테이지 8-1~8-5 theme→izakaya_underground, waves/customers 전면 재구성 (8-6 보스 변경 없음)
+- [x] recipeData.js: 서빙 8종 + 버프 2종 = 10종 추가 (누적 136종)
 
 ---
 
@@ -1297,7 +1297,7 @@
 | ~~21~~ | ~~8장 용의 주방 (두부, 고수)~~ | 126 | 19 | ✅ 완료 |
 | ~~22-1~~ | ~~스크립트 & 7장 보스 재편~~ | 126 | 19 | ✅ 완료 |
 | ~~22-2~~ | ~~에셋 생성 (sake_specter, oni_minion, 타일셋)~~ | 126 | 19 | ✅ 완료 |
-| 22-3 | 8장 스테이지 + 레시피 구현 | ~126 | 20 | 📋 계획 |
+| ~~22-3~~ | ~~8장 스테이지 + 레시피 구현~~ | 136 | 20 | ✅ 완료 |
 | 23-1 | 에셋 + 스크립트 (sake_oni 보스, 9장 대사) | ~126 | 20 | 📋 계획 |
 | 23-2 | 9장 스테이지 구현 (일식 아크 완성) | ~136 | 20 | 📋 계획 |
 | 24 | 인프라: 8장→10장 재편 + WorldMapScene 24챕터 | ~136 | 20 | 📋 계획 |

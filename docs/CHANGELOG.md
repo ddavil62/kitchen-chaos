@@ -1,5 +1,62 @@
 # Changelog
 
+## [2026-04-13] - Phase 22-3 이자카야 심층부 스테이지 + 레시피 구현
+
+### 추가
+
+- **적 2종 코드 등록** (`js/data/gameData.js` ENEMY_TYPES)
+  - sake_specter: HP 300, speed 65, 마취 디버프 (5초 간격, 70px 범위, 공격속도 -20% 3초)
+  - oni_minion: HP 350, speed 55, 돌진 (HP 60% 이하, 속도 2.5배, 2초간, 8초 쿨다운)
+  - 누적: 일반 적 23종
+
+- **재료 1종 등록** (`js/data/gameData.js` INGREDIENT_TYPES)
+  - sake: nameKo '사케', color 0xc8a2c8, icon '🍶'
+  - 누적: 20종
+
+- **SpriteLoader 갱신** (`js/managers/SpriteLoader.js`)
+  - ENEMY_IDS: 23종 (sake_specter, oni_minion 추가)
+  - ENEMY_WALK_HASHES: sake_specter 'walking-e2f2a098', oni_minion 'walking-3d25e8be'
+  - INGREDIENT_FILE_MAP: sake 추가
+  - TILESET_IDS: 9종 (izakaya_underground 추가)
+  - _loadTilesets: TILESET_16PX Set 분기 처리 (izakaya_underground만 16px, 기존 32px 유지)
+
+- **스테이지 8-1~8-5 재구성** (`js/data/stageData.js`)
+  - theme: 전부 'izakaya_underground'로 변경
+  - 8-1 '이자카야 심층부 입구' (5웨이브, W3부터 sake_specter 소량 도입)
+  - 8-2 '사케 저장고' (5웨이브, W1부터 sake_specter 주력)
+  - 8-3 '지하 통로' (6웨이브, sake_specter+oni_minion 균형)
+  - 8-4 '봉인 전실' (6웨이브, sake_specter+oni_minion 주력)
+  - 8-5 '심층부 제단' (6웨이브, sake_specter+oni_minion 최고 밀도)
+  - 8-6 보스 스테이지 변경 없음 (dragon_wok 유지)
+  - customers: 사케 레시피(sake_cocktail~sake_kaiseki) 순차 참조
+  - service: duration 240~280s, customerInterval 3.5~2.6, maxCustomers 35~44
+
+- **서빙 레시피 8종** (`js/data/recipeData.js` ALL_SERVING_RECIPES)
+  - sake_cocktail (1성, sake x1, 30G, 8-1)
+  - sake_bowl (2성, sake+rice, 52G, 8-1)
+  - sake_shrimp (2성, sake+shrimp, 55G, 8-2)
+  - sake_sashimi (3성, sake+sashimi_tuna, 75G, 8-2)
+  - sake_ramen (3성, sake+tofu+mushroom, 80G, 8-3)
+  - sake_hotpot (3성, sake+tofu+shrimp, 82G, 8-3)
+  - sake_oden (4성, sake+tofu+cilantro+mushroom, 105G, 8-4)
+  - sake_kaiseki (5성, sake x2+sashimi_tuna+wasabi+tofu, 140G, 8-5)
+
+- **버프 레시피 2종** (`js/data/recipeData.js` ALL_BUFF_RECIPES)
+  - sake_clarity (3성, sake x2, 마취 면역+공격속도 +15% 3웨이브, 8-2)
+  - sake_oni_spirit (4성, sake+tofu+cilantro, 공격력+공격속도 +25% 2웨이브, 8-3)
+  - 누적 레시피: 136종 (서빙 110 + 버프 26)
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-phase22-3-scope.md`
+- 리포트: `.claude/specs/2026-04-13-phase22-3-report.md`
+- QA: `.claude/specs/2026-04-13-phase22-3-qa.md`
+- 스펙 "배치 원칙" 텍스트에 "8-3부터 oni_minion 본격 등장"이라 기재되었으나, 스펙 코드 블록에는 8-1 W5, 8-2 W3에도 oni_minion이 배치됨. 구현은 코드 블록 기준으로 수행. "본격"은 주력 비중 증가의 의미로 해석.
+- 스펙 "레시피 설계 원칙"에 "4성 2종"이라 기재되었으나, 코드 블록에는 4성 서빙 1종(sake_oden) + 4성 버프 1종(sake_oni_spirit). 서빙 기준 4성은 1종. 구현은 코드 블록 기준으로 올바름.
+- `buff_narcotize_immunity` effectType은 BuffManager에 미구현 상태. 데이터만 등록됨. 후속 Phase에서 처리 로직 추가 필요.
+- SpriteLoader.js 내 기존 JSDoc 주석 일부(적 "16종", 재료 "15종" 등)가 미갱신 상태 -- Phase 22-3 스펙 범위 외 누적 이슈.
+
+---
+
 ## [2026-04-13] - Phase 22-2 8장 에셋 생성 (PixelLab)
 
 ### 추가
