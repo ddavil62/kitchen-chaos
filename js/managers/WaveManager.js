@@ -58,7 +58,10 @@ export class WaveManager {
 
     waveDef.enemies.forEach(group => {
       for (let i = 0; i < group.count; i++) {
-        this._spawnQueue.push({ type: group.type, delay: group.interval });
+        const entry = { type: group.type, delay: group.interval };
+        // Phase 26-1: hpOverride 스폰 파라미터 전달
+        if (group.hpOverride) entry.hpOverride = group.hpOverride;
+        this._spawnQueue.push(entry);
         // __pause__는 실제 적이 아니므로 총 스폰 수에서 제외
         if (group.type !== '__pause__') this._totalToSpawn++;
       }
@@ -82,7 +85,7 @@ export class WaveManager {
     if (this._spawnTimer >= nextSpawn.delay) {
       // __pause__는 딜레이만 소비하고 스폰 없이 넘어간다
       if (nextSpawn.type !== '__pause__') {
-        this._spawnEnemy(nextSpawn.type);
+        this._spawnEnemy(nextSpawn.type, nextSpawn.hpOverride ? { hpOverride: nextSpawn.hpOverride } : undefined);
         this._enemiesSpawned++;
       }
       this._spawnTimer = 0;
@@ -111,13 +114,15 @@ export class WaveManager {
 
   /**
    * 적 스폰.
+   * @param {string} typeId - ENEMY_TYPES 키
+   * @param {object} [spawnData] - 스폰 파라미터 (hpOverride 등)
    * @private
    */
-  _spawnEnemy(typeId) {
+  _spawnEnemy(typeId, spawnData) {
     const enemyData = ENEMY_TYPES[typeId];
     if (!enemyData) return;
 
-    const enemy = new Enemy(this.scene, enemyData, this._waypoints);
+    const enemy = new Enemy(this.scene, enemyData, this._waypoints, spawnData);
     this.enemyGroup.add(enemy);
   }
 

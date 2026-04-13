@@ -9,6 +9,7 @@
  * Phase 21: 분열(split), 화염 장판(fireZone), 화염 브레스+3페이즈(fireBreath) 메카닉.
  * Phase 22-1: 전령 소환(heraldSummon) + 분노 속도 증가(enrageSpeedMultiplier) 메카닉.
  * Phase 25-1: 어둠 디버프(darkDebuff) + wok_guardian 전면 방어 70%(shieldFrontHeavy) 메카닉.
+ * Phase 26-1: 양조 주기(brewCycle) + 봉인 방어막(sealShield) + hpOverride 스폰 파라미터 메카닉.
  */
 
 import Phaser from 'phaser';
@@ -20,8 +21,9 @@ export class Enemy extends Phaser.GameObjects.Container {
    * @param {Phaser.Scene} scene
    * @param {object} enemyData - ENEMY_TYPES의 적 데이터
    * @param {{x:number,y:number}[]} [waypoints] - 커스텀 웨이포인트 (없으면 기본)
+   * @param {object} [spawnData] - 스폰 파라미터 (hpOverride 등)
    */
-  constructor(scene, enemyData, waypoints) {
+  constructor(scene, enemyData, waypoints, spawnData) {
     const wp = waypoints || PATH_WAYPOINTS;
     const spawn = wp[0];
     super(scene, spawn.x, spawn.y);
@@ -34,6 +36,12 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── 스탯 ──
     this.hp = enemyData.hp;
     this.maxHp = enemyData.hp;
+
+    // ── Phase 26-1: hpOverride 스폰 파라미터 (약화 선등장 등) ──
+    if (spawnData?.hpOverride) {
+      this.maxHp = spawnData.hpOverride;
+      this.hp = spawnData.hpOverride;
+    }
     this.speed = enemyData.speed;
     this.goldReward = 0;
     this.ingredientType = enemyData.ingredient;
@@ -141,6 +149,16 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── Phase 25-1: 어둠 디버프 (shadow_dragon_spawn) ──
     if (enemyData.darkDebuff) {
       this._darkDebuffTimer = 0;
+    }
+
+    // ── Phase 26-1: 양조 주기 (sake_master) ──
+    if (enemyData.brewCycle) {
+      this._brewCycleTimer = 0;
+      this._brewEnraged = false;
+      // 봉인 방어막 상태
+      this._sealShieldActive = false;
+      this._sealShieldTriggered = false;
+      this._sealShieldHp = 0;
     }
 
     // ── 비주얼 ──
@@ -453,6 +471,11 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── Phase 25-1: 어둠 디버프 (shadow_dragon_spawn) ──
     if (this.data_.darkDebuff) {
       this._updateDarkDebuff(delta);
+    }
+
+    // ── Phase 26-1: 양조 주기 (sake_master) ──
+    if (this.data_.brewCycle) {
+      this._updateBrewCycle(delta);
     }
 
     // ── 이동 ──
@@ -842,6 +865,40 @@ export class Enemy extends Phaser.GameObjects.Container {
       amount *= (1 - this.data_.shieldFrontHeavy);
     }
 
+    // Phase 26-1: 봉인 방어막 (sake_master) — 방어막이 피해를 흡수
+    if (this._sealShieldActive) {
+      this._sealShieldHp -= amount;
+      if (this._sealShieldHp <= 0) {
+        // 방어막 파괴, 초과 피해는 본체로 전달
+        const overflow = -this._sealShieldHp;
+        this._sealShieldActive = false;
+        this._sealShieldHp = 0;
+        if (this._brewEnraged) {
+          this.setTint(0xff4444);
+        } else {
+          this.clearTint();
+        }
+        amount = overflow;
+        if (amount <= 0) return;
+      } else {
+        // 방어막이 피해를 전부 흡수
+        return;
+      }
+    }
+
+    // Phase 26-1: 봉인 방어막 활성화 트리거 (sake_master)
+    if (this.data_.brewCycle && !this._sealShieldTriggered) {
+      const ratioBeforeDamage = this.hp / this.maxHp;
+      const ratioAfterDamage = (this.hp - amount) / this.maxHp;
+      if (ratioBeforeDamage > this.data_.sealThreshold && ratioAfterDamage <= this.data_.sealThreshold) {
+        this._sealShieldTriggered = true;
+        this._sealShieldActive = true;
+        this._sealShieldHp = this.data_.sealHp;
+        this.setTint(0x8844bb); // 보라색 틴트로 방어막 표시
+        // 본체 피해는 정상 적용 후 방어막 활성화
+      }
+    }
+
     this.hp -= amount;
     const ratio = Math.max(0, this.hp / this.maxHp);
     this.hpBar.width = 26 * ratio;
@@ -966,6 +1023,72 @@ export class Enemy extends Phaser.GameObjects.Container {
         radius: this.data_.darkRadius,
         damageReduction: this.data_.darkEffect.damageReduction,
         duration: this.data_.darkEffect.duration,
+      });
+    }
+  }
+
+  // ── Phase 26-1: 양조 주기 메카닉 ────────────────────────────────────
+
+  /**
+   * 양조 주기 업데이트 (sake_master).
+   * brewInterval마다 범위 내 도구에 발효 디버프 + 아군 적 HP 회복.
+   * 분노 발동 시 brewInterval 절반 + 사거리 감소 이벤트.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateBrewCycle(delta) {
+    // 분노 체크: HP 30% 이하 시 1회 발동
+    if (!this._brewEnraged && this.data_.enrageHpThreshold &&
+        this.hp / this.maxHp <= this.data_.enrageHpThreshold) {
+      this._brewEnraged = true;
+      this.setTint(0xff4444);
+      // 사거리 감소 이벤트 emit
+      this.scene.events.emit('range_reduction', {
+        damageReduction: this.data_.enrageRangeReduction,
+        duration: this.data_.enrageRangeDuration,
+      });
+    }
+
+    // 양조 타이머
+    const interval = this._brewEnraged
+      ? this.data_.brewInterval / 2
+      : this.data_.brewInterval;
+    this._brewCycleTimer += delta;
+    if (this._brewCycleTimer >= interval) {
+      this._brewCycleTimer = 0;
+      this._onBrewCycleActivate();
+    }
+  }
+
+  /**
+   * 양조 주기 발동: 도구 디버프 + 아군 힐.
+   * @private
+   */
+  _onBrewCycleActivate() {
+    // 범위 내 도구에 발효 디버프
+    this.scene.events.emit('brew_cycle_debuff', {
+      x: this.x,
+      y: this.y,
+      radius: this.data_.brewDebuffRadius,
+      damageReduction: this.data_.brewDebuffEffect.damageReduction,
+      duration: this.data_.brewDebuffEffect.duration,
+    });
+
+    // 범위 내 아군 적 HP 회복
+    if (this.scene?.enemies) {
+      const healRadius = this.data_.brewHealRadius;
+      const healAmount = this.data_.brewHealAmount;
+      this.scene.enemies.getChildren().forEach(enemy => {
+        if (!enemy.active || enemy === this || enemy.isDead) return;
+        const dist = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
+        if (dist <= healRadius) {
+          enemy.hp = Math.min(enemy.maxHp, enemy.hp + healAmount);
+          // HP 바 갱신
+          const ratio = Math.max(0, enemy.hp / enemy.maxHp);
+          enemy.hpBar.width = 26 * ratio;
+          if (ratio >= 0.7) enemy.hpBar.setFillStyle(0x44ff44);
+          else if (ratio >= 0.4) enemy.hpBar.setFillStyle(0xffaa00);
+        }
       });
     }
   }

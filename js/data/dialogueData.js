@@ -13,6 +13,7 @@
  * Phase 24-1: chapter8_* → chapter10_* 번호 이동.
  * Phase 23-1: chapter9_intro, chapter9_boss, chapter9_clear 추가. CHARACTERS에 sake_oni 추가.
  * Phase 25-1: 11장 용의 주방 심층부 대화 3종 추가 (chapter11_intro, chapter11_mid, lao_side_11).
+ * Phase 26-1: 12장 용의 궁전 결전 대화 5종 추가 (chapter12_intro, chapter12_lao_mid, chapter12_boss, chapter12_clear, lao_side_12). CHARACTERS에 sake_master 추가.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -815,6 +816,62 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(무표정) ...포코 씨는 역시 변하지 않네.' },
     ],
   },
+
+  // ── 시즌 2: 12장 용의 궁전 결전 (Phase 26-1) ──
+
+  chapter12_intro: {
+    id: 'chapter12_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '11-6 최후의 관문 돌파 후. 드래곤 웍의 본거지, 용의 궁전에 발을 들이다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '이 기운... 예전보다 훨씬 강해졌어. 11-6의 선등장은 경고였던 거야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '겨우 경고? 그게 경고라면 본체는 얼마나 강한 거야?!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(조용히) 가문의 잘못된 미력이 응집된 곳이야. 내가 끝내야 해.' },
+    ],
+  },
+  chapter12_lao_mid: {
+    id: 'chapter12_lao_mid',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '...사실, 내가 처음 드래곤 웍을 깨웠어. 어렸을 때 금지된 조리법을 시도했다가.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '라오...' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(낮은 목소리) 그래서 네가 이 아크를 책임지겠다고 한 거구나.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '응. 내가 시작했으니, 내가 마무리짓는 거야.' },
+    ],
+  },
+  chapter12_boss: {
+    id: 'chapter12_boss',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '용의 궁전 최심부. 드래곤 웍의 미력이 방 전체를 압도한다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '드래곤 웍. 오래 기다렸어. 이번엔 달아나지 않을 거야.' },
+      { speaker: 'narrator', portrait: '', text: '거대한 웍이 불꽃을 내뿜으며 전진해왔다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(도구를 꽉 쥐며) 모두, 준비해!' },
+    ],
+  },
+  chapter12_clear: {
+    id: 'chapter12_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '드래곤 웍이 정화되었다. 용의 궁전에 오랫동안 깔려 있던 폭주 미력이 흩어진다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(긴 침묵 후) ...끝났어. 드디어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '라오, 고생했어. 진짜로.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '이제 이 미력... 정화된 중식 재료로 돌아올 거야. 할아버지가 기뻐하시겠지.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '응. (미소) ...이제 진짜 요리를 시작할 수 있겠어.' },
+      { speaker: 'narrator', portrait: '', text: '중식 아크 완결. 라오는 가문의 짐을 내려놓고, 새로운 여정으로 향한다.' },
+    ],
+  },
+  lao_side_12: {
+    id: 'lao_side_12',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '미미, 잠깐. 고마워. 혼자였으면 못 했을 거야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '뭘~ 팀이잖아!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(훌쩍) 감동이야... 그나저나 이번 대가는 좀 깎아줄 수 없—' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '안 돼!' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '안 돼!' },
+    ],
+  },
 };
 
 // ── 캐릭터 정의 ──
@@ -832,4 +889,6 @@ export const CHARACTERS = {
   lao: { id: 'lao', nameKo: '라오', portrait: '🐉', portraitKey: 'lao', color: 0xff4500, role: 'ally', desc: '중국 출신 미력사. 호쾌한 웍 마스터.' },
   // ── Phase 23-1: 9장 보스 캐릭터 ──
   sake_oni: { id: 'sake_oni', nameKo: '사케 오니', portrait: '🍶', color: 0xff4488, role: 'boss', desc: '이자카야를 수호하던 식신. 정화된 사케 영기에 중독되어 타락한 옛 미력사.' },
+  // ── Phase 26-1: 10장 보스 캐릭터 ──
+  sake_master: { id: 'sake_master', nameKo: '주조 달인', portrait: '🍶', color: 0x8844bb, role: 'boss', desc: '이자카야 심층부 최심층을 지키는 고대 일식 양조 정령. sake_oni의 스승이자 원형.' },
 };

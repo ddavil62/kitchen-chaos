@@ -6,6 +6,7 @@
  * Phase 22-1: oni_herald 미니보스 추가 (HP 800, 전령 소환 + 분노 기믹).
  * Phase 22-3: sake_specter(마취), oni_minion(돌진) 등록. sake 재료 추가 (누적 20종).
  * Phase 25-1: 적 2종(shadow_dragon_spawn, wok_guardian), 재료 1종(star_anise) 추가. 누적 적 25종.
+ * Phase 26-1: sake_master(일식 양조 보스) 추가. 누적 보스 9종.
  */
 
 // ── 적 타입 정의 ──
@@ -470,6 +471,40 @@ export const ENEMY_TYPES = {
     // fish_knight의 shieldFront(50%)보다 강화된 버전 (70%)
     // Enemy.js takeDamage()에서 shieldFrontHeavy 플래그로 분기 처리
     shieldFrontHeavy: 0.70,
+  },
+  // ── Phase 26-1 신규 보스 (10장 이자카야 최심층) ──
+  sake_master: {
+    id: 'sake_master',
+    nameKo: '사케 주조 달인',
+    hp: 7500,
+    speed: 18,
+    ingredient: null,
+    bodyColor: 0x8844bb,
+    isBoss: true,
+    // ── 양조 주기 기믹 ──
+    // brewInterval마다 범위 내 도구에 발효 디버프 적용 (공격력 -25%, 4초)
+    // 동시에 자신 주변 sake_specter / oni_minion 적에게 HP 회복 부여
+    brewCycle: true,
+    brewInterval: 6000,          // 6초마다 양조 발동
+    brewDebuffRadius: 90,        // 90px 이내 도구에 발효 디버프
+    brewDebuffEffect: { damageReduction: 0.25, duration: 4000 },
+    brewHealRadius: 150,         // 150px 이내 아군 적 HP 회복
+    brewHealAmount: 80,          // 1회 80 HP 회복
+    // ── 봉인 방어막 기믹 ──
+    // HP sealThreshold 이하 시 방어막 활성화 (1500 HP)
+    // 방어막 활성 중 취권 패턴 발동 (drunkWalk 임시 발동)
+    sealThreshold: 0.55,
+    sealHp: 1500,
+    // ── 분노 기믹 ──
+    // HP 30% 이하 시 brewInterval 절반 + 모든 도구 사거리 -35% (5초, 1회)
+    enrageHpThreshold: 0.3,
+    enrageRangeReduction: 0.35,
+    enrageRangeDuration: 5000,
+    bossReward: 420,
+    bossDrops: [
+      { ingredient: 'sake', count: 5 },
+      { ingredient: 'sashimi_tuna', count: 3 },
+    ],
   },
 };
 

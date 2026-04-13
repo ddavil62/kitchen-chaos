@@ -8,6 +8,7 @@
  * Phase 21: 8장 적 3종(dumpling_warrior, mini_dumpling, wok_phantom), 보스 1종(dragon_wok), 타일셋 1종(chinese_palace_kitchen), 재료 2종(tofu, cilantro) 추가.
  * Phase 22-3: 적 2종(sake_specter, oni_minion), 타일셋 1종(izakaya_underground, 16px), 재료 1종(sake) 추가.
  * Phase 25-1: 11장 적 2종(shadow_dragon_spawn, wok_guardian), 타일셋 1종(dragon_lair), 재료 1종(star_anise) 추가.
+ * Phase 26-1: sake_master 보스 추가, dragon_wok 스프라이트 교체.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -38,12 +39,13 @@ const ENEMY_IDS = [
   'shadow_dragon_spawn', 'wok_guardian',  // Phase 25-1
 ];
 
-// ── 보스 ID 목록 (8종, Phase 21: dragon_wok 추가) ──
+// ── 보스 ID 목록 (9종, Phase 26-1: sake_master 추가) ──
 const BOSS_IDS = [
   'pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem',
   'master_patissier', 'cuisine_god',
   'sake_oni',
   'dragon_wok',
+  'sake_master',  // Phase 26-1
 ];
 
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
@@ -118,7 +120,8 @@ const BOSS_WALK_HASHES = {
   pasta_boss: 'walking-49c92768',
   seafood_kraken: 'walking-f85ec5ca',
   sake_oni: 'walking-9fa1ac06',  // Phase 23-1
-  dragon_wok: 'animating-8efd2218',     // Phase 21
+  dragon_wok: 'animating-30e6c64f',     // Phase 26-1 신규 스프라이트 (기존 animating-8efd2218 교체)
+  sake_master: 'animating-8d3d020e',   // Phase 26-1 신규
 };
 
 /** 걷기 애니메이션 방향 목록 */

@@ -5,6 +5,7 @@
  * Phase 21: + 서빙 8종 + 버프 2종 = 126종 (8장 용의 주방).
  * Phase 22-3: + 서빙 8종 + 버프 2종 = 136종 (8장 이자카야 심층부).
  * Phase 25-1: + 서빙 8종 + 버프 2종 = 146종 (11장 용의 주방 심층부).
+ * Phase 26-1: + 서빙 8종 + 버프 2종 = 156종 (12장 용의 궁전 결전).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -716,6 +717,56 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { star_anise: 2, tofu: 2, cilantro: 1, meat: 1 }, baseReward: 155, cookTime: 14000,
     unlockCost: 220, gateStage: '11-4',
   },
+
+  // ── Phase 26-1 신규 서빙 레시피 (12장 용의 궁전 결전) ──
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'dragon_soup', nameKo: '용의 탕', icon: '🍲', category: 'soup',
+    tier: 3, ingredients: { star_anise: 1, tofu: 1, sake: 1 }, baseReward: 88, cookTime: 9000,
+    unlockCost: 85, gateStage: '12-1',
+  },
+  {
+    id: 'wok_flame_rice', nameKo: '웍 화염 볶음밥', icon: '🍳', category: 'fry',
+    tier: 3, ingredients: { star_anise: 1, cilantro: 1, rice: 1 }, baseReward: 80, cookTime: 8000,
+    unlockCost: 80, gateStage: '12-1',
+  },
+
+  // ★★ 2성 (1종)
+  {
+    id: 'dragon_dim_sum', nameKo: '용의 딤섬', icon: '🥟', category: 'special',
+    tier: 2, ingredients: { tofu: 1, cilantro: 1, flour: 1 }, baseReward: 72, cookTime: 7500,
+    unlockCost: 55, gateStage: '12-2',
+  },
+
+  // ★★★★ 4성 (3종)
+  {
+    id: 'fire_wok_noodle', nameKo: '화염 웍 면', icon: '🍜', category: 'noodle',
+    tier: 4, ingredients: { star_anise: 2, cilantro: 1, egg: 1 }, baseReward: 95, cookTime: 10000,
+    unlockCost: 130, gateStage: '12-2',
+  },
+  {
+    id: 'palace_hotpot', nameKo: '궁중 훠궈', icon: '🍲', category: 'soup',
+    tier: 4, ingredients: { star_anise: 2, tofu: 2, sake: 1 }, baseReward: 120, cookTime: 11500,
+    unlockCost: 145, gateStage: '12-3',
+  },
+  {
+    id: 'imperial_tofu_feast', nameKo: '황제의 두부 연회', icon: '🍽️', category: 'special',
+    tier: 4, ingredients: { tofu: 2, cilantro: 2, sake: 1 }, baseReward: 110, cookTime: 11000,
+    unlockCost: 140, gateStage: '12-3',
+  },
+
+  // ★★★★★ 5성 (2종)
+  {
+    id: 'dragon_wok_banquet', nameKo: '드래곤 웍 연회', icon: '🐉', category: 'special',
+    tier: 5, ingredients: { star_anise: 2, tofu: 2, cilantro: 2 }, baseReward: 145, cookTime: 13500,
+    unlockCost: 240, gateStage: '12-5',
+  },
+  {
+    id: 'final_dragon_course', nameKo: '최후의 용의 만찬', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { star_anise: 3, tofu: 2, cilantro: 1, sake: 1, meat: 1 }, baseReward: 180, cookTime: 15000,
+    unlockCost: 280, gateStage: '12-5',
+  },
 ];
 
 /**
@@ -920,6 +971,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.30,
     duration: 2, durationUnit: 'wave',
     unlockCost: 95, gateStage: '11-3',
+  },
+
+  // ── Phase 26-1 신규 버프 레시피 (12장 용의 궁전 결전) ──
+  {
+    id: 'dragon_fire_boost', nameKo: '용화 강화', icon: '🔥', category: 'buff',
+    tier: 3, ingredients: { star_anise: 2, sake: 1 },
+    effectDesc: '화염 공격력 +50% (2웨이브)',
+    effectType: 'buff_burn',
+    effectValue: 0.50,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 80, gateStage: '12-3',
+  },
+  {
+    id: 'dragon_wok_aura', nameKo: '드래곤 웍 오라', icon: '🐉', category: 'buff',
+    tier: 4, ingredients: { star_anise: 1, tofu: 2, cilantro: 1 },
+    effectDesc: '공격력+속도 +35% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.35,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 100, gateStage: '12-5',
   },
 ];
 
