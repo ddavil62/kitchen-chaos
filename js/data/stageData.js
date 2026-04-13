@@ -4,6 +4,7 @@
  * 1장: 파스타 레스토랑, 2장: 동양 요리, 3장: 바닷가 씨푸드 바, 4장: 화산 BBQ,
  * 5장: 마법사 디저트 카페, 6장: 그랑 가스트로노미.
  * Phase 25-1: 11장 용의 주방 심층부 11-1~11-5 웨이브 데이터 추가 (11-6은 placeholder 유지).
+ * Phase 26-2: 10-6 sake_master 보스전으로 교체, 11-6 완성 (dragon_wok 약화 선등장), 12-1~12-6 완성 (dragon_wok 최종 보스전).
  * 각 스테이지는 고유 경로, 웨이브, 손님 구성을 가진다.
  */
 
@@ -4671,8 +4672,9 @@ export const STAGES = {
     starThresholds: { three: 22, two: 16 },
     service: { duration: 280, customerInterval: 2.6, maxCustomers: 44, customerPatience: 24 },
   },
+  // ── Phase 26-2: 10-6 sake_master 보스전으로 교체 (기존 dragon_wok → 12-6 이동) ──
   '10-6': {
-    id: '10-6', nameKo: '용의 주방 \u2014 결전 (보스)', theme: 'chinese_palace_kitchen',
+    id: '10-6', nameKo: '이자카야 심층부 \u2014 최심층 (보스)', theme: 'izakaya_underground',
     availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
     gridCols: 9, gridRows: 10,
     pathSegments: [
@@ -4683,18 +4685,18 @@ export const STAGES = {
       { type: 'vertical', col: 8, rowStart: 6, rowEnd: 9 },
     ],
     waves: [
-      { wave: 1, enemies: [{ type: 'dumpling_warrior', count: 20, interval: 900 }, { type: 'shrimp_samurai', count: 14, interval: 850 }, { type: 'milk_phantom', count: 8, interval: 1400 }] },
-      { wave: 2, enemies: [{ type: 'wok_phantom', count: 14, interval: 1700 }, { type: 'butter_ghost', count: 14, interval: 860 }, { type: 'cheese_golem', count: 6, interval: 2400 }, { type: 'flour_ghost', count: 12, interval: 1000 }] },
-      { wave: 3, enemies: [{ type: 'dumpling_warrior', count: 28, interval: 720 }, { type: 'chili_demon', count: 18, interval: 680 }, { type: 'sushi_ninja', count: 14, interval: 1000 }, { type: 'egg_sprite', count: 16, interval: 760 }] },
-      { wave: 4, enemies: [{ type: 'wok_phantom', count: 16, interval: 1500 }, { type: 'meat_ogre', count: 16, interval: 820 }, { type: 'mushroom_scout', count: 12, interval: 1050 }, { type: 'rice_slime', count: 6, interval: 1900 }, { type: 'cheese_golem', count: 8, interval: 1900 }] },
-      { wave: 5, enemies: [{ type: 'dragon_wok', count: 1, interval: 0 }, { type: 'dumpling_warrior', count: 14, interval: 900 }, { type: 'wok_phantom', count: 10, interval: 1700 }, { type: 'shrimp_samurai', count: 16, interval: 750 }] },
+      { wave: 1, enemies: [{ type: 'sake_specter', count: 22, interval: 1100 }, { type: 'oni_minion', count: 16, interval: 1500 }] },
+      { wave: 2, enemies: [{ type: 'sake_specter', count: 26, interval: 950 }, { type: 'tempura_monk', count: 14, interval: 1700 }, { type: 'cheese_golem', count: 6, interval: 2400 }] },
+      { wave: 3, enemies: [{ type: 'sake_specter', count: 28, interval: 880 }, { type: 'oni_minion', count: 22, interval: 1300 }, { type: 'sushi_ninja', count: 12, interval: 1100 }, { type: 'butter_ghost', count: 14, interval: 900 }] },
+      { wave: 4, enemies: [{ type: 'sake_specter', count: 30, interval: 820 }, { type: 'oni_minion', count: 24, interval: 1200 }, { type: 'fish_knight', count: 16, interval: 900 }, { type: 'milk_phantom', count: 8, interval: 1500 }] },
+      { wave: 5, enemies: [{ type: 'sake_master', count: 1, interval: 0 }, { type: 'sake_specter', count: 14, interval: 1000 }, { type: 'oni_minion', count: 12, interval: 1400 }] },
     ],
     customers: [
-      { wave: 1, customers: [{ dish: 'steak_plate', patience: 9000, baseReward: 70, tipMultiplier: 1.5 }] },
-      { wave: 2, customers: [{ dish: 'seafood_pasta', patience: 8000, baseReward: 80, tipMultiplier: 1.5, vip: true }] },
-      { wave: 3, customers: [{ dish: 'mixed_platter', patience: 8000, baseReward: 90, tipMultiplier: 2.0, vip: true }] },
-      { wave: 4, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
-      { wave: 5, customers: [{ dish: 'cheese_fondue', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
+      { wave: 1, customers: [{ dish: 'sake_cocktail', patience: 9000, baseReward: 70, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'sake_bowl', patience: 8500, baseReward: 85, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'sake_hotpot', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'sake_kaiseki', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'sake_kaiseki', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
     ],
     starThresholds: { three: 24, two: 17 },
     service: { duration: 300, customerInterval: 2.4, maxCustomers: 48, customerPatience: 21 },
@@ -5186,18 +5188,428 @@ export const STAGES = {
     starThresholds: { three: 28, two: 21 },
     service: { duration: 320, customerInterval: 2.5, maxCustomers: 50, customerPatience: 24 },
   },
-  '11-6': { id: '11-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── Phase 26-2: 11-6 완성 (dragon_wok 약화 선등장 미니전) ──
+  '11-6': {
+    id: '11-6',
+    nameKo: '용의 보좌 \u2014 최후의 관문',
+    theme: 'dragon_lair',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 11-5와 동일한 S자 경로
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'shadow_dragon_spawn', count: 20, interval: 1200 },
+        { type: 'wok_guardian', count: 12, interval: 2000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'shadow_dragon_spawn', count: 24, interval: 1050 },
+        { type: 'wok_guardian', count: 14, interval: 1800 },
+        { type: 'chili_demon', count: 20, interval: 700 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'shadow_dragon_spawn', count: 26, interval: 950 },
+        { type: 'wok_guardian', count: 16, interval: 1700 },
+        { type: 'sake_specter', count: 14, interval: 1400 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'shadow_dragon_spawn', count: 28, interval: 880 },
+        { type: 'wok_guardian', count: 18, interval: 1600 },
+        { type: 'fish_knight', count: 16, interval: 900 },
+        { type: 'cheese_golem', count: 8, interval: 1900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'shadow_dragon_spawn', count: 32, interval: 800 },
+        { type: 'wok_guardian', count: 20, interval: 1500 },
+        { type: 'tempura_monk', count: 14, interval: 1500 },
+        { type: 'milk_phantom', count: 12, interval: 1200 },
+      ]},
+      // wave 6: dragon_wok 약화 선등장 (hpOverride: 2500)
+      { wave: 6, enemies: [
+        { type: 'dragon_wok', count: 1, interval: 0, hpOverride: 2500 },
+        { type: 'shadow_dragon_spawn', count: 18, interval: 900 },
+        { type: 'wok_guardian', count: 10, interval: 1700 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'five_spice_stir_fry', patience: 9000, baseReward: 88, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'star_anise_hotpot', patience: 8500, baseReward: 100, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'dragon_spice_banquet', patience: 8500, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'dragon_spice_banquet', patience: 8000, baseReward: 128, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'legendary_star_anise_course', patience: 8000, baseReward: 148, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'legendary_star_anise_course', patience: 7500, baseReward: 170, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 30, two: 22 },
+    service: { duration: 340, customerInterval: 2.5, maxCustomers: 52, customerPatience: 23 },
+  },
 
   // ══════════════════════════════════════════════════════════════
-  // ── 시즌 2: 12장 (미구현) ──
+  // ── 시즌 2: 12장 용의 궁전 결전 (Phase 26-2) ──
   // ══════════════════════════════════════════════════════════════
 
-  '12-1': { id: '12-1', nameKo: '미구현', theme: 'placeholder' },
-  '12-2': { id: '12-2', nameKo: '미구현', theme: 'placeholder' },
-  '12-3': { id: '12-3', nameKo: '미구현', theme: 'placeholder' },
-  '12-4': { id: '12-4', nameKo: '미구현', theme: 'placeholder' },
-  '12-5': { id: '12-5', nameKo: '미구현', theme: 'placeholder' },
-  '12-6': { id: '12-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 12-1: 용의 궁전 입구 ──
+  '12-1': {
+    id: '12-1',
+    nameKo: '용의 궁전 입구',
+    theme: 'dragon_lair',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'shadow_dragon_spawn', count: 22, interval: 1200 },
+        { type: 'wok_guardian', count: 12, interval: 2000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'shadow_dragon_spawn', count: 26, interval: 1050 },
+        { type: 'chili_demon', count: 18, interval: 700 },
+        { type: 'cheese_golem', count: 6, interval: 2300 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wok_guardian', count: 16, interval: 1800 },
+        { type: 'shadow_dragon_spawn', count: 24, interval: 1000 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'shadow_dragon_spawn', count: 28, interval: 900 },
+        { type: 'wok_guardian', count: 18, interval: 1700 },
+        { type: 'fish_knight', count: 16, interval: 900 },
+        { type: 'rice_slime', count: 6, interval: 1900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'shadow_dragon_spawn', count: 32, interval: 820 },
+        { type: 'wok_guardian', count: 20, interval: 1600 },
+        { type: 'cheese_golem', count: 9, interval: 1800 },
+        { type: 'mushroom_scout', count: 12, interval: 1000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'dragon_soup', patience: 9000, baseReward: 82, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'wok_flame_rice', patience: 8500, baseReward: 90, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'dragon_dim_sum', patience: 8500, baseReward: 85, tipMultiplier: 1.5 }] },
+      { wave: 4, customers: [{ dish: 'wok_flame_rice', patience: 8000, baseReward: 100, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'dragon_soup', patience: 8000, baseReward: 118, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 24, two: 18 },
+    service: { duration: 290, customerInterval: 2.8, maxCustomers: 46, customerPatience: 25 },
+  },
+
+  // ── 12-2: 용의 가문 훈련장 ──
+  '12-2': {
+    id: '12-2',
+    nameKo: '용의 가문 훈련장',
+    theme: 'dragon_lair',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 11-5와 동일 패턴 (S자)
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'shadow_dragon_spawn', count: 24, interval: 1100 },
+        { type: 'wok_guardian', count: 14, interval: 1900 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'shadow_dragon_spawn', count: 28, interval: 950 },
+        { type: 'chili_demon', count: 22, interval: 680 },
+        { type: 'cheese_golem', count: 6, interval: 2200 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wok_guardian', count: 18, interval: 1700 },
+        { type: 'shadow_dragon_spawn', count: 26, interval: 950 },
+        { type: 'oni_minion', count: 14, interval: 1500 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'shadow_dragon_spawn', count: 32, interval: 860 },
+        { type: 'wok_guardian', count: 20, interval: 1600 },
+        { type: 'fish_knight', count: 18, interval: 880 },
+        { type: 'rice_slime', count: 6, interval: 1900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'shadow_dragon_spawn', count: 36, interval: 780 },
+        { type: 'wok_guardian', count: 22, interval: 1500 },
+        { type: 'cheese_golem', count: 10, interval: 1700 },
+        { type: 'sake_specter', count: 14, interval: 1300 },
+        { type: 'mushroom_scout', count: 12, interval: 1000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'fire_wok_noodle', patience: 9000, baseReward: 86, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'dragon_dim_sum', patience: 8500, baseReward: 94, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'fire_wok_noodle', patience: 8000, baseReward: 106, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'palace_hotpot', patience: 8000, baseReward: 122, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'palace_hotpot', patience: 8000, baseReward: 138, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 26, two: 19 },
+    service: { duration: 300, customerInterval: 2.7, maxCustomers: 48, customerPatience: 24 },
+  },
+
+  // ── 12-3: 용의 불꽃 정원 ──
+  '12-3': {
+    id: '12-3',
+    nameKo: '용의 불꽃 정원',
+    theme: 'dragon_lair',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 11-4와 동일 패턴 (W자)
+    pathSegments: [
+      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 6, rowStart: 4, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 2, rowStart: 7, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'shadow_dragon_spawn', count: 24, interval: 1100 },
+        { type: 'wok_guardian', count: 14, interval: 1900 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'shadow_dragon_spawn', count: 28, interval: 950 },
+        { type: 'chili_demon', count: 22, interval: 680 },
+        { type: 'milk_phantom', count: 8, interval: 1500 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wok_guardian', count: 18, interval: 1700 },
+        { type: 'shadow_dragon_spawn', count: 28, interval: 920 },
+        { type: 'sake_specter', count: 14, interval: 1400 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'shadow_dragon_spawn', count: 32, interval: 840 },
+        { type: 'wok_guardian', count: 20, interval: 1600 },
+        { type: 'fish_knight', count: 18, interval: 880 },
+        { type: 'rice_slime', count: 6, interval: 1900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'shadow_dragon_spawn', count: 36, interval: 760 },
+        { type: 'wok_guardian', count: 22, interval: 1500 },
+        { type: 'tempura_monk', count: 14, interval: 1500 },
+        { type: 'cheese_golem', count: 9, interval: 1800 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'shadow_dragon_spawn', count: 40, interval: 700 },
+        { type: 'wok_guardian', count: 24, interval: 1400 },
+        { type: 'cheese_golem', count: 12, interval: 1700 },
+        { type: 'sake_specter', count: 16, interval: 1200 },
+        { type: 'milk_phantom', count: 10, interval: 1300 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'dragon_soup', patience: 9000, baseReward: 88, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'wok_flame_rice', patience: 8500, baseReward: 98, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'imperial_tofu_feast', patience: 8000, baseReward: 112, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'palace_hotpot', patience: 8000, baseReward: 128, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'dragon_wok_banquet', patience: 8000, baseReward: 148, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'dragon_wok_banquet', patience: 8000, baseReward: 165, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 28, two: 21 },
+    service: { duration: 310, customerInterval: 2.6, maxCustomers: 50, customerPatience: 24 },
+  },
+
+  // ── 12-4: 용의 궁전 내전 ──
+  '12-4': {
+    id: '12-4',
+    nameKo: '용의 궁전 내전',
+    theme: 'dragon_lair',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 11-3과 동일 패턴
+    pathSegments: [
+      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 4, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'shadow_dragon_spawn', count: 26, interval: 1050 },
+        { type: 'wok_guardian', count: 16, interval: 1800 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'shadow_dragon_spawn', count: 30, interval: 900 },
+        { type: 'chili_demon', count: 24, interval: 660 },
+        { type: 'cheese_golem', count: 8, interval: 2100 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wok_guardian', count: 20, interval: 1600 },
+        { type: 'shadow_dragon_spawn', count: 30, interval: 880 },
+        { type: 'oni_minion', count: 16, interval: 1400 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'shadow_dragon_spawn', count: 34, interval: 800 },
+        { type: 'wok_guardian', count: 22, interval: 1500 },
+        { type: 'fish_knight', count: 20, interval: 860 },
+        { type: 'sake_specter', count: 16, interval: 1300 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'shadow_dragon_spawn', count: 38, interval: 730 },
+        { type: 'wok_guardian', count: 24, interval: 1400 },
+        { type: 'tempura_monk', count: 16, interval: 1400 },
+        { type: 'cheese_golem', count: 10, interval: 1700 },
+        { type: 'milk_phantom', count: 10, interval: 1300 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'shadow_dragon_spawn', count: 42, interval: 670 },
+        { type: 'wok_guardian', count: 26, interval: 1300 },
+        { type: 'sake_specter', count: 18, interval: 1200 },
+        { type: 'cheese_golem', count: 12, interval: 1600 },
+        { type: 'mushroom_scout', count: 14, interval: 950 },
+        { type: 'butter_ghost', count: 14, interval: 900 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'fire_wok_noodle', patience: 9000, baseReward: 92, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'imperial_tofu_feast', patience: 8000, baseReward: 106, tipMultiplier: 2.0, vip: true }] },
+      { wave: 3, customers: [{ dish: 'palace_hotpot', patience: 8000, baseReward: 120, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'dragon_wok_banquet', patience: 8000, baseReward: 138, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 172, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 30, two: 22 },
+    service: { duration: 320, customerInterval: 2.5, maxCustomers: 52, customerPatience: 23 },
+  },
+
+  // ── 12-5: 용의 왕좌 앞 ──
+  '12-5': {
+    id: '12-5',
+    nameKo: '용의 왕좌 앞',
+    theme: 'dragon_lair',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 11-2와 동일 패턴
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 4 },
+      { type: 'vertical', col: 4, rowStart: 1, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 4, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'shadow_dragon_spawn', count: 28, interval: 1000 },
+        { type: 'wok_guardian', count: 18, interval: 1700 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'shadow_dragon_spawn', count: 32, interval: 870 },
+        { type: 'chili_demon', count: 26, interval: 640 },
+        { type: 'cheese_golem', count: 8, interval: 2000 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wok_guardian', count: 22, interval: 1500 },
+        { type: 'shadow_dragon_spawn', count: 32, interval: 850 },
+        { type: 'sake_specter', count: 16, interval: 1300 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'shadow_dragon_spawn', count: 36, interval: 780 },
+        { type: 'wok_guardian', count: 24, interval: 1400 },
+        { type: 'fish_knight', count: 20, interval: 840 },
+        { type: 'rice_slime', count: 7, interval: 1900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'shadow_dragon_spawn', count: 40, interval: 710 },
+        { type: 'wok_guardian', count: 26, interval: 1300 },
+        { type: 'tempura_monk', count: 18, interval: 1400 },
+        { type: 'cheese_golem', count: 11, interval: 1700 },
+        { type: 'milk_phantom', count: 12, interval: 1200 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'shadow_dragon_spawn', count: 44, interval: 650 },
+        { type: 'wok_guardian', count: 28, interval: 1250 },
+        { type: 'sake_specter', count: 20, interval: 1150 },
+        { type: 'cheese_golem', count: 13, interval: 1600 },
+        { type: 'oni_minion', count: 14, interval: 1400 },
+        { type: 'butter_ghost', count: 16, interval: 880 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'dragon_wok_banquet', patience: 9000, baseReward: 108, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'palace_hotpot', patience: 8000, baseReward: 118, tipMultiplier: 2.0, vip: true }] },
+      { wave: 3, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 135, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 150, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'dragon_wok_banquet', patience: 8000, baseReward: 168, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 185, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 32, two: 24 },
+    service: { duration: 330, customerInterval: 2.5, maxCustomers: 54, customerPatience: 23 },
+  },
+
+  // ── 12-6: 드래곤 웍 — 최후의 결전 (보스) ──
+  '12-6': {
+    id: '12-6',
+    nameKo: '드래곤 웍 \u2014 최후의 결전 (보스)',
+    theme: 'dragon_lair',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 기존 10-6 S자형 경로
+    pathSegments: [
+      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 0, colEnd: 4 },
+      { type: 'vertical', col: 4, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 4, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'shadow_dragon_spawn', count: 22, interval: 900 },
+        { type: 'wok_guardian', count: 16, interval: 1900 },
+        { type: 'milk_phantom', count: 8, interval: 1400 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'wok_phantom', count: 16, interval: 1700 },
+        { type: 'shadow_dragon_spawn', count: 20, interval: 900 },
+        { type: 'cheese_golem', count: 8, interval: 2200 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'shadow_dragon_spawn', count: 32, interval: 720 },
+        { type: 'chili_demon', count: 20, interval: 680 },
+        { type: 'sushi_ninja', count: 16, interval: 1000 },
+        { type: 'wok_guardian', count: 14, interval: 1900 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'wok_phantom', count: 18, interval: 1500 },
+        { type: 'shadow_dragon_spawn', count: 26, interval: 820 },
+        { type: 'mushroom_scout', count: 14, interval: 1050 },
+        { type: 'rice_slime', count: 8, interval: 1800 },
+        { type: 'cheese_golem', count: 10, interval: 1800 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'dragon_wok', count: 1, interval: 0 },
+        { type: 'shadow_dragon_spawn', count: 16, interval: 900 },
+        { type: 'wok_phantom', count: 12, interval: 1700 },
+        { type: 'wok_guardian', count: 12, interval: 1900 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'final_dragon_course', patience: 9000, baseReward: 105, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'dragon_wok_banquet', patience: 8000, baseReward: 120, tipMultiplier: 1.5, vip: true }] },
+      { wave: 3, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 138, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 155, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'final_dragon_course', patience: 8000, baseReward: 175, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 26, two: 19 },
+    service: { duration: 310, customerInterval: 2.4, maxCustomers: 50, customerPatience: 21 },
+  },
 
   // ══════════════════════════════════════════════════════════════
   // ── 시즌 2: 13장 (미구현) ──

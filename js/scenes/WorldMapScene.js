@@ -33,7 +33,7 @@ const CHAPTERS = [
   { id: 'ch9',  nameKo: '9장: 사케 오니 최종전',   themeColor: '#cc3333', themeHex: 0xcc3333, strokeColor: '#881111', icon: '\uD83C\uDF76', stages: ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6'] },
   { id: 'ch10', nameKo: '10장: 용의 주방',          themeColor: '#ff4500', themeHex: 0xff4500, strokeColor: '#882200', icon: '\uD83D\uDC09', stages: ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6'] },
   { id: 'ch11', nameKo: '11장: 용의 주방 심층부',    themeColor: '#2a0a3a', themeHex: 0x2a0a3a, strokeColor: '#110022', icon: '\uD83D\uDC09', stages: ['11-1', '11-2', '11-3', '11-4', '11-5', '11-6'] },
-  { id: 'ch12', nameKo: '12장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'], theme: 'placeholder' },
+  { id: 'ch12', nameKo: '12장: 용의 궁전',            themeColor: '#cc2200', themeHex: 0xcc2200, strokeColor: '#661100', icon: '\uD83D\uDC09', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'] },
   { id: 'ch13', nameKo: '13장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['13-1', '13-2', '13-3', '13-4', '13-5', '13-6'], theme: 'placeholder' },
   { id: 'ch14', nameKo: '14장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['14-1', '14-2', '14-3', '14-4', '14-5', '14-6'], theme: 'placeholder' },
   { id: 'ch15', nameKo: '15장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['15-1', '15-2', '15-3', '15-4', '15-5', '15-6'], theme: 'placeholder' },

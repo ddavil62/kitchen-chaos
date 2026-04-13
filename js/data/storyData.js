@@ -10,6 +10,7 @@
  * Phase 23-1: 9장 트리거 3건 추가 (chapter9_intro, chapter9_boss, chapter9_clear) + stage_first_clear 제외 목록 갱신.
  * Phase 24-1: 8장 트리거 전체 10장으로 번호 이동. season2_lao_intro 조건 currentChapter >= 10으로 확정.
  * Phase 25-1: 11장 트리거 3건 추가 (chapter11_intro, chapter11_mid, lao_side_11) + stage_first_clear 제외 목록 갱신.
+ * Phase 26-2: 12장 트리거 5건 추가 (chapter12_intro, chapter12_lao_mid, chapter12_boss, chapter12_clear, lao_side_12) + stage_first_clear 제외 목록 갱신.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -246,7 +247,10 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '9-1' &&   // chapter9_intro 별도 처리
       ctx.stageId !== '9-6' &&   // chapter9_boss / chapter9_clear 별도 처리
       ctx.stageId !== '11-1' &&   // chapter11_intro 별도 처리
-      ctx.stageId !== '11-4',     // chapter11_mid 별도 처리
+      ctx.stageId !== '11-4' &&   // chapter11_mid 별도 처리
+      ctx.stageId !== '12-1' &&   // chapter12_intro 별도 처리
+      ctx.stageId !== '12-3' &&   // chapter12_lao_mid 별도 처리
+      ctx.stageId !== '12-6',     // chapter12_boss / chapter12_clear 별도 처리
     delay: 800,
   },
 
@@ -509,6 +513,67 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.storyFlags?.chapter11_mid_seen === true &&
       !save.seenDialogues?.includes('lao_side_11'),
+  },
+
+  // ── 시즌 2: 12장 용의 궁전 결전 (Phase 26-2) ─────────────────────────────
+  // 12-1 입장 시 chapter12_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter12_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '12-1',
+    delay: 400,
+  },
+  // 12-3 첫 클리어 시 chapter12_lao_mid + 플래그 저장
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter12_lao_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '12-3',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      data.storyProgress.storyFlags.chapter12_mid_seen = true;
+      SaveManager.save(data);
+    },
+  },
+  // 12-6 입장 시 chapter12_boss (보스전 직전 대사)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter12_boss',
+    once: true,
+    condition: (ctx) => ctx.stageId === '12-6',
+    delay: 400,
+  },
+  // 12-6 첫 클리어 시 chapter12_clear + 플래그 + currentChapter 13 설정
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter12_clear',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '12-6',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter12_cleared = true;
+      if (data.storyProgress.currentChapter < 13) {
+        data.storyProgress.currentChapter = 13;
+      }
+      SaveManager.save(data);
+    },
+  },
+  // merchant_enter 에서 lao_side_12 (12장 클리어 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'lao_side_12',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter12_cleared === true &&
+      !save.seenDialogues?.includes('lao_side_12'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────

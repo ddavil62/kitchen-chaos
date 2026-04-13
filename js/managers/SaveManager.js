@@ -13,12 +13,13 @@
  * Phase 14-3: v11 마이그레이션 — storyProgress (챕터 진행도, 스토리 플래그) 추가.
  * Phase 19-1: v12 마이그레이션 — 신규 도구 2종(wasabi_cannon, spice_grinder) + season2Unlocked 추가.
  * Phase 19-3: v13 마이그레이션 — storyFlags 배열→객체 변환 (프로퍼티 접근 지원).
+ * Phase 26-2: v16 마이그레이션 — chapter12 진행 플래그 + sake_master 스테이지 교체 관련 플래그 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 15;
+const SAVE_VERSION = 16;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -763,6 +764,27 @@ export class SaveManager {
       }
       if (data.season3Unlocked === undefined) data.season3Unlocked = false;
       data.version = 15;
+    }
+
+    // v15 → v16: chapter12 진행 플래그 + sake_master 스테이지 교체 플래그 추가 (Phase 26-2)
+    if (data.version < 16) {
+      // storyFlags 객체 보장
+      if (!data.storyProgress) {
+        data.storyProgress = { currentChapter: 1, storyFlags: {} };
+      }
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      // chapter12 진행 플래그 기본값
+      if (data.storyProgress.storyFlags.chapter12_cleared === undefined) {
+        data.storyProgress.storyFlags.chapter12_cleared = false;
+      }
+      if (data.storyProgress.storyFlags.chapter12_mid_seen === undefined) {
+        data.storyProgress.storyFlags.chapter12_mid_seen = false;
+      }
+      // 10-6 클리어 기록 유지 (sake_master로 보스 교체 후에도 기존 클리어 기록 보존)
+      // 별도 처리 불필요 — stages['10-6'] 클리어 기록은 스테이지 데이터 변경과 독립적
+      data.version = 16;
     }
 
     return data;
