@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-13
-> 기준: Phase 24-1 완료
+> 기준: Phase 25-1 완료
 
 ---
 
@@ -35,7 +35,7 @@
 | Phase 22 | 8장 — 이자카야 심층부 (일식 2장) + 7장 보스 재편 | ✅ 완료 |
 | Phase 23 | 9장 — 사케 오니 최종전 (일식 3장) | 🔄 진행중 (23-1 완료) |
 | Phase 24 | 기존 8장→10장 번호 재편 + WorldMapScene 24챕터 확장 | 🔄 진행중 (24-1 완료) |
-| Phase 25 | 11장 — 용의 주방 심층부 (중식 2장) | 📋 계획 |
+| Phase 25 | 11장 — 용의 주방 심층부 (중식 2장) | 🔄 진행중 (25-1 완료) |
 | Phase 26 | 12장 — 드래곤 웍 최종전 (중식 3장) | 📋 계획 |
 | Phase 27 | 13장 — 별빛 비스트로 (양식 1장) | 📋 계획 |
 | Phase 28 | 14장 — 비스트로 심층부 (양식 2장) | 📋 계획 |
@@ -797,36 +797,29 @@
 
 ---
 
-## Phase 25-1 — 스크립트 (11장: 용의 주방 심층부)
+## Phase 25-1 — 11장 용의 주방 심층부 기반 구축 ✅
 
-> `visual_change: none` | 스토리 대사 집필만
+> `visual_change: art` | 스토리+에셋+스테이지+레시피 통합 구현
 
-- [ ] dialogueData.js: chapter11_intro 작성 (라오 과거 회상 — 봉인의 실패)
-- [ ] dialogueData.js: chapter11_mid 작성 (봉인 해제의 진실, 라오 죄책감)
-- [ ] 사이드 대화 1종 (lao_side_11)
-
----
-
-## Phase 25-2 — 에셋 생성 (11장 신규 적)
-
-> `visual_change: art` | PixelLab 스프라이트 + 타일셋
-
-- [ ] shadow_dragon_spawn: HP ~380, 어둠 디버프 — PixelLab 생성
-- [ ] wok_guardian: HP ~450, 방어 특화 — PixelLab 생성
-- [ ] 용의 주방 심층부 타일셋 — PixelLab tiles
-- [ ] 재료 아이콘: 팔각(star_anise) 32px
+- [x] gameData.js: shadow_dragon_spawn(darkDebuff), wok_guardian(shieldFrontHeavy 0.70), star_anise 등록
+- [x] Enemy.js: _updateDarkDebuff 메서드, shieldFrontHeavy 분기 추가
+- [x] stageData.js: 11-1~11-5 웨이브 데이터 (11-6 placeholder 유지)
+- [x] recipeData.js: 서빙 8종 + 버프 2종 = 10종 추가 (누적 146종)
+- [x] dialogueData.js: chapter11_intro, chapter11_mid, lao_side_11 대사 3종
+- [x] storyData.js: 트리거 3건 + stage_first_clear 제외 목록 갱신
+- [x] WorldMapScene.js: ch11 nameKo 활성화
+- [x] 에셋 4종: shadow_dragon_spawn(8방향), wok_guardian(8방향), dragon_lair 타일셋, star_anise 아이콘
+- [x] SpriteLoader.js: ENEMY_IDS, TILESET_IDS, INGREDIENT_FILE_MAP, WALK_HASHES 갱신
 
 ---
 
-## Phase 25-3 — 11장 스테이지 + 레시피 구현
+## Phase 25-2 — 11장 후속 작업 (미착수)
 
-> `visual_change: none` | 25-2 에셋 완성 후 진행
+> 25-1에서 미완료된 기능 보완
 
-- [ ] ingredientData.js: 팔각(star_anise) 추가 — 누적 21종
-- [ ] enemyData.js: shadow_dragon_spawn, wok_guardian 등록
-- [ ] stageData.js: 스테이지 11-1 ~ 11-5 배치 (11-6은 Phase 26-1에서 dragon_wok)
-- [ ] recipeData.js: 팔각 조합 레시피 ~10종 (팔각 육수 라면, 마파두부 등)
-- [ ] 서비스 설정 (11장 손님 패턴)
+- [ ] GatheringScene에 dark_debuff 이벤트 리스너 구현 (도구 공격력 감소 실동작)
+- [ ] SpriteLoader ENEMY_WALK_HASHES에 shadow_dragon_spawn, wok_guardian walk hash 기입
+- [ ] SpriteLoader ENEMY_IDS 주석 "// 23종" → "// 25종" 수정
 
 ---
 

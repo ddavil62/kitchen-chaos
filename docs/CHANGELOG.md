@@ -1,5 +1,72 @@
 # Changelog
 
+## [2026-04-13] - Phase 25-1 11장 용의 주방 심층부 기반 구축
+
+### 추가
+
+- **gameData.js** (`js/data/gameData.js`)
+  - ENEMY_TYPES에 shadow_dragon_spawn 추가: hp:380, speed:60, darkDebuff:true, darkInterval:5000ms, darkRadius:80px, darkEffect:{damageReduction:0.20, duration:5000}
+  - ENEMY_TYPES에 wok_guardian 추가: hp:450, speed:40, shieldFrontHeavy:0.70, ingredient:'star_anise'
+  - INGREDIENT_TYPES에 star_anise(팔각) 추가: color:0x8b1a1a
+
+- **SpriteLoader.js** (`js/managers/SpriteLoader.js`)
+  - ENEMY_IDS 배열에 shadow_dragon_spawn, wok_guardian 추가
+  - ENEMY_WALK_HASHES에 null 엔트리 2종 (PixelLab 생성 후 hash 기입 필요)
+  - INGREDIENT_FILE_MAP에 star_anise 추가
+  - TILESET_IDS에 dragon_lair 추가
+
+- **Enemy.js** (`js/entities/Enemy.js`)
+  - constructor에 darkDebuff 초기화 블록 추가 (_darkDebuffTimer)
+  - update()에 _updateDarkDebuff 호출 분기 추가
+  - _updateDarkDebuff() 메서드 신규: 5초마다 dark_debuff 이벤트 emit (x, y, radius, damageReduction, duration)
+  - takeDamage()에 shieldFrontHeavy 분기 추가: 전면 피해 70% 감소 (실제 받는 피해 = 30%)
+  - _buildShapeFallback 직사각형 분기에 wok_guardian 추가
+
+- **stageData.js** (`js/data/stageData.js`)
+  - 11-1~11-5 placeholder를 완전한 웨이브 데이터로 교체
+  - 11-1: 5웨이브, 11-2~11-5: 각 6웨이브, theme: 'dragon_lair'
+  - 11-6은 placeholder 유지 (Phase 26 범위)
+
+- **recipeData.js** (`js/data/recipeData.js`)
+  - 서빙 레시피 8종 추가: star_anise_broth_ramen(2성), five_spice_stir_fry(2성), mapo_star_anise_steam(3성), star_anise_hotpot(3성), star_anise_wok_noodle(3성), dragon_spice_banquet(4성), star_anise_duck_roast(4성), legendary_star_anise_course(5성)
+  - 버프 레시피 2종 추가: star_anise_ward(어둠 면역+공격력 15%, 3웨이브), dragon_five_spice(공격력 30%+공속 20%, 2웨이브)
+  - 누적: 서빙 118종 + 버프 28종 = 총 146종
+
+- **dialogueData.js** (`js/data/dialogueData.js`)
+  - chapter11_intro(8줄): 심층부 진입, 팔각 봉인 설명
+  - chapter11_mid(8줄): 11-4 클리어 후, 최심층 개방
+  - lao_side_11(10줄): 라오 팔각 회상 사이드 스토리
+
+- **storyData.js** (`js/data/storyData.js`)
+  - 트리거 3건: 11-1 gathering_enter→chapter11_intro, 11-4 result_clear→chapter11_mid, merchant_enter→lao_side_11
+  - stage_first_clear 제외 목록에 11-1, 11-4 추가
+  - chapter11_mid onComplete에서 storyFlags.chapter11_mid_seen 설정
+
+- **WorldMapScene.js** (`js/scenes/WorldMapScene.js`)
+  - ch11 nameKo '11장: (미구현)' → '11장: 용의 주방 심층부' 활성화, 테마 색상/아이콘 갱신
+
+- **에셋 4종 생성**
+  - `assets/enemies/shadow_dragon_spawn/`: 64px chibi 8방향 스프라이트 (그림자 용 새끼)
+  - `assets/enemies/wok_guardian/`: 64px chibi 8방향 스프라이트 (웍 수호자)
+  - `assets/tilesets/dragon_lair.png`: 16x16 Wang 타일셋
+  - `assets/ingredients/star_anise.png`: 32px 투명 배경 재료 아이콘
+
+- **ART-STANDARD.md** (`docs/ART-STANDARD.md`)
+  - 에셋 레지스트리 적(Enemies) 표에 shadow_dragon_spawn, wok_guardian 항목 추가
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-kc-phase25-1-impl.md`
+- 구현 리포트: `.claude/specs/2026-04-13-phase25-1-report.md`
+- QA: `.claude/specs/2026-04-13-kc-phase25-1-qa.md`
+- QA 판정: PASS (39/39 전체 통과 -- 수용기준 19, 예외시나리오 9, 에셋 6, UI안정성 3, 시각적 2)
+- 스펙에서 WorldMapScene ch11 활성화는 "Phase 25-2 범위"로 기재되었으나, 구현 시 사용자 요청으로 Phase 25-1에서 완료
+- 구현 리포트의 레시피 누적 수(136/30=166)는 오류. QA에서 실제 118/28=146으로 정정됨
+- dark_debuff 이벤트 수신자(GatheringScene/ToolManager)는 미구현. 이벤트 emit은 되지만 리스너 없어 실질적 효과 없음. Phase 25-2에서 구현 필요
+- ENEMY_WALK_HASHES에 null로 등록된 2종은 walk 애니메이션 미활성. Phase 25-2에서 hash 기입 필요
+- SpriteLoader ENEMY_IDS 주석 "// 23종"이 실제 25종과 불일치 (사소한 주석 오류)
+
+---
+
 ## [2026-04-13] - Phase 24-2 WorldMapScene 24챕터 3탭 UI 확장
 
 ### 추가

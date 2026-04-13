@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-13 (Phase 24-2 완료)
+> 최종 업데이트: 2026-04-13 (Phase 25-1 완료)
 
 ## 프로젝트 개요
 
@@ -82,7 +82,7 @@ kitchen-chaos/
     scenes/
       BootScene.js           # 에셋 로드
       MenuScene.js           # 메인 메뉴 (캠페인/엔드리스/상점/도감)
-      WorldMapScene.js       # 월드맵 (24챕터 3그룹 탭 + 9노드 맵 + 스테이지 패널, ch10=용의 주방)
+      WorldMapScene.js       # 월드맵 (24챕터 3그룹 탭 + 9노드 맵 + 스테이지 패널, ch11=용의 주방 심층부)
       ChefSelectScene.js     # 셰프 선택 (캠페인/엔드리스 분기)
       GatheringScene.js      # 재료 채집 페이즈 (TD, 도구 배치/회수/재배치)
       EndlessScene.js        # 엔드리스 TD 페이즈 (GatheringScene 상속)
@@ -107,18 +107,18 @@ kitchen-chaos/
       OrderManager.js        # 오더(미션) 시스템
     data/
       gameData.js            # 적/도구(TOOL_DEFS)/재료 정의
-      stageData.js           # 스테이지 데이터 138슬롯 (그룹1 30 + 그룹2 54 + 그룹3 54, 8장+11~24장 placeholder)
-      recipeData.js          # 레시피 136종 정의
-      dialogueData.js        # 대화 스크립트 49종 + 캐릭터 8종 정의 (시즌2 7~9장 14종 포함)
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 48항목 (triggerPoint 8종, import SaveManager)
+      stageData.js           # 스테이지 데이터 138슬롯 (그룹1 30 + 그룹2 54 + 그룹3 54, 8장+12~24장 placeholder)
+      recipeData.js          # 레시피 146종 정의 (서빙 118 + 버프 28)
+      dialogueData.js        # 대화 스크립트 52종 + 캐릭터 8종 정의 (시즌2 7~11장 17종 포함)
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 51항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
-    sprites/enemies/         # 적 스프라이트 23종 (sake_specter, oni_minion 48px 8방향 포함)
+    sprites/enemies/         # 적 스프라이트 25종 (shadow_dragon_spawn, wok_guardian 64px 8방향 포함)
     sprites/bosses/sake_oni/ # sake_oni 보스 스프라이트 (124x124px, 8방향 rotations + walking-9fa1ac06)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
-    tilesets/                # 타일셋 9종 (izakaya_underground 16x16 Wang 16타일 포함)
-    icons/                   # 재료 아이콘 20종 (sake 32px isometric 포함)
+    tilesets/                # 타일셋 10종 (dragon_lair 포함)
+    icons/                   # 재료 아이콘 21종 (star_anise 32px 포함)
     service/                 # 영업 씬 에셋 15종 (테이블/손님/바닥/카운터/홀 데코)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
@@ -135,8 +135,8 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (다이아몬드 격자+depth sorting+홀 데코), 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 49종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 48항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 52종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 51항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v15, season3Unlocked, getTotalStars(group) |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
@@ -154,8 +154,8 @@ kitchen-chaos/
 |------|------|------|
 | 코어 TD | 아이소메트릭 그리드, 도구 배치/회수/재배치, 적 AI, 재료 드롭 | 완료 |
 | 3단계 루프 | GatheringScene(재료 채집) + ServiceScene(영업) + MerchantScene(행상인) + ResultScene | 완료 |
-| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~10장, 보스 8종, 별점 시스템 | 완료 |
-| 레시피 | 136종 (서빙 110 + 버프 26), 5등급, 도감 | 완료 |
+| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~11장, 보스 8종, 별점 시스템 | 완료 |
+| 레시피 | 146종 (서빙 118 + 버프 28), 5등급, 도감 | 완료 |
 | 셰프 시스템 | 5종 셰프(유키/라오 데이터 등록+잠금 표시, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
@@ -170,35 +170,33 @@ kitchen-chaos/
 | 도구 시스템 | 영구 도구 8종(+wasabi_cannon 범위/둔화, +spice_grinder DoT), 구매/판매/업그레이드, ToolManager, freezer canTargetInvisible | 완료 |
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
-| 대화/스토리 | DialogueManager+StoryManager, 스크립트 49종, 트리거 48항목, 선택지 분기, 초상화 6종, 8캐릭터(sake_oni 추가), chapter8→chapter10 재편 완료 | 완료 |
+| 대화/스토리 | DialogueManager+StoryManager, 스크립트 52종, 트리거 51항목, 선택지 분기, 초상화 6종, 8캐릭터, 11장 스토리 포함 | 완료 |
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코 3종, 웜 다크 팔레트) + fallback | 완료 |
 | 도구 도감/팝업 | 행상인 ℹ 팝업(스탯바+로어), 도감 도구 탭(3열 그리드+Lv테이블) | 완료 |
 | 7장 사쿠라 이자카야 | 적 3종(sushi_ninja/tempura_monk/sake_oni)+미니보스(oni_herald), 재료 2종, 레시피 10종, 스토리 4종+복선 1종, 은신/배리어/취권/아우라/전령소환 메커닉 | 완료 |
 | 10장 용의 주방 | 적 5종(dumpling_warrior/wok_phantom/mini_dumpling/sake_specter/oni_minion)+보스(dragon_wok), 재료 3종, 레시피 20종, 스토리 7종, 분열/화염장판/3페이즈/마취/돌진 메커닉, 10-1~10-5 이자카야 심층부 테마 (Phase 24-1에서 8장→10장 재편) | 완료 |
+| 11장 용의 주방 심층부 | 적 2종(shadow_dragon_spawn/wok_guardian), 재료 1종(star_anise), 레시피 10종, 스토리 3종, 어둠디버프/전면방어70% 메커닉, 11-1~11-5 스테이지 (11-6 보스전은 Phase 26) | 완료 |
 
 ## 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 32종 (일반 23 + 미니보스 1 + 보스 8) |
+| 적 | 34종 (일반 25 + 미니보스 1 + 보스 8) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
-| 재료 | 20종 |
-| 레시피 | 136종 (서빙 110 + 버프 26) |
-| 스테이지 | 138슬롯 (그룹1: 1~6장 30개 + 그룹2: 7~15장 54개 + 그룹3: 16~24장 54개, 8장+11~24장은 placeholder) |
+| 재료 | 21종 |
+| 레시피 | 146종 (서빙 118 + 버프 28) |
+| 스테이지 | 138슬롯 (그룹1: 1~6장 30개 + 그룹2: 7~15장 54개 + 그룹3: 16~24장 54개, 8장+12~24장은 placeholder) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
 | 세이브 버전 | v15 |
 
 ## 알려진 제약사항
 
-- WaveManager에 공식 override API가 없어 EndlessScene이 MonkeyPatch로 연동
-- 온라인 랭킹 미구현 (엔드리스는 로컬 기록만)
-- 엔드리스 ServiceScene은 1장(stageId='1-1') 기준 config 사용
-- ServiceScene dead code 잔존 + 하단바 팔레트 불일치 (LOW, 기능 무영향)
+- EndlessScene이 WaveManager를 MonkeyPatch로 연동 (공식 override API 없음)
+- 온라인 랭킹 미구현, 엔드리스 ServiceScene은 1장 기준 config
+- dark_debuff 이벤트 수신자 미구현 (emit만 됨, 실질적 효과 없음)
 
 ## 향후 계획
 
-- Phase 24-2 완료 (WorldMapScene 3그룹 탭 UI, 24챕터 9노드 맵, stageData 138슬롯, season3Unlocked).
-- 챕터 확장 로드맵: 그룹1(1~6장, 완료) → 그룹2(7~15장, 일식·중식·양식, Phase 22~30) → 그룹3(16~24장, 인도·멕시칸·디저트, Phase 31~40).
-- 향후 16장 구현 시 `isUnlocked('16-1')`에 season3Unlocked 게이트 패턴 추가 필요.
-- `buff_narcotize_immunity` effectType을 BuffManager에 구현 필요 (sake_clarity 버프 실동작).
-- 상세: `docs/ROADMAP.md` 참조
+- Phase 25-2: dark_debuff 리스너 구현 + walk 애니메이션 hash 기입
+- Phase 26: 11-6 보스전(dragon_wok 리워크) + 12장 콘텐츠
+- 그룹2(7~15장) → 그룹3(16~24장) 챕터 확장. 상세: `docs/ROADMAP.md`
