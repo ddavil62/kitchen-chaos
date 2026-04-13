@@ -535,7 +535,7 @@ export const DIALOGUES = {
   season2_lao_intro: {
     id: 'season2_lao_intro',
     lines: [
-      { speaker: 'narrator', portrait: '', text: '7장 정화를 마친 뒤, WCA로부터 새 연락이 도착했다.' },
+      { speaker: 'narrator', portrait: '', text: '일본 식란 정화 임무가 계속되던 어느 날, WCA로부터 낯선 연락이 도착했다.' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(읽으며) 중국 쪽이야. 라오라는 사람이 가문의 드래곤 웍이 식란에 오염됐다며 도움을 요청했어.' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '라오... 어떤 사람이야?' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: 'WCA 정식 소속은 아니야. 비공개로 연락을 취했어. 자존심 강해 보이는데 — 먼저 도움을 구했다는 건 그만큼 심각하다는 거겠지.' },
@@ -577,12 +577,12 @@ export const DIALOGUES = {
     id: 'chapter7_clear',
     skippable: true,
     lines: [
-      { speaker: 'narrator', portrait: '', text: '사케 오니가 정화되었다. 이자카야 마을에 평화가 돌아온다.' },
-      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '해냈다! 사케 오니 정화 완료!' },
+      { speaker: 'narrator', portrait: '', text: '이자카야를 장악한 오니 전령이 정화되었다. 마을에 숨통이 트인다.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '해냈다! 오니 전령 정화 완료!' },
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...고마워. 혼자였다면 절대 못 했을 거야.' },
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '(마을을 둘러보며) 이제 재건할 수 있겠어. 미력사 길드도 다시 세울 수 있고.' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '정화된 사케... 이게 최상급 주류가 되겠군. 이자카야 다시 열면 대박 날 텐데~' },
-      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '아직 다음 임무가 기다리고 있어. WCA에서 중국 쪽 연락도 왔고.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '아직 이자카야 심층부가 남아 있어. 지하 봉인 흔적... 계속 파봐야 해.' },
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '당연하지. 같이 가자.' },
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '...그런데 한 가지 신경 쓰이는 게 있어. 이자카야 아래 지하 구조물 — 봉인의 핵심이 거기 있을 수 있어.' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '봉인의 핵심? 그게 뭔데?' },

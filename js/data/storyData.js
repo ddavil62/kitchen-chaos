@@ -467,6 +467,7 @@ export const STORY_TRIGGERS = [
     triggerPoint: 'worldmap_enter',
     dialogueId: 'season2_lao_intro',
     once: true,
+    // TODO Phase 24: 8~9장(일식) 완성 후 currentChapter >= 10 으로 변경
     condition: (ctx, save) =>
       save.season2Unlocked && save.currentChapter >= 8 &&
       !save.storyFlags?.lao_joined,
