@@ -59,6 +59,11 @@ const game = new Phaser.Game(config);
 // Playwright 테스트에서 게임 인스턴스 접근용
 window.__game = game;
 
+// 개발 환경 전용 Dev Helper (프로덕션 빌드에서 트리-쉐이킹으로 제거됨)
+if (import.meta.env.DEV) {
+  import('./devtools/DevHelper.js');
+}
+
 // ── 전역 에러 핸들러 (Phase 11-3d) ──
 // 프로덕션에서는 에러를 콘솔에만 로깅하고 사용자에게 노출하지 않는다.
 
