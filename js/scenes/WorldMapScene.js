@@ -51,16 +51,17 @@ const CHAPTERS = [
 
 // ── 노드 위치 좌표 (3열 3행, Phase 24-2: 9챕터 그룹 맵) ──
 
+// Phase 24-2 AD 검수 반영: 3행 균등 배치 (y=190/297/404)
 const NODE_POSITIONS = [
-  { x: 80,  y: 180 },  // 노드 0 (좌상)
-  { x: 180, y: 180 },  // 노드 1 (중상)
-  { x: 280, y: 180 },  // 노드 2 (우상)
-  { x: 80,  y: 310 },  // 노드 3 (좌중)
-  { x: 180, y: 310 },  // 노드 4 (중중)
-  { x: 280, y: 310 },  // 노드 5 (우중)
-  { x: 80,  y: 440 },  // 노드 6 (좌하)
-  { x: 180, y: 440 },  // 노드 7 (중하)
-  { x: 280, y: 440 },  // 노드 8 (우하)
+  { x: 80,  y: 190 },  // 노드 0 (좌상)
+  { x: 180, y: 190 },  // 노드 1 (중상)
+  { x: 280, y: 190 },  // 노드 2 (우상)
+  { x: 80,  y: 297 },  // 노드 3 (좌중)
+  { x: 180, y: 297 },  // 노드 4 (중중)
+  { x: 280, y: 297 },  // 노드 5 (우중)
+  { x: 80,  y: 404 },  // 노드 6 (좌하)
+  { x: 180, y: 404 },  // 노드 7 (중하)
+  { x: 280, y: 404 },  // 노드 8 (우하)
 ];
 
 // ── 연결선 쌍 (Phase 24-2: 9노드 3x3 격자 연결) ──
@@ -144,9 +145,9 @@ export class WorldMapScene extends Phaser.Scene {
    * @private
    */
   _createGroupTabs() {
-    const tabY = 60;
+    const tabY = 64;   // AD 검수: HUD와 4px 여백 확보
     const tabW = 100;
-    const tabH = 28;
+    const tabH = 40;   // AD 검수: 터치 타겟 28→40px
     const tabGap = 8;
     const totalW = tabW * 3 + tabGap * 2;
     const startX = (GAME_WIDTH - totalW) / 2 + tabW / 2;
@@ -304,11 +305,20 @@ export class WorldMapScene extends Phaser.Scene {
       return { unlocked: chapterUnlocked, inProgress, cleared, currentStars, maxStars, placeholder: false };
     });
 
+    // 그룹1(6챕터)은 2행 전용 좌표를 사용해 빈 하단 공간을 제거 (AD 검수)
+    // 그룹1은 탭과의 공백을 줄여 중앙 배치 (AD 재검수 반영: y=170/340)
+    const positions = (this._currentGroup === 1)
+      ? [
+          { x: 80,  y: 170 }, { x: 180, y: 170 }, { x: 280, y: 170 },
+          { x: 80,  y: 340 }, { x: 180, y: 340 }, { x: 280, y: 340 },
+        ]
+      : NODE_POSITIONS;
+
     // 연결선 렌더링
-    this._drawConnections(chapters);
+    this._drawConnections(chapters, positions);
 
     // 노드 렌더링
-    this._drawNodes(chapters);
+    this._drawNodes(chapters, positions);
   }
 
   // ── 연결선 렌더링 ──────────────────────────────────────────────
@@ -320,14 +330,14 @@ export class WorldMapScene extends Phaser.Scene {
    * @param {object[]} chapters - 현재 그룹의 챕터 배열 (6~9개)
    * @private
    */
-  _drawConnections(chapters) {
+  _drawConnections(chapters, positions) {
     const g = this.add.graphics();
     this._mapContainer.add(g);
     const chapterStates = this._chapterStates;
 
     GROUP_CONNECTIONS.forEach(([a, b]) => {
-      const posA = NODE_POSITIONS[a];
-      const posB = NODE_POSITIONS[b];
+      const posA = positions[a];
+      const posB = positions[b];
       if (!posA || !posB) return;  // 해당 노드가 없으면 연결선 스킵
       const stateA = chapterStates[a];
       const stateB = chapterStates[b];
@@ -374,13 +384,13 @@ export class WorldMapScene extends Phaser.Scene {
    * @param {object[]} chapters - 현재 그룹의 챕터 배열 (6~9개)
    * @private
    */
-  _drawNodes(chapters) {
+  _drawNodes(chapters, positions) {
     const chapterStates = this._chapterStates;
     // 그룹1=0, 그룹2=6, 그룹3=15 기준 절대 챕터 번호 계산
     const groupBaseChapter = this._currentGroup === 1 ? 1 : (this._currentGroup === 2 ? 7 : 16);
 
     chapters.forEach((chapter, idx) => {
-      const pos = NODE_POSITIONS[idx];
+      const pos = positions[idx];
       const state = chapterStates[idx];
       const { x, y } = pos;
 

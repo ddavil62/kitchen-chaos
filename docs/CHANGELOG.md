@@ -1,5 +1,44 @@
 # Changelog
 
+## [2026-04-13] - Phase 24-2 WorldMapScene 24챕터 3탭 UI 확장
+
+### 추가
+
+- **stageData.js** (`js/data/stageData.js`)
+  - STAGES에 8장 placeholder 6개 추가 ('8-1'~'8-6', theme: 'placeholder')
+  - STAGES에 16~24장 placeholder 54개 추가 ('16-1'~'24-6', theme: 'placeholder')
+  - STAGE_ORDER를 78슬롯 → 138슬롯으로 확장 (그룹1 30 + 그룹2 54 + 그룹3 54)
+  - 8장 삽입으로 unlock 체인 변경: 7-6 → 9-1 에서 8-6 → 9-1 (의도된 동작, 8장 placeholder로 9장 이후 영구 잠금)
+  - 스펙 주석의 "144슬롯"은 계산 오류 (그룹2를 60으로 잘못 산출), 실제 138이 정확
+
+- **WorldMapScene.js** (`js/scenes/WorldMapScene.js`)
+  - CHAPTERS 12개 → 24개 확장 (그룹1: ch1~ch6, 그룹2: ch7~ch15, 그룹3: ch16~ch24)
+  - NODE_POSITIONS 6노드 → 9노드 (3x3 격자)
+  - SEASON_CONNECTIONS → GROUP_CONNECTIONS 교체 (9노드 3x3 격자 연결)
+  - `_createGroupTabs()`: 3탭 UI (1~6장/7~15장/16~24장), 잠금 탭 자물쇠+회색 표시
+  - `_switchGroup(group)`: 그룹 전환 + 탭 하이라이트 갱신 + 맵 재생성
+  - `_buildGroupMap()`: 그룹별 챕터 슬라이스 + placeholder 상태 처리
+  - `_drawConnections()`: undefined 가드 체크 추가 (그룹1 6챕터에서 인덱스 6~8 참조 방어)
+  - `_drawNodes()`: groupBaseChapter 오프셋 계산 (그룹1=1, 그룹2=7, 그룹3=16)
+  - `_openStagePanel()`: 그룹 오프셋 (그룹1=0, 그룹2=6, 그룹3=15) 적용
+  - AD 검수 반영: tabH 28px → 40px, NODE_POSITIONS y축 균등 배치, 그룹1 전용 positions 인라인 배열, _drawConnections/_drawNodes에 positions 매개변수 추가
+
+- **SaveManager.js** (`js/managers/SaveManager.js`)
+  - createDefault()에 `season3Unlocked: false` 추가
+  - _migrate() v15 블록에 `season3Unlocked` 패치 추가 (SAVE_VERSION 변경 없음)
+  - `getTotalStars(group)`: season 필터 → group 필터 변경 (그룹1: ch<=6, 그룹2: 7<=ch<=15, 그룹3: ch>=16)
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-kc-phase24-2-impl.md`
+- 구현 리포트: `.claude/specs/2026-04-13-kc-phase24-2-impl-report.md`
+- QA: `.claude/specs/2026-04-13-kc-phase24-2-qa.md`
+- QA 판정: PASS (32/32 전체 통과 -- 수용기준 13, 예외시나리오 10, 안정성 4, 시각검증 5)
+- STAGE_ORDER.length가 스펙 144가 아닌 138인 것은 스펙 주석의 산술 오류이며 구현은 올바름
+- `isUnlocked('16-1')`에 season3Unlocked 게이트 미구현. 그룹3 전체 placeholder인 현시점에서 영향 없으나, 향후 16장 실콘텐츠 구현 시 추가 필요
+- AD 검수로 tabH, NODE_POSITIONS, positions 매개변수 등 스펙 원본과 다른 부분 있으나 모두 정상 반영 확인
+
+---
+
 ## [2026-04-13] - Phase 24-1 데이터 재편 (chapter8→10 번호 치환 + stageData 78슬롯 + 세이브 v15)
 
 ### 변경
