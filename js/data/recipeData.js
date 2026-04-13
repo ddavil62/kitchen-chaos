@@ -3,6 +3,7 @@
  * Phase 10: 스타터 12종 + Phase 5 12종 + Phase 6 18종 + Phase 8 24종 + Phase 9 23종 + Phase 10 17종 = 106종.
  * Phase 20: + 서빙 8종 + 버프 2종 = 116종 (7장 사쿠라 이자카야).
  * Phase 21: + 서빙 8종 + 버프 2종 = 126종 (8장 용의 주방).
+ * Phase 22-3: + 서빙 8종 + 버프 2종 = 136종 (8장 이자카야 심층부).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -612,6 +613,58 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { tofu: 2, cilantro: 2, meat: 1 }, baseReward: 130, cookTime: 13000,
     unlockCost: 180, gateStage: '8-5',
   },
+
+  // ── Phase 22-3 신규 서빙 레시피 (8장 이자카야 심층부) ──
+
+  // ★ 1성 (1종)
+  {
+    id: 'sake_cocktail', nameKo: '사케 칵테일', icon: '🍶', category: 'special',
+    tier: 1, ingredients: { sake: 1 }, baseReward: 30, cookTime: 3000,
+    unlockCost: 20, gateStage: '8-1',
+  },
+
+  // ★★ 2성 (2종)
+  {
+    id: 'sake_bowl', nameKo: '사케 덮밥', icon: '🥢', category: 'special',
+    tier: 2, ingredients: { sake: 1, rice: 1 }, baseReward: 52, cookTime: 5500,
+    unlockCost: 38, gateStage: '8-1',
+  },
+  {
+    id: 'sake_shrimp', nameKo: '사케 새우구이', icon: '🦐', category: 'grill',
+    tier: 2, ingredients: { sake: 1, shrimp: 1 }, baseReward: 55, cookTime: 5500,
+    unlockCost: 40, gateStage: '8-2',
+  },
+
+  // ★★★ 3성 (3종)
+  {
+    id: 'sake_sashimi', nameKo: '사케 사시미', icon: '🍣', category: 'special',
+    tier: 3, ingredients: { sake: 1, sashimi_tuna: 1 }, baseReward: 75, cookTime: 7500,
+    unlockCost: 65, gateStage: '8-2',
+  },
+  {
+    id: 'sake_ramen', nameKo: '사케 라멘', icon: '🍜', category: 'noodle',
+    tier: 3, ingredients: { sake: 1, tofu: 1, mushroom: 1 }, baseReward: 80, cookTime: 8500,
+    unlockCost: 72, gateStage: '8-3',
+  },
+  {
+    id: 'sake_hotpot', nameKo: '사케 전골', icon: '🫕', category: 'soup',
+    tier: 3, ingredients: { sake: 1, tofu: 1, shrimp: 1 }, baseReward: 82, cookTime: 9000,
+    unlockCost: 75, gateStage: '8-3',
+  },
+
+  // ★★★★ 4성 (1종)
+  {
+    id: 'sake_oden', nameKo: '사케 오뎅', icon: '🍢', category: 'soup',
+    tier: 4, ingredients: { sake: 1, tofu: 1, cilantro: 1, mushroom: 1 }, baseReward: 105, cookTime: 10500,
+    unlockCost: 115, gateStage: '8-4',
+  },
+
+  // ★★★★★ 5성 (1종)
+  {
+    id: 'sake_kaiseki', nameKo: '사케 가이세키', icon: '🌸', category: 'special',
+    tier: 5, ingredients: { sake: 2, sashimi_tuna: 1, wasabi: 1, tofu: 1 }, baseReward: 140, cookTime: 13000,
+    unlockCost: 190, gateStage: '8-5',
+  },
 ];
 
 /**
@@ -776,6 +829,26 @@ export const ALL_BUFF_RECIPES = [
     tier: 3, ingredients: { tofu: 1, cilantro: 2 },
     effectDesc: '공격력+속도 +25% (50초)', effectType: 'buff_both', effectValue: 0.25,
     duration: 50000, unlockCost: 60, gateStage: '8-2',
+  },
+
+  // ── Phase 22-3 신규 버프 레시피 (8장 이자카야 심층부) ──
+  {
+    id: 'sake_clarity', nameKo: '사케 각성', icon: '🍶', category: 'buff',
+    tier: 3, ingredients: { sake: 2 },
+    effectDesc: '마취 디버프 면역 + 공격속도 +15% (3웨이브)',
+    effectType: 'buff_narcotize_immunity',
+    effectValue: 0.15,
+    duration: 3, durationUnit: 'wave',
+    unlockCost: 65, gateStage: '8-2',
+  },
+  {
+    id: 'sake_oni_spirit', nameKo: '오니 정기', icon: '👹', category: 'buff',
+    tier: 4, ingredients: { sake: 1, tofu: 1, cilantro: 1 },
+    effectDesc: '공격력 +25% 공격속도 +25% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.25,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 85, gateStage: '8-3',
   },
 ];
 

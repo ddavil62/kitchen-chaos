@@ -4,6 +4,7 @@
  * Phase 20: 적 25종(일반 18 + 보스 7), 재료 17종, 서빙 레시피 14종, 버프 레시피 8종.
  * Phase 21: 적 29종(일반 21 + 보스 8), 재료 19종, 서빙 레시피 22종, 버프 레시피 10종.
  * Phase 22-1: oni_herald 미니보스 추가 (HP 800, 전령 소환 + 분노 기믹).
+ * Phase 22-3: sake_specter(마취), oni_minion(돌진) 등록. sake 재료 추가 (누적 20종).
  */
 
 // ── 적 타입 정의 ──
@@ -412,6 +413,36 @@ export const ENEMY_TYPES = {
       { ingredient: 'cilantro', count: 4 },
     ],
   },
+  // ── Phase 22-3 신규 적 (이자카야 심층부) ──
+  sake_specter: {
+    id: 'sake_specter',
+    nameKo: '사케 유령',
+    hp: 300,
+    speed: 65,
+    ingredient: 'sake',
+    bodyColor: 0x9966cc,
+    // 마취 디버프: narcotizeInterval마다 범위 내 도구에 공격속도 디버프 적용
+    // narcotizeRadius 이내 도구에 narcotizeEffect(공격속도 -20%), narcotizeDuration(3초) 부여
+    narcotize: true,
+    narcotizeInterval: 5000,    // 5초마다 마취 발동
+    narcotizeRadius: 70,        // 70px 범위
+    narcotizeEffect: { speedReduction: 0.20, duration: 3000 },
+  },
+  oni_minion: {
+    id: 'oni_minion',
+    nameKo: '오니 부하',
+    hp: 350,
+    speed: 55,
+    ingredient: 'sake',
+    bodyColor: 0xcc3333,
+    // 돌진 메커닉: HP chargeHpThreshold 이하 시 속도 chargeSpeedMultiplier 배로 급증
+    // chargeDuration 동안 고속 이동 후 원래 속도 복귀. chargeInterval 쿨다운.
+    charge: true,
+    chargeHpThreshold: 0.6,      // HP 60% 이하 시 돌진
+    chargeSpeedMultiplier: 2.5,  // 돌진 중 속도 2.5배 (55 * 2.5 = 137.5)
+    chargeDuration: 2000,        // 2초간 돌진
+    chargeInterval: 8000,        // 8초 쿨다운 (재돌진 대기)
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -765,6 +796,13 @@ export const INGREDIENT_TYPES = {
     nameKo: '고수',
     color: 0x228b22,
     icon: '🌿',
+  },
+  // ── Phase 22-3 신규 재료 ──
+  sake: {
+    id: 'sake',
+    nameKo: '사케',
+    color: 0xc8a2c8,   // 연보라 (사케 도쿠리 청자/보라 색조)
+    icon: '🍶',
   },
 };
 

@@ -6,6 +6,7 @@
  * Phase 19-4: 서비스씬 에셋 (테이블 5종, 손님 5종, 바닥, 카운터) 로드.
  * Phase 20: 7장 적 2종(sushi_ninja, tempura_monk), 보스 1종(sake_oni), 타일셋 1종(sakura_izakaya), 재료 2종(sashimi_tuna, wasabi) 추가.
  * Phase 21: 8장 적 3종(dumpling_warrior, mini_dumpling, wok_phantom), 보스 1종(dragon_wok), 타일셋 1종(chinese_palace_kitchen), 재료 2종(tofu, cilantro) 추가.
+ * Phase 22-3: 적 2종(sake_specter, oni_minion), 타일셋 1종(izakaya_underground, 16px), 재료 1종(sake) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -24,7 +25,7 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (21종, Phase 21: dumpling_warrior, mini_dumpling, wok_phantom 추가) ──
+// ── 적 ID 목록 (23종, Phase 22-3: sake_specter, oni_minion 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
@@ -32,6 +33,7 @@ const ENEMY_IDS = [
   'tomato_bomber', 'butter_ghost', 'sugar_fairy', 'milk_phantom',
   'sushi_ninja', 'tempura_monk',
   'dumpling_warrior', 'mini_dumpling', 'wok_phantom',
+  'sake_specter', 'oni_minion',
 ];
 
 // ── 보스 ID 목록 (8종, Phase 21: dragon_wok 추가) ──
@@ -70,6 +72,7 @@ const INGREDIENT_FILE_MAP = {
   wasabi: 'wasabi',
   tofu: 'tofu',
   cilantro: 'cilantro',
+  sake: 'sake',                            // Phase 22-3
 };
 
 // ── 재료 ID 목록 (15종, 게임 내 ID 기준) ──
@@ -98,6 +101,8 @@ const ENEMY_WALK_HASHES = {
   dumpling_warrior: 'animating-1e8cfa3d',  // Phase 21
   mini_dumpling: 'animating-8123f320',     // Phase 21
   wok_phantom: 'animating-4a4ef775',       // Phase 21
+  sake_specter: 'walking-e2f2a098',        // Phase 22-3
+  oni_minion:   'walking-3d25e8be',        // Phase 22-3
 };
 
 const BOSS_WALK_HASHES = {
@@ -119,12 +124,13 @@ const WALK_FRAME_COUNT = 6;
 // ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가) ──
 const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao'];
 
-// ── 타일셋 ID 목록 (8종, Phase 21: chinese_palace_kitchen 추가) ──
+// ── 타일셋 ID 목록 (9종, Phase 22-3: izakaya_underground 추가) ──
 const TILESET_IDS = [
   'pasta_field', 'oriental_bamboo', 'seafood_beach', 'volcano_lava',
   'dessert_cafe', 'grand_finale',
   'sakura_izakaya',
   'chinese_palace_kitchen',
+  'izakaya_underground',
 ];
 
 // ── 서비스씬 에셋 경로 (Phase 19-4) ──
@@ -298,16 +304,22 @@ export class SpriteLoader {
   }
 
   /**
-   * 타일셋 4종 — 스프라이트시트 (32x32 프레임).
+   * 타일셋 스프라이트시트 로드.
+   * 기본 frameWidth: 32, frameHeight: 32.
+   * izakaya_underground는 예외적으로 16×16 타일 (Phase 22-3).
    * @param {Phaser.Scene} scene
    * @private
    */
   static _loadTilesets(scene) {
+    // izakaya_underground는 16×16 타일 (Phase 22-2 PixelLab 생성 결과)
+    const TILESET_16PX = new Set(['izakaya_underground']);
+
     for (const id of TILESET_IDS) {
+      const frameSize = TILESET_16PX.has(id) ? 16 : 32;
       scene.load.spritesheet(
         `tileset_${id}`,
         `${SPRITES_ROOT}/tilesets/${id}.png`,
-        { frameWidth: 32, frameHeight: 32 }
+        { frameWidth: frameSize, frameHeight: frameSize }
       );
     }
   }
