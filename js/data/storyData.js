@@ -534,6 +534,10 @@ export const STORY_TRIGGERS = [
     delay: 800,
     onComplete: () => {
       const data = SaveManager.load();
+      // storyFlags 객체 보장 (방어 가드)
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
       data.storyProgress.storyFlags.chapter12_mid_seen = true;
       SaveManager.save(data);
     },
