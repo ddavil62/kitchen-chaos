@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-13 (Phase 25-1 완료)
+> 최종 업데이트: 2026-04-13 (Phase 25-2 완료)
 
 ## 프로젝트 개요
 
@@ -175,7 +175,7 @@ kitchen-chaos/
 | 도구 도감/팝업 | 행상인 ℹ 팝업(스탯바+로어), 도감 도구 탭(3열 그리드+Lv테이블) | 완료 |
 | 7장 사쿠라 이자카야 | 적 3종(sushi_ninja/tempura_monk/sake_oni)+미니보스(oni_herald), 재료 2종, 레시피 10종, 스토리 4종+복선 1종, 은신/배리어/취권/아우라/전령소환 메커닉 | 완료 |
 | 10장 용의 주방 | 적 5종(dumpling_warrior/wok_phantom/mini_dumpling/sake_specter/oni_minion)+보스(dragon_wok), 재료 3종, 레시피 20종, 스토리 7종, 분열/화염장판/3페이즈/마취/돌진 메커닉, 10-1~10-5 이자카야 심층부 테마 (Phase 24-1에서 8장→10장 재편) | 완료 |
-| 11장 용의 주방 심층부 | 적 2종(shadow_dragon_spawn/wok_guardian), 재료 1종(star_anise), 레시피 10종, 스토리 3종, 어둠디버프/전면방어70% 메커닉, 11-1~11-5 스테이지 (11-6 보스전은 Phase 26) | 완료 |
+| 11장 용의 주방 심층부 | 적 2종(shadow_dragon_spawn/wok_guardian) walk 8방향 6프레임 완성, 재료 1종(star_anise), 레시피 10종, 스토리 3종, 어둠디버프(dark_debuff)/전면방어70% 메커닉 구현 완료, 11-1~11-5 스테이지 (11-6 보스전은 Phase 26) | 완료 |
 
 ## 콘텐츠 규모
 
@@ -193,10 +193,9 @@ kitchen-chaos/
 
 - EndlessScene이 WaveManager를 MonkeyPatch로 연동 (공식 override API 없음)
 - 온라인 랭킹 미구현, 엔드리스 ServiceScene은 1장 기준 config
-- dark_debuff 이벤트 수신자 미구현 (emit만 됨, 실질적 효과 없음)
+- removeBuff()가 모든 멀티플라이어를 전역 초기화하므로, 디버프 동시 적용 시 먼저 만료된 디버프가 나머지도 해제할 수 있음 (기존 설계, 향후 멀티 버프 스택 구현 시 개선)
 
 ## 향후 계획
 
-- Phase 25-2: dark_debuff 리스너 구현 + walk 애니메이션 hash 기입
 - Phase 26: 11-6 보스전(dragon_wok 리워크) + 12장 콘텐츠
 - 그룹2(7~15장) → 그룹3(16~24장) 챕터 확장. 상세: `docs/ROADMAP.md`

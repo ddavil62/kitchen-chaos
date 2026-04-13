@@ -1,5 +1,41 @@
 # Changelog
 
+## [2026-04-13] - Phase 25-2 11장 walk 애니메이션 + dark_debuff 수신자
+
+### 추가
+
+- **shadow_dragon_spawn walk 애니메이션** (`assets/enemies/shadow_dragon_spawn/animations/walking-dde29672/`)
+  - 8방향 x 6프레임 = 48 PNG (92x92px)
+  - PixelLab animate_character API로 생성, character_id: `08983815-9751-476a-90b6-b5f6a8ee8802`
+  - metadata.json에 animations 블록 추가 (export_version 2.0)
+
+- **wok_guardian walk 애니메이션** (`assets/enemies/wok_guardian/animations/walking-bc1aca17/`)
+  - 8방향 x 6프레임 = 48 PNG (92x92px)
+  - PixelLab animate_character API로 생성, character_id: `9c33ea4c-e9b0-4fe3-a09c-5dc97400e416`
+  - metadata.json에 animations 블록 추가 (export_version 2.0)
+
+- **GatheringScene `_onDarkDebuff` 핸들러** (`js/scenes/GatheringScene.js`)
+  - `dark_debuff` 이벤트 리스너 등록 (create) + 해제 (shutdown)
+  - 범위(80px) 내 타워에 공격력 -20%, 5초 후 해제
+  - delivery/soup_pot 타워 제외, `_darkDebuffed` 플래그로 중복 방지
+  - 해제 시 `removeBuff()` + `_applyBuffToTower`로 레시피 버프 복원
+  - `_onSporeDebuff` 패턴 준수 + `.setOrigin(0.5).setDepth(115)` 일관성 개선 추가
+
+### 변경
+
+- **SpriteLoader.js** (`js/managers/SpriteLoader.js`)
+  - `ENEMY_WALK_HASHES.shadow_dragon_spawn`: `null` → `'walking-dde29672'`
+  - `ENEMY_WALK_HASHES.wok_guardian`: `null` → `'walking-bc1aca17'`
+  - `ENEMY_IDS` 주석: "23종" → "25종"
+
+### 참고
+- 스펙: `.claude/specs/2026-04-13-kc-phase25-2-impl.md`
+- QA: `.claude/specs/2026-04-13-kc-phase25-2-qa.md` (30/30 PASS)
+- QA LOW 이슈: removeBuff() 전역 초기화로 디버프 동시 만료 시 상호 간섭 가능 -- 기존 설계(spore/fire_zone/boss 모두 동일), 범위 밖
+- 스펙 대비 차이: `_onDarkDebuff`에 `.setOrigin(0.5).setDepth(115)` 추가 (스펙 미포함, 기존 패턴 일관성 개선)
+
+---
+
 ## [2026-04-13] - Phase 25-1 11장 용의 주방 심층부 기반 구축
 
 ### 추가
