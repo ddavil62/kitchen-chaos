@@ -107,22 +107,23 @@ kitchen-chaos/
       ChefManager.js         # 셰프 선택/스킬 관리
       OrderManager.js        # 오더(미션) 시스템
     data/
-      gameData.js            # 적(33종)/도구(TOOL_DEFS)/재료(26종) 정의
-      stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~17장, placeholder: 8/14/18~24장)
-      recipeData.js          # 레시피 213종 정의 (서빙 173 + 버프 40)
+      gameData.js            # 적(35종)/도구(TOOL_DEFS)/재료(27종) 정의
+      stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~18장, placeholder: 8/14/19~24장)
+      recipeData.js          # 레시피 221종 정의 (서빙 180 + 버프 41)
       dialogueData.js        # 대화 스크립트 82종 + 캐릭터 13종 정의 (시즌2 7~15장 31종, 16장 4종, 17장 3종, 18장 6종 포함)
       storyData.js           # STORY_TRIGGERS 트리거 데이터 82항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
-    sprites/enemies/         # 적 스프라이트 33종 (incense_specter 176px, spice_elemental 164px 포함)
+    sprites/enemies/         # 적 스프라이트 35종 (masala_guide 108px 포함)
     sprites/bosses/sake_oni/ # sake_oni 보스 스프라이트 (124x124px, 8방향 rotations + walking-9fa1ac06)
     sprites/bosses/sake_master/ # sake_master 보스 스프라이트 (64px, 8방향 animating-8d3d020e)
     sprites/bosses/dragon_wok/  # dragon_wok 보스 스프라이트 (64px, 8방향 animating-30e6c64f)
     sprites/bosses/chef_noir/   # chef_noir 보스 스프라이트 (64px pro, 8방향 animating-96100c0f, 124x124px)
+    sprites/bosses/maharaja/    # maharaja 보스 스프라이트 (212px pro, 8방향 animating-2c666ada)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
     tilesets/                # 타일셋 14종 (spice_palace, spice_palace_interior 포함)
-    icons/                   # 재료 아이콘 26종 (curry_leaf, saffron, chai 32px 포함)
+    icons/                   # 재료 아이콘 27종 (curry_leaf, saffron, chai, cardamom 32px 포함)
     service/                 # 영업 씬 에셋 15종 (테이블/손님/바닥/카운터/홀 데코)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
@@ -158,8 +159,8 @@ kitchen-chaos/
 |------|------|------|
 | 코어 TD | 아이소메트릭 그리드, 도구 배치/회수/재배치, 적 AI, 재료 드롭 | 완료 |
 | 3단계 루프 | GatheringScene(재료 채집) + ServiceScene(영업) + MerchantScene(행상인) + ResultScene | 완료 |
-| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~13/15~17장, 보스 10종, 별점 시스템 | 완료 |
-| 레시피 | 213종 (서빙 173 + 버프 40), 5등급, 도감 | 완료 |
+| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~13/15~18장, 보스 11종, 별점 시스템 | 완료 |
+| 레시피 | 221종 (서빙 180 + 버프 41), 5등급, 도감 | 완료 |
 | 셰프 시스템 | 5종 셰프(유키/라오 데이터 등록+잠금 표시, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
@@ -182,16 +183,17 @@ kitchen-chaos/
 | 17장 에셋 생성 (Phase 32-2) | 적 2종(incense_specter 176px, spice_elemental 164px), spice_palace_interior 타일셋, 재료 아이콘 1종(chai) | 완료 |
 | 17장 스테이지+레시피+메카닉 (Phase 32-3) | 스테이지 17-1~17-5 구현, chai 활용 레시피 12종(서빙 10+버프 2), confuseOnHit/elementalResistance 메카닉 | 완료 |
 | 18장 대화 스크립트 (Phase 32-4) | 대화 6종 추가 (chapter18_intro/mid/boss/clear/epilogue, team_side_18), CHARACTERS에 masala_guide/maharaja 추가, 17장 ??? 대사 아르준 소급 수정 | 완료 |
+| 18장 스테이지+레시피+에셋 (Phase 32-5) | 스테이지 18-1~18-6 구현, 보스 maharaja(212px)+적 masala_guide(108px), cardamom 재료, 레시피 8종(서빙 7+버프 1) | 완료 |
 
 ## 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 44종 (일반 33 + 미니보스 1 + 보스 10) |
+| 적 | 46종 (일반 34 + 미니보스 1 + 보스 11) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
-| 재료 | 26종 |
-| 레시피 | 213종 (서빙 173 + 버프 40) |
-| 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~17장, placeholder: 8/14/18~24장) |
+| 재료 | 27종 |
+| 레시피 | 221종 (서빙 180 + 버프 41) |
+| 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~18장, placeholder: 8/14/19~24장) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
 | 세이브 버전 | v16 |
 

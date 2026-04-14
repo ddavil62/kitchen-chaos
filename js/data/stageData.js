@@ -9,6 +9,7 @@
  * Phase 29-2: 13-6 + 15-1~15-6 (카타콩브) 구현 완료.
  * Phase 31-3: 16-1~16-5 (향신료 궁전) 구현 완료. curry_djinn 16-3 첫 등장, naan_golem 16-4 첫 등장.
  * Phase 32-3: 17-1~17-5 (향신료 궁전 심층부) 구현 완료. incense_specter 17-3 첫 등장, spice_elemental 17-4 첫 등장.
+ * Phase 32-5: 18-1~18-6 (향신료 궁전 최심부) 구현 완료. masala_guide 18-1 첫 등장, maharaja 18-6 보스전.
  * 각 스테이지는 고유 경로, 웨이브, 손님 구성을 가진다.
  */
 
@@ -6947,12 +6948,380 @@ export const STAGES = {
     service: { duration: 370, customerInterval: 1.9, maxCustomers: 66, customerPatience: 18 },
   },
   '17-6': { id: '17-6', nameKo: '미구현', theme: 'placeholder' },
-  '18-1': { id: '18-1', nameKo: '미구현', theme: 'placeholder' },
-  '18-2': { id: '18-2', nameKo: '미구현', theme: 'placeholder' },
-  '18-3': { id: '18-3', nameKo: '미구현', theme: 'placeholder' },
-  '18-4': { id: '18-4', nameKo: '미구현', theme: 'placeholder' },
-  '18-5': { id: '18-5', nameKo: '미구현', theme: 'placeholder' },
-  '18-6': { id: '18-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 18-1: 황금 회랑 (진입 — 17-5보다 약간 낮은 난이도) ──
+  '18-1': {
+    id: '18-1',
+    nameKo: '황금 회랑',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // L자형
+    pathSegments: [
+      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'curry_djinn', count: 18, interval: 1100 },
+        { type: 'naan_golem', count: 14, interval: 1500 },
+        { type: 'incense_specter', count: 10, interval: 1900 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'curry_djinn', count: 24, interval: 1000 },
+        { type: 'naan_golem', count: 18, interval: 1400 },
+        { type: 'incense_specter', count: 14, interval: 1750 },
+        { type: 'masala_guide', count: 6, interval: 2200 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'curry_djinn', count: 30, interval: 920 },
+        { type: 'naan_golem', count: 22, interval: 1300 },
+        { type: 'incense_specter', count: 18, interval: 1600 },
+        { type: 'masala_guide', count: 9, interval: 2000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'curry_djinn', count: 38, interval: 840 },
+        { type: 'naan_golem', count: 28, interval: 1220 },
+        { type: 'incense_specter', count: 24, interval: 1480 },
+        { type: 'masala_guide', count: 14, interval: 1840 },
+        { type: 'spice_elemental', count: 8, interval: 2400 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'curry_djinn', count: 46, interval: 780 },
+        { type: 'naan_golem', count: 34, interval: 1140 },
+        { type: 'incense_specter', count: 30, interval: 1360 },
+        { type: 'masala_guide', count: 19, interval: 1680 },
+        { type: 'spice_elemental', count: 12, interval: 2200 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'cardamom_tea', patience: 9500, baseReward: 310, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'masala_lamb', patience: 9000, baseReward: 345, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'maharaja_grand_platter', patience: 8800, baseReward: 385, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'maharaja_grand_platter', patience: 8500, baseReward: 428, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'maharaja_grand_platter', patience: 8200, baseReward: 475, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 45, two: 35 },
+    service: { duration: 375, customerInterval: 1.85, maxCustomers: 68, customerPatience: 17 },
+  },
+
+  // ── 18-2: 향신료 회랑 (완만한 상승) ──
+  '18-2': {
+    id: '18-2',
+    nameKo: '향신료 회랑',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // S자형
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 3, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 7, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'curry_djinn', count: 22, interval: 1060 },
+        { type: 'naan_golem', count: 16, interval: 1440 },
+        { type: 'incense_specter', count: 12, interval: 1840 },
+        { type: 'masala_guide', count: 8, interval: 2100 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'curry_djinn', count: 28, interval: 980 },
+        { type: 'naan_golem', count: 20, interval: 1340 },
+        { type: 'incense_specter', count: 16, interval: 1700 },
+        { type: 'masala_guide', count: 12, interval: 1940 },
+        { type: 'butter_ghost', count: 14, interval: 600 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'curry_djinn', count: 35, interval: 900 },
+        { type: 'naan_golem', count: 25, interval: 1260 },
+        { type: 'incense_specter', count: 21, interval: 1580 },
+        { type: 'masala_guide', count: 17, interval: 1800 },
+        { type: 'spice_elemental', count: 10, interval: 2300 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'curry_djinn', count: 43, interval: 820 },
+        { type: 'naan_golem', count: 31, interval: 1180 },
+        { type: 'incense_specter', count: 27, interval: 1460 },
+        { type: 'masala_guide', count: 22, interval: 1660 },
+        { type: 'spice_elemental', count: 15, interval: 2100 },
+        { type: 'milk_phantom', count: 12, interval: 900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'curry_djinn', count: 52, interval: 760 },
+        { type: 'naan_golem', count: 38, interval: 1100 },
+        { type: 'incense_specter', count: 34, interval: 1340 },
+        { type: 'masala_guide', count: 28, interval: 1540 },
+        { type: 'spice_elemental', count: 19, interval: 1960 },
+        { type: 'butter_ghost', count: 22, interval: 580 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'cardamom_tea', patience: 9200, baseReward: 318, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'masala_lamb', patience: 8800, baseReward: 354, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'maharaja_grand_platter', patience: 8600, baseReward: 395, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'maharaja_grand_platter', patience: 8300, baseReward: 440, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'maharaja_grand_platter', patience: 8000, baseReward: 490, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 46, two: 36 },
+    service: { duration: 380, customerInterval: 1.80, maxCustomers: 70, customerPatience: 17 },
+  },
+
+  // ── 18-3: 마살라 문파 도장 (masala_guide 대거 등장) ──
+  '18-3': {
+    id: '18-3',
+    nameKo: '마살라 문파 도장',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 역L자형
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 1, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 20, interval: 1040 },
+        { type: 'curry_djinn', count: 26, interval: 1020 },
+        { type: 'naan_golem', count: 18, interval: 1300 },
+        { type: 'incense_specter', count: 14, interval: 1740 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 26, interval: 980 },
+        { type: 'curry_djinn', count: 33, interval: 940 },
+        { type: 'naan_golem', count: 23, interval: 1220 },
+        { type: 'incense_specter', count: 18, interval: 1620 },
+        { type: 'spice_elemental', count: 12, interval: 2200 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'masala_guide', count: 33, interval: 920 },
+        { type: 'curry_djinn', count: 41, interval: 860 },
+        { type: 'naan_golem', count: 29, interval: 1140 },
+        { type: 'incense_specter', count: 24, interval: 1500 },
+        { type: 'spice_elemental', count: 16, interval: 2040 },
+        { type: 'milk_phantom', count: 15, interval: 860 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'masala_guide', count: 40, interval: 860 },
+        { type: 'curry_djinn', count: 50, interval: 800 },
+        { type: 'naan_golem', count: 35, interval: 1060 },
+        { type: 'incense_specter', count: 30, interval: 1380 },
+        { type: 'spice_elemental', count: 21, interval: 1900 },
+        { type: 'cheese_golem', count: 10, interval: 1700 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'masala_guide', count: 48, interval: 800 },
+        { type: 'curry_djinn', count: 60, interval: 740 },
+        { type: 'naan_golem', count: 42, interval: 980 },
+        { type: 'incense_specter', count: 37, interval: 1280 },
+        { type: 'spice_elemental', count: 26, interval: 1760 },
+        { type: 'butter_ghost', count: 20, interval: 570 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'cardamom_masala_bowl', patience: 9000, baseReward: 328, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'cardamom_masala_bowl', patience: 8700, baseReward: 365, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'maharaja_grand_platter', patience: 8400, baseReward: 408, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'maharaja_grand_platter', patience: 8100, baseReward: 455, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'maharaja_grand_platter', patience: 8000, baseReward: 508, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 47, two: 37 },
+    service: { duration: 385, customerInterval: 1.78, maxCustomers: 72, customerPatience: 16 },
+  },
+
+  // ── 18-4: 황금 왕좌실 전실 (17-5 수준 도달 시작) ──
+  '18-4': {
+    id: '18-4',
+    nameKo: '황금 왕좌실 전실',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 17-5 유사 구조, 탈출 컬럼 변경
+    pathSegments: [
+      { type: 'vertical', col: 3, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 5, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 24, interval: 960 },
+        { type: 'curry_djinn', count: 32, interval: 980 },
+        { type: 'naan_golem', count: 22, interval: 1240 },
+        { type: 'incense_specter', count: 18, interval: 1640 },
+        { type: 'spice_elemental', count: 14, interval: 2100 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 30, interval: 900 },
+        { type: 'curry_djinn', count: 40, interval: 900 },
+        { type: 'naan_golem', count: 27, interval: 1160 },
+        { type: 'incense_specter', count: 23, interval: 1520 },
+        { type: 'spice_elemental', count: 19, interval: 1960 },
+        { type: 'butter_ghost', count: 16, interval: 560 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'masala_guide', count: 37, interval: 840 },
+        { type: 'curry_djinn', count: 49, interval: 820 },
+        { type: 'naan_golem', count: 33, interval: 1080 },
+        { type: 'incense_specter', count: 29, interval: 1400 },
+        { type: 'spice_elemental', count: 24, interval: 1820 },
+        { type: 'milk_phantom', count: 18, interval: 840 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'masala_guide', count: 44, interval: 780 },
+        { type: 'curry_djinn', count: 58, interval: 760 },
+        { type: 'naan_golem', count: 39, interval: 1000 },
+        { type: 'incense_specter', count: 36, interval: 1300 },
+        { type: 'spice_elemental', count: 29, interval: 1700 },
+        { type: 'cheese_golem', count: 13, interval: 1620 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'masala_guide', count: 52, interval: 720 },
+        { type: 'curry_djinn', count: 68, interval: 700 },
+        { type: 'naan_golem', count: 46, interval: 920 },
+        { type: 'incense_specter', count: 44, interval: 1200 },
+        { type: 'spice_elemental', count: 35, interval: 1580 },
+        { type: 'mushroom_scout', count: 22, interval: 700 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'cardamom_masala_bowl', patience: 8800, baseReward: 340, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'maharaja_grand_platter', patience: 8500, baseReward: 378, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'maharaja_grand_platter', patience: 8200, baseReward: 422, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'spice_throne_feast', patience: 8000, baseReward: 472, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'spice_throne_feast', patience: 7800, baseReward: 525, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 48, two: 38 },
+    service: { duration: 390, customerInterval: 1.76, maxCustomers: 74, customerPatience: 16 },
+  },
+
+  // ── 18-5: 향신료 왕국의 정점 (17-5 수준 상한 도달) ──
+  '18-5': {
+    id: '18-5',
+    nameKo: '향신료 왕국의 정점',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 십자 변형
+    pathSegments: [
+      { type: 'vertical', col: 3, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 6, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 28, interval: 940 },
+        { type: 'curry_djinn', count: 38, interval: 960 },
+        { type: 'naan_golem', count: 26, interval: 1200 },
+        { type: 'incense_specter', count: 22, interval: 1580 },
+        { type: 'spice_elemental', count: 17, interval: 2000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 35, interval: 880 },
+        { type: 'curry_djinn', count: 47, interval: 880 },
+        { type: 'naan_golem', count: 31, interval: 1120 },
+        { type: 'incense_specter', count: 28, interval: 1460 },
+        { type: 'spice_elemental', count: 22, interval: 1860 },
+        { type: 'milk_phantom', count: 20, interval: 820 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'masala_guide', count: 43, interval: 820 },
+        { type: 'curry_djinn', count: 57, interval: 800 },
+        { type: 'naan_golem', count: 37, interval: 1040 },
+        { type: 'incense_specter', count: 35, interval: 1340 },
+        { type: 'spice_elemental', count: 28, interval: 1720 },
+        { type: 'cheese_golem', count: 15, interval: 1560 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'masala_guide', count: 51, interval: 760 },
+        { type: 'curry_djinn', count: 67, interval: 730 },
+        { type: 'naan_golem', count: 43, interval: 960 },
+        { type: 'incense_specter', count: 43, interval: 1240 },
+        { type: 'spice_elemental', count: 34, interval: 1600 },
+        { type: 'butter_ghost', count: 22, interval: 555 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'masala_guide', count: 60, interval: 700 },
+        { type: 'curry_djinn', count: 78, interval: 670 },
+        { type: 'naan_golem', count: 50, interval: 880 },
+        { type: 'incense_specter', count: 52, interval: 1140 },
+        { type: 'spice_elemental', count: 40, interval: 1480 },
+        { type: 'mushroom_scout', count: 25, interval: 690 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'maharaja_grand_platter', patience: 8600, baseReward: 355, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'spice_throne_feast', patience: 8300, baseReward: 395, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'spice_throne_feast', patience: 8000, baseReward: 440, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'maharaja_final_banquet', patience: 7800, baseReward: 492, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'maharaja_final_banquet', patience: 7600, baseReward: 548, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 50, two: 40 },
+    service: { duration: 395, customerInterval: 1.74, maxCustomers: 76, customerPatience: 16 },
+  },
+
+  // ── 18-6: 마하라자의 왕좌 (보스전) ──
+  '18-6': {
+    id: '18-6',
+    nameKo: '마하라자의 왕좌',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 대칭 경로 (중앙 세로→가로→중앙 세로)
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 30, interval: 920 },
+        { type: 'curry_djinn', count: 40, interval: 940 },
+        { type: 'naan_golem', count: 28, interval: 1160 },
+        { type: 'incense_specter', count: 24, interval: 1540 },
+        { type: 'spice_elemental', count: 18, interval: 1940 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 38, interval: 860 },
+        { type: 'curry_djinn', count: 50, interval: 860 },
+        { type: 'naan_golem', count: 34, interval: 1080 },
+        { type: 'incense_specter', count: 30, interval: 1420 },
+        { type: 'spice_elemental', count: 24, interval: 1800 },
+        { type: 'butter_ghost', count: 20, interval: 555 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'masala_guide', count: 46, interval: 800 },
+        { type: 'curry_djinn', count: 60, interval: 780 },
+        { type: 'naan_golem', count: 40, interval: 1000 },
+        { type: 'incense_specter', count: 38, interval: 1300 },
+        { type: 'spice_elemental', count: 30, interval: 1660 },
+        { type: 'cheese_golem', count: 16, interval: 1540 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'masala_guide', count: 50, interval: 760 },
+        { type: 'curry_djinn', count: 65, interval: 740 },
+        { type: 'naan_golem', count: 44, interval: 940 },
+        { type: 'incense_specter', count: 44, interval: 1200 },
+        { type: 'spice_elemental', count: 36, interval: 1560 },
+        { type: 'milk_phantom', count: 22, interval: 800 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'maharaja', count: 1, interval: 0 },
+        { type: 'masala_guide', count: 6, interval: 3000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'maharaja_grand_platter', patience: 8400, baseReward: 368, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'spice_throne_feast', patience: 8100, baseReward: 410, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'spice_throne_feast', patience: 7800, baseReward: 458, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'maharaja_final_banquet', patience: 7600, baseReward: 512, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'maharaja_final_banquet', patience: 7400, baseReward: 572, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 52, two: 42 },
+    service: { duration: 400, customerInterval: 1.72, maxCustomers: 78, customerPatience: 15 },
+  },
   '19-1': { id: '19-1', nameKo: '미구현', theme: 'placeholder' },
   '19-2': { id: '19-2', nameKo: '미구현', theme: 'placeholder' },
   '19-3': { id: '19-3', nameKo: '미구현', theme: 'placeholder' },

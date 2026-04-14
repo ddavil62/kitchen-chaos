@@ -10,6 +10,7 @@
  * Phase 29-2: + 서빙 16종 + 버프 4종 = 186종 (15장 카타콩브).
  * Phase 31-3: + 서빙 13종 + 버프 2종 = 201종 (16장 향신료 궁전).
  * Phase 32-3: + 서빙 10종 + 버프 2종 = 213종 (17장 향신료 궁전 심층부).
+ * Phase 32-5: + 서빙 7종 + 버프 1종 = 221종 (18장 향신료 궁전 최심부).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -1046,6 +1047,49 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { chai: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 2, truffle: 1 }, baseReward: 335, cookTime: 20500,
     unlockCost: 540, gateStage: '17-5',
   },
+
+  // ── Phase 32-5 신규 서빙 레시피 (18장 향신료 궁전 최심부) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'cardamom_tea', nameKo: '카다멈 차', icon: '☕', category: 'soup',
+    tier: 2, ingredients: { cardamom: 1 }, baseReward: 78, cookTime: 6500,
+    unlockCost: 58, gateStage: '18-1',
+  },
+  {
+    id: 'spiced_cardamom_bread', nameKo: '스파이스 카다멈 브레드', icon: '🍞', category: 'grill',
+    tier: 2, ingredients: { cardamom: 1, flour: 1 }, baseReward: 85, cookTime: 7200,
+    unlockCost: 65, gateStage: '18-1',
+  },
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'cardamom_masala_bowl', nameKo: '카다멈 마살라 볼', icon: '🍛', category: 'fry',
+    tier: 3, ingredients: { cardamom: 1, curry_leaf: 1 }, baseReward: 115, cookTime: 9000,
+    unlockCost: 95, gateStage: '18-2',
+  },
+  {
+    id: 'masala_lamb', nameKo: '마살라 램', icon: '🥩', category: 'grill',
+    tier: 3, ingredients: { cardamom: 1, meat: 1, curry_leaf: 1 }, baseReward: 128, cookTime: 10000,
+    unlockCost: 108, gateStage: '18-2',
+  },
+
+  // ★★★★★ 5성 (3종)
+  {
+    id: 'maharaja_grand_platter', nameKo: '마하라자 그랑 플래터', icon: '🌟', category: 'special',
+    tier: 5, ingredients: { cardamom: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 2 }, baseReward: 348, cookTime: 21000,
+    unlockCost: 560, gateStage: '18-3',
+  },
+  {
+    id: 'spice_throne_feast', nameKo: '향신료 왕좌 피스트', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { cardamom: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 2, chai: 1 }, baseReward: 378, cookTime: 22500,
+    unlockCost: 610, gateStage: '18-4',
+  },
+  {
+    id: 'maharaja_final_banquet', nameKo: '마하라자 최종 연회', icon: '🏆', category: 'special',
+    tier: 5, ingredients: { cardamom: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 2, chai: 2, truffle: 1 }, baseReward: 415, cookTime: 24000,
+    unlockCost: 665, gateStage: '18-5',
+  },
 ];
 
 /**
@@ -1368,6 +1412,17 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.50,
     duration: 2, durationUnit: 'wave',
     unlockCost: 135, gateStage: '17-4',
+  },
+
+  // ── Phase 32-5 신규 버프 레시피 (18장 향신료 궁전 최심부) ──
+  {
+    id: 'cardamom_aura', nameKo: '카다멈 오라', icon: '🪬', category: 'buff',
+    tier: 4, ingredients: { cardamom: 2, chai: 1 },
+    effectDesc: '혼란 면역 + 공격력 +20% (2웨이브)',
+    effectType: 'buff_confuse_immune',
+    effectValue: 0.20,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 140, gateStage: '18-3',
   },
 ];
 

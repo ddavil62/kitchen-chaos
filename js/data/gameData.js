@@ -10,6 +10,7 @@
  * Phase 27-3: 적 2종(wine_specter, foie_gras_knight), 재료 1종(truffle) 추가. 누적 적 29종, 재료 22종.
  * Phase 31-2: 적 2종(curry_djinn, naan_golem), 재료 2종(curry_leaf, saffron) 추가. 누적 적 31종, 재료 25종.
  * Phase 32-2: 적 2종(incense_specter, spice_elemental), 재료 1종(chai) 추가. 누적 적 33종, 재료 26종.
+ * Phase 32-5: 적 1종(masala_guide), 보스 1종(maharaja), 재료 1종(cardamom) 추가. 누적 적 35종, 재료 27종.
  */
 
 // ── 적 타입 정의 ──
@@ -594,6 +595,57 @@ export const ENEMY_TYPES = {
     group: 2,
     reward: 35,
   },
+  // ── Phase 32-5 신규 적 (18장 향신료 궁전 최심부) ──
+  masala_guide: {
+    id: 'masala_guide',
+    nameKo: '마살라 계승자',
+    hp: 330,
+    speed: 82,
+    ingredient: 'cardamom',
+    bodyColor: 0xe67e22,        // 주황빛 황토 (무술복)
+    // 혼란 온 히트: incense_specter(35%)보다 낮은 확률, 빠른 속도로 교란
+    confuseOnHit: true,
+    confuseDuration: 2500,
+    confuseChance: 0.25,
+    // 돌진: HP 50% 이하 시 속도 2배로 2초 돌진, 10초 쿨다운
+    charge: true,
+    chargeHpThreshold: 0.50,
+    chargeSpeedMultiplier: 2.0,
+    chargeDuration: 2000,
+    chargeInterval: 10000,
+    canvasSize: 108,
+    group: 2,
+    reward: 32,
+  },
+  // 보스 — maharaja는 BOSS_IDS에 등록 (SpriteLoader에서 /sprites/bosses/ 경로 사용)
+  maharaja: {
+    id: 'maharaja',
+    nameKo: '마하라자',
+    hp: 2200,
+    speed: 20,
+    ingredient: null,
+    bodyColor: 0xb8860b,        // 황금 다크 (스코프 문서 지정값)
+    isBoss: true,
+    // 향신료 폭발: spiceBlastInterval마다 범위 내 도구에 공격력/사거리 동시 디버프
+    spiceBlast: true,
+    spiceBlastInterval: 7000,        // 7초마다 발동
+    spiceBlastRadius: 100,
+    spiceBlastEffect: { damageReduction: 0.25, rangeReduction: 0.20, duration: 4000 },
+    // 호위 소환: HP enrageHpThreshold 이하 시 masala_guide 3마리 소환 (1회)
+    summonThreshold: 0.60,
+    summonType: 'masala_guide',
+    summonCount: 3,
+    // 분노: HP 30% 이하 시 speed 35로 상승, spiceBlastInterval 절반
+    enrageHpThreshold: 0.30,
+    enrageSpeedBonus: 35,
+    bossReward: 480,
+    bossDrops: [
+      { ingredient: 'cardamom', count: 4 },
+      { ingredient: 'saffron', count: 3 },
+      { ingredient: 'chai', count: 2 },
+    ],
+    canvasSize: 212,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -988,6 +1040,13 @@ export const INGREDIENT_TYPES = {
     nameKo: '차이',
     color: 0xc08050,   // 따뜻한 갈색 (밀크티)
     icon: 'assets/ingredients/chai.png',
+  },
+  // ── Phase 32-5 신규 재료 (18장 향신료 궁전 최심부) ──
+  cardamom: {
+    id: 'cardamom',
+    nameKo: '카다멈',
+    color: 0x4caf50,            // 초록빛 씨앗 껍질
+    icon: 'assets/ingredients/cardamom.png',
   },
 };
 

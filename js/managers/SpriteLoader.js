@@ -14,6 +14,7 @@
  * Phase 29-1: 15장 보스 1종(chef_noir) 추가.
  * Phase 31-2: 16장 적 2종(curry_djinn, naan_golem), 타일셋 1종(spice_palace), 재료 2종(curry_leaf, saffron) 추가.
  * Phase 32-2: 17장 적 2종(incense_specter, spice_elemental), 타일셋 1종(spice_palace_interior), 재료 1종(chai) 추가.
+ * Phase 32-5: 18장 보스 1종(maharaja), 적 1종(masala_guide), 재료 1종(cardamom) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -32,7 +33,7 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (33종, Phase 32-2: incense_specter, spice_elemental 추가) ──
+// ── 적 ID 목록 (35종, Phase 32-5: masala_guide 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
@@ -46,9 +47,10 @@ const ENEMY_IDS = [
   'cellar_phantom', 'sommelier_wraith',   // Phase 28-2
   'curry_djinn', 'naan_golem',            // Phase 31-2 (164px curry_djinn, 120px naan_golem)
   'incense_specter', 'spice_elemental',   // Phase 32-2 (176px/164px, pro)
+  'masala_guide',                          // Phase 32-5 (108px, pro)
 ];
 
-// ── 보스 ID 목록 (10종, Phase 29-1: chef_noir 추가) ──
+// ── 보스 ID 목록 (11종, Phase 32-5: maharaja 추가) ──
 const BOSS_IDS = [
   'pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem',
   'master_patissier', 'cuisine_god',
@@ -56,6 +58,7 @@ const BOSS_IDS = [
   'dragon_wok',
   'sake_master',  // Phase 26-1
   'chef_noir',    // Phase 29-1
+  'maharaja',     // Phase 32-5
 ];
 
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
@@ -93,6 +96,7 @@ const INGREDIENT_FILE_MAP = {
   curry_leaf: 'curry_leaf',  // Phase 31-2
   saffron: 'saffron',        // Phase 31-2
   chai: 'chai',              // Phase 32-2
+  cardamom: 'cardamom',      // Phase 32-5
 };
 
 // ── 재료 ID 목록 (26종, 게임 내 ID 기준) ──
@@ -133,6 +137,7 @@ const ENEMY_WALK_HASHES = {
   naan_golem: 'animating-33505870',       // Phase 31-2 (120px, chibi)
   incense_specter: 'animating-7f60bab8',  // Phase 32-2 (176px, pro)
   spice_elemental: 'animating-6e040724',  // Phase 32-2 (164px, pro)
+  masala_guide: 'animating-3594d863',     // Phase 32-5 (108px, pro)
 };
 
 const BOSS_WALK_HASHES = {
@@ -146,6 +151,7 @@ const BOSS_WALK_HASHES = {
   dragon_wok: 'animating-30e6c64f',     // Phase 26-1 신규 스프라이트 (기존 animating-8efd2218 교체)
   sake_master: 'animating-8d3d020e',   // Phase 26-1 신규
   chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
+  maharaja: 'animating-2c666ada',     // Phase 32-5 (pro 모드, 212px canvas)
 };
 
 /** 걷기 애니메이션 방향 목록 */
