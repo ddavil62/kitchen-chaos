@@ -14,6 +14,7 @@
  * Phase 27-3: 13장 트리거 4건 추가 (chapter13_intro, chapter13_mid, mimi_side_13, chapter13_clear) + stage_first_clear 제외 목록 갱신.
  * Phase 30: 14장 트리거 4건 선등록 (chapter14_intro, chapter14_mid, team_side_14, chapter14_clear) + stage_first_clear 제외 목록 갱신. 14장은 placeholder 단계(Phase 28-4 예정).
  * Phase 31-1: 15장 트리거 5건 추가 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b) + 16장 트리거 3건 추가 (chapter16_intro, chapter16_mid, team_side_16) + stage_first_clear 제외 목록 갱신.
+ * Phase 32-1: 16-5 에필로그 트리거 + 17장 트리거 4건 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17) + stage_first_clear 제외 목록 갱신.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -263,7 +264,10 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '15-5' &&   // chapter15_boss 별도 처리
       ctx.stageId !== '15-6' &&   // chapter15_clear 별도 처리
       ctx.stageId !== '16-1' &&   // chapter16_intro 별도 처리
-      ctx.stageId !== '16-3',     // chapter16_mid 별도 처리
+      ctx.stageId !== '16-3' &&   // chapter16_mid 별도 처리
+      ctx.stageId !== '16-5' &&   // chapter16_epilogue 별도 처리
+      ctx.stageId !== '17-1' &&   // chapter17_intro 별도 처리
+      ctx.stageId !== '17-3',     // chapter17_mid 별도 처리
     delay: 800,
   },
 
@@ -795,6 +799,66 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.storyProgress?.currentChapter >= 16 &&
       !save.seenDialogues?.includes('team_side_16'),
+  },
+
+  // 16-5 첫 클리어 시 chapter16_epilogue + currentChapter 17 설정
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter16_epilogue',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '16-5',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter16_cleared = true;
+      if (data.storyProgress.currentChapter < 17) {
+        data.storyProgress.currentChapter = 17;
+      }
+      SaveManager.save(data);
+    },
+  },
+
+  // ── 17장: 향신료 궁전 심층부 (Phase 32-1) ──────────────────────────────
+
+  // 17-1 진입 시 chapter17_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter17_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '17-1',
+    delay: 400,
+  },
+
+  // 17-3 첫 클리어 시 chapter17_mid + 플래그 저장
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter17_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '17-3',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter17_mid_seen = true;
+      SaveManager.save(data);
+    },
+  },
+
+  // merchant_enter 에서 team_side_17 (17장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_17',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 17 &&
+      !save.seenDialogues?.includes('team_side_17'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────

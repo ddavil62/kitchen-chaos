@@ -19,6 +19,7 @@
  * Phase 28-1: 14장 비스트로 심층부 대화 3종 추가 (chapter14_intro, chapter14_mid, team_side_14). 누적 64종.
  * Phase 29-1: 15장 셰프 누아르 최종전 대화 5종 추가 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b). 누적 69종.
  * Phase 31-1: 16장 향신료 궁전 대화 3종 추가 (chapter16_intro, chapter16_mid, team_side_16). 누적 72종.
+ * Phase 32-1: 16장 에필로그 + 17장 향신료 궁전 심층부 대화 4종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17). 누적 76종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1167,6 +1168,79 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(씩 웃으며) 둘 다.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '역시 라오! 감식안이 달라! 이거 기준으로 도구 패키지 구성해줄게~' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '결국 장사 얘기야!!' },
+    ],
+  },
+
+  // ── 16장 에필로그 + 17장: 향신료 궁전 심층부 (Phase 32-1) ──────────
+
+  // chapter16_epilogue — 16-5 클리어 직후, 심층부 진입 결의
+  chapter16_epilogue: {
+    id: 'chapter16_epilogue',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '시장 외곽의 식란이 잦아들었다. 그러나 중심부의 공기는 여전히 뜨겁다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '전부 다 끝난 건 아니지? 저 안쪽이 더 진하게 느껴져.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '미력 반응 수치가 오히려 올라갑니다. 심층부가 진원지입니다.' },
+      { speaker: '???', portrait: '🧿', text: '(낮은 목소리로) 거기까지 들어가려면… 각오가 있어야 한다. 그 안에 있는 것은 우리도 오래 봉인해온 것이다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '봉인이 풀리고 있다는 뜻이야?' },
+      { speaker: '???', portrait: '🧿', text: '그렇다. 그래서 너희가 온 것이 운이 좋다고 생각하기 시작했다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(작게) 첫 인사보다 많이 풀렸는걸~' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(결의를 다지며) 좋아. 심층부로 간다. 함께 막아요.' },
+      { speaker: 'narrator', portrait: '', text: '팀은 향신료 궁전의 심층부, 금고의 층으로 발걸음을 내디뎠다.' },
+    ],
+  },
+
+  // chapter17_intro — 17-1 진입 시, 향신료 금고 발견
+  chapter17_intro: {
+    id: 'chapter17_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '거대한 석문이 열리자 향신료 먼지가 폭포처럼 쏟아졌다. 안쪽에는 황금빛 항아리들이 천장까지 쌓여 있었다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '이게… 향신료 금고야? 이 양이 다 뭐야!' },
+      { speaker: '???', portrait: '🧿', text: '수백 년 전, 우리 조상이 미력을 담은 향신료들을 봉인해 쌓아온 장소다. 그것이 지금 풀려나고 있다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(주위를 살피며) 내부에서 누군가 건드렸다는 흔적이 있습니다. 봉인이 저절로 풀리지 않아요.' },
+      { speaker: '???', portrait: '🧿', text: '(표정이 굳으며) …맞다. 안에서부터 열린 것이다. 우리가 알아채지 못한 사이에.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '누가 이걸 열 수 있는 겁니까? 마살라 문파 외부 인물이?' },
+      { speaker: '???', portrait: '🧿', text: '(긴 침묵 후, 낮게) …그 이름을 입에 올리고 싶지 않지만. 마하라자. 그 이름이 떠오른다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '마하라자? 누구야?' },
+      { speaker: '???', portrait: '🧿', text: '나중에 설명하겠다. 지금은 먼저 이 안을 정화해라.' },
+    ],
+  },
+
+  // chapter17_mid — 17-3 클리어 후, 마하라자의 음모 일부 공개
+  chapter17_mid: {
+    id: 'chapter17_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '금고 한 층이 고요해졌다. 황금빛 먼지가 천천히 가라앉으며, 벽에 새겨진 문양이 드러났다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(문양을 가리키며) 이 각인… 마살라 문파의 봉인 문양과 다릅니다. 형태가 달라요.' },
+      { speaker: '???', portrait: '🧿', text: '(표정이 굳으며) …그건 마하라자의 인장이다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '마하라자. 아까 그 이름이군요. 설명해줄 수 있습니까?' },
+      { speaker: '???', portrait: '🧿', text: '300년 전, 우리 문파에서 추방된 미력사다. 향신료의 미력을 무기로 바꾸려 했다. 정화가 아닌 — 지배를.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(차갑게) 추방됐다면 이미 죽었을 텐데.' },
+      { speaker: '???', portrait: '🧿', text: '그가 죽었는지는 모른다. 하지만 이 인장은… 그의 기술로 다시 새겨진 것이다. 누군가가 그의 방법을 재현했다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '추종자가 있다는 거야?' },
+      { speaker: '???', portrait: '🧿', text: '(고개를 끄덕이며) 그리고 그들이 이 금고를 열고, 안에 잠든 것을 깨우려 하고 있다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(긴장된 표정으로) 안에 잠든 게 뭔데?' },
+      { speaker: '???', portrait: '🧿', text: '금고의 수호자. 봉인이 풀리면 — 그것이 깨어난다. 다음 층에서 마주칠 것이다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(프라이팬을 단단히 쥐며) …이 팀이라면 막을 수 있어. 같이 간다.' },
+    ],
+  },
+
+  // team_side_17 — merchant_enter에서 1회, 17장 진입 후 팀원 리액션
+  team_side_17: {
+    id: 'team_side_17',
+    skippable: true,
+    lines: [
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(조용히) 마하라자라는 인물… WCA 문서에도 기록이 없는 이름이에요. 그만큼 오래된 이야기라는 뜻이겠죠.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '300년 전 기술이 지금 재현된다면, 누군가 자료를 갖고 있다는 뜻입니다. 외부 세력이 개입해 있을 가능성이 높아요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(팔짱을 끼며) 마살라 문파도 전부 공개하지 않는 게 있어. 뭔가 더 알고 있는 것 같던데.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '그래도 이제 같이 싸우고 있잖아. 조금씩 열어주는 거 아닐까?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(짧게) …그러길 바라지.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(봉지를 흔들며) 참, 나 금고 안에서 희귀 향신료 몇 가지 챙겼는데~ 도구 강화 재료로 딱이야!' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코!! 그거 무단으로 가져온 거야?!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '정화된 거니까 반환 완료 아닌가요~?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(한숨) …그 논리, 절대 통하지 않습니다.' },
     ],
   },
 };
