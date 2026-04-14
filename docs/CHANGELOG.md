@@ -1,5 +1,29 @@
 # Changelog
 
+## [Phase 32-2] 2026-04-14 — 17장 신규 에셋 4종 생성
+
+### Added
+- assets/enemies/incense_specter/: 8방향 스프라이트 (176px 캔버스, 8프레임, animating-7f60bab8)
+  - 향 혼령, HP 420, speed 58, confuseOnHit(35%/3초), group 2, reward 30
+  - 스펙 canvasSize 92px -> AD 모드2 확정 176px
+- assets/enemies/spice_elemental/: 8방향 스프라이트 (164px 캔버스, 8프레임, animating-6e040724)
+  - 향신료 정령, HP 500, speed 45, elementalResistance(freezer/wasabi_cannon 50% 감소), group 2, reward 35
+  - 스펙 canvasSize 92px -> AD 모드2 확정 164px
+- assets/tilesets/spice_palace_interior.png: 128x128px Wang 타일셋 16종 (17장 심층부 실내, 대리석+로열블루+금)
+- assets/ingredients/chai.png: 재료 아이콘 32px (클레이 컵 차이 티, 투명 배경)
+- gameData.js: ENEMY_TYPES에 incense_specter, spice_elemental 추가 (누적 일반 33종)
+- gameData.js: INGREDIENT_TYPES에 chai 추가 (누적 26종, 스펙에 미명시이나 incense_specter.ingredient 참조 충족 위해 추가)
+- SpriteLoader.js: ENEMY_IDS +2종(33종), ENEMY_WALK_HASHES +2종, INGREDIENT_FILE_MAP +1종(chai), TILESET_IDS +1종(spice_palace_interior, 14종)
+
+### 참고
+- 커밋: 1c6c057
+- 스펙: `.claude/specs/2026-04-14-kc-phase32-2-spec.md`
+- QA: `.claude/specs/2026-04-14-kc-phase32-2-qa.md`
+- confuseOnHit/elementalResistance 로직 구현은 Phase 32-3 스코프 (현재 데이터만 등록)
+- INGREDIENT_TYPES(25->26종)과 INGREDIENT_FILE_MAP(26종) 카운트: herb_bundle 미등록 이슈는 Phase 28-2 이전 기존 문제
+
+---
+
 ## [Phase 32-1] 2026-04-14
 
 ### Added

@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-14 (Phase 32-1 완료)
+> 최종 업데이트: 2026-04-14 (Phase 32-2 완료)
 
 ## 프로젝트 개요
 
@@ -106,7 +106,7 @@ kitchen-chaos/
       ChefManager.js         # 셰프 선택/스킬 관리
       OrderManager.js        # 오더(미션) 시스템
     data/
-      gameData.js            # 적/도구(TOOL_DEFS)/재료 정의
+      gameData.js            # 적(33종)/도구(TOOL_DEFS)/재료(26종) 정의
       stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~16장, placeholder: 8/14/17~24장)
       recipeData.js          # 레시피 201종 정의 (서빙 163 + 버프 38)
       dialogueData.js        # 대화 스크립트 76종 + 캐릭터 11종 정의 (시즌2 7~15장 31종, 16장 4종, 17장 3종 포함)
@@ -114,14 +114,14 @@ kitchen-chaos/
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
-    sprites/enemies/         # 적 스프라이트 31종 (curry_djinn 164px, naan_golem 120px 8방향 포함)
+    sprites/enemies/         # 적 스프라이트 33종 (incense_specter 176px, spice_elemental 164px 포함)
     sprites/bosses/sake_oni/ # sake_oni 보스 스프라이트 (124x124px, 8방향 rotations + walking-9fa1ac06)
     sprites/bosses/sake_master/ # sake_master 보스 스프라이트 (64px, 8방향 animating-8d3d020e)
     sprites/bosses/dragon_wok/  # dragon_wok 보스 스프라이트 (64px, 8방향 animating-30e6c64f)
     sprites/bosses/chef_noir/   # chef_noir 보스 스프라이트 (64px pro, 8방향 animating-96100c0f, 124x124px)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
-    tilesets/                # 타일셋 13종 (spice_palace 포함)
-    icons/                   # 재료 아이콘 25종 (curry_leaf, saffron 32px 포함)
+    tilesets/                # 타일셋 14종 (spice_palace, spice_palace_interior 포함)
+    icons/                   # 재료 아이콘 26종 (curry_leaf, saffron, chai 32px 포함)
     service/                 # 영업 씬 에셋 15종 (테이블/손님/바닥/카운터/홀 데코)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
@@ -178,14 +178,15 @@ kitchen-chaos/
 | 16장 에셋 생성 (Phase 31-2) | 적 2종(curry_djinn, naan_golem), spice_palace 타일셋, 재료 아이콘 2종(curry_leaf, saffron) | 완료 |
 | 16장 스테이지+레시피 (Phase 31-3) | 스테이지 16-1~16-5 구현, 인도 요리 레시피 15종, curry_djinn 텔레포트/naan_golem 자가회복 메커닉 | 완료 |
 | 17장 대화 스크립트 (Phase 32-1) | 16장 에필로그 + 17장 대화 3종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17), 트리거 4건 등록 | 완료 |
+| 17장 에셋 생성 (Phase 32-2) | 적 2종(incense_specter 176px, spice_elemental 164px), spice_palace_interior 타일셋, 재료 아이콘 1종(chai) | 완료 |
 
 ## 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 42종 (일반 31 + 미니보스 1 + 보스 10) |
+| 적 | 44종 (일반 33 + 미니보스 1 + 보스 10) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
-| 재료 | 25종 |
+| 재료 | 26종 |
 | 레시피 | 201종 (서빙 163 + 버프 38) |
 | 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~16장, placeholder: 8/14/17~24장) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
