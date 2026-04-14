@@ -930,9 +930,9 @@
 
 > `visual_change: none` | 29-1 에셋 완성 후 진행
 
-- [ ] stageData.js: 스테이지 15-1 ~ 15-5 + 15-6 chef_noir 보스전
-- [ ] recipeData.js: 허브 조합 추가분 (누적 ~186종)
-- [ ] 양식 아크 밸런스 점검 (13~15장 DPS 커브)
+- [x] stageData.js: 스테이지 15-1 ~ 15-5 + 15-6 chef_noir 보스전
+- [x] recipeData.js: 허브 조합 추가분 (누적 ~186종)
+- [x] 양식 아크 밸런스 점검 (13~15장 DPS 커브)
 
 ---
 

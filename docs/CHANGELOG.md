@@ -1,5 +1,34 @@
 # Changelog
 
+## [Phase 29-2] 2026-04-14
+
+### Added
+- stageData.js: 15-1~15-6 카타콩브 스테이지 구현 (양식 아크 완성)
+  - 15-1 카타콩브 입구 (뱀형/M자, 5 waves)
+  - 15-2 카타콩브 통로 (소용돌이/나선, 5 waves)
+  - 15-3 카타콩브 지하 홀 (십자형, 6 waves)
+  - 15-4 카타콩브 제단 (Z자, 6 waves)
+  - 15-5 셰프 누아르의 어둠 (역T자, 6 waves, triggerDialogue: chapter15_boss)
+  - 15-6 최후의 결전 (직선, 3 waves 보스전, isBossBattle, triggerDialogueClear: chapter15_clear)
+- stageData.js: 13-6 비스트로 비밀 지하실 구현 (bistro_parisian, 5 waves, T자 패턴)
+- recipeData.js: 허브 레시피 20종 추가 (서빙 16 + 버프 4), 누적 186종
+  - 서빙: herb_butter_toast, herb_escargot_plate (tier2), catacomb_herb_roast, herb_mushroom_soup, herb_fish_meuniere, herb_truffle_bisque, cellar_herb_plate, herb_egg_galette (tier3), herb_noir_ragout, catacomb_herb_croute, herb_shrimp_bisque, herb_truffle_risotto, noir_herb_course (tier4), catacomb_grand_finale, herb_cellar_banquet, noir_final_tasting (tier5)
+  - 버프: herb_focus_brew, herb_slow_essence (tier3), catacomb_awakening, noir_essence (tier4)
+
+### Changed
+- stageData.js fileoverview: Phase 29-2 이력 추가
+- recipeData.js fileoverview: Phase 29-2 이력 추가, 누적 186종 표기
+
+### 참고
+- QA 16/16 PASS
+- 15장 주력 적: cellar_phantom, sommelier_wraith (Phase 28-2), wine_specter, foie_gras_knight
+- 15-6 보스: chef_noir (HP 9000, 3페이즈, bossReward 500)
+- 13~15장 DPS 커브: 15-1~15-2는 13-5 대비 6~10% 상승, 15-3~15-5는 6웨이브 확장으로 총 HP 부하 154~190% 상승
+- 스펙: `.claude/specs/2026-04-14-kc-phase29-2-spec.md`
+- QA: `.claude/specs/2026-04-14-kc-phase29-2-qa.md`
+
+---
+
 ## [2026-04-14] - Phase 29-1 15장 셰프 누아르 보스 에셋 + 대화 스크립트
 
 ### 추가
