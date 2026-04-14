@@ -17,6 +17,7 @@
  * Phase 27-1: 13장 별빛 비스트로 대화 3종 추가 (chapter13_intro, chapter13_mid, mimi_side_13). CHARACTERS에 앙드레 추가.
  * Phase 27-3: chapter13_clear 대화 추가 (13-5 클리어 후, 14장 예고). 누적 61종.
  * Phase 28-1: 14장 비스트로 심층부 대화 3종 추가 (chapter14_intro, chapter14_mid, team_side_14). 누적 64종.
+ * Phase 29-1: 15장 셰프 누아르 최종전 대화 5종 추가 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b). 누적 69종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1013,6 +1014,107 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(씩 웃으며) 우리 팀 최고야!' },
     ],
   },
+
+  // ── 시즌 2: 15장 셰프 누아르 최종전 (Phase 29-1) ──
+
+  // chapter15_boss — 15-5 진입 시, 셰프 누아르 첫 대면
+  chapter15_boss: {
+    id: 'chapter15_boss',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '카타콩브 최심부. 무너질 듯한 석조 궁륭 아래 거대한 조리대가 놓여 있다. 그 뒤에 서 있는 검은 실루엣.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(목소리를 높여) 셰프 누아르! 드디어 찾았어요!' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '(천천히 돌아서며) ...오래 걸렸군.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '동방의 미력사들. WCA의 개들이 보낸 건가.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(비통하게) 누아르... 이게 당신이 원하던 방향입니까?' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '(냉소하며) 앙드레. 자네는 아직도 WCA의 언어로 말하는군. 실망이야.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(낮은 목소리로) 당신 때문에 마르세유 사람들이 피해를 입었습니다.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '피해? (비웃으며) 재료가 스스로 미력을 방출하는 것을 인간이 피해라고 부르는 거야. 오만한 정의로군.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '사람이 다쳤는데 그게 오만이에요?!' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '강요된 정화야말로 예술의 폭력이다. 너희가 하는 일이 그것이야. 미력을 억누르고, 재료를 길들이고, 자연을 지배한다고 믿는 것.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '요리는 지배가 아니야. 요리는... 해방이어야 해.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(차갑게) 철학은 들었습니다. 하지만 결과가 피해라면, 멈춰야 합니다.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '(칼을 들어 올리며) 멈추는 것은 내 사전에 없어. 보여주마, 진정한 미력이 무엇인지.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(도구를 꽉 쥐며) 모두, 간다!' },
+    ],
+  },
+
+  // chapter15_clear — 누아르 정화 후
+  chapter15_clear: {
+    id: 'chapter15_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '셰프 누아르의 미력이 꺾이기 시작했다. 칼이 바닥에 떨어진다.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '(무릎을 꿇으며) ...이런 결말이라니.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(숨을 고르며) 이제 그만해요. 당신 때문에 상처 입은 사람들이 있어요.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '(힘없이) ...알고 있었어. 처음부터. 노트에 다 기록했잖아. 하지만 멈출 수가 없었어.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(조용히 다가서며) 누아르... 왜 저한테는 말하지 않았습니까.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '(쓴웃음) 자네가 WCA에 보고할 거 아닌가. 나는... 이미 그 세계에서 끝난 사람이라고 생각했으니까.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(조용하게) 미력이 해방됐어. 카타콩브의 폭주 농도가 빠르게 내려가고 있어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(누아르를 보며 천천히) 당신 생각이 완전히 틀렸다고는 못 하겠어요. 하지만 방법이 틀렸어요.' },
+      { speaker: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', text: '(긴 침묵 후) ...그 말, 오래전에 들었어야 했는데.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(담담하게) 이제부터라도 달라질 수 있습니다.' },
+      { speaker: 'narrator', portrait: '', text: '카타콩브의 어둠이 걷히기 시작했다. 오랫동안 응집된 미력이 천천히, 자연스럽게 흩어졌다.' },
+      { speaker: 'narrator', portrait: '', text: '양식 아크 완결. 셰프 누아르는 WCA에 자수를 결정했다.' },
+    ],
+  },
+
+  // chapter15_epilogue — 팀 전원, 아크 종료 직후
+  chapter15_epilogue: {
+    id: 'chapter15_epilogue',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '카타콩브 밖. 파리의 새벽빛이 센 강 위로 번지기 시작한다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(깊게 숨을 들이쉬며) ...끝났군요. 3년 넘게 쫓던 일이.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '앙드레 씨, 누아르 씨... 알고 지낸 분이었죠?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(조용히) 스승이었습니다. WCA에 들어갔을 때, 가장 처음 가르침을 주신 분이에요. 그가 이렇게 될 줄은...' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '...미력에 대한 신념이 너무 강하면, 결과를 보지 못하게 되는 거겠죠.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(멀리 바라보며) 나도 같은 실수를 했었으니까. 드래곤 웍 사건처럼. 강한 신념일수록 더 위험해.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(조심스럽게) 그래서 우리가 서로 견제하는 거잖아. 팀이라는 게 그런 거야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(앙드레를 보며 힘주어) WCA는 어떻게 되는 거예요? 누아르 씨가 제명된 것도, 그쪽이 대응을 못 한 거잖아요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(긴 침묵 후) ...맞습니다. 저도 WCA 내부를 다시 들여다봐야 할 것 같아요. 이번 일로 뭔가가 명확해졌습니다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(씩 웃으며) 그럼 같이 바꿔요. WCA도, 요리도, 미력도. 혼자 안 해도 되잖아요!' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(가볍게 미소 지으며) ...고맙습니다. 미미 씨.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(박수치며) 명장면이야! 그나저나 이제 파리 일은 끝난 거죠? 마카롱 사러 가도 되나요?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(웃음을 터뜨리며) 포코!!' },
+    ],
+  },
+
+  // side_15a — 전원 집합 대화 (상점 1회)
+  side_15a: {
+    id: 'side_15a',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '다들 괜찮아? 오늘 진짜 힘들었다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(팔뚝의 상처를 보며) ...가벼운 열상 정도입니다. 신경 쓰지 마세요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '나도 괜찮아. 미력 소모가 좀 컸지만.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(진지하게) 여러분, 오늘 보스 상대로 다들 정말 잘 싸웠어요. 자랑스러워요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코가 진지한 건 처음 보는 것 같아.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(돌아서며) 그, 그러니까 이번엔 도구 값 10% 할인 쿠폰 드릴게요!' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(풋 웃으며) 역시 포코 씨군요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(아주 작게) ...10%면 쓸 만하네.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '라오 씨도 그런 말 해?!' },
+    ],
+  },
+
+  // side_15b — 다음 여정 암시 (상점 2회 이상)
+  side_15b: {
+    id: 'side_15b',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(지도를 펼치며) 자자, 다음 목적지는 어디야? WCA 본부? 아니면 다른 나라?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '아직 정해진 건 없어. 앙드레 씨, WCA에서 뭔가 연락 왔어요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(표정이 굳으며) ...어젯밤에 연락이 왔습니다. 유럽 바깥에서 새로운 식란 징후가 보인다고.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '어느 지역입니까?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '아직 정보가 불완전해요. 하지만... WCA가 단독으로 대응하기에는 규모가 크다고 판단하고 있는 것 같습니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(차분하게) 그러면 우리가 필요하다는 거겠지.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(두 주먹을 꽉 쥐며) 좋아. 어디든 간다! 식란이 있는 곳이라면!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(씩 웃으며) 역시 우리 미미야. 그럼 출발 전에 도구 보충은 필수~' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코... 지금 그게 중요해?!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '항상 중요해! 도구 없이 식란 못 잡아!' },
+      { speaker: 'narrator', portrait: '', text: '팀은 다음 목적지를 향한 준비를 시작했다. 여정은 아직 끝나지 않았다.' },
+    ],
+  },
 };
 
 // ── 캐릭터 정의 ──
@@ -1034,4 +1136,6 @@ export const CHARACTERS = {
   sake_master: { id: 'sake_master', nameKo: '주조 달인', portrait: '🍶', color: 0x8844bb, role: 'boss', desc: '이자카야 심층부 최심층을 지키는 고대 일식 양조 정령. sake_oni의 스승이자 원형.' },
   // ── Phase 27-1: WCA 유럽 지부장 ──
   andre: { id: 'andre', nameKo: '앙드레', portrait: '🥐', portraitKey: 'andre', color: 0x4169e1, role: 'ally', desc: 'WCA 유럽 지부장. 파리 출신 미력사로, 별빛 비스트로 식란 사태를 조사 중이다.' },
+  // ── Phase 29-1: 15장 보스 캐릭터 ──
+  chef_noir: { id: 'chef_noir', nameKo: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', color: 0x1a1a2e, role: 'boss', desc: '파리 카타콩브 출신의 전 WCA 수석 미력사. 식란을 자연적 해방으로 보는 극단적 요리 철학의 소유자. 양식 아크 최종 보스.' },
 };

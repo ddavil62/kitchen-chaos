@@ -11,6 +11,7 @@
  * Phase 26-1: sake_master 보스 추가, dragon_wok 스프라이트 교체.
  * Phase 27-2: 13장 적 2종(wine_specter, foie_gras_knight), 타일셋 1종(bistro_parisian), 재료 1종(truffle) 추가.
  * Phase 28-2: 14장 적 2종(cellar_phantom, sommelier_wraith), 타일셋 1종(wine_cellar), 재료 1종(herb_bundle) 추가.
+ * Phase 29-1: 15장 보스 1종(chef_noir) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -43,13 +44,14 @@ const ENEMY_IDS = [
   'cellar_phantom', 'sommelier_wraith',   // Phase 28-2
 ];
 
-// ── 보스 ID 목록 (9종, Phase 26-1: sake_master 추가) ──
+// ── 보스 ID 목록 (10종, Phase 29-1: chef_noir 추가) ──
 const BOSS_IDS = [
   'pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem',
   'master_patissier', 'cuisine_god',
   'sake_oni',
   'dragon_wok',
   'sake_master',  // Phase 26-1
+  'chef_noir',    // Phase 29-1
 ];
 
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
@@ -132,6 +134,7 @@ const BOSS_WALK_HASHES = {
   sake_oni: 'walking-9fa1ac06',  // Phase 23-1
   dragon_wok: 'animating-30e6c64f',     // Phase 26-1 신규 스프라이트 (기존 animating-8efd2218 교체)
   sake_master: 'animating-8d3d020e',   // Phase 26-1 신규
+  chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
 };
 
 /** 걷기 애니메이션 방향 목록 */
