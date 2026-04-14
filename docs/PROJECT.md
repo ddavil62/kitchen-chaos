@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-14 (Phase 27-3 완료)
+> 최종 업데이트: 2026-04-14 (Phase 28-2 완료)
 
 ## 프로젝트 개요
 
@@ -114,13 +114,13 @@ kitchen-chaos/
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
-    sprites/enemies/         # 적 스프라이트 27종 (wine_specter, foie_gras_knight 92px 8방향 포함)
+    sprites/enemies/         # 적 스프라이트 29종 (cellar_phantom, sommelier_wraith 92px 8방향 포함)
     sprites/bosses/sake_oni/ # sake_oni 보스 스프라이트 (124x124px, 8방향 rotations + walking-9fa1ac06)
     sprites/bosses/sake_master/ # sake_master 보스 스프라이트 (64px, 8방향 animating-8d3d020e)
     sprites/bosses/dragon_wok/  # dragon_wok 보스 스프라이트 (64px, 8방향 animating-30e6c64f)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
-    tilesets/                # 타일셋 11종 (bistro_parisian 포함)
-    icons/                   # 재료 아이콘 22종 (truffle 32px 포함)
+    tilesets/                # 타일셋 12종 (wine_cellar 포함)
+    icons/                   # 재료 아이콘 23종 (herb_bundle 32px 포함)
     service/                 # 영업 씬 에셋 15종 (테이블/손님/바닥/카운터/홀 데코)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
@@ -169,25 +169,23 @@ kitchen-chaos/
 | UI/UX 폴리시 | 씬 전환, 버튼 스타일, 터치 피드백 통일 | 완료 |
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
-| 도구 시스템 | 영구 도구 8종(+wasabi_cannon 범위/둔화, +spice_grinder DoT), 구매/판매/업그레이드, ToolManager, freezer canTargetInvisible | 완료 |
-| 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
-| 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
-| 대화/스토리 | DialogueManager+StoryManager, 스크립트 61종, 트리거 60항목, 선택지 분기, 초상화 6종, 10캐릭터, 13장 스토리 포함 | 완료 |
-| 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코 3종, 웜 다크 팔레트) + fallback | 완료 |
-| 도구 도감/팝업 | 행상인 ℹ 팝업(스탯바+로어), 도감 도구 탭(3열 그리드+Lv테이블) | 완료 |
-| 7장 사쿠라 이자카야 | 적 3종(sushi_ninja/tempura_monk/sake_oni)+미니보스(oni_herald), 재료 2종, 레시피 10종, 스토리 4종+복선 1종, 은신/배리어/취권/아우라/전령소환 메커닉 | 완료 |
-| 10장 용의 주방 | 적 5종(dumpling_warrior/wok_phantom/mini_dumpling/sake_specter/oni_minion)+보스(sake_master), 재료 3종, 레시피 20종, 스토리 7종, 분열/화염장판/마취/돌진/양조주기/봉인방어막/분노 메커닉, 10-1~10-5 이자카야 심층부 + 10-6 sake_master 보스전 | 완료 |
-| 11장 용의 주방 심층부 | 적 2종(shadow_dragon_spawn/wok_guardian), 재료 1종(star_anise), 레시피 10종, 스토리 3종, 어둠디버프/전면방어70%/hpOverride 메커닉, 11-1~11-5 + 11-6 dragon_wok 약화 선등장 미니전 완성 | 완료 |
-| 12장 용의 궁전 | 보스(dragon_wok) 3페이즈 화염 브레스 최종전, 레시피 10종, 대화 5종, 스토리 트리거 5건, 12-1~12-6 dragon_lair 테마, 라오 성장 서사 완결(중식 아크 완결) | 완료 |
-| 13장 별빛 비스트로 | 적 2종(wine_specter/foie_gras_knight), 재료 1종(truffle), 레시피 10종, 대화 4종, 스토리 트리거 4건, 13-1~13-5 bistro_parisian 테마, 은신/전면방어/격노/취기디버프(데이터) 메커닉, 양식 아크 1장 | 완료 |
+| 도구/행상인/채집 | 영구 도구 8종, 구매/판매/업그레이드, 행상인 UI, 재료 채집 TD, 도구 도감/팝업 | 완료 |
+| 대화/스토리 | 스크립트 61종, 트리거 60항목, 선택지 분기, 초상화 6종, 10캐릭터 | 완료 |
+| 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코, 웜 다크 팔레트) | 완료 |
+| 7장 사쿠라 이자카야 | 적 4종, 재료 2종, 레시피 10종, 스토리 5종, 은신/배리어/취권/전령소환 메커닉 | 완료 |
+| 10장 용의 주방 | 적 6종+보스(sake_master), 재료 3종, 레시피 20종, 스토리 7종, 분열/화염/마취/봉인 메커닉 | 완료 |
+| 11장 용의 주방 심층부 | 적 2종, 재료 1종, 레시피 10종, 스토리 3종, 어둠디버프/전면방어 메커닉 | 완료 |
+| 12장 용의 궁전 | 보스(dragon_wok) 3페이즈 최종전, 레시피 10종, 대화 5종, 중식 아크 완결 | 완료 |
+| 13장 별빛 비스트로 | 적 2종, 재료 1종, 레시피 10종, 대화 4종, 양식 아크 1장 | 완료 |
+| 14장 스크립트+에셋 | 대화 3종(39줄, 셰프 누아르 복선), 적 2종(cellar_phantom/sommelier_wraith), 타일셋 1종(wine_cellar), 재료 1종(herb_bundle) | 완료 |
 
 ## 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 37종 (일반 27 + 미니보스 1 + 보스 9) |
+| 적 | 39종 (일반 29 + 미니보스 1 + 보스 9) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
-| 재료 | 22종 |
+| 재료 | 23종 |
 | 레시피 | 166종 (서빙 134 + 버프 32) |
 | 스테이지 | 138슬롯 (그룹1: 1~6장 30개 + 그룹2: 7~15장 54개 + 그룹3: 16~24장 54개, 8장+14~24장은 placeholder) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
@@ -201,5 +199,4 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 28~29: 14~15장 (양식 아크 완성). 상세: `docs/ROADMAP.md`
-- 그룹2(7~15장) → 그룹3(16~24장) 챕터 확장
+- Phase 28-3~29: 14장 게임 로직 + 15장 양식 아크 완성 → 그룹3(16~24장) 확장. 상세: `docs/ROADMAP.md`

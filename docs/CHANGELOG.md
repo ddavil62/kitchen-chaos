@@ -1,5 +1,62 @@
 # Changelog
 
+## [2026-04-14] - Phase 28-2 14장 에셋 생성
+
+### 추가
+
+- **cellar_phantom 적 스프라이트** (`assets/enemies/cellar_phantom/`)
+  - 92x92px, 8방향 x 8프레임 걷기 애니메이션 (animating-387abc3e)
+  - 남색/흑보라(#1010A0~#000060) 반투명 유령, 붉은 눈(#FF2020), 카타콩브 잠복형
+  - HP ~400, 잠복+기습 메커닉 (게임 로직은 Phase 28-3에서 등록)
+
+- **sommelier_wraith 적 스프라이트** (`assets/enemies/sommelier_wraith/`)
+  - 92x92px, 8방향 x 8프레임 걷기 애니메이션 (animating-7cb39ccd)
+  - 다크레드/버건디(#600020~#800030) 소믈리에 유령, 황금 눈(#FFD040), 와인 글라스 소품
+  - HP ~380, 버프 해제 메커닉 (게임 로직은 Phase 28-3에서 등록)
+
+- **wine_cellar 타일셋** (`assets/tilesets/wine_cellar.png/.json`)
+  - 128x128px, Wang 16타일, 32x32 tile_size
+  - 어두운 돌바닥 + 오크 와인 통 단면, 파리 카타콩브 분위기
+
+- **herb_bundle 재료 아이콘** (`assets/ingredients/herb_bundle.png`)
+  - 32x32px, 올리브 그린/갈색 말린 허브 묶음, 투명 배경(75.3%)
+
+### 변경
+
+- **SpriteLoader.js** (`js/managers/SpriteLoader.js`)
+  - ENEMY_IDS: 27종 -> 29종 (cellar_phantom, sommelier_wraith 추가)
+  - ENEMY_WALK_HASHES: cellar_phantom='animating-387abc3e', sommelier_wraith='animating-7cb39ccd' 추가
+  - TILESET_IDS: 11종 -> 12종 (wine_cellar 추가)
+  - INGREDIENT_FILE_MAP: 22종 -> 23종 (herb_bundle 추가)
+
+### 참고
+
+- QA 17/17 PASS (시각 검증 8항목 포함), 콘솔 에러 0건
+- WALK_FRAME_COUNT=6 vs 8프레임 에셋 불일치는 Phase 21부터 존재하는 기존 이슈 (scope 외)
+- TILESET_IDS 12종 중 dessert_cafe, grand_finale, sakura_izakaya 3종은 PNG 미생성 상태 (기존 이슈)
+- 스펙: `.claude/specs/2026-04-14-kc-phase28-2-scope.md`
+- QA: `.claude/specs/2026-04-14-kc-phase28-2-qa.md`
+- AD 컨셉: `.claude/specs/2026-04-14-phase28-2-art-concept.md`
+
+---
+
+## [2026-04-14] - Phase 28-1 14장 대화 스크립트
+
+### 추가
+
+- **대화 스크립트 3종** (`.claude/specs/2026-04-14-kc-phase28-1-script.md`)
+  - chapter14_intro (14줄): 카타콩브 진입, 셰프 누아르 요리 철학서 발견, "강요된 정화 = 예술의 폭력"
+  - chapter14_mid (13줄): 피해 기록 발견, 팀 갈등 — 악인인가 피해자인가, 유키(원칙)/라오(실용)/미미(공감) 포지션
+  - team_side_14 (12줄): 카타콩브 간식 파티, 라오의 말린 허브(herb_bundle 연결), 앙드레 유대
+
+### 참고
+
+- 셰프 누아르는 14장에서 직접 등장하지 않음 -- 노트와 기록을 통한 간접 복선
+- Phase 29에서 첫 대면 + 보스전 예정
+- 스펙: `.claude/specs/2026-04-14-kc-phase28-1-script.md`
+
+---
+
 ## [2026-04-14] - Phase 27-3 13장 별빛 비스트로 스테이지/레시피 구현
 
 ### 추가
