@@ -16,6 +16,7 @@
  * Phase 26-1: 12장 용의 궁전 결전 대화 5종 추가 (chapter12_intro, chapter12_lao_mid, chapter12_boss, chapter12_clear, lao_side_12). CHARACTERS에 sake_master 추가.
  * Phase 27-1: 13장 별빛 비스트로 대화 3종 추가 (chapter13_intro, chapter13_mid, mimi_side_13). CHARACTERS에 앙드레 추가.
  * Phase 27-3: chapter13_clear 대화 추가 (13-5 클리어 후, 14장 예고). 누적 61종.
+ * Phase 28-1: 14장 비스트로 심층부 대화 3종 추가 (chapter14_intro, chapter14_mid, team_side_14). 누적 64종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -945,6 +946,71 @@ export const DIALOGUES = {
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(멀리서 조용히) ...나도.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '유키 씨! 먹고 싶으면 먹고 싶다고 해!' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '...간다.' },
+    ],
+  },
+
+  // ── 시즌 2: 14장 비스트로 심층부 (Phase 28-1) ──
+
+  // chapter14_intro — 14-1 진입 시 (파리 카타콩브 진입, 셰프 누아르의 요리 철학 노트 발견)
+  chapter14_intro: {
+    id: 'chapter14_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '파리 지하. 수백 년 된 카타콩브 구역. 13장 비스트로 완파 후, 팀은 앙드레의 안내로 지하로 내려갔다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(목소리가 약간 떨리며) ...여기, 뭔가 냄새가 달라요. 아직도 요리하고 있는 사람이 있는 건가?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(조심스럽게) 트러플과 허브 향이 섞여 있어요. 최근까지 누군가가 이 통로를 사용했다는 뜻입니다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(코를 벌름이며) 미력 농도가 꽤 높아. 단순한 식란이 아니야 — 누군가가 의도적으로 집중시키고 있어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(벽 쪽에서 무언가를 발견하며) ...이거.' },
+      { speaker: 'narrator', portrait: '', text: '낡은 가죽 노트 한 권. 표지에는 흐릿하게 「N」 이니셜이 새겨져 있다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(숨을 들이켜며) ...이건. 누아르의 요리 철학서입니다. 제가 WCA에서 본 적 있어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '뭐라고 쓰여 있어요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(천천히 읽으며) 「재료가 스스로 미력을 방출할 때만, 요리는 진정한 예술이 된다. 강요된 정화는 예술의 폭력이다.」' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(조용히) ...식란을 자연스러운 현상으로 보고 있다는 건가요.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(심각하게) 그게 문제야. 미력 폭주를 "해방"이라고 보면... 멈출 이유가 없는 거거든.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '하지만 그 사람, 왜 이 노트를 여기 두고 갔을까요. 일부러 남긴 건 아닐까요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(착잡하게) ...그 가능성도 있습니다. 더 깊이 들어가야 알 수 있어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(노트를 조심히 챙기며) 가죠. 직접 만나서 물어볼 거예요.' },
+    ],
+  },
+
+  // chapter14_mid — 14-3 클리어 후 (셰프 누아르의 피해 보고서 발견, 팀 갈등)
+  chapter14_mid: {
+    id: 'chapter14_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '14-3 클리어. 지하 깊은 곳, 오래된 주방의 흔적. 누군가 최근까지 여기서 요리했다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(진지하게) 화덕이 아직 따뜻해. 하루 이틀 전까지 사람이 있었어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(서류 뭉치를 집으며) ...이건 피해 기록입니다. 날짜별로 정리된.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(읽으며, 표정이 복잡해지며) 「내 실험으로 인해 마르세유 지구의 식란이 악화되었다. 의도치 않은 결과였다.」...' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '의도치 않게... 라고요? 그럼 일부러 한 게 아닌 건가요?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(냉정하게) 의도가 있든 없든, 결과는 같아. 사람들이 피해를 입었어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '동의합니다. 철학으로 피해를 정당화할 수는 없어요. 책임은 결과에 있습니다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(조용히) 하지만... 기록하고 있었잖아요. 피해를 알고 있었다는 거잖아요. 모른 척한 게 아니라.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(먼 곳을 보며) ...누아르는 WCA에서 가장 뛰어난 미력사였어요. 우리 모두의 선배이자 기준이었죠. 아무도 이렇게 될 거라고 생각 안 했습니다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '과거가 어떻든, 지금도 도망치고 있잖아. 책임지려는 사람이 도망가나?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(잠시 생각하다 조용히) ...일단 찾아야겠지. 그 다음 판단은, 만나고 나서.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(고개를 끄덕이며) ...맞아. 만나기 전엔 아무것도 모르는 거야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(서류를 챙기며) 가죠.' },
+    ],
+  },
+
+  // team_side_14 — merchant_enter 1회 (카타콩브에서의 허기, 팀 유대)
+  team_side_14: {
+    id: 'team_side_14',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '배고파... 카타콩브에 편의점이 없나?' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '여기가 파리 지하 납골당인데 편의점이 어딨어.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(조용히 말린 허브 한 봉지를 꺼내며) ...여기.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(눈이 빛나며) 라오 씨 천재다! 이게 뭐예요?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '말린 허브. 에너지 보충용이야. 파리 오기 전에 챙겼어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(조용히 손을 내밀며) ...감사합니다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(황당하게 웃으며) 카타콩브에서 간식 파티를 하시는군요...' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '배고프면 집중 못 해요! 이건 전술적 에너지 보충이에요!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(씩 웃으며) 세계 어딜 가도 이 팀 분위기는 똑같네. 분위기 파악 같은 거 없어.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(미소 지으며) ...오히려 좋아요. 저도 하나 주시겠어요?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(묵묵히 하나 더 건네며) ...' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(씩 웃으며) 우리 팀 최고야!' },
     ],
   },
 };
