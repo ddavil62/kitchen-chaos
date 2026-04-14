@@ -37,7 +37,7 @@
 | Phase 24 | 기존 8장→10장 번호 재편 + WorldMapScene 24챕터 확장 | 🔄 진행중 (24-1 완료) |
 | Phase 25 | 11장 — 용의 주방 심층부 (중식 2장) | 🔄 진행중 (25-1 완료) |
 | Phase 26 | 12장 — 드래곤 웍 최종전 (중식 3장) | 📋 계획 |
-| Phase 27 | 13장 — 별빛 비스트로 (양식 1장) | 📋 계획 |
+| Phase 27 | 13장 — 별빛 비스트로 (양식 1장) | 🔄 진행중 (27-1, 27-2 완료) |
 | Phase 28 | 14장 — 비스트로 심층부 (양식 2장) | 📋 계획 |
 | Phase 29 | 15장 — 셰프 누아르 최종전 (양식 3장) | 📋 계획 |
 | Phase 30 | 챕터 7~15 밸런스 QA | 📋 계획 |
@@ -844,24 +844,26 @@
 
 ---
 
-## Phase 27-1 — 스크립트 (13장: 별빛 비스트로)
+## Phase 27-1 — 스크립트 (13장: 별빛 비스트로) ✅ 완료
 
 > `visual_change: none` | 스토리 대사 집필만
 
-- [ ] dialogueData.js: chapter13_intro 작성 (파리 도착, WCA 유럽 지부장과의 첫 대면)
-- [ ] dialogueData.js: chapter13_mid 작성 (미미와 프랑스 미력사의 만남, 셰프 누아르 첫 언급)
-- [ ] 사이드 대화 1종 (mimi_side_13)
+- [x] dialogueData.js: chapter13_intro 작성 (파리 도착, WCA 유럽 지부장과의 첫 대면)
+- [x] dialogueData.js: chapter13_mid 작성 (미미와 프랑스 미력사의 만남, 셰프 누아르 첫 언급)
+- [x] 사이드 대화 1종 (mimi_side_13)
+- [x] CHARACTERS에 앙드레(andre) 추가 — WCA 유럽 지부장, 0x4169e1
 
 ---
 
-## Phase 27-2 — 에셋 생성 (13장 신규 적)
+## Phase 27-2 — 에셋 생성 (13장 신규 적) ✅ 완료
 
 > `visual_change: art` | PixelLab 스프라이트 + 타일셋
 
-- [ ] wine_specter: HP ~350, 취기 디버프 — PixelLab 생성
-- [ ] foie_gras_knight: HP ~400, 방어 특화 — PixelLab 생성
-- [ ] 양식 비스트로 타일셋 (파리풍 인테리어) — PixelLab tiles
-- [ ] 재료 아이콘: 트러플(truffle) 32px
+- [x] wine_specter: 92px 8방향x8프레임, 보라 유령+글로우 (animating-aaf41951)
+- [x] foie_gras_knight: 92px 8방향x8프레임, 황금 갑옷 기사 (animating-d9b31bcd)
+- [x] bistro_parisian 타일셋: 128px Wang 16타일, 크림 마블+헤링본 패턴
+- [x] 재료 아이콘: 트러플(truffle) 32px 흑보라 계열
+- [x] SpriteLoader.js: ENEMY_IDS 27종, TILESET_IDS 11종, INGREDIENT_FILE_MAP 22종
 
 ---
 
@@ -1308,8 +1310,8 @@
 | 25-3 | 11장 스테이지 + 레시피 | ~136 | 21 | 📋 계획 |
 | 26-1 | 에셋 + 스크립트 (dragon_wok, chapter12) | ~136 | 21 | 📋 계획 |
 | 26-2 | 12장 스테이지 (중식 아크 완성) | ~146 | 21 | 📋 계획 |
-| 27-1 | 스크립트 (chapter13 대사) | ~146 | 21 | 📋 계획 |
-| 27-2 | 에셋 생성 (wine_specter, foie_gras_knight, 타일셋) | ~146 | 21 | 📋 계획 |
+| ~~27-1~~ | ~~스크립트 (chapter13 대사)~~ | 156 | 22 | ✅ 완료 |
+| ~~27-2~~ | ~~에셋 생성 (wine_specter, foie_gras_knight, 타일셋)~~ | 156 | 22 | ✅ 완료 |
 | 27-3 | 13장 스테이지 + 레시피 | ~156 | 22 | 📋 계획 |
 | 28-1 | 스크립트 (chapter14 대사) | ~156 | 22 | 📋 계획 |
 | 28-2 | 에셋 생성 (cellar_phantom, sommelier_wraith, 타일셋) | ~156 | 22 | 📋 계획 |

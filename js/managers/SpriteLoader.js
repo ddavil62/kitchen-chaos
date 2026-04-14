@@ -28,7 +28,7 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (25종, Phase 25-1: shadow_dragon_spawn, wok_guardian 추가) ──
+// ── 적 ID 목록 (27종, Phase 27-2: wine_specter, foie_gras_knight 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
@@ -83,7 +83,7 @@ const INGREDIENT_FILE_MAP = {
   truffle: 'truffle',         // Phase 27-2
 };
 
-// ── 재료 ID 목록 (15종, 게임 내 ID 기준) ──
+// ── 재료 ID 목록 (22종, 게임 내 ID 기준) ──
 const INGREDIENT_IDS = Object.keys(INGREDIENT_FILE_MAP);
 
 // ── 걷기 애니메이션 폴더 해시 맵 (Phase 12) ──
@@ -137,7 +137,7 @@ const WALK_FRAME_COUNT = 6;
 // ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가) ──
 const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao'];
 
-// ── 타일셋 ID 목록 (9종, Phase 22-3: izakaya_underground 추가) ──
+// ── 타일셋 ID 목록 (11종, Phase 27-2: bistro_parisian 추가) ──
 const TILESET_IDS = [
   'pasta_field', 'oriental_bamboo', 'seafood_beach', 'volcano_lava',
   'dessert_cafe', 'grand_finale',

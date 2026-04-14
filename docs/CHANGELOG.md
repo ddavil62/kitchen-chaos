@@ -1,5 +1,67 @@
 # Changelog
 
+## [2026-04-14] - Phase 27-2 13장 에셋 생성
+
+### 추가
+
+- **wine_specter 적 스프라이트** (`assets/enemies/wine_specter/`)
+  - 92x92px, 8방향 x 8프레임 걷기 애니메이션 (animating-aaf41951)
+  - 보라/마젠타 유령 실루엣, 하단 퍼플 글로우, 치비 스타일
+  - HP ~350, 취기 디버프 (게임 로직은 Phase 27-3에서 등록)
+
+- **foie_gras_knight 적 스프라이트** (`assets/enemies/foie_gras_knight/`)
+  - 92x92px, 8방향 x 8프레임 걷기 애니메이션 (animating-d9b31bcd)
+  - 황금 갑옷+방패+투구 기사, 치비 스타일
+  - HP ~400, 방어 특화 (게임 로직은 Phase 27-3에서 등록)
+
+- **bistro_parisian 타일셋** (`assets/tilesets/bistro_parisian.png/.json`)
+  - 128x128px, Wang 16타일, 32x32 tile_size
+  - 크림 화이트 마블 + 흑백 대각선 헤링본 패턴, 파리 비스트로 분위기
+
+- **truffle 재료 아이콘** (`assets/ingredients/truffle.png`)
+  - 32x32px, 흑보라 계열 흑트러플, 불투명 픽셀 415개
+
+### 변경
+
+- **SpriteLoader.js** (`js/managers/SpriteLoader.js`)
+  - ENEMY_IDS: 25종 → 27종 (wine_specter, foie_gras_knight 추가)
+  - ENEMY_WALK_HASHES: wine_specter='animating-aaf41951', foie_gras_knight='animating-d9b31bcd' 추가
+  - TILESET_IDS: 9종 → 11종 (bistro_parisian 추가, 기타 미생성 ID도 선등록)
+  - INGREDIENT_FILE_MAP: 15종 → 22종 (truffle 추가 + 이전 페이즈 누락분 일괄 등록)
+
+### 참고
+
+- AD 리뷰에서 wine_specter REVISE, foie_gras_knight FAIL 판정 후 92px 재생성으로 해결
+- QA 48/48 PASS (Playwright 테스트 14.2s)
+- 주석 3곳 stale 상태 (ENEMY_IDS/INGREDIENT_IDS/TILESET_IDS 수량 주석), 심각도 LOW
+- WALK_FRAME_COUNT=6 vs animating- 에셋 8프레임 불일치는 Phase 21부터 존재하는 기존 설계 (frame_006/007 dead asset)
+- 스펙: `.claude/specs/2026-04-14-kc-phase27-2-scope.md`
+- QA: `.claude/specs/2026-04-14-kc-phase27-2-qa.md`
+- AD: `.claude/specs/2026-04-14-kc-phase27-2-art-review.md`
+
+---
+
+## [2026-04-14] - Phase 27-1 13장 스크립트
+
+### 추가
+
+- **chapter13 대화 3종** (`js/data/dialogueData.js`, 누적 60종)
+  - chapter13_intro (15줄): 파리 도착, WCA 유럽 지부장 앙드레와 첫 대면
+  - chapter13_mid (13줄): 비스트로 심층부 접근, 셰프 누아르 첫 언급
+  - mimi_side_13 (12줄): 파리에서의 팀 일상 (크루아상, 마카롱)
+
+- **CHARACTERS에 앙드레(andre) 추가** (`js/data/dialogueData.js`)
+  - nameKo: 'WCA 유럽 지부장', portrait: emoji, color: 0x4169e1 (로열 블루)
+  - 누적 캐릭터 10종
+
+### 참고
+
+- `pipeline: quick`으로 처리 (스토리 대사 집필만, 코드 로직 변경 없음)
+- 스토리 트리거는 Phase 27-3에서 stageData.js와 함께 등록 예정
+- 스펙: `.claude/specs/2026-04-14-kc-phase27-1-script.md`
+
+---
+
 ## [2026-04-13] - Phase 26 dragon_wok 리워크 + 12장 중식 아크 완성
 
 ### 추가

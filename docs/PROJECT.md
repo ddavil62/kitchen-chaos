@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-13 (Phase 26 완료)
+> 최종 업데이트: 2026-04-14 (Phase 27-2 완료)
 
 ## 프로젝트 개요
 
@@ -109,18 +109,18 @@ kitchen-chaos/
       gameData.js            # 적/도구(TOOL_DEFS)/재료 정의
       stageData.js           # 스테이지 데이터 138슬롯 (그룹1 30 + 그룹2 54 + 그룹3 54, 8장+13~24장 placeholder)
       recipeData.js          # 레시피 156종 정의 (서빙 126 + 버프 30)
-      dialogueData.js        # 대화 스크립트 57종 + 캐릭터 9종 정의 (시즌2 7~12장 22종 포함)
+      dialogueData.js        # 대화 스크립트 60종 + 캐릭터 10종 정의 (시즌2 7~13장 25종 포함)
       storyData.js           # STORY_TRIGGERS 트리거 데이터 56항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
-    sprites/enemies/         # 적 스프라이트 25종 (shadow_dragon_spawn, wok_guardian 64px 8방향 포함)
+    sprites/enemies/         # 적 스프라이트 27종 (wine_specter, foie_gras_knight 92px 8방향 포함)
     sprites/bosses/sake_oni/ # sake_oni 보스 스프라이트 (124x124px, 8방향 rotations + walking-9fa1ac06)
     sprites/bosses/sake_master/ # sake_master 보스 스프라이트 (64px, 8방향 animating-8d3d020e)
     sprites/bosses/dragon_wok/  # dragon_wok 보스 스프라이트 (64px, 8방향 animating-30e6c64f)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
-    tilesets/                # 타일셋 10종 (dragon_lair 포함)
-    icons/                   # 재료 아이콘 21종 (star_anise 32px 포함)
+    tilesets/                # 타일셋 11종 (bistro_parisian 포함)
+    icons/                   # 재료 아이콘 22종 (truffle 32px 포함)
     service/                 # 영업 씬 에셋 15종 (테이블/손님/바닥/카운터/홀 데코)
   tests/                     # Playwright 테스트
   docs/                      # 프로젝트 문서
@@ -137,7 +137,7 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (다이아몬드 격자+depth sorting+홀 데코), 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 57종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 60종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 56항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v16, season3Unlocked, getTotalStars(group) |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
@@ -172,7 +172,7 @@ kitchen-chaos/
 | 도구 시스템 | 영구 도구 8종(+wasabi_cannon 범위/둔화, +spice_grinder DoT), 구매/판매/업그레이드, ToolManager, freezer canTargetInvisible | 완료 |
 | 행상인 | MerchantScene, 영업 후 도구 거래 UI | 완료 |
 | 재료 채집 | GatheringScene, 골드 제거, 보스 재료 드롭, 도구 배치 전용 | 완료 |
-| 대화/스토리 | DialogueManager+StoryManager, 스크립트 57종, 트리거 56항목, 선택지 분기, 초상화 6종, 9캐릭터, 12장 스토리 포함 | 완료 |
+| 대화/스토리 | DialogueManager+StoryManager, 스크립트 60종, 트리거 56항목, 선택지 분기, 초상화 6종, 10캐릭터, 13장 스토리 포함 | 완료 |
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코 3종, 웜 다크 팔레트) + fallback | 완료 |
 | 도구 도감/팝업 | 행상인 ℹ 팝업(스탯바+로어), 도감 도구 탭(3열 그리드+Lv테이블) | 완료 |
 | 7장 사쿠라 이자카야 | 적 3종(sushi_ninja/tempura_monk/sake_oni)+미니보스(oni_herald), 재료 2종, 레시피 10종, 스토리 4종+복선 1종, 은신/배리어/취권/아우라/전령소환 메커닉 | 완료 |
@@ -184,9 +184,9 @@ kitchen-chaos/
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 35종 (일반 25 + 미니보스 1 + 보스 9) |
+| 적 | 37종 (일반 27 + 미니보스 1 + 보스 9) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
-| 재료 | 21종 |
+| 재료 | 22종 |
 | 레시피 | 156종 (서빙 126 + 버프 30) |
 | 스테이지 | 138슬롯 (그룹1: 1~6장 30개 + 그룹2: 7~15장 54개 + 그룹3: 16~24장 54개, 8장+13~24장은 placeholder) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
@@ -200,5 +200,6 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 27: 13장 콘텐츠 또는 신규 아크 (양식 13~15장)
-- 그룹2(7~15장) → 그룹3(16~24장) 챕터 확장. 상세: `docs/ROADMAP.md`
+- Phase 27-3: 13장 스테이지 + 레시피 구현 (적 등록, 스테이지 13-1~13-5, 트러플 레시피)
+- Phase 28~29: 14~15장 (양식 아크 완성). 상세: `docs/ROADMAP.md`
+- 그룹2(7~15장) → 그룹3(16~24장) 챕터 확장
