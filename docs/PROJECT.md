@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-14 (Phase 32-4 완료)
+> 최종 업데이트: 2026-04-14 (Phase 32-5 완료)
 
 ## 프로젝트 개요
 
@@ -107,7 +107,7 @@ kitchen-chaos/
       ChefManager.js         # 셰프 선택/스킬 관리
       OrderManager.js        # 오더(미션) 시스템
     data/
-      gameData.js            # 적(35종)/도구(TOOL_DEFS)/재료(27종) 정의
+      gameData.js            # 적(46종)/도구(TOOL_DEFS)/재료(27종) 정의
       stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~18장, placeholder: 8/14/19~24장)
       recipeData.js          # 레시피 221종 정의 (서빙 180 + 버프 41)
       dialogueData.js        # 대화 스크립트 82종 + 캐릭터 13종 정의 (시즌2 7~15장 31종, 16장 4종, 17장 3종, 18장 6종 포함)
@@ -202,6 +202,7 @@ kitchen-chaos/
 - EndlessScene이 WaveManager를 MonkeyPatch로 연동 (공식 override API 없음)
 - 온라인 랭킹 미구현, 엔드리스 ServiceScene은 1장 기준 config
 - removeBuff()가 모든 멀티플라이어를 전역 초기화하므로, 디버프 동시 적용 시 먼저 만료된 디버프가 나머지도 해제할 수 있음 (기존 설계, 향후 멀티 버프 스택 구현 시 개선)
+- cardamom.png 아이콘은 chai.png 복사본 placeholder (고유 아이콘 미생성)
 
 ## 향후 계획
 

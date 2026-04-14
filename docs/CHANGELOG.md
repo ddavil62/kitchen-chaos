@@ -1,5 +1,62 @@
 # Changelog
 
+## [Phase 32-5] 2026-04-14 — 18장 스테이지 구현 + maharaja/masala_guide/cardamom
+
+### Added
+- gameData.js: ENEMY_TYPES에 masala_guide(마살라 계승자) 추가
+  - HP 330, speed 82, canvasSize 108, confuseOnHit(25%, 2500ms), charge(HP 50%, speed x2.0, 2s/10s CD)
+  - ingredient: cardamom, bodyColor: 0xe67e22, group 2, reward 32
+- gameData.js: ENEMY_TYPES에 maharaja(마하라자, 보스) 추가
+  - HP 2200, speed 20, canvasSize 212, isBoss: true
+  - spiceBlast: 7초마다 반경 100, damageReduction 25% + rangeReduction 20% (4s)
+  - summon: HP 60% 이하 시 masala_guide 3마리 1회 소환
+  - enrage: HP 30% 이하 시 speed 35, spiceBlastInterval 절반
+  - bossDrops: cardamom x4, saffron x3, chai x2, bossReward 480
+- gameData.js: INGREDIENT_TYPES에 cardamom(카다멈, color 0x4caf50) 추가
+- SpriteLoader.js: ENEMY_IDS에 masala_guide 추가 (누적 35종)
+- SpriteLoader.js: BOSS_IDS에 maharaja 추가 (누적 11종)
+- SpriteLoader.js: ENEMY_WALK_HASHES.masala_guide = 'animating-3594d863'
+- SpriteLoader.js: BOSS_WALK_HASHES.maharaja = 'animating-2c666ada'
+- SpriteLoader.js: INGREDIENT_FILE_MAP.cardamom = 'cardamom'
+- stageData.js: 18-1~18-6 placeholder → 완성 (theme: 'spice_palace', 5웨이브)
+  - 18-1 황금 회랑: 세로→가로→세로 경로, 진입 난이도 (17-5보다 약간 낮음)
+  - 18-2 향신료 회랑: S자형 경로, 완만한 상승
+  - 18-3 마살라 문파 도장: masala_guide 대거 등장 고밀도
+  - 18-4 황금 왕좌실 전실: 17-5 수준 도달 시작
+  - 18-5 향신료 왕국의 정점: 17-5 수준 상한 도달
+  - 18-6 마하라자의 왕좌: 일반 4웨이브 + maharaja 보스전(wave 5)
+- recipeData.js: 서빙 레시피 7종 추가
+  - cardamom_tea (2성, gateStage 18-1, baseReward 78)
+  - spiced_cardamom_bread (2성, 18-1, 85)
+  - cardamom_masala_bowl (3성, 18-2, 115)
+  - masala_lamb (3성, 18-2, 128)
+  - maharaja_grand_platter (5성, 18-3, 348)
+  - spice_throne_feast (5성, 18-4, 378)
+  - maharaja_final_banquet (5성, 18-5, 415)
+- recipeData.js: 버프 레시피 1종 추가
+  - cardamom_aura (4성, 18-3, 혼란 면역 + 공격력 +20%, 2웨이브)
+- 에셋: assets/bosses/maharaja/ (212x212px pro, 8방향 rotations + animating-2c666ada 8방향x8프레임)
+- 에셋: assets/enemies/masala_guide/ (108x108px pro, 8방향 rotations + animating-3594d863 8방향x8프레임)
+- 에셋: assets/ingredients/cardamom.png (chai.png 복사 placeholder)
+
+### Changed
+- gameData.js: 파일 상단 주석 갱신 (적 35종, 재료 27종)
+- SpriteLoader.js: 파일 상단 주석 갱신 (Phase 32-5 내역)
+- recipeData.js: 파일 상단 주석 갱신 (누적 221종)
+
+### 스펙 대비 변경
+- canvasSize: 스펙(maharaja 192, masala_guide 160) → 실측(maharaja 212, masala_guide 108)으로 변경 (AD 모드2 에셋 크기 기준)
+- 레시피 누적: 스펙 222종 → 실제 221종 (213+7+1=221, 스펙 산술 오류 수정)
+- palace_cardamom_feast: 스펙 stageData 고객 dish에 있었으나 recipeData에 미정의 → maharaja_grand_platter로 대체
+
+### 참고
+- 스펙: `.claude/specs/2026-04-14-kc-phase32-5-spec.md`
+- QA: `.claude/specs/2026-04-14-kc-phase32-5-qa.md` (33/33 PASS)
+- cardamom.png는 placeholder (chai.png 복사). 고유 아이콘은 추후 페이즈에서 생성 예정
+- maharaja의 spiceBlast/summon/enrage 기믹은 gameData.js 데이터 정의만 완료, 런타임 로직은 기존 보스 처리 코드에 의존
+
+---
+
 ## [Phase 32-4] 2026-04-14 — 18장 대화 스크립트 6종
 
 ### Added
