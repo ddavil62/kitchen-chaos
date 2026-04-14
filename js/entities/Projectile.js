@@ -96,7 +96,7 @@ export class Projectile extends Phaser.GameObjects.Arc {
     }
 
     // ── 기본 피해 적용 ──
-    this.target.takeDamage(this.damage);
+    this.target.takeDamage(this.damage, this.towerType);
 
     // ── wasabi_cannon: 범위 공격 + 둔화 ──
     if (this.splashRadius > 0) {
@@ -110,7 +110,7 @@ export class Projectile extends Phaser.GameObjects.Arc {
           if (!enemy.active || enemy.isDead || enemy === this.target) return;
           const dist = Phaser.Math.Distance.Between(hitX, hitY, enemy.x, enemy.y);
           if (dist <= this.splashRadius) {
-            enemy.takeDamage(splashDamage);
+            enemy.takeDamage(splashDamage, this.towerType);
             // 범위 내 모든 적에게 둔화
             if (this.slowRate && !enemy.isDead) {
               enemy.applySlow(1 - this.slowRate, this.splashSlowDuration);

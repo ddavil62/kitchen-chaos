@@ -9,6 +9,7 @@
  * Phase 27-3: + 서빙 8종 + 버프 2종 = 166종 (13장 별빛 비스트로).
  * Phase 29-2: + 서빙 16종 + 버프 4종 = 186종 (15장 카타콩브).
  * Phase 31-3: + 서빙 13종 + 버프 2종 = 201종 (16장 향신료 궁전).
+ * Phase 32-3: + 서빙 10종 + 버프 2종 = 213종 (17장 향신료 궁전 심층부).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -985,6 +986,66 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { saffron: 2, curry_leaf: 2, meat: 1, butter: 1, truffle: 1, rice: 1 }, baseReward: 250, cookTime: 19500,
     unlockCost: 430, gateStage: '16-5',
   },
+
+  // ── Phase 32-3 신규 서빙 레시피 (17장 향신료 궁전 심층부) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'chai_masala', nameKo: '차이 마살라', icon: '☕', category: 'soup',
+    tier: 2, ingredients: { chai: 1 }, baseReward: 75, cookTime: 6500,
+    unlockCost: 55, gateStage: '17-1',
+  },
+  {
+    id: 'spiced_chai_bread', nameKo: '스파이스 차이 브레드', icon: '🍞', category: 'grill',
+    tier: 2, ingredients: { chai: 1, flour: 1 }, baseReward: 80, cookTime: 7000,
+    unlockCost: 60, gateStage: '17-1',
+  },
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'chai_rice', nameKo: '차이 라이스', icon: '🍚', category: 'fry',
+    tier: 3, ingredients: { chai: 1, rice: 1 }, baseReward: 105, cookTime: 8500,
+    unlockCost: 88, gateStage: '17-1',
+  },
+  {
+    id: 'incense_soup', nameKo: '향 수프', icon: '🍲', category: 'soup',
+    tier: 3, ingredients: { chai: 1, saffron: 1 }, baseReward: 112, cookTime: 9000,
+    unlockCost: 95, gateStage: '17-2',
+  },
+
+  // ★★★★ 4성 (2종)
+  {
+    id: 'chai_chicken', nameKo: '차이 치킨', icon: '🍛', category: 'special',
+    tier: 4, ingredients: { chai: 1, meat: 1, curry_leaf: 1, butter: 1 }, baseReward: 145, cookTime: 12000,
+    unlockCost: 180, gateStage: '17-2',
+  },
+  {
+    id: 'deep_spice_stew', nameKo: '깊은 향신료 스튜', icon: '🫕', category: 'special',
+    tier: 4, ingredients: { chai: 1, saffron: 1, meat: 1, curry_leaf: 1 }, baseReward: 152, cookTime: 12500,
+    unlockCost: 190, gateStage: '17-3',
+  },
+
+  // ★★★★★ 5성 (4종)
+  {
+    id: 'chai_grand_curry', nameKo: '차이 그랑 카레', icon: '🌟', category: 'special',
+    tier: 5, ingredients: { chai: 2, saffron: 1, meat: 1, butter: 1, curry_leaf: 1 }, baseReward: 265, cookTime: 17500,
+    unlockCost: 425, gateStage: '17-3',
+  },
+  {
+    id: 'incense_palace_feast', nameKo: '향 궁전 피스트', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { chai: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 1 }, baseReward: 285, cookTime: 18500,
+    unlockCost: 460, gateStage: '17-4',
+  },
+  {
+    id: 'elemental_platter', nameKo: '원소 플래터', icon: '🎖️', category: 'special',
+    tier: 5, ingredients: { chai: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 2 }, baseReward: 308, cookTime: 19500,
+    unlockCost: 495, gateStage: '17-4',
+  },
+  {
+    id: 'sanctum_grand_feast', nameKo: '성역 그랑 피스트', icon: '🏆', category: 'special',
+    tier: 5, ingredients: { chai: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 2, truffle: 1 }, baseReward: 335, cookTime: 20500,
+    unlockCost: 540, gateStage: '17-5',
+  },
 ];
 
 /**
@@ -1287,6 +1348,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.45,
     duration: 2, durationUnit: 'wave',
     unlockCost: 120, gateStage: '16-4',
+  },
+
+  // ── Phase 32-3 신규 버프 레시피 (17장 향신료 궁전 심층부) ──
+  {
+    id: 'chai_shield', nameKo: '차이 방어막', icon: '☕', category: 'buff',
+    tier: 3, ingredients: { chai: 2 },
+    effectDesc: '받는 피해 -20% (2웨이브)',
+    effectType: 'buff_defense',
+    effectValue: 0.20,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 82, gateStage: '17-2',
+  },
+  {
+    id: 'incense_blessing', nameKo: '향의 축복', icon: '🌸', category: 'buff',
+    tier: 4, ingredients: { chai: 1, saffron: 1, curry_leaf: 1 },
+    effectDesc: '공격력+속도 +50% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.50,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 135, gateStage: '17-4',
   },
 ];
 

@@ -11,6 +11,7 @@
  * Phase 25-1: 어둠 디버프(darkDebuff) + wok_guardian 전면 방어 70%(shieldFrontHeavy) 메카닉.
  * Phase 26-1: 양조 주기(brewCycle) + 봉인 방어막(sealShield) + hpOverride 스폰 파라미터 메카닉.
  * Phase 31-3: 텔레포트(teleportEnabled) 메카닉 (curry_djinn).
+ * Phase 32-3: 원소 저항(elementalResistance) + 혼란 디버프(confuseOnHit) 메카닉.
  */
 
 import Phaser from 'phaser';
@@ -859,8 +860,11 @@ export class Enemy extends Phaser.GameObjects.Container {
     return 'south';
   }
 
-  /** @param {number} amount */
-  takeDamage(amount) {
+  /**
+   * @param {number} amount - 피해량
+   * @param {string|null} [towerType=null] - 피해를 준 타워 타입 ID (Projectile._hit에서 전달)
+   */
+  takeDamage(amount, towerType = null) {
     if (this.isDead) return;
 
     // Phase 20: 배리어 활성 시 피해 무효
@@ -874,6 +878,12 @@ export class Enemy extends Phaser.GameObjects.Container {
     // wok_guardian: 전면 피해 70% 감소 (이동 방향 기준, 전면 피격으로 간주)
     if (this.data_.shieldFrontHeavy && this.waypointIndex < this._waypoints.length) {
       amount *= (1 - this.data_.shieldFrontHeavy);
+    }
+
+    // Phase 32-3: 원소 저항 (spice_elemental) — resistTypes 타워 피해 50% 감산
+    if (this.data_.elementalResistance && towerType &&
+        this.data_.resistTypes.includes(towerType)) {
+      amount *= this.data_.resistMultiplier;
     }
 
     // Phase 26-1: 봉인 방어막 (sake_master) — 방어막이 피해를 흡수
@@ -911,6 +921,15 @@ export class Enemy extends Phaser.GameObjects.Container {
     }
 
     this.hp -= amount;
+
+    // Phase 32-3: 혼란 디버프 (incense_specter) — 피격 시 confuseChance 확률로 이벤트 emit
+    if (this.data_.confuseOnHit && Math.random() < this.data_.confuseChance) {
+      this.scene.events.emit('enemy_confuse', {
+        x: this.x, y: this.y,
+        duration: this.data_.confuseDuration,
+      });
+    }
+
     const ratio = Math.max(0, this.hp / this.maxHp);
     this.hpBar.width = 26 * ratio;
     if (ratio < 0.4) this.hpBar.setFillStyle(0xff4444);

@@ -8,6 +8,7 @@
  * Phase 27-3: 13-1~13-5 스테이지 구현. 테마: bistro_parisian.
  * Phase 29-2: 13-6 + 15-1~15-6 (카타콩브) 구현 완료.
  * Phase 31-3: 16-1~16-5 (향신료 궁전) 구현 완료. curry_djinn 16-3 첫 등장, naan_golem 16-4 첫 등장.
+ * Phase 32-3: 17-1~17-5 (향신료 궁전 심층부) 구현 완료. incense_specter 17-3 첫 등장, spice_elemental 17-4 첫 등장.
  * 각 스테이지는 고유 경로, 웨이브, 손님 구성을 가진다.
  */
 
@@ -6644,11 +6645,307 @@ export const STAGES = {
 
   // ── 16-6 placeholder (보스전, Phase 31-3 스코프 외) ──
   '16-6': { id: '16-6', nameKo: '미구현', theme: 'placeholder' },
-  '17-1': { id: '17-1', nameKo: '미구현', theme: 'placeholder' },
-  '17-2': { id: '17-2', nameKo: '미구현', theme: 'placeholder' },
-  '17-3': { id: '17-3', nameKo: '미구현', theme: 'placeholder' },
-  '17-4': { id: '17-4', nameKo: '미구현', theme: 'placeholder' },
-  '17-5': { id: '17-5', nameKo: '미구현', theme: 'placeholder' },
+  // ── 17-1: 향신료 궁전 내원 ──
+  '17-1': {
+    id: '17-1',
+    nameKo: '향신료 궁전 내원',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // W자 변형 (가로→세로→가로→세로)
+    pathSegments: [
+      { type: 'horizontal', row: 0, colStart: 0, colEnd: 5 },
+      { type: 'vertical', col: 5, rowStart: 0, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 5 },
+      { type: 'vertical', col: 2, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'curry_djinn', count: 14, interval: 1750 },
+        { type: 'naan_golem', count: 12, interval: 2000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'curry_djinn', count: 18, interval: 1600 },
+        { type: 'naan_golem', count: 15, interval: 1850 },
+        { type: 'foie_gras_knight', count: 20, interval: 1150 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'curry_djinn', count: 22, interval: 1480 },
+        { type: 'naan_golem', count: 18, interval: 1720 },
+        { type: 'foie_gras_knight', count: 26, interval: 1060 },
+        { type: 'butter_ghost', count: 18, interval: 640 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'curry_djinn', count: 26, interval: 1360 },
+        { type: 'naan_golem', count: 21, interval: 1600 },
+        { type: 'foie_gras_knight', count: 32, interval: 980 },
+        { type: 'milk_phantom', count: 20, interval: 900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'curry_djinn', count: 32, interval: 1240 },
+        { type: 'naan_golem', count: 25, interval: 1480 },
+        { type: 'foie_gras_knight', count: 40, interval: 900 },
+        { type: 'butter_ghost', count: 22, interval: 600 },
+        { type: 'mushroom_scout', count: 18, interval: 780 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'chai_masala', patience: 9000, baseReward: 158, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'spiced_chai_bread', patience: 8500, baseReward: 172, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'chai_rice', patience: 8500, baseReward: 190, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'chai_rice', patience: 8000, baseReward: 210, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'incense_soup', patience: 8000, baseReward: 232, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 36, two: 28 },
+    service: { duration: 348, customerInterval: 2.1, maxCustomers: 59, customerPatience: 20 },
+  },
+
+  // ── 17-2: 향신료 제단 ──
+  '17-2': {
+    id: '17-2',
+    nameKo: '향신료 제단',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 대각 Z자형 (세로→가로→세로→가로)
+    pathSegments: [
+      { type: 'vertical', col: 7, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 4, rowEnd: 8 },
+      { type: 'horizontal', row: 8, colStart: 1, colEnd: 8 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'curry_djinn', count: 16, interval: 1680 },
+        { type: 'naan_golem', count: 14, interval: 1920 },
+        { type: 'foie_gras_knight', count: 22, interval: 1100 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'curry_djinn', count: 20, interval: 1540 },
+        { type: 'naan_golem', count: 17, interval: 1780 },
+        { type: 'foie_gras_knight', count: 28, interval: 1020 },
+        { type: 'milk_phantom', count: 16, interval: 880 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'curry_djinn', count: 24, interval: 1420 },
+        { type: 'naan_golem', count: 20, interval: 1660 },
+        { type: 'foie_gras_knight', count: 34, interval: 940 },
+        { type: 'cheese_golem', count: 12, interval: 1600 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'curry_djinn', count: 28, interval: 1300 },
+        { type: 'naan_golem', count: 23, interval: 1540 },
+        { type: 'foie_gras_knight', count: 40, interval: 860 },
+        { type: 'butter_ghost', count: 20, interval: 620 },
+        { type: 'mushroom_scout', count: 16, interval: 760 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'curry_djinn', count: 34, interval: 1180 },
+        { type: 'naan_golem', count: 27, interval: 1420 },
+        { type: 'foie_gras_knight', count: 48, interval: 780 },
+        { type: 'milk_phantom', count: 24, interval: 860 },
+        { type: 'cheese_golem', count: 14, interval: 1550 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'chai_rice', patience: 9000, baseReward: 175, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'incense_soup', patience: 8500, baseReward: 192, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'chai_chicken', patience: 8500, baseReward: 210, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'chai_chicken', patience: 8000, baseReward: 228, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'deep_spice_stew', patience: 8000, baseReward: 252, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 37, two: 29 },
+    service: { duration: 352, customerInterval: 2.1, maxCustomers: 60, customerPatience: 20 },
+  },
+
+  // ── 17-3: 향 제례당 (incense_specter 첫 등장) ──
+  '17-3': {
+    id: '17-3',
+    nameKo: '향 제례당',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 역U자형 (가로→세로→가로)
+    pathSegments: [
+      { type: 'horizontal', row: 2, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 2, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 0, colEnd: 8 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'curry_djinn', count: 20, interval: 1580 },
+        { type: 'naan_golem', count: 16, interval: 1820 },
+        { type: 'foie_gras_knight', count: 24, interval: 1050 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'curry_djinn', count: 24, interval: 1460 },
+        { type: 'naan_golem', count: 19, interval: 1700 },
+        { type: 'foie_gras_knight', count: 30, interval: 970 },
+        { type: 'butter_ghost', count: 18, interval: 610 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'curry_djinn', count: 28, interval: 1340 },
+        { type: 'naan_golem', count: 22, interval: 1580 },
+        { type: 'incense_specter', count: 6, interval: 2400 },
+        { type: 'milk_phantom', count: 18, interval: 870 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'curry_djinn', count: 32, interval: 1220 },
+        { type: 'naan_golem', count: 25, interval: 1460 },
+        { type: 'incense_specter', count: 9, interval: 2200 },
+        { type: 'butter_ghost', count: 20, interval: 595 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'curry_djinn', count: 36, interval: 1120 },
+        { type: 'naan_golem', count: 28, interval: 1360 },
+        { type: 'incense_specter', count: 12, interval: 2000 },
+        { type: 'cheese_golem', count: 12, interval: 1550 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'curry_djinn', count: 42, interval: 1020 },
+        { type: 'naan_golem', count: 32, interval: 1260 },
+        { type: 'incense_specter', count: 16, interval: 1800 },
+        { type: 'milk_phantom', count: 22, interval: 840 },
+        { type: 'mushroom_scout', count: 16, interval: 740 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'chai_chicken', patience: 9000, baseReward: 195, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'deep_spice_stew', patience: 8500, baseReward: 215, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'chai_grand_curry', patience: 8500, baseReward: 238, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'chai_grand_curry', patience: 8000, baseReward: 262, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'incense_palace_feast', patience: 8000, baseReward: 288, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'incense_palace_feast', patience: 8000, baseReward: 318, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 39, two: 30 },
+    service: { duration: 358, customerInterval: 2.0, maxCustomers: 62, customerPatience: 19 },
+  },
+
+  // ── 17-4: 정령 의식장 (spice_elemental 첫 등장) ──
+  '17-4': {
+    id: '17-4',
+    nameKo: '정령 의식장',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 계단형 (가로→세로→가로→세로)
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 4 },
+      { type: 'vertical', col: 4, rowStart: 1, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 4, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'curry_djinn', count: 24, interval: 1440 },
+        { type: 'naan_golem', count: 20, interval: 1660 },
+        { type: 'incense_specter', count: 8, interval: 2100 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'curry_djinn', count: 28, interval: 1320 },
+        { type: 'naan_golem', count: 23, interval: 1540 },
+        { type: 'incense_specter', count: 11, interval: 1940 },
+        { type: 'spice_elemental', count: 5, interval: 2600 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'curry_djinn', count: 32, interval: 1200 },
+        { type: 'naan_golem', count: 26, interval: 1420 },
+        { type: 'incense_specter', count: 14, interval: 1780 },
+        { type: 'spice_elemental', count: 8, interval: 2400 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'curry_djinn', count: 36, interval: 1100 },
+        { type: 'naan_golem', count: 29, interval: 1320 },
+        { type: 'incense_specter', count: 17, interval: 1640 },
+        { type: 'spice_elemental', count: 11, interval: 2200 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'curry_djinn', count: 42, interval: 1000 },
+        { type: 'naan_golem', count: 33, interval: 1220 },
+        { type: 'incense_specter', count: 20, interval: 1520 },
+        { type: 'spice_elemental', count: 14, interval: 2040 },
+        { type: 'butter_ghost', count: 18, interval: 590 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'curry_djinn', count: 50, interval: 900 },
+        { type: 'naan_golem', count: 38, interval: 1120 },
+        { type: 'incense_specter', count: 24, interval: 1400 },
+        { type: 'spice_elemental', count: 18, interval: 1880 },
+        { type: 'milk_phantom', count: 20, interval: 820 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'incense_palace_feast', patience: 9000, baseReward: 255, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'elemental_platter', patience: 8500, baseReward: 280, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'elemental_platter', patience: 8500, baseReward: 308, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'sanctum_grand_feast', patience: 8000, baseReward: 338, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'sanctum_grand_feast', patience: 8000, baseReward: 372, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'sanctum_grand_feast', patience: 8000, baseReward: 410, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 41, two: 32 },
+    service: { duration: 364, customerInterval: 2.0, maxCustomers: 64, customerPatience: 19 },
+  },
+
+  // ── 17-5: 향신료 성역 (클라이맥스) ──
+  '17-5': {
+    id: '17-5',
+    nameKo: '향신료 성역',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 십자 역방향형 (세로→가로→세로)
+    pathSegments: [
+      { type: 'vertical', col: 3, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 6, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'incense_specter', count: 18, interval: 1750 },
+        { type: 'spice_elemental', count: 12, interval: 2200 },
+        { type: 'curry_djinn', count: 30, interval: 1180 },
+        { type: 'naan_golem', count: 22, interval: 1400 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'incense_specter', count: 24, interval: 1600 },
+        { type: 'spice_elemental', count: 16, interval: 2040 },
+        { type: 'curry_djinn', count: 36, interval: 1080 },
+        { type: 'naan_golem', count: 26, interval: 1300 },
+        { type: 'butter_ghost', count: 20, interval: 580 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'incense_specter', count: 30, interval: 1460 },
+        { type: 'spice_elemental', count: 20, interval: 1880 },
+        { type: 'curry_djinn', count: 44, interval: 990 },
+        { type: 'naan_golem', count: 30, interval: 1220 },
+        { type: 'milk_phantom', count: 22, interval: 800 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'incense_specter', count: 37, interval: 1340 },
+        { type: 'spice_elemental', count: 25, interval: 1740 },
+        { type: 'curry_djinn', count: 52, interval: 900 },
+        { type: 'naan_golem', count: 35, interval: 1140 },
+        { type: 'cheese_golem', count: 14, interval: 1520 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'incense_specter', count: 45, interval: 1200 },
+        { type: 'spice_elemental', count: 30, interval: 1600 },
+        { type: 'curry_djinn', count: 62, interval: 810 },
+        { type: 'naan_golem', count: 42, interval: 1060 },
+        { type: 'butter_ghost', count: 24, interval: 560 },
+        { type: 'mushroom_scout', count: 20, interval: 720 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'chai_grand_curry', patience: 9000, baseReward: 302, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'elemental_platter', patience: 8500, baseReward: 335, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'sanctum_grand_feast', patience: 8500, baseReward: 372, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'sanctum_grand_feast', patience: 8000, baseReward: 412, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'sanctum_grand_feast', patience: 8000, baseReward: 458, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 43, two: 33 },
+    service: { duration: 370, customerInterval: 1.9, maxCustomers: 66, customerPatience: 18 },
+  },
   '17-6': { id: '17-6', nameKo: '미구현', theme: 'placeholder' },
   '18-1': { id: '18-1', nameKo: '미구현', theme: 'placeholder' },
   '18-2': { id: '18-2', nameKo: '미구현', theme: 'placeholder' },
