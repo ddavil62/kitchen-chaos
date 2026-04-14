@@ -1000,13 +1000,14 @@
 
 ---
 
-## Phase 32-1 — 스크립트 (17장: 향신료 궁전 심층부)
+## Phase 32-1 — 스크립트 (17장: 향신료 궁전 심층부) ✅
 
 > `visual_change: none` | 스토리 대사 집필만
 
-- [ ] dialogueData.js: chapter17_intro 작성 (가문의 비밀 — 향신료 금고 발견)
-- [ ] dialogueData.js: chapter17_mid 작성 (마하라자의 음모 일부 공개)
-- [ ] 사이드 대화 1종
+- [x] dialogueData.js: chapter17_intro 작성 (가문의 비밀 — 향신료 금고 발견)
+- [x] dialogueData.js: chapter17_mid 작성 (마하라자의 음모 일부 공개)
+- [x] 사이드 대화 1종 (team_side_17)
+- [x] chapter16_epilogue 추가 (16-5 클리어 직후 에필로그, 스펙 외 추가)
 
 ---
 
@@ -1342,7 +1343,7 @@
 | ~~31-1~~ | ~~스크립트 (chapter16 대사)~~ | 186 | 25 | ✅ 완료 |
 | ~~31-2~~ | ~~에셋 생성 (curry_djinn, naan_golem, 타일셋)~~ | 186 | 25 | ✅ 완료 |
 | ~~31-3~~ | ~~16장 스테이지 + 레시피~~ | 201 | 25 | ✅ 완료 |
-| 32-1 | 스크립트 (chapter17 대사) | ~196 | 25 | 📋 계획 |
+| ~~32-1~~ | ~~스크립트 (chapter17 대사)~~ | 201 | 25 | ✅ 완료 |
 | 32-2 | 에셋 생성 (incense_specter, spice_elemental, 타일셋) | ~196 | 25 | 📋 계획 |
 | 32-3 | 17장 스테이지 + 레시피 | ~206 | 26 | 📋 계획 |
 | 33-1 | 에셋 + 스크립트 (spice_maharaja, chapter18) | ~206 | 26 | 📋 계획 |

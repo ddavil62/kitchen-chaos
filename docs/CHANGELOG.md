@@ -1,5 +1,26 @@
 # Changelog
 
+## [Phase 32-1] 2026-04-14
+
+### Added
+- dialogueData.js: 대화 스크립트 4종 추가 (누적 76종)
+  - chapter16_epilogue: 16-5 클리어 직후, 심층부 진입 결의
+  - chapter17_intro: 17-1 진입 시, 향신료 금고 발견
+  - chapter17_mid: 17-3 클리어 후, 마하라자의 음모 일부 공개
+  - team_side_17: merchant_enter에서 1회, 17장 진입 후 팀원 리액션
+- storyData.js: 트리거 4건 추가 (누적 77항목)
+  - chapter16_epilogue: result_clear 16-5 첫 클리어, currentChapter=17 설정
+  - chapter17_intro: gathering_enter 17-1 진입 시
+  - chapter17_mid: result_clear 17-3 첫 클리어, chapter17_mid_seen 플래그
+  - team_side_17: merchant_enter, currentChapter >= 17 조건
+- storyData.js: stage_first_clear 제외 목록에 16-5, 17-1, 17-3 추가
+
+### 참고
+- 커밋: e074e70
+- 스펙: 없음 (quick 모드, visual_change: none)
+
+---
+
 ## [Phase 31-3] 2026-04-14
 
 ### Added

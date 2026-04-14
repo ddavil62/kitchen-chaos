@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-14 (Phase 31-3 완료)
+> 최종 업데이트: 2026-04-14 (Phase 32-1 완료)
 
 ## 프로젝트 개요
 
@@ -109,8 +109,8 @@ kitchen-chaos/
       gameData.js            # 적/도구(TOOL_DEFS)/재료 정의
       stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~16장, placeholder: 8/14/17~24장)
       recipeData.js          # 레시피 201종 정의 (서빙 163 + 버프 38)
-      dialogueData.js        # 대화 스크립트 72종 + 캐릭터 11종 정의 (시즌2 7~15장 31종, 16장 3종 포함)
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 68항목 (triggerPoint 8종, import SaveManager)
+      dialogueData.js        # 대화 스크립트 76종 + 캐릭터 11종 정의 (시즌2 7~15장 31종, 16장 4종, 17장 3종 포함)
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 77항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
@@ -138,8 +138,8 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (다이아몬드 격자+depth sorting+홀 데코), 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 72종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 68항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 76종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 77항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v16, season3Unlocked, getTotalStars(group) |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
@@ -171,12 +171,13 @@ kitchen-chaos/
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
 | 도구/행상인/채집 | 영구 도구 8종, 구매/판매/업그레이드, 행상인 UI, 재료 채집 TD, 도구 도감/팝업 | 완료 |
-| 대화/스토리 | 스크립트 72종, 트리거 68항목, 선택지 분기, 초상화 6종, 11캐릭터 | 완료 |
+| 대화/스토리 | 스크립트 76종, 트리거 77항목, 선택지 분기, 초상화 6종, 11캐릭터 | 완료 |
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코, 웜 다크 팔레트) | 완료 |
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 16장 향신료 궁전 대화 스크립트 (Phase 31-1) | 대화 3종 추가 (chapter16_intro/mid/team_side_16), 15장 트리거 5건 + 16장 트리거 3건 등록 | 완료 |
 | 16장 에셋 생성 (Phase 31-2) | 적 2종(curry_djinn, naan_golem), spice_palace 타일셋, 재료 아이콘 2종(curry_leaf, saffron) | 완료 |
 | 16장 스테이지+레시피 (Phase 31-3) | 스테이지 16-1~16-5 구현, 인도 요리 레시피 15종, curry_djinn 텔레포트/naan_golem 자가회복 메커닉 | 완료 |
+| 17장 대화 스크립트 (Phase 32-1) | 16장 에필로그 + 17장 대화 3종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17), 트리거 4건 등록 | 완료 |
 
 ## 콘텐츠 규모
 
