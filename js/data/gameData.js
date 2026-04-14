@@ -944,13 +944,13 @@ export const INGREDIENT_TYPES = {
     id: 'curry_leaf',
     nameKo: '카레 잎',
     color: 0x2e7d32,   // 짙은 녹색
-    icon: '🌿',        // 임시. 실제 아이콘은 curry_leaf.png로 교체
+    icon: 'assets/ingredients/curry_leaf.png',
   },
   saffron: {
     id: 'saffron',
     nameKo: '사프란',
     color: 0xff6f00,   // 황금 오렌지
-    icon: '✨',        // 임시. 실제 아이콘은 saffron.png로 교체
+    icon: 'assets/ingredients/saffron.png',
   },
 };
 

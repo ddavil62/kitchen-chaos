@@ -8,6 +8,7 @@
  * Phase 26-1: + 서빙 8종 + 버프 2종 = 156종 (12장 용의 궁전 결전).
  * Phase 27-3: + 서빙 8종 + 버프 2종 = 166종 (13장 별빛 비스트로).
  * Phase 29-2: + 서빙 16종 + 버프 4종 = 186종 (15장 카타콩브).
+ * Phase 31-3: + 서빙 13종 + 버프 2종 = 201종 (16장 향신료 궁전).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -909,6 +910,81 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { herb_bundle: 2, truffle: 2, meat: 1, mushroom: 1, butter: 1, egg: 1 }, baseReward: 225, cookTime: 18500,
     unlockCost: 380, gateStage: '15-6',
   },
+
+  // ── Phase 31-3 신규 서빙 레시피 (16장 향신료 궁전) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'curry_leaf_soup', nameKo: '카레 잎 수프', icon: '🍲', category: 'soup',
+    tier: 2, ingredients: { curry_leaf: 1 }, baseReward: 68, cookTime: 6500,
+    unlockCost: 50, gateStage: '16-1',
+  },
+  {
+    id: 'spiced_flatbread', nameKo: '스파이스 플랫브레드', icon: '🫓', category: 'grill',
+    tier: 2, ingredients: { curry_leaf: 1, flour: 1 }, baseReward: 72, cookTime: 7000,
+    unlockCost: 54, gateStage: '16-1',
+  },
+
+  // ★★★ 3성 (3종)
+  {
+    id: 'saffron_rice', nameKo: '사프란 라이스', icon: '🍚', category: 'fry',
+    tier: 3, ingredients: { saffron: 1, rice: 1 }, baseReward: 95, cookTime: 8500,
+    unlockCost: 80, gateStage: '16-1',
+  },
+  {
+    id: 'curry_leaf_saute', nameKo: '카레 잎 소테', icon: '🍳', category: 'fry',
+    tier: 3, ingredients: { curry_leaf: 1, butter: 1 }, baseReward: 92, cookTime: 8500,
+    unlockCost: 78, gateStage: '16-1',
+  },
+  {
+    id: 'tandoori_grill', nameKo: '탄두리 구이', icon: '🍗', category: 'grill',
+    tier: 3, ingredients: { curry_leaf: 1, meat: 1, saffron: 1 }, baseReward: 108, cookTime: 9500,
+    unlockCost: 96, gateStage: '16-2',
+  },
+
+  // ★★★★ 4성 (3종)
+  {
+    id: 'butter_chicken', nameKo: '버터 치킨', icon: '🍛', category: 'special',
+    tier: 4, ingredients: { curry_leaf: 1, butter: 1, meat: 1, saffron: 1 }, baseReward: 132, cookTime: 12000,
+    unlockCost: 165, gateStage: '16-3',
+  },
+  {
+    id: 'saffron_kheer', nameKo: '사프란 키르', icon: '🍮', category: 'dessert',
+    tier: 4, ingredients: { saffron: 1, rice: 1, egg: 1, butter: 1 }, baseReward: 128, cookTime: 11500,
+    unlockCost: 158, gateStage: '16-3',
+  },
+  {
+    id: 'saffron_biryani', nameKo: '사프란 비리야니', icon: '🍛', category: 'special',
+    tier: 4, ingredients: { saffron: 1, curry_leaf: 1, rice: 1, meat: 1 }, baseReward: 138, cookTime: 12500,
+    unlockCost: 172, gateStage: '16-4',
+  },
+
+  // ★★★★★ 5성 (5종)
+  {
+    id: 'spice_palace_curry', nameKo: '향신료 궁전 카레', icon: '🫕', category: 'special',
+    tier: 5, ingredients: { curry_leaf: 2, saffron: 1, meat: 1, butter: 1 }, baseReward: 195, cookTime: 16000,
+    unlockCost: 315, gateStage: '16-3',
+  },
+  {
+    id: 'biryani_grand', nameKo: '비리야니 그랑', icon: '🌟', category: 'special',
+    tier: 5, ingredients: { saffron: 1, curry_leaf: 2, rice: 1, meat: 1, egg: 1 }, baseReward: 205, cookTime: 17000,
+    unlockCost: 345, gateStage: '16-4',
+  },
+  {
+    id: 'spice_palace_tasting', nameKo: '향신료 궁전 테이스팅', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { saffron: 1, curry_leaf: 1, meat: 1, butter: 1, truffle: 1 }, baseReward: 215, cookTime: 17500,
+    unlockCost: 360, gateStage: '16-4',
+  },
+  {
+    id: 'maharaja_feast', nameKo: '마하라자 피스트', icon: '🎖️', category: 'special',
+    tier: 5, ingredients: { saffron: 2, curry_leaf: 2, meat: 1, butter: 1, egg: 1 }, baseReward: 230, cookTime: 18500,
+    unlockCost: 395, gateStage: '16-5',
+  },
+  {
+    id: 'saffron_grand_platter', nameKo: '사프란 그랑 플래터', icon: '🏆', category: 'special',
+    tier: 5, ingredients: { saffron: 2, curry_leaf: 2, meat: 1, butter: 1, truffle: 1, rice: 1 }, baseReward: 250, cookTime: 19500,
+    unlockCost: 430, gateStage: '16-5',
+  },
 ];
 
 /**
@@ -1191,6 +1267,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.30,
     duration: 3, durationUnit: 'wave',
     unlockCost: 125, gateStage: '15-5',
+  },
+
+  // ── Phase 31-3 신규 버프 레시피 (16장 향신료 궁전) ──
+  {
+    id: 'curry_aura', nameKo: '카레 오라', icon: '🌿', category: 'buff',
+    tier: 3, ingredients: { curry_leaf: 2 },
+    effectDesc: '이동속도 -30% (2웨이브)',
+    effectType: 'debuff_slow',
+    effectValue: 0.30,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 76, gateStage: '16-2',
+  },
+  {
+    id: 'saffron_blessing', nameKo: '사프란의 축복', icon: '✨', category: 'buff',
+    tier: 4, ingredients: { saffron: 1, curry_leaf: 1, butter: 1 },
+    effectDesc: '공격력+속도 +45% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.45,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 120, gateStage: '16-4',
   },
 ];
 

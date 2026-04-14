@@ -7,6 +7,7 @@
  * Phase 26-2: 10-6 sake_master 보스전으로 교체, 11-6 완성 (dragon_wok 약화 선등장), 12-1~12-6 완성 (dragon_wok 최종 보스전).
  * Phase 27-3: 13-1~13-5 스테이지 구현. 테마: bistro_parisian.
  * Phase 29-2: 13-6 + 15-1~15-6 (카타콩브) 구현 완료.
+ * Phase 31-3: 16-1~16-5 (향신료 궁전) 구현 완료. curry_djinn 16-3 첫 등장, naan_golem 16-4 첫 등장.
  * 각 스테이지는 고유 경로, 웨이브, 손님 구성을 가진다.
  */
 
@@ -6338,12 +6339,310 @@ export const STAGES = {
     service: { duration: 360, customerInterval: 3.0, maxCustomers: 20, customerPatience: 25 },
   },
 
-  // ── 그룹 3 placeholder (16~24장) ──
-  '16-1': { id: '16-1', nameKo: '미구현', theme: 'placeholder' },
-  '16-2': { id: '16-2', nameKo: '미구현', theme: 'placeholder' },
-  '16-3': { id: '16-3', nameKo: '미구현', theme: 'placeholder' },
-  '16-4': { id: '16-4', nameKo: '미구현', theme: 'placeholder' },
-  '16-5': { id: '16-5', nameKo: '미구현', theme: 'placeholder' },
+  // ── 그룹 3: 16장 향신료 궁전 (Phase 31-3) ──
+
+  // ── 16-1: 향신료 시장 입구 ──
+  '16-1': {
+    id: '16-1',
+    nameKo: '향신료 시장 입구',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // S자 변형: 세로→가로→세로
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 20, interval: 1300 },
+        { type: 'wine_specter', count: 22, interval: 1000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 24, interval: 1180 },
+        { type: 'wine_specter', count: 26, interval: 900 },
+        { type: 'foie_gras_knight', count: 14, interval: 1500 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 28, interval: 1080 },
+        { type: 'foie_gras_knight', count: 18, interval: 1400 },
+        { type: 'milk_phantom', count: 16, interval: 1050 },
+        { type: 'cheese_golem', count: 10, interval: 1700 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 32, interval: 980 },
+        { type: 'foie_gras_knight', count: 22, interval: 1300 },
+        { type: 'wine_specter', count: 30, interval: 820 },
+        { type: 'mushroom_scout', count: 16, interval: 860 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 38, interval: 880 },
+        { type: 'foie_gras_knight', count: 26, interval: 1200 },
+        { type: 'wine_specter', count: 36, interval: 740 },
+        { type: 'butter_ghost', count: 18, interval: 700 },
+        { type: 'cheese_golem', count: 12, interval: 1650 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'curry_leaf_soup', patience: 9000, baseReward: 72, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'spiced_flatbread', patience: 8500, baseReward: 82, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'saffron_rice', patience: 8500, baseReward: 95, tipMultiplier: 1.5 }] },
+      { wave: 4, customers: [{ dish: 'curry_leaf_saute', patience: 8000, baseReward: 108, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'butter_chicken', patience: 8000, baseReward: 122, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 29, two: 22 },
+    service: { duration: 322, customerInterval: 2.3, maxCustomers: 53, customerPatience: 22 },
+  },
+
+  // ── 16-2: 향신료 창고 ──
+  '16-2': {
+    id: '16-2',
+    nameKo: '향신료 창고',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 소용돌이형
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 1, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 2, colEnd: 8 },
+      { type: 'vertical', col: 2, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 22, interval: 1230 },
+        { type: 'wine_specter', count: 24, interval: 940 },
+        { type: 'foie_gras_knight', count: 16, interval: 1450 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 26, interval: 1120 },
+        { type: 'foie_gras_knight', count: 20, interval: 1350 },
+        { type: 'milk_phantom', count: 18, interval: 1020 },
+        { type: 'butter_ghost', count: 14, interval: 720 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 30, interval: 1020 },
+        { type: 'foie_gras_knight', count: 24, interval: 1260 },
+        { type: 'wine_specter', count: 32, interval: 800 },
+        { type: 'cheese_golem', count: 12, interval: 1650 },
+        { type: 'mushroom_scout', count: 14, interval: 880 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 36, interval: 930 },
+        { type: 'foie_gras_knight', count: 28, interval: 1180 },
+        { type: 'wine_specter', count: 38, interval: 720 },
+        { type: 'butter_ghost', count: 20, interval: 680 },
+        { type: 'milk_phantom', count: 20, interval: 990 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 42, interval: 840 },
+        { type: 'foie_gras_knight', count: 32, interval: 1100 },
+        { type: 'wine_specter', count: 44, interval: 650 },
+        { type: 'cheese_golem', count: 14, interval: 1600 },
+        { type: 'mushroom_scout', count: 18, interval: 820 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'saffron_rice', patience: 9000, baseReward: 88, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'curry_leaf_saute', patience: 8500, baseReward: 102, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'tandoori_grill', patience: 8500, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'butter_chicken', patience: 8000, baseReward: 128, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'saffron_kheer', patience: 8000, baseReward: 142, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 30, two: 23 },
+    service: { duration: 326, customerInterval: 2.3, maxCustomers: 54, customerPatience: 22 },
+  },
+
+  // ── 16-3: 향신료 정원 (curry_djinn 첫 등장) ──
+  '16-3': {
+    id: '16-3',
+    nameKo: '향신료 정원',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 십자형 변형
+    pathSegments: [
+      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 26, interval: 1150 },
+        { type: 'foie_gras_knight', count: 22, interval: 1300 },
+        { type: 'wine_specter', count: 28, interval: 870 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 30, interval: 1050 },
+        { type: 'foie_gras_knight', count: 26, interval: 1220 },
+        { type: 'milk_phantom', count: 20, interval: 980 },
+        { type: 'butter_ghost', count: 16, interval: 700 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 34, interval: 960 },
+        { type: 'foie_gras_knight', count: 30, interval: 1140 },
+        { type: 'wine_specter', count: 36, interval: 790 },
+        { type: 'curry_djinn', count: 6, interval: 2200 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 38, interval: 880 },
+        { type: 'foie_gras_knight', count: 34, interval: 1060 },
+        { type: 'wine_specter', count: 42, interval: 720 },
+        { type: 'curry_djinn', count: 8, interval: 2000 },
+        { type: 'cheese_golem', count: 12, interval: 1650 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 44, interval: 800 },
+        { type: 'foie_gras_knight', count: 38, interval: 980 },
+        { type: 'milk_phantom', count: 22, interval: 950 },
+        { type: 'curry_djinn', count: 10, interval: 1800 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'cellar_phantom', count: 50, interval: 720 },
+        { type: 'foie_gras_knight', count: 42, interval: 900 },
+        { type: 'wine_specter', count: 52, interval: 650 },
+        { type: 'curry_djinn', count: 14, interval: 1650 },
+        { type: 'butter_ghost', count: 20, interval: 660 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'tandoori_grill', patience: 9000, baseReward: 102, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'butter_chicken', patience: 8500, baseReward: 115, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'spice_palace_curry', patience: 8500, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'saffron_kheer', patience: 8000, baseReward: 145, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'spice_palace_curry', patience: 8000, baseReward: 162, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'biryani_grand', patience: 8000, baseReward: 180, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 32, two: 24 },
+    service: { duration: 332, customerInterval: 2.2, maxCustomers: 55, customerPatience: 21 },
+  },
+
+  // ── 16-4: 카레 성채 (naan_golem 첫 등장) ──
+  '16-4': {
+    id: '16-4',
+    nameKo: '카레 성채',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // Z자 패턴
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 1, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 28, interval: 1100 },
+        { type: 'foie_gras_knight', count: 26, interval: 1240 },
+        { type: 'curry_djinn', count: 8, interval: 2000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 32, interval: 1000 },
+        { type: 'foie_gras_knight', count: 30, interval: 1160 },
+        { type: 'curry_djinn', count: 10, interval: 1850 },
+        { type: 'naan_golem', count: 6, interval: 2400 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 36, interval: 920 },
+        { type: 'foie_gras_knight', count: 34, interval: 1080 },
+        { type: 'curry_djinn', count: 12, interval: 1700 },
+        { type: 'naan_golem', count: 8, interval: 2200 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 40, interval: 840 },
+        { type: 'foie_gras_knight', count: 38, interval: 1000 },
+        { type: 'curry_djinn', count: 14, interval: 1560 },
+        { type: 'naan_golem', count: 10, interval: 2000 },
+        { type: 'mushroom_scout', count: 16, interval: 820 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 46, interval: 760 },
+        { type: 'foie_gras_knight', count: 42, interval: 920 },
+        { type: 'curry_djinn', count: 16, interval: 1440 },
+        { type: 'naan_golem', count: 12, interval: 1850 },
+        { type: 'butter_ghost', count: 20, interval: 660 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'cellar_phantom', count: 52, interval: 690 },
+        { type: 'foie_gras_knight', count: 46, interval: 850 },
+        { type: 'curry_djinn', count: 20, interval: 1300 },
+        { type: 'naan_golem', count: 14, interval: 1700 },
+        { type: 'milk_phantom', count: 18, interval: 930 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'spice_palace_curry', patience: 9000, baseReward: 128, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'saffron_biryani', patience: 8500, baseReward: 142, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'biryani_grand', patience: 8500, baseReward: 158, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'spice_palace_tasting', patience: 8000, baseReward: 175, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'spice_palace_tasting', patience: 8000, baseReward: 195, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'maharaja_feast', patience: 8000, baseReward: 218, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 34, two: 26 },
+    service: { duration: 338, customerInterval: 2.2, maxCustomers: 57, customerPatience: 21 },
+  },
+
+  // ── 16-5: 향신료 궁전의 심장부 (클라이맥스) ──
+  '16-5': {
+    id: '16-5',
+    nameKo: '향신료 궁전의 심장부',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 역T자 패턴
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'foie_gras_knight', count: 30, interval: 1180 },
+        { type: 'curry_djinn', count: 12, interval: 1800 },
+        { type: 'naan_golem', count: 10, interval: 2100 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'foie_gras_knight', count: 36, interval: 1080 },
+        { type: 'curry_djinn', count: 16, interval: 1650 },
+        { type: 'naan_golem', count: 13, interval: 1950 },
+        { type: 'milk_phantom', count: 20, interval: 920 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'foie_gras_knight', count: 42, interval: 990 },
+        { type: 'curry_djinn', count: 20, interval: 1500 },
+        { type: 'naan_golem', count: 16, interval: 1800 },
+        { type: 'butter_ghost', count: 22, interval: 640 },
+        { type: 'mushroom_scout', count: 18, interval: 800 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'foie_gras_knight', count: 48, interval: 900 },
+        { type: 'curry_djinn', count: 24, interval: 1360 },
+        { type: 'naan_golem', count: 19, interval: 1660 },
+        { type: 'cheese_golem', count: 14, interval: 1600 },
+        { type: 'milk_phantom', count: 24, interval: 880 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'foie_gras_knight', count: 56, interval: 810 },
+        { type: 'curry_djinn', count: 30, interval: 1200 },
+        { type: 'naan_golem', count: 22, interval: 1520 },
+        { type: 'butter_ghost', count: 26, interval: 600 },
+        { type: 'mushroom_scout', count: 22, interval: 760 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'spice_palace_tasting', patience: 9000, baseReward: 155, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'maharaja_feast', patience: 8500, baseReward: 175, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'saffron_grand_platter', patience: 8500, baseReward: 198, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'maharaja_feast', patience: 8000, baseReward: 222, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'saffron_grand_platter', patience: 8000, baseReward: 252, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 35, two: 27 },
+    service: { duration: 344, customerInterval: 2.2, maxCustomers: 58, customerPatience: 20 },
+  },
+
+  // ── 16-6 placeholder (보스전, Phase 31-3 스코프 외) ──
   '16-6': { id: '16-6', nameKo: '미구현', theme: 'placeholder' },
   '17-1': { id: '17-1', nameKo: '미구현', theme: 'placeholder' },
   '17-2': { id: '17-2', nameKo: '미구현', theme: 'placeholder' },

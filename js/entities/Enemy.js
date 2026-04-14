@@ -10,6 +10,7 @@
  * Phase 22-1: 전령 소환(heraldSummon) + 분노 속도 증가(enrageSpeedMultiplier) 메카닉.
  * Phase 25-1: 어둠 디버프(darkDebuff) + wok_guardian 전면 방어 70%(shieldFrontHeavy) 메카닉.
  * Phase 26-1: 양조 주기(brewCycle) + 봉인 방어막(sealShield) + hpOverride 스폰 파라미터 메카닉.
+ * Phase 31-3: 텔레포트(teleportEnabled) 메카닉 (curry_djinn).
  */
 
 import Phaser from 'phaser';
@@ -159,6 +160,11 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._sealShieldActive = false;
       this._sealShieldTriggered = false;
       this._sealShieldHp = 0;
+    }
+
+    // ── Phase 31-3: 텔레포트 (curry_djinn) ──
+    if (enemyData.teleportEnabled) {
+      this._teleportTimer = 0;
     }
 
     // ── 비주얼 ──
@@ -476,6 +482,11 @@ export class Enemy extends Phaser.GameObjects.Container {
     // ── Phase 26-1: 양조 주기 (sake_master) ──
     if (this.data_.brewCycle) {
       this._updateBrewCycle(delta);
+    }
+
+    // ── Phase 31-3: 텔레포트 (curry_djinn) ──
+    if (this.data_.teleportEnabled) {
+      this._updateTeleport(delta);
     }
 
     // ── 이동 ──
@@ -1091,6 +1102,44 @@ export class Enemy extends Phaser.GameObjects.Container {
         }
       });
     }
+  }
+
+  // ── Phase 31-3: 텔레포트 메카닉 ───────────────────────────────────
+
+  /**
+   * 텔레포트 업데이트 (curry_djinn).
+   * teleportInterval마다 현재 waypointIndex 기준 teleportRadius 범위 내
+   * 앞쪽 웨이포인트로 순간이동한다. 역행(뒤로 이동)은 허용하지 않는다.
+   * @param {number} delta - ms
+   * @private
+   */
+  _updateTeleport(delta) {
+    this._teleportTimer += delta;
+    if (this._teleportTimer < this.data_.teleportInterval) return;
+    this._teleportTimer = 0;
+
+    // 웨이포인트 배열에서 teleportRadius 이내의 앞쪽 후보 목록 수집
+    const radius = this.data_.teleportRadius;
+    const candidates = [];
+    for (let i = this.waypointIndex + 1; i < this._waypoints.length; i++) {
+      const wp = this._waypoints[i];
+      const dist = Phaser.Math.Distance.Between(this.x, this.y, wp.x, wp.y);
+      if (dist <= radius) {
+        candidates.push(i);
+      }
+    }
+    // 후보 없으면 스킵 (경로 끝에 가까울 때 발동 안 함)
+    if (candidates.length === 0) return;
+
+    // 후보 중 랜덤 선택
+    const targetIdx = Phaser.Math.RND.pick(candidates);
+    const targetWp = this._waypoints[targetIdx];
+
+    // 순간이동 실행
+    this.x = targetWp.x;
+    this.y = targetWp.y;
+    this.waypointIndex = targetIdx;
+    this.setDepth(10 + Math.floor(this.y));
   }
 
   /** @private */
