@@ -1,5 +1,30 @@
 # Changelog
 
+## [Phase 31-1] 2026-04-14
+
+### Added
+- dialogueData.js: chapter16_intro, chapter16_mid, team_side_16 대화 3종 추가 (누적 72종)
+  - chapter16_intro: 8줄 (향신료 시장 탐사, 강렬한 냄새, 인도 도착 첫 인상)
+  - chapter16_mid: 11줄 (마살라 문파와의 첫 접촉, ??? speaker 5줄 portraitKey 미설정)
+  - team_side_16: 8줄 (팀 사이드 대화, 향신료 시장 여담)
+- storyData.js: 15장 트리거 5건 등록 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b)
+  - chapter15_epilogue onComplete: currentChapter=16 설정, chapter15_cleared 플래그 설정
+  - side_15b 조건에 seenDialogues.includes('side_15a') 순서 보장
+- storyData.js: 16장 트리거 3건 등록 (chapter16_intro, chapter16_mid, team_side_16)
+  - chapter16_intro: 16-1 진입 시 발화
+  - chapter16_mid: 16-3 첫 클리어 시 발화
+  - team_side_16: merchant 진입 시 발화 (ch>=16)
+- storyData.js: stage_first_clear 제외 목록에 15-5/15-6/16-1/16-3 추가
+
+### 참고
+- QA 전체 PASS (정상 14개 + 대화품질 4개 = 총 18개)
+- ??? speaker(마살라 문파 대표)는 Phase 31-2에서 캐릭터 확정 후 portraitKey 추가 예정
+- chapter14_clear 대화는 여전히 미등록 (Phase 28-4에서 추가 필요)
+- 스펙: `.claude/specs/2026-04-14-kc-phase31-1-scope.md`
+- QA: `.claude/specs/2026-04-14-kc-phase31-1-qa.md`
+
+---
+
 ## [Phase 30] 2026-04-14
 
 ### Added

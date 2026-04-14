@@ -971,9 +971,9 @@
 
 > `visual_change: none` | 스토리 대사 집필만
 
-- [ ] dialogueData.js: chapter16_intro 작성 (향신료 시장 탐사, 강렬한 냄새)
-- [ ] dialogueData.js: chapter16_mid 작성 (인도 미력사 가문과의 첫 접촉)
-- [ ] 사이드 대화 1종 (team_side_16)
+- [x] dialogueData.js: chapter16_intro 작성 (향신료 시장 탐사, 강렬한 냄새)
+- [x] dialogueData.js: chapter16_mid 작성 (인도 미력사 가문과의 첫 접촉)
+- [x] 사이드 대화 1종 (team_side_16)
 
 ---
 
