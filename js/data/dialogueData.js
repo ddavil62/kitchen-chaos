@@ -14,6 +14,7 @@
  * Phase 23-1: chapter9_intro, chapter9_boss, chapter9_clear 추가. CHARACTERS에 sake_oni 추가.
  * Phase 25-1: 11장 용의 주방 심층부 대화 3종 추가 (chapter11_intro, chapter11_mid, lao_side_11).
  * Phase 26-1: 12장 용의 궁전 결전 대화 5종 추가 (chapter12_intro, chapter12_lao_mid, chapter12_boss, chapter12_clear, lao_side_12). CHARACTERS에 sake_master 추가.
+ * Phase 27-1: 13장 별빛 비스트로 대화 3종 추가 (chapter13_intro, chapter13_mid, mimi_side_13). CHARACTERS에 앙드레 추가.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -872,6 +873,66 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '안 돼!' },
     ],
   },
+
+  // ── 시즌 2: 13장 별빛 비스트로 (Phase 27-1) ──
+
+  chapter13_intro: {
+    id: 'chapter13_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '중식 아크 완결 직후. 팀은 WCA의 긴급 연락을 받아 파리로 향했다.' },
+      { speaker: 'narrator', portrait: '', text: '밤의 파리. 에펠탑 불빛 아래, 센 강변의 고급 레스토랑 거리가 이상하게 조용하다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '와... 파리야. 진짜 파리. (두리번거리며) 근데 가게들이 왜 다 불이 꺼져 있어?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(냉정하게) 식란 구역이에요. WCA 보고서에 따르면 3주 전부터 거리 전체가 봉쇄됐다고.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(긴장하며) 이 정도면... 한국 때보다 규모가 훨씬 커.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(귀를 쫑긋) 누군가 오고 있어.' },
+      { speaker: '???', portrait: '🥐', text: '잘 오셨습니다. 동방의 미력사분들.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '저는 앙드레. WCA 유럽 지부장입니다. (정중히 고개를 숙이며) 연락을 기다렸어요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '이 별빛 비스트로... 파리 최고의 미슐랭 3스타 레스토랑이었습니다. 지금은 식란의 중심지가 됐지만.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '왜 저희한테 연락하신 거예요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(진지하게) 이 식란... 유럽 미력사들의 방식으로는 막을 수 없기 때문입니다. 무언가가 다릅니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '다르다는 게 무슨 의미입니까?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '음식의 맛이 아니라 \'예술\'에서 미력이 폭주하고 있어요. 극단적인 요리 집착이 식재료를 변이시키는 건지...' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(결의에 차서) 이유야 어떻든 정화하면 되는 거잖아요. 시작하겠습니다!' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(가볍게 미소 지으며) 역시. 동방 미력사는 대담하군요.' },
+    ],
+  },
+  chapter13_mid: {
+    id: 'chapter13_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '13-3 클리어. 별빛 비스트로 심층부에 가까워질수록 미력 농도가 짙어진다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(경계하며) 여기부터는... 저도 경험한 적 없는 구역입니다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코, 이 미력 냄새, 뭔가 달라. 전에 없던 향이야.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(조심스럽게) 트러플. 흑트러플인데... 이걸 이렇게 고농도로 쓰는 요리사는 흔치 않아.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(낮은 목소리로 앙드레에게) ...혹시 이 구역, 특정 인물과 연관이 있습니까?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(잠시 멈추며) ...셰프 누아르.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '셰프 누아르? 누구예요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '유럽 미력사 세계에서 전설적인 이름입니다. 극한의 요리 미학으로 재료의 미력을 \'조각\'하듯 다룬다고 했었는데...' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '3년 전 WCA에서 제명됐어요. \'미력의 폭주를 의도적으로 유발했다\'는 의혹으로.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(표정이 굳으며) ...의도적이라고요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '아직 확실하지 않습니다. 하지만 이 식란의 방식이 그의 요리 철학과 너무 닮아 있어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(입술을 깨물며) ...찾아야겠어.' },
+    ],
+  },
+  mimi_side_13: {
+    id: 'mimi_side_13',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코, 파리 빵 진짜 맛있다. 크루아상이 이렇게 맛있는 거였어?' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(흐뭇하게) 오~ 싸게 먹고 싶으면 다음엔 내가 파리 분점 열어줄게!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(조용히 지나가며) ...팀장, 지금 식란 조사 중입니다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '알아, 알아! 그냥 잠깐 먹은 거야!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(옆에서 크루아상을 천천히 먹으며) ...맛있긴 해. 중국 꽃빵이랑 결이 다른 맛이야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '라오 씨도 먹고 있잖아!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(무표정으로) 에너지 보충.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(웃으며) 세계 어딜 가도 맛있는 게 최고야! 이 전통은 지켜야지.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(씩 웃으며) 그럼 식란 정화하고 마카롱도 사 먹자!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(멀리서 조용히) ...나도.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '유키 씨! 먹고 싶으면 먹고 싶다고 해!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '...간다.' },
+    ],
+  },
 };
 
 // ── 캐릭터 정의 ──
@@ -891,4 +952,6 @@ export const CHARACTERS = {
   sake_oni: { id: 'sake_oni', nameKo: '사케 오니', portrait: '🍶', color: 0xff4488, role: 'boss', desc: '이자카야를 수호하던 식신. 정화된 사케 영기에 중독되어 타락한 옛 미력사.' },
   // ── Phase 26-1: 10장 보스 캐릭터 ──
   sake_master: { id: 'sake_master', nameKo: '주조 달인', portrait: '🍶', color: 0x8844bb, role: 'boss', desc: '이자카야 심층부 최심층을 지키는 고대 일식 양조 정령. sake_oni의 스승이자 원형.' },
+  // ── Phase 27-1: WCA 유럽 지부장 ──
+  andre: { id: 'andre', nameKo: '앙드레', portrait: '🥐', portraitKey: 'andre', color: 0x4169e1, role: 'ally', desc: 'WCA 유럽 지부장. 파리 출신 미력사로, 별빛 비스트로 식란 사태를 조사 중이다.' },
 };
