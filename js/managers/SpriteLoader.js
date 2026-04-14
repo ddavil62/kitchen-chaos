@@ -10,6 +10,7 @@
  * Phase 25-1: 11장 적 2종(shadow_dragon_spawn, wok_guardian), 타일셋 1종(dragon_lair), 재료 1종(star_anise) 추가.
  * Phase 26-1: sake_master 보스 추가, dragon_wok 스프라이트 교체.
  * Phase 27-2: 13장 적 2종(wine_specter, foie_gras_knight), 타일셋 1종(bistro_parisian), 재료 1종(truffle) 추가.
+ * Phase 28-2: 14장 적 2종(cellar_phantom, sommelier_wraith), 타일셋 1종(wine_cellar), 재료 1종(herb_bundle) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -28,7 +29,7 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (27종, Phase 27-2: wine_specter, foie_gras_knight 추가) ──
+// ── 적 ID 목록 (29종, Phase 28-2: cellar_phantom, sommelier_wraith 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
@@ -39,6 +40,7 @@ const ENEMY_IDS = [
   'sake_specter', 'oni_minion',
   'shadow_dragon_spawn', 'wok_guardian',  // Phase 25-1
   'wine_specter', 'foie_gras_knight',     // Phase 27-2
+  'cellar_phantom', 'sommelier_wraith',   // Phase 28-2
 ];
 
 // ── 보스 ID 목록 (9종, Phase 26-1: sake_master 추가) ──
@@ -81,9 +83,10 @@ const INGREDIENT_FILE_MAP = {
   sake: 'sake',                            // Phase 22-3
   star_anise: 'star_anise',   // Phase 25-1
   truffle: 'truffle',         // Phase 27-2
+  herb_bundle: 'herb_bundle', // Phase 28-2
 };
 
-// ── 재료 ID 목록 (22종, 게임 내 ID 기준) ──
+// ── 재료 ID 목록 (23종, 게임 내 ID 기준) ──
 const INGREDIENT_IDS = Object.keys(INGREDIENT_FILE_MAP);
 
 // ── 걷기 애니메이션 폴더 해시 맵 (Phase 12) ──
@@ -115,6 +118,8 @@ const ENEMY_WALK_HASHES = {
   wok_guardian: 'walking-bc1aca17',         // Phase 25-2
   wine_specter: 'animating-aaf41951',      // Phase 27-2 (92px, chibi)
   foie_gras_knight: 'animating-d9b31bcd', // Phase 27-2 (92px, chibi)
+  cellar_phantom: 'animating-387abc3e',   // Phase 28-2 (92px, chibi)
+  sommelier_wraith: 'animating-7cb39ccd', // Phase 28-2 (92px, chibi)
 };
 
 const BOSS_WALK_HASHES = {
@@ -137,7 +142,7 @@ const WALK_FRAME_COUNT = 6;
 // ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가) ──
 const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao'];
 
-// ── 타일셋 ID 목록 (11종, Phase 27-2: bistro_parisian 추가) ──
+// ── 타일셋 ID 목록 (12종, Phase 28-2: wine_cellar 추가) ──
 const TILESET_IDS = [
   'pasta_field', 'oriental_bamboo', 'seafood_beach', 'volcano_lava',
   'dessert_cafe', 'grand_finale',
@@ -146,6 +151,7 @@ const TILESET_IDS = [
   'izakaya_underground',
   'dragon_lair',          // Phase 25-1
   'bistro_parisian',      // Phase 27-2
+  'wine_cellar',          // Phase 28-2
 ];
 
 // ── 서비스씬 에셋 경로 (Phase 19-4) ──
