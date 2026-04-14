@@ -9,6 +9,7 @@
  * Phase 22-3: 적 2종(sake_specter, oni_minion), 타일셋 1종(izakaya_underground, 16px), 재료 1종(sake) 추가.
  * Phase 25-1: 11장 적 2종(shadow_dragon_spawn, wok_guardian), 타일셋 1종(dragon_lair), 재료 1종(star_anise) 추가.
  * Phase 26-1: sake_master 보스 추가, dragon_wok 스프라이트 교체.
+ * Phase 27-2: 13장 적 2종(wine_specter, foie_gras_knight), 타일셋 1종(bistro_parisian), 재료 1종(truffle) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -37,6 +38,7 @@ const ENEMY_IDS = [
   'dumpling_warrior', 'mini_dumpling', 'wok_phantom',
   'sake_specter', 'oni_minion',
   'shadow_dragon_spawn', 'wok_guardian',  // Phase 25-1
+  'wine_specter', 'foie_gras_knight',     // Phase 27-2
 ];
 
 // ── 보스 ID 목록 (9종, Phase 26-1: sake_master 추가) ──
@@ -78,6 +80,7 @@ const INGREDIENT_FILE_MAP = {
   cilantro: 'cilantro',
   sake: 'sake',                            // Phase 22-3
   star_anise: 'star_anise',   // Phase 25-1
+  truffle: 'truffle',         // Phase 27-2
 };
 
 // ── 재료 ID 목록 (15종, 게임 내 ID 기준) ──
@@ -110,6 +113,8 @@ const ENEMY_WALK_HASHES = {
   oni_minion:   'walking-3d25e8be',        // Phase 22-3
   shadow_dragon_spawn: 'walking-dde29672',  // Phase 25-2
   wok_guardian: 'walking-bc1aca17',         // Phase 25-2
+  wine_specter: 'animating-aaf41951',      // Phase 27-2 (92px, chibi)
+  foie_gras_knight: 'animating-d9b31bcd', // Phase 27-2 (92px, chibi)
 };
 
 const BOSS_WALK_HASHES = {
@@ -139,7 +144,8 @@ const TILESET_IDS = [
   'sakura_izakaya',
   'chinese_palace_kitchen',
   'izakaya_underground',
-  'dragon_lair',   // Phase 25-1
+  'dragon_lair',          // Phase 25-1
+  'bistro_parisian',      // Phase 27-2
 ];
 
 // ── 서비스씬 에셋 경로 (Phase 19-4) ──
