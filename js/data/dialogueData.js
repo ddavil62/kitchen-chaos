@@ -18,6 +18,7 @@
  * Phase 27-3: chapter13_clear 대화 추가 (13-5 클리어 후, 14장 예고). 누적 61종.
  * Phase 28-1: 14장 비스트로 심층부 대화 3종 추가 (chapter14_intro, chapter14_mid, team_side_14). 누적 64종.
  * Phase 29-1: 15장 셰프 누아르 최종전 대화 5종 추가 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b). 누적 69종.
+ * Phase 31-1: 16장 향신료 궁전 대화 3종 추가 (chapter16_intro, chapter16_mid, team_side_16). 누적 72종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1113,6 +1114,59 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코... 지금 그게 중요해?!' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '항상 중요해! 도구 없이 식란 못 잡아!' },
       { speaker: 'narrator', portrait: '', text: '팀은 다음 목적지를 향한 준비를 시작했다. 여정은 아직 끝나지 않았다.' },
+    ],
+  },
+
+  // ── 16장: 향신료 궁전 (Phase 31-1) ──────────────────────────────────
+
+  // chapter16_intro — 16-1 진입 시, 인도 향신료 시장 도착
+  chapter16_intro: {
+    id: 'chapter16_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '인도, 어느 오래된 향신료 시장. 미로처럼 뻗은 골목마다 색깔이 다른 가루들이 산처럼 쌓여 있다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '으아... 눈이 매워! 코도 매워! 전부 매운 거야?!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(깊게 들이마시며) 커민, 코리앤더, 카르다몸... 이 냄새, 예전에 한번 맡아봤어. 강렬하다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '야, 이 시장 엄청 크다? 도구 재료도 여기서 나는 거 아닐까~' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코, 지금 그게 중요한 게 아니잖아! WCA가 식란 징후 신고했잖아!' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(시장을 훑어보며) 미미 씨 말이 맞습니다. 냄새가... 단순한 향신료가 아니에요. 미력 반응이 섞여 있어요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(조용히 칼을 잡으며) 방향은 시장 안쪽. 깊어질수록 반응이 강해집니다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(긴장하며 프라이팬을 꽉 쥐고) ...가자. 조심히.' },
+    ],
+  },
+
+  // chapter16_mid — 16-3 첫 클리어 후, 인도 미력사 가문 마살라 문파와 첫 접촉
+  chapter16_mid: {
+    id: 'chapter16_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '시장 깊숙한 곳, 향신료 탑들 사이. 갑자기 사방에서 등불이 켜진다.' },
+      { speaker: '???', portrait: '🧿', text: '(낮고 단호한 목소리로) 멈춰라. 이 구역은 외부인 출입 금지다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '누, 누구야?! 갑자기 나타나서!' },
+      { speaker: '???', portrait: '🧿', text: '우리는 마살라 문파. 이 시장의 식란을 대대로 다스려온 자들이다. 당신들은 누구이고, 무슨 목적으로 왔나.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(한 걸음 앞으로 나서며) 저희는 WCA 소속 미력사입니다. 새로운 식란 징후를 추적해왔습니다.' },
+      { speaker: '???', portrait: '🧿', text: '(비웃듯) WCA? 유럽 미력사들이 인도까지 왔군. 우리 일에 간섭하려고?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(팔짱을 끼며) 식란이 국경을 알겠어? 혼자 다 막을 수 있다면 진작 막았겠지.' },
+      { speaker: '???', portrait: '🧿', text: '(잠시 침묵) ...말이 거칩구나, 중국인. 하지만 틀린 말은 아니야.' },
+      { speaker: '???', portrait: '🧿', text: '지금 당장 협력하겠다는 건 아니다. 하지만 쫓아내지도 않겠다. 일단... 지켜보겠어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(작은 목소리로) ...경계하는 건지 인정하는 건지 모르겠어.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(미미 귀에 속삭이며) 쫓겨나지 않았잖아. 우린 늘 이렇게 시작하는 거야!' },
+    ],
+  },
+
+  // team_side_16 — merchant_enter에서 1회, 향신료 시장 관련 팀원 리액션
+  team_side_16: {
+    id: 'team_side_16',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(커다란 봉지를 들고 나타나며) 야호~ 향신료 한 트럭 구했어! 거저나 다름없었다고!' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코, 그거 다 뭐야?! 짐이 얼마야!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(봉지 하나를 열어 냄새 맡고는 즉시 닫으며) ...강합니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(다른 봉지를 집어 들며) 이건 마살라 블렌드네. 웍에 넣으면 폭발하겠는데. 좋다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '라오 씨, 좋다는 게 요리용이야, 정화용이야?!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(씩 웃으며) 둘 다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '역시 라오! 감식안이 달라! 이거 기준으로 도구 패키지 구성해줄게~' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '결국 장사 얘기야!!' },
     ],
   },
 };

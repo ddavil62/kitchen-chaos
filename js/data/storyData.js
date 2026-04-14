@@ -13,6 +13,7 @@
  * Phase 26-2: 12장 트리거 5건 추가 (chapter12_intro, chapter12_lao_mid, chapter12_boss, chapter12_clear, lao_side_12) + stage_first_clear 제외 목록 갱신.
  * Phase 27-3: 13장 트리거 4건 추가 (chapter13_intro, chapter13_mid, mimi_side_13, chapter13_clear) + stage_first_clear 제외 목록 갱신.
  * Phase 30: 14장 트리거 4건 선등록 (chapter14_intro, chapter14_mid, team_side_14, chapter14_clear) + stage_first_clear 제외 목록 갱신. 14장은 placeholder 단계(Phase 28-4 예정).
+ * Phase 31-1: 15장 트리거 5건 추가 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b) + 16장 트리거 3건 추가 (chapter16_intro, chapter16_mid, team_side_16) + stage_first_clear 제외 목록 갱신.
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -258,7 +259,11 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '13-5' &&   // chapter13_clear 별도 처리
       ctx.stageId !== '14-1' &&   // chapter14_intro 별도 처리 (placeholder)
       ctx.stageId !== '14-3' &&   // chapter14_mid 별도 처리 (placeholder)
-      ctx.stageId !== '14-5',     // chapter14_clear 별도 처리 (placeholder)
+      ctx.stageId !== '14-5' &&   // chapter14_clear 별도 처리 (placeholder)
+      ctx.stageId !== '15-5' &&   // chapter15_boss 별도 처리
+      ctx.stageId !== '15-6' &&   // chapter15_clear 별도 처리
+      ctx.stageId !== '16-1' &&   // chapter16_intro 별도 처리
+      ctx.stageId !== '16-3',     // chapter16_mid 별도 처리
     delay: 800,
   },
 
@@ -698,6 +703,98 @@ export const STORY_TRIGGERS = [
       }
       SaveManager.save(data);
     },
+  },
+
+  // ── 15장: 셰프 누아르 최종전 (Phase 31-1 등록) ──────────────────────
+  // 15-5 진입 시 chapter15_boss
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter15_boss',
+    once: true,
+    condition: (ctx) => ctx.stageId === '15-5',
+    delay: 400,
+  },
+
+  // 15-5 첫 클리어 시 chapter15_clear (보스 정화 직후)
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter15_clear',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '15-5',
+    delay: 800,
+  },
+
+  // 15-6 첫 클리어 시 chapter15_epilogue + currentChapter 16 설정
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter15_epilogue',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '15-6',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter15_cleared = true;
+      if (data.storyProgress.currentChapter < 16) {
+        data.storyProgress.currentChapter = 16;
+      }
+      SaveManager.save(data);
+    },
+  },
+
+  // merchant_enter 에서 side_15a (15장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'side_15a',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 15 &&
+      !save.seenDialogues?.includes('side_15a'),
+  },
+
+  // merchant_enter 에서 side_15b (side_15a 이후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'side_15b',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 15 &&
+      save.seenDialogues?.includes('side_15a') &&
+      !save.seenDialogues?.includes('side_15b'),
+  },
+
+  // ── 16장: 향신료 궁전 인도 아크 1장 (Phase 31-1) ──────────────────
+  // 16-1 진입 시 chapter16_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter16_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '16-1',
+    delay: 400,
+  },
+
+  // 16-3 첫 클리어 시 chapter16_mid
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter16_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '16-3',
+    delay: 800,
+  },
+
+  // merchant_enter 에서 team_side_16 (16장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_16',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 16 &&
+      !save.seenDialogues?.includes('team_side_16'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────
