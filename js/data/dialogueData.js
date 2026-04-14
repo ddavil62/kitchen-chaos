@@ -884,7 +884,7 @@ export const DIALOGUES = {
       { speaker: 'narrator', portrait: '', text: '밤의 파리. 에펠탑 불빛 아래, 센 강변의 고급 레스토랑 거리가 이상하게 조용하다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '와... 파리야. 진짜 파리. (두리번거리며) 근데 가게들이 왜 다 불이 꺼져 있어?' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(냉정하게) 식란 구역이에요. WCA 보고서에 따르면 3주 전부터 거리 전체가 봉쇄됐다고.' },
-      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(긴장하며) 이 정도면... 한국 때보다 규모가 훨씬 커.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(긴장하며) 이 정도면... 드래곤 웍 때보다 훨씬 광범위해.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(귀를 쫑긋) 누군가 오고 있어.' },
       { speaker: '???', portrait: '🥐', text: '잘 오셨습니다. 동방의 미력사분들.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '저는 앙드레. WCA 유럽 지부장입니다. (정중히 고개를 숙이며) 연락을 기다렸어요.' },
