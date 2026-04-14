@@ -3,6 +3,7 @@
  * 웨이브 번호를 입력받아 해당 웨이브의 적 구성 객체를 반환하는 순수 로직 모듈.
  * WaveManager에 options.waves로 주입하여 사용한다.
  * Phase 11-1: 엔드리스 모드 도입.
+ * Phase 30: 그룹2 적 10종(POOL_TIER_5, 웨이브 21+) + 보스 3종(sake_oni, sake_master, dragon_wok) 통합.
  */
 
 import { ENEMY_TYPES } from '../data/gameData.js';
@@ -21,8 +22,19 @@ const POOL_TIER_3 = ['fish_knight', 'mushroom_scout', 'cheese_rat', 'shrimp_samu
 /** 16~20 웨이브 추가 적 */
 const POOL_TIER_4 = ['sugar_fairy', 'milk_phantom'];
 
+/** 21+ 웨이브 추가 적 (그룹2: 일식·중식·양식 적) */
+const POOL_TIER_5 = [
+  'sushi_ninja', 'tempura_monk', 'sake_specter', 'oni_minion',
+  'dumpling_warrior', 'wok_phantom', 'shadow_dragon_spawn', 'wok_guardian',
+  'wine_specter', 'foie_gras_knight',
+];
+
 /** 보스 풀 (전 구간 공통) */
-const BOSS_POOL = ['pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem', 'master_patissier', 'cuisine_god'];
+const BOSS_POOL = [
+  'pasta_boss', 'dragon_ramen', 'seafood_kraken',
+  'lava_dessert_golem', 'master_patissier', 'cuisine_god',
+  'sake_oni', 'sake_master', 'dragon_wok',
+];
 
 // ── 기본 적 수 (비보스 웨이브에서 랜덤 구성용) ──
 
@@ -131,6 +143,7 @@ export class EndlessWaveGenerator {
     if (waveNumber >= 6) pool = pool.concat(POOL_TIER_2);
     if (waveNumber >= 11) pool = pool.concat(POOL_TIER_3);
     if (waveNumber >= 16) pool = pool.concat(POOL_TIER_4);
+    if (waveNumber >= 21) pool = pool.concat(POOL_TIER_5);
     return pool;
   }
 

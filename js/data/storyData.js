@@ -12,6 +12,7 @@
  * Phase 25-1: 11장 트리거 3건 추가 (chapter11_intro, chapter11_mid, lao_side_11) + stage_first_clear 제외 목록 갱신.
  * Phase 26-2: 12장 트리거 5건 추가 (chapter12_intro, chapter12_lao_mid, chapter12_boss, chapter12_clear, lao_side_12) + stage_first_clear 제외 목록 갱신.
  * Phase 27-3: 13장 트리거 4건 추가 (chapter13_intro, chapter13_mid, mimi_side_13, chapter13_clear) + stage_first_clear 제외 목록 갱신.
+ * Phase 30: 14장 트리거 4건 선등록 (chapter14_intro, chapter14_mid, team_side_14, chapter14_clear) + stage_first_clear 제외 목록 갱신. 14장은 placeholder 단계(Phase 28-4 예정).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -254,7 +255,10 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '12-6' &&    // chapter12_boss / chapter12_clear 별도 처리
       ctx.stageId !== '13-1' &&   // chapter13_intro 별도 처리
       ctx.stageId !== '13-3' &&   // chapter13_mid 별도 처리
-      ctx.stageId !== '13-5',     // chapter13_clear 별도 처리
+      ctx.stageId !== '13-5' &&   // chapter13_clear 별도 처리
+      ctx.stageId !== '14-1' &&   // chapter14_intro 별도 처리 (placeholder)
+      ctx.stageId !== '14-3' &&   // chapter14_mid 별도 처리 (placeholder)
+      ctx.stageId !== '14-5',     // chapter14_clear 별도 처리 (placeholder)
     delay: 800,
   },
 
@@ -639,6 +643,58 @@ export const STORY_TRIGGERS = [
       data.storyProgress.storyFlags.chapter13_cleared = true;
       if (data.storyProgress.currentChapter < 14) {
         data.storyProgress.currentChapter = 14;
+      }
+      SaveManager.save(data);
+    },
+  },
+
+  // ── 시즌 2: 14장 (Phase 28-4 예정 -- placeholder 단계 사전 트리거 등록) ─────────
+
+  // 14-1 입장 시 chapter14_intro (placeholder 상태이므로 실제 발화는 Phase 28-4 완성 후)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter14_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '14-1',
+    delay: 400,
+  },
+
+  // 14-3 첫 클리어 시 chapter14_mid
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter14_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '14-3',
+    delay: 800,
+  },
+
+  // merchant_enter 에서 team_side_14 (14장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_14',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 14 &&
+      !save.seenDialogues?.includes('team_side_14'),
+  },
+
+  // 14-5 첫 클리어 시 chapter14_clear + currentChapter 15 설정
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter14_clear',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '14-5',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter14_cleared = true;
+      if (data.storyProgress.currentChapter < 15) {
+        data.storyProgress.currentChapter = 15;
       }
       SaveManager.save(data);
     },

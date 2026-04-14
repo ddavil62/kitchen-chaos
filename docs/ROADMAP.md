@@ -936,6 +936,24 @@
 
 ---
 
+## Phase 28-3a — 8장 스테이지 구현 (일식 아크 완성)
+
+> `visual_change: none` | 8장 에셋은 7장 재활용. Phase 28-1 스크립트 완료 후 진행.
+
+- [ ] stageData.js: 스테이지 8-1 ~ 8-5 + 8-6 sake_master 보스전 (이미 구현된 12-6 패턴 참조)
+- [ ] recipeData.js: 사케 조합 레시피 추가분 (현재 스테이지에 손님 요리로 사케 계열 필요 시)
+
+---
+
+## Phase 28-4 — 14장 스테이지 구현 (양식 아크 중간)
+
+> `visual_change: none` | 14장 에셋은 15장 재활용 (wine_cellar 타일셋, cellar_phantom/sommelier_wraith). Phase 28-1 스크립트 완료 후 진행.
+
+- [ ] stageData.js: 스테이지 14-1 ~ 14-5 + 14-6 (14장 중간보스 또는 특수 스테이지)
+- [ ] recipeData.js: 14장 전용 손님 요리 추가 (필요 시)
+
+---
+
 ## Phase 30 — 챕터 7~15 밸런스 QA
 
 > 목표: 그룹2 전체 밸런스 검증, 스토리 흐름 정합성 확인
