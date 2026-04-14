@@ -1,5 +1,42 @@
 # Changelog
 
+## [Phase 32-4] 2026-04-14 — 18장 대화 스크립트 6종
+
+### Added
+- dialogueData.js: CHARACTERS에 masala_guide(아르준), maharaja 2종 추가 (누적 13종)
+  - masala_guide: id, nameKo='아르준', portrait='🪬', color=0xd4a017, role=ally
+  - maharaja: id, nameKo='마하라자', portrait='👑', color=0xb8860b, role=boss
+- dialogueData.js: 대화 스크립트 6종 추가 (누적 82종)
+  - chapter18_intro: 12라인, 18-1 진입 시, 아르준 신원 공개
+  - chapter18_mid: 12라인, 18-3 첫 클리어 후, 정화할수록 각성하는 마하라자
+  - chapter18_boss: 10라인, 18-6 진입 시, 마하라자 각성 보스전 직전 대사
+  - chapter18_clear: 9라인, 18-6 첫 클리어, onComplete→currentChapter:19 + chapter18_epilogue 연쇄(delay 1200ms)
+  - chapter18_epilogue: 11라인, chapter18_clear의 chain으로만 재생, 인도 아크 완결
+  - team_side_18: 8라인, merchant_enter에서 1회, 18장 진입 후 팀원 리액션
+- storyData.js: 트리거 5건 추가 (누적 82항목)
+  - chapter18_intro: gathering_enter, stageId=18-1
+  - chapter18_mid: result_clear, stageId=18-3, isFirstClear+stars>0
+  - chapter18_boss: gathering_enter, stageId=18-6 (isFirstClear 조건 없음, 기존 boss 패턴)
+  - chapter18_clear: result_clear, stageId=18-6, isFirstClear+stars>0, onComplete(currentChapter=19+chapter18_cleared 플래그), chain(chapter18_epilogue, delay 1200ms)
+  - team_side_18: merchant_enter, currentChapter>=18, seenDialogues 미포함 조건
+- storyData.js: stage_first_clear 제외 목록에 18-1, 18-3, 18-6 추가
+
+### Changed
+- dialogueData.js: 17장 ??? 대사 16건 → 아르준(masala_guide) 소급 수정
+  - chapter16_mid: 5건, chapter16_epilogue: 2건, chapter17_intro: 4건, chapter17_mid: 5건
+  - speaker: '???' → '아르준', portrait: '🧿' → '🪬', portraitKey: 'masala_guide' 추가
+- dialogueData.js: fileoverview 갱신 (76종 → 82종, Phase 32-4 항목)
+- storyData.js: fileoverview 갱신 (Phase 32-4 항목)
+
+### 참고
+- 스펙: `.claude/specs/2026-04-14-kc-phase32-4-spec.md`
+- QA: `.claude/specs/2026-04-14-kc-phase32-4-qa.md`
+- chapter18_epilogue는 storyData.js에 독립 트리거 없이 chapter18_clear의 chain으로만 재생
+- 스펙 요구사항의 라인 수(intro 11, boss 9, clear 10)와 스펙 본문 스크립트 라인 수(각 12, 10, 9)에 불일치가 있었으나, 구현은 본문 스크립트를 정확히 반영
+- 18장 스테이지 데이터 구현은 Phase 32-5 범위
+
+---
+
 ## [Phase 32-3] 2026-04-14 — 17장 스테이지 구현
 
 ### Added

@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-14 (Phase 32-3 완료)
+> 최종 업데이트: 2026-04-14 (Phase 32-4 완료)
 
 ## 프로젝트 개요
 
@@ -46,6 +46,7 @@
 | 메이지 | 🧁 | 연구원→동료 | 디저트 전문 미력사이자 식란 연구원. 식란의 원인을 학문적으로 추적. |
 | 유키 | ❄️ | 그룹2 동료 | 일본 출신 미력사. 차분하고 정밀한 칼잡이. 7장에서 합류. |
 | 라오 | 🐉 | 그룹2 동료 | 중국 출신 미력사. 호쾌한 웍 마스터. 8장(구)에서 합류. |
+| 아르준 | 🪬 | 그룹3 동료 | 마살라 문파 12대 계승자. 17장에서 ???로 등장, 18장에서 신원 공개. |
 
 ### 챕터 확장 구조 (80~100시간 분량)
 
@@ -109,8 +110,8 @@ kitchen-chaos/
       gameData.js            # 적(33종)/도구(TOOL_DEFS)/재료(26종) 정의
       stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~17장, placeholder: 8/14/18~24장)
       recipeData.js          # 레시피 213종 정의 (서빙 173 + 버프 40)
-      dialogueData.js        # 대화 스크립트 76종 + 캐릭터 11종 정의 (시즌2 7~15장 31종, 16장 4종, 17장 3종 포함)
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 77항목 (triggerPoint 8종, import SaveManager)
+      dialogueData.js        # 대화 스크립트 82종 + 캐릭터 13종 정의 (시즌2 7~15장 31종, 16장 4종, 17장 3종, 18장 6종 포함)
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 82항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
@@ -138,8 +139,8 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (다이아몬드 격자+depth sorting+홀 데코), 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 76종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 77항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 82종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 82항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v16, season3Unlocked, getTotalStars(group) |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
@@ -171,7 +172,7 @@ kitchen-chaos/
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
 | 도구/행상인/채집 | 영구 도구 8종, 구매/판매/업그레이드, 행상인 UI, 재료 채집 TD, 도구 도감/팝업 | 완료 |
-| 대화/스토리 | 스크립트 76종, 트리거 77항목, 선택지 분기, 초상화 6종, 11캐릭터 | 완료 |
+| 대화/스토리 | 스크립트 82종, 트리거 82항목, 선택지 분기, 초상화 6종, 13캐릭터 | 완료 |
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코, 웜 다크 팔레트) | 완료 |
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 16장 향신료 궁전 대화 스크립트 (Phase 31-1) | 대화 3종 추가 (chapter16_intro/mid/team_side_16), 15장 트리거 5건 + 16장 트리거 3건 등록 | 완료 |
@@ -180,6 +181,7 @@ kitchen-chaos/
 | 17장 대화 스크립트 (Phase 32-1) | 16장 에필로그 + 17장 대화 3종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17), 트리거 4건 등록 | 완료 |
 | 17장 에셋 생성 (Phase 32-2) | 적 2종(incense_specter 176px, spice_elemental 164px), spice_palace_interior 타일셋, 재료 아이콘 1종(chai) | 완료 |
 | 17장 스테이지+레시피+메카닉 (Phase 32-3) | 스테이지 17-1~17-5 구현, chai 활용 레시피 12종(서빙 10+버프 2), confuseOnHit/elementalResistance 메카닉 | 완료 |
+| 18장 대화 스크립트 (Phase 32-4) | 대화 6종 추가 (chapter18_intro/mid/boss/clear/epilogue, team_side_18), CHARACTERS에 masala_guide/maharaja 추가, 17장 ??? 대사 아르준 소급 수정 | 완료 |
 
 ## 콘텐츠 규모
 
