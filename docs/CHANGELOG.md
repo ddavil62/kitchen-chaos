@@ -1,5 +1,22 @@
 # Changelog
 
+## [Phase 31-3] 2026-04-14
+
+### Added
+- stageData.js: 스테이지 16-1 ~ 16-5 완전 구현 (theme: spice_palace)
+  - 16-3부터 curry_djinn 등장, 16-4부터 naan_golem 등장
+- recipeData.js: 인도 요리 레시피 15종 추가 (누적 201종 = 서빙 163 + 버프 38)
+  - curry_leaf_soup, spiced_flatbread, saffron_rice, butter_chicken, tandoori_grill, chicken_tikka, saffron_biryani, maharaja_feast 등
+- Enemy.js: curry_djinn 텔레포트 메커닉 (_updateTeleport, 6000ms 주기)
+- Enemy.js: naan_golem 자가 회복 (regenRate 6, 기존 범용 로직 적용)
+- gameData.js: curry_leaf/saffron 아이콘 PNG 경로 교체
+
+### 참고
+- 커밋: 05554e6
+- 스펙: `.claude/specs/2026-04-14-kc-phase31-3-scope.md`
+
+---
+
 ## [Phase 31-2] 2026-04-14
 
 ### Added

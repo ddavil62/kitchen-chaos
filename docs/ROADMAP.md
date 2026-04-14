@@ -992,11 +992,11 @@
 
 > `visual_change: none` | 31-2 에셋 완성 후 진행
 
-- [ ] ingredientData.js: 커리잎(curry_leaf), 사프란(saffron) 추가 — 누적 25종
-- [ ] enemyData.js: curry_djinn, naan_golem 등록
-- [ ] stageData.js: 스테이지 16-1 ~ 16-5 배치
-- [ ] recipeData.js: 커리잎+사프란 조합 레시피 ~10종 (버터치킨, 탄두리, 비리야니 등)
-- [ ] 서비스 설정 (16장 손님 패턴)
+- [x] ingredientData.js: 커리잎(curry_leaf), 사프란(saffron) 추가 — 누적 25종
+- [x] enemyData.js: curry_djinn, naan_golem 등록 + Enemy.js 텔레포트/자가회복 메커닉 구현
+- [x] stageData.js: 스테이지 16-1 ~ 16-5 배치 (theme: spice_palace, 16-3부터 curry_djinn, 16-4부터 naan_golem)
+- [x] recipeData.js: 커리잎+사프란 조합 레시피 15종 추가 *(스펙 ~10종에서 15종으로 확장)*
+- [x] 서비스 설정 (16장 손님 패턴)
 
 ---
 
@@ -1339,9 +1339,9 @@
 | 29-1 | 에셋 + 스크립트 (chef_noir, chapter15, 에필로그) | ~166 | 23 | 📋 계획 |
 | 29-2 | 15장 스테이지 (양식 아크 완성) | ~186 | 23 | 📋 계획 |
 | 30 | 챕터 7~15 밸런스 QA | ~186 | 23 | 📋 계획 |
-| 31-1 | 스크립트 (chapter16 대사) | ~186 | 23 | 📋 계획 |
-| 31-2 | 에셋 생성 (curry_djinn, naan_golem, 타일셋) | ~186 | 23 | 📋 계획 |
-| 31-3 | 16장 스테이지 + 레시피 | ~196 | 25 | 📋 계획 |
+| ~~31-1~~ | ~~스크립트 (chapter16 대사)~~ | 186 | 25 | ✅ 완료 |
+| ~~31-2~~ | ~~에셋 생성 (curry_djinn, naan_golem, 타일셋)~~ | 186 | 25 | ✅ 완료 |
+| ~~31-3~~ | ~~16장 스테이지 + 레시피~~ | 201 | 25 | ✅ 완료 |
 | 32-1 | 스크립트 (chapter17 대사) | ~196 | 25 | 📋 계획 |
 | 32-2 | 에셋 생성 (incense_specter, spice_elemental, 타일셋) | ~196 | 25 | 📋 계획 |
 | 32-3 | 17장 스테이지 + 레시피 | ~206 | 26 | 📋 계획 |
