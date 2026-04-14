@@ -1,5 +1,25 @@
 # Changelog
 
+## [Phase 31-2] 2026-04-14
+
+### Added
+- assets/sprites/enemies/curry_djinn/: 8방향 walking 스프라이트 (164px 캔버스, 8프레임, animating-c40a2ab6)
+  - HP 380, 텔레포트 능력
+- assets/sprites/enemies/naan_golem/: 8방향 walking 스프라이트 (120px 캔버스, 8프레임, animating-33505870)
+  - HP 450, 자가 회복 6HP/s
+- assets/tilesets/spice_palace/: 128x128px Wang 타일셋 16종 (향신료 궁전)
+- assets/icons/curry_leaf.png: 재료 아이콘 32px
+- assets/icons/saffron.png: 재료 아이콘 32px
+- gameData.js: ENEMY_TYPES에 curry_djinn(HP 380, teleport), naan_golem(HP 450, regen 6) 추가 (누적 일반 31종)
+- gameData.js: INGREDIENT_TYPES에 curry_leaf, saffron 추가 (누적 25종)
+- SpriteLoader.js: ENEMY_IDS +2종, ENEMY_WALK_HASHES +2종, INGREDIENT_FILE_MAP +2종, TILESET_IDS +1종
+
+### 참고
+- 커밋: 2d7e210 (feat), ca8a5a6 (fix)
+- 스펙: `.claude/specs/2026-04-14-kc-phase31-2-scope.md`
+
+---
+
 ## [Phase 31-1] 2026-04-14
 
 ### Added

@@ -981,10 +981,10 @@
 
 > `visual_change: art` | PixelLab 스프라이트 + 타일셋
 
-- [ ] curry_djinn: HP ~380, 텔레포트 — PixelLab 생성
-- [ ] naan_golem: HP ~450, 자가 회복 — PixelLab 생성
-- [ ] 인도 궁전 타일셋 (화려한 색채+패턴) — PixelLab tiles
-- [ ] 재료 아이콘: 커리잎(curry_leaf), 사프란(saffron) 32px
+- [x] curry_djinn: HP ~380, 텔레포트 — PixelLab 생성 (164px, animating-c40a2ab6)
+- [x] naan_golem: HP ~450, 자가 회복 — PixelLab 생성 (120px, animating-33505870)
+- [x] 인도 궁전 타일셋 (화려한 색채+패턴) — PixelLab tiles (spice_palace, 128x128 Wang 16종)
+- [x] 재료 아이콘: 커리잎(curry_leaf), 사프란(saffron) 32px
 
 ---
 
