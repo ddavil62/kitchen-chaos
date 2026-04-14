@@ -15,6 +15,7 @@
  * Phase 25-1: 11장 용의 주방 심층부 대화 3종 추가 (chapter11_intro, chapter11_mid, lao_side_11).
  * Phase 26-1: 12장 용의 궁전 결전 대화 5종 추가 (chapter12_intro, chapter12_lao_mid, chapter12_boss, chapter12_clear, lao_side_12). CHARACTERS에 sake_master 추가.
  * Phase 27-1: 13장 별빛 비스트로 대화 3종 추가 (chapter13_intro, chapter13_mid, mimi_side_13). CHARACTERS에 앙드레 추가.
+ * Phase 27-3: chapter13_clear 대화 추가 (13-5 클리어 후, 14장 예고). 누적 61종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -913,6 +914,19 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(표정이 굳으며) ...의도적이라고요?' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '아직 확실하지 않습니다. 하지만 이 식란의 방식이 그의 요리 철학과 너무 닮아 있어요.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(입술을 깨물며) ...찾아야겠어.' },
+    ],
+  },
+  // chapter13_clear -- 13-5 클리어 후 (비스트로 심층부 완파, 14장 예고)
+  chapter13_clear: {
+    id: 'chapter13_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '별빛 비스트로의 식란이 걷히기 시작했다. 하지만 셰프 누아르의 흔적은 발견되지 않았다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '...여기까지 와주셔서 감사합니다. 솔직히, 혼자였다면 엄두도 못 냈을 거예요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '아직 안 끝난 거잖아요. 셰프 누아르, 어디 있는 거예요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(고민하며) 파리 지하. 오래된 카타콩브 구역에 연결된 비밀 조리장이 있다는 정보가 있습니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '...더 들어간다는 거군요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(결의에 차서) 당연하죠. 시작했으면 끝을 봐야죠!' },
     ],
   },
   mimi_side_13: {

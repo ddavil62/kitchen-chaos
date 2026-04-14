@@ -7,6 +7,7 @@
  * Phase 22-3: sake_specter(마취), oni_minion(돌진) 등록. sake 재료 추가 (누적 20종).
  * Phase 25-1: 적 2종(shadow_dragon_spawn, wok_guardian), 재료 1종(star_anise) 추가. 누적 적 25종.
  * Phase 26-1: sake_master(일식 양조 보스) 추가. 누적 보스 9종.
+ * Phase 27-3: 적 2종(wine_specter, foie_gras_knight), 재료 1종(truffle) 추가. 누적 적 29종, 재료 22종.
  */
 
 // ── 적 타입 정의 ──
@@ -506,6 +507,35 @@ export const ENEMY_TYPES = {
       { ingredient: 'sashimi_tuna', count: 3 },
     ],
   },
+  // ── Phase 27-3 신규 적 (13장 별빛 비스트로) ──
+  wine_specter: {
+    id: 'wine_specter',
+    nameKo: '와인 유령',
+    hp: 320,
+    speed: 62,
+    ingredient: 'truffle',
+    bodyColor: 0x722f37,   // 버건디 레드
+    // 취기 디버프: wineDebuffInterval마다 범위 내 도구 공격속도 감소
+    wineDebuff: true,
+    wineDebuffInterval: 5000,    // 5초마다 발동
+    wineDebuffRadius: 75,        // 75px 범위
+    wineDebuffEffect: { speedReduction: 0.25, duration: 3500 },
+    // 유령 특성: 반투명, 냉동고만 타겟 가능 (invisible: true)
+    invisible: true,
+  },
+  foie_gras_knight: {
+    id: 'foie_gras_knight',
+    nameKo: '푸아그라 기사',
+    hp: 420,
+    speed: 38,
+    ingredient: 'truffle',
+    bodyColor: 0xd4a017,   // 황금 베이지
+    // 전방 방어 특화: 이동 방향(전면) 피해 70% 감소 (wok_guardian과 동일 플래그)
+    shieldFrontHeavy: 0.70,
+    // 격노: HP enrageHpThreshold 이하 시 속도 1.8배로 돌진
+    enrageHpThreshold: 0.35,
+    enrageSpeedMultiplier: 1.8,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -873,6 +903,13 @@ export const INGREDIENT_TYPES = {
     nameKo: '팔각',
     color: 0x8b1a1a,   // 짙은 적갈색
     icon: '✨',         // 임시. 실제 아이콘은 별형 향신료 이미지로 교체
+  },
+  // ── Phase 27-3 신규 재료 ──
+  truffle: {
+    id: 'truffle',
+    nameKo: '흑트러플',
+    color: 0x2c1810,   // 짙은 흑갈색
+    icon: '🍄',         // 임시. 실제 아이콘은 truffle.png로 교체
   },
 };
 

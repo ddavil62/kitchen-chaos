@@ -5,6 +5,7 @@
  * 5장: 마법사 디저트 카페, 6장: 그랑 가스트로노미.
  * Phase 25-1: 11장 용의 주방 심층부 11-1~11-5 웨이브 데이터 추가 (11-6은 placeholder 유지).
  * Phase 26-2: 10-6 sake_master 보스전으로 교체, 11-6 완성 (dragon_wok 약화 선등장), 12-1~12-6 완성 (dragon_wok 최종 보스전).
+ * Phase 27-3: 13-1~13-5 스테이지 구현. 테마: bistro_parisian.
  * 각 스테이지는 고유 경로, 웨이브, 손님 구성을 가진다.
  */
 
@@ -5612,14 +5613,303 @@ export const STAGES = {
   },
 
   // ══════════════════════════════════════════════════════════════
-  // ── 시즌 2: 13장 (미구현) ──
+  // ── 시즌 2: 13장 별빛 비스트로 (Phase 27-3) ──
   // ══════════════════════════════════════════════════════════════
 
-  '13-1': { id: '13-1', nameKo: '미구현', theme: 'placeholder' },
-  '13-2': { id: '13-2', nameKo: '미구현', theme: 'placeholder' },
-  '13-3': { id: '13-3', nameKo: '미구현', theme: 'placeholder' },
-  '13-4': { id: '13-4', nameKo: '미구현', theme: 'placeholder' },
-  '13-5': { id: '13-5', nameKo: '미구현', theme: 'placeholder' },
+  // ── 13-1: 비스트로 외관 ──
+  '13-1': {
+    id: '13-1',
+    nameKo: '비스트로 외관',
+    theme: 'bistro_parisian',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 12-1과 동일 패턴 (L자)
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'wine_specter', count: 14, interval: 1300 },
+        { type: 'foie_gras_knight', count: 8, interval: 2200 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'wine_specter', count: 18, interval: 1150 },
+        { type: 'foie_gras_knight', count: 10, interval: 2000 },
+        { type: 'chili_demon', count: 18, interval: 700 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wine_specter', count: 22, interval: 1000 },
+        { type: 'foie_gras_knight', count: 12, interval: 1800 },
+        { type: 'flour_ghost', count: 14, interval: 1000 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'wine_specter', count: 26, interval: 900 },
+        { type: 'foie_gras_knight', count: 14, interval: 1700 },
+        { type: 'fish_knight', count: 16, interval: 900 },
+        { type: 'cheese_golem', count: 8, interval: 2000 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'wine_specter', count: 30, interval: 800 },
+        { type: 'foie_gras_knight', count: 16, interval: 1600 },
+        { type: 'sake_specter', count: 14, interval: 1400 },
+        { type: 'milk_phantom', count: 10, interval: 1300 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'truffle_bisque', patience: 9000, baseReward: 85, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'foie_gras_toast', patience: 8500, baseReward: 95, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'truffle_risotto', patience: 8500, baseReward: 108, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'truffle_risotto', patience: 8000, baseReward: 122, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 25, two: 19 },
+    service: { duration: 295, customerInterval: 2.7, maxCustomers: 47, customerPatience: 24 },
+  },
+
+  // ── 13-2: 비스트로 입구 홀 ──
+  '13-2': {
+    id: '13-2',
+    nameKo: '비스트로 입구 홀',
+    theme: 'bistro_parisian',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 12-2와 동일 패턴 (S자)
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'wine_specter', count: 16, interval: 1200 },
+        { type: 'foie_gras_knight', count: 10, interval: 2000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'wine_specter', count: 20, interval: 1050 },
+        { type: 'foie_gras_knight', count: 12, interval: 1800 },
+        { type: 'chili_demon', count: 20, interval: 680 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wine_specter', count: 24, interval: 950 },
+        { type: 'foie_gras_knight', count: 14, interval: 1700 },
+        { type: 'flour_ghost', count: 14, interval: 1000 },
+        { type: 'rice_slime', count: 6, interval: 1900 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'wine_specter', count: 28, interval: 860 },
+        { type: 'foie_gras_knight', count: 16, interval: 1600 },
+        { type: 'fish_knight', count: 18, interval: 880 },
+        { type: 'cheese_golem', count: 8, interval: 2000 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'wine_specter', count: 32, interval: 780 },
+        { type: 'foie_gras_knight', count: 18, interval: 1500 },
+        { type: 'sake_specter', count: 16, interval: 1300 },
+        { type: 'mushroom_scout', count: 12, interval: 1000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'truffle_bisque', patience: 9000, baseReward: 88, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'foie_gras_toast', patience: 8500, baseReward: 98, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'wine_truffle_plate', patience: 8000, baseReward: 112, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'truffle_risotto', patience: 8000, baseReward: 126, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 144, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 27, two: 20 },
+    service: { duration: 305, customerInterval: 2.6, maxCustomers: 49, customerPatience: 24 },
+  },
+
+  // ── 13-3: 비스트로 주방 ──
+  '13-3': {
+    id: '13-3',
+    nameKo: '비스트로 주방',
+    theme: 'bistro_parisian',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 12-3과 동일 패턴 (W자)
+    pathSegments: [
+      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 6, rowStart: 4, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 2, rowStart: 7, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'wine_specter', count: 18, interval: 1150 },
+        { type: 'foie_gras_knight', count: 12, interval: 1900 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'wine_specter', count: 22, interval: 1000 },
+        { type: 'foie_gras_knight', count: 14, interval: 1700 },
+        { type: 'chili_demon', count: 22, interval: 680 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wine_specter', count: 26, interval: 920 },
+        { type: 'foie_gras_knight', count: 16, interval: 1600 },
+        { type: 'flour_ghost', count: 14, interval: 1000 },
+        { type: 'milk_phantom', count: 8, interval: 1500 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'wine_specter', count: 30, interval: 840 },
+        { type: 'foie_gras_knight', count: 18, interval: 1500 },
+        { type: 'fish_knight', count: 18, interval: 880 },
+        { type: 'cheese_golem', count: 9, interval: 1900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'wine_specter', count: 34, interval: 760 },
+        { type: 'foie_gras_knight', count: 20, interval: 1400 },
+        { type: 'sake_specter', count: 16, interval: 1300 },
+        { type: 'tempura_monk', count: 12, interval: 1500 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'wine_specter', count: 38, interval: 700 },
+        { type: 'foie_gras_knight', count: 22, interval: 1350 },
+        { type: 'cheese_golem', count: 12, interval: 1800 },
+        { type: 'sake_specter', count: 18, interval: 1200 },
+        { type: 'milk_phantom', count: 10, interval: 1300 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'foie_gras_toast', patience: 9000, baseReward: 90, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'truffle_risotto', patience: 8500, baseReward: 102, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'wine_truffle_plate', patience: 8000, baseReward: 115, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 130, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 148, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 165, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 29, two: 22 },
+    service: { duration: 315, customerInterval: 2.5, maxCustomers: 51, customerPatience: 23 },
+  },
+
+  // ── 13-4: 비스트로 와인 셀러 ──
+  '13-4': {
+    id: '13-4',
+    nameKo: '비스트로 와인 셀러',
+    theme: 'bistro_parisian',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 12-4와 동일 패턴 (U자)
+    pathSegments: [
+      { type: 'vertical', col: 0, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 4, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'wine_specter', count: 20, interval: 1100 },
+        { type: 'foie_gras_knight', count: 14, interval: 1800 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'wine_specter', count: 24, interval: 960 },
+        { type: 'foie_gras_knight', count: 16, interval: 1650 },
+        { type: 'chili_demon', count: 24, interval: 660 },
+        { type: 'cheese_golem', count: 8, interval: 2100 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wine_specter', count: 28, interval: 880 },
+        { type: 'foie_gras_knight', count: 18, interval: 1550 },
+        { type: 'flour_ghost', count: 14, interval: 1000 },
+        { type: 'oni_minion', count: 14, interval: 1500 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'wine_specter', count: 32, interval: 800 },
+        { type: 'foie_gras_knight', count: 20, interval: 1500 },
+        { type: 'fish_knight', count: 20, interval: 860 },
+        { type: 'sake_specter', count: 16, interval: 1300 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'wine_specter', count: 36, interval: 730 },
+        { type: 'foie_gras_knight', count: 22, interval: 1400 },
+        { type: 'tempura_monk', count: 16, interval: 1400 },
+        { type: 'cheese_golem', count: 10, interval: 1800 },
+        { type: 'milk_phantom', count: 10, interval: 1300 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'wine_specter', count: 40, interval: 670 },
+        { type: 'foie_gras_knight', count: 24, interval: 1300 },
+        { type: 'sake_specter', count: 18, interval: 1200 },
+        { type: 'cheese_golem', count: 12, interval: 1700 },
+        { type: 'mushroom_scout', count: 14, interval: 950 },
+        { type: 'butter_ghost', count: 14, interval: 900 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'wine_truffle_plate', patience: 9000, baseReward: 95, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'truffle_risotto', patience: 8000, baseReward: 108, tipMultiplier: 2.0, vip: true }] },
+      { wave: 3, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 122, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 140, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 158, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 175, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 31, two: 23 },
+    service: { duration: 325, customerInterval: 2.5, maxCustomers: 53, customerPatience: 23 },
+  },
+
+  // ── 13-5: 셰프 누아르의 주방 (보스 선등장) ──
+  '13-5': {
+    id: '13-5',
+    nameKo: '셰프 누아르의 주방',
+    theme: 'bistro_parisian',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 12-5와 동일 패턴 (역Z자)
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 4 },
+      { type: 'vertical', col: 4, rowStart: 1, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 4, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'wine_specter', count: 20, interval: 1050 },
+        { type: 'foie_gras_knight', count: 16, interval: 1900 },
+        { type: 'milk_phantom', count: 8, interval: 1400 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'wok_phantom', count: 14, interval: 1800 },
+        { type: 'wine_specter', count: 18, interval: 1000 },
+        { type: 'foie_gras_knight', count: 12, interval: 1900 },
+        { type: 'flour_ghost', count: 12, interval: 1000 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wine_specter', count: 30, interval: 750 },
+        { type: 'foie_gras_knight', count: 20, interval: 1600 },
+        { type: 'chili_demon', count: 20, interval: 680 },
+        { type: 'sake_specter', count: 14, interval: 1400 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'wok_phantom', count: 16, interval: 1600 },
+        { type: 'wine_specter', count: 26, interval: 820 },
+        { type: 'foie_gras_knight', count: 18, interval: 1700 },
+        { type: 'cheese_golem', count: 10, interval: 1800 },
+        { type: 'rice_slime', count: 8, interval: 1800 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'wine_specter', count: 40, interval: 650 },
+        { type: 'foie_gras_knight', count: 30, interval: 1300 },
+        { type: 'sake_specter', count: 20, interval: 1200 },
+        { type: 'milk_phantom', count: 14, interval: 1200 },
+        { type: 'wok_phantom', count: 12, interval: 1700 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'noir_tasting_course', patience: 9000, baseReward: 108, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'bistro_full_course', patience: 8000, baseReward: 118, tipMultiplier: 2.0, vip: true }] },
+      { wave: 3, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 135, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 150, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 170, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 27, two: 20 },
+    service: { duration: 315, customerInterval: 2.4, maxCustomers: 51, customerPatience: 22 },
+  },
+
   '13-6': { id: '13-6', nameKo: '미구현', theme: 'placeholder' },
 
   // ══════════════════════════════════════════════════════════════

@@ -1574,6 +1574,10 @@ export class GatheringScene extends Phaser.Scene {
     else if (effectType === 'buff_range') tower.applyBuff('range', effectValue);
     else if (effectType === 'buff_burn') tower.applyBuff('burn', effectValue);
     else if (effectType === 'buff_slow') tower.applyBuff('slow', effectValue);
+    // 면역 계열: 디버프 면역 + 공격속도 보너스 (effectValue를 속도 버프로 적용)
+    else if (effectType === 'buff_narcotize_immunity') tower.applyBuff('speed', effectValue);
+    else if (effectType === 'buff_dark_immunity') tower.applyBuff('damage', effectValue);
+    else if (effectType === 'buff_wine_immunity') tower.applyBuff('speed', effectValue);
   }
 
   // ── 배달 도구 자동 수거 ────────────────────────────────────────

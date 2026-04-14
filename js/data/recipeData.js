@@ -6,6 +6,7 @@
  * Phase 22-3: + 서빙 8종 + 버프 2종 = 136종 (8장 이자카야 심층부).
  * Phase 25-1: + 서빙 8종 + 버프 2종 = 146종 (11장 용의 주방 심층부).
  * Phase 26-1: + 서빙 8종 + 버프 2종 = 156종 (12장 용의 궁전 결전).
+ * Phase 27-3: + 서빙 8종 + 버프 2종 = 166종 (13장 별빛 비스트로).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -767,6 +768,56 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { star_anise: 3, tofu: 2, cilantro: 1, sake: 1, meat: 1 }, baseReward: 180, cookTime: 15000,
     unlockCost: 280, gateStage: '12-5',
   },
+
+  // ── Phase 27-3 신규 서빙 레시피 (13장 별빛 비스트로) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'truffle_bisque', nameKo: '트러플 비스크', icon: '🍲', category: 'soup',
+    tier: 2, ingredients: { truffle: 1 }, baseReward: 58, cookTime: 6000,
+    unlockCost: 42, gateStage: '13-1',
+  },
+  {
+    id: 'foie_gras_toast', nameKo: '푸아그라 토스트', icon: '🍞', category: 'grill',
+    tier: 2, ingredients: { truffle: 1, butter: 1 }, baseReward: 62, cookTime: 6500,
+    unlockCost: 45, gateStage: '13-1',
+  },
+
+  // ★★★ 3성 (3종)
+  {
+    id: 'truffle_risotto', nameKo: '트러플 리조또', icon: '🍚', category: 'noodle',
+    tier: 3, ingredients: { truffle: 1, rice: 1, butter: 1 }, baseReward: 88, cookTime: 9000,
+    unlockCost: 78, gateStage: '13-2',
+  },
+  {
+    id: 'wine_truffle_plate', nameKo: '와인 트러플 정식', icon: '🍽️', category: 'special',
+    tier: 3, ingredients: { truffle: 1, mushroom: 1, meat: 1 }, baseReward: 92, cookTime: 9500,
+    unlockCost: 82, gateStage: '13-2',
+  },
+  {
+    id: 'truffle_pasta', nameKo: '트러플 파스타', icon: '🍝', category: 'noodle',
+    tier: 3, ingredients: { truffle: 1, flour: 1, egg: 1 }, baseReward: 85, cookTime: 8500,
+    unlockCost: 75, gateStage: '13-3',
+  },
+
+  // ★★★★ 4성 (2종)
+  {
+    id: 'bistro_full_course', nameKo: '비스트로 풀코스', icon: '🌟', category: 'special',
+    tier: 4, ingredients: { truffle: 1, butter: 1, mushroom: 1, meat: 1 }, baseReward: 118, cookTime: 11500,
+    unlockCost: 145, gateStage: '13-3',
+  },
+  {
+    id: 'wine_seafood_bisque', nameKo: '와인 씨푸드 비스크', icon: '🍲', category: 'soup',
+    tier: 4, ingredients: { truffle: 1, fish: 1, shrimp: 1, butter: 1 }, baseReward: 112, cookTime: 11000,
+    unlockCost: 138, gateStage: '13-4',
+  },
+
+  // ★★★★★ 5성 (1종)
+  {
+    id: 'noir_tasting_course', nameKo: '누아르 테이스팅 코스', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { truffle: 2, butter: 1, mushroom: 1, meat: 1, egg: 1 }, baseReward: 185, cookTime: 15500,
+    unlockCost: 290, gateStage: '13-5',
+  },
 ];
 
 /**
@@ -991,6 +1042,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.35,
     duration: 2, durationUnit: 'wave',
     unlockCost: 100, gateStage: '12-5',
+  },
+
+  // ── Phase 27-3 신규 버프 레시피 (13장 별빛 비스트로) ──
+  {
+    id: 'truffle_essence', nameKo: '트러플 에센스', icon: '🍄', category: 'buff',
+    tier: 3, ingredients: { truffle: 2 },
+    effectDesc: '취기 디버프 면역 + 공격속도 +15% (3웨이브)',
+    effectType: 'buff_wine_immunity',
+    effectValue: 0.15,
+    duration: 3, durationUnit: 'wave',
+    unlockCost: 70, gateStage: '13-2',
+  },
+  {
+    id: 'noir_awakening', nameKo: '누아르 각성', icon: '🌟', category: 'buff',
+    tier: 4, ingredients: { truffle: 1, butter: 1, mushroom: 1 },
+    effectDesc: '공격력+속도 +35% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.35,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 105, gateStage: '13-4',
   },
 ];
 
