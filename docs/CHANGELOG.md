@@ -1,5 +1,40 @@
 # Changelog
 
+## [2026-04-14] - Phase 27-3 13장 별빛 비스트로 스테이지/레시피 구현
+
+### 추가
+
+- **gameData.js**: truffle 재료 추가 (누적 22종), wine_specter/foie_gras_knight 적 데이터 등록
+  - wine_specter: HP 320, speed 62, invisible:true, wineDebuff 데이터 선등록 (발동 로직은 후속 Phase)
+  - foie_gras_knight: HP 420, speed 38, shieldFrontHeavy:0.70, enrageHpThreshold:0.35, enrageSpeedMultiplier:1.8
+
+- **stageData.js**: 13-1~13-5 스테이지 5개 구현 (placeholder 교체)
+  - 전체 theme: bistro_parisian, availableTowers 8종, gridCols:9/gridRows:10
+  - 13-1 비스트로 외관 (5웨이브), 13-2 비스트로 입구 홀 (5웨이브), 13-3 비스트로 주방 (6웨이브), 13-4 비스트로 와인 셀러 (6웨이브), 13-5 셰프 누아르의 주방 (5웨이브, 보스 선등장 패턴)
+  - 12장 4종 경로 순환 재사용 (L자/S자/W자/U자/역Z자)
+
+- **recipeData.js**: 트러플 서빙 레시피 8종 + 버프 레시피 2종 추가 (156종 → 166종)
+  - 서빙: truffle_bisque(T2), foie_gras_toast(T2), truffle_risotto(T3), wine_truffle_plate(T3), truffle_pasta(T3), bistro_full_course(T4), wine_seafood_bisque(T4), noir_tasting_course(T5)
+  - 버프: truffle_essence(T3, 취기면역+공속+15%, 3웨이브), noir_awakening(T4, 공격력+속도+35%, 2웨이브)
+
+- **storyData.js**: 13장 스토리 트리거 4건 등록 (누적 60항목)
+  - chapter13_intro (13-1 입장 시), chapter13_mid (13-3 첫 클리어 시), mimi_side_13 (행상인 1회), chapter13_clear (13-5 첫 클리어 시 + currentChapter→14)
+  - stage_first_clear 제외 목록에 13-1/13-3/13-5 추가
+
+- **dialogueData.js**: chapter13_clear 대화 1종 추가 (누적 61종)
+  - 6줄 (narrator + 앙드레x2 + 미미x2 + 라오x1), 비스트로 심층부 완파 + 14장 예고
+
+### 참고
+
+- buff_wine_immunity 면역 처리는 스펙상 RecipeManager.js로 기술되었으나, 실제 GatheringScene.js:1580에 구현됨 (기존 buff_narcotize_immunity와 동일 위치). 기능 정상 동작
+- wineDebuff 발동 로직 자체는 미구현 (데이터 선등록 상태). 기존 buff_narcotize_immunity도 동일 상황 (Phase 22-3 선례)
+- 난이도: 13장은 12장 대비 총 적 수는 적으나, wine_specter/foie_gras_knight의 높은 HP + 은신/전면방어/격노 메커닉으로 실질 난이도 상승
+- QA 26/26 PASS (Playwright 테스트), 콘솔 에러 0건
+- 스펙: `.claude/specs/2026-04-14-kc-phase27-3-scope.md`
+- QA: `.claude/specs/2026-04-14-kc-phase27-3-qa.md`
+
+---
+
 ## [2026-04-14] - Phase 27-2 13장 에셋 생성
 
 ### 추가

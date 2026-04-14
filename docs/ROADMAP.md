@@ -37,7 +37,7 @@
 | Phase 24 | 기존 8장→10장 번호 재편 + WorldMapScene 24챕터 확장 | 🔄 진행중 (24-1 완료) |
 | Phase 25 | 11장 — 용의 주방 심층부 (중식 2장) | 🔄 진행중 (25-1 완료) |
 | Phase 26 | 12장 — 드래곤 웍 최종전 (중식 3장) | 📋 계획 |
-| Phase 27 | 13장 — 별빛 비스트로 (양식 1장) | 🔄 진행중 (27-1, 27-2 완료) |
+| Phase 27 | 13장 — 별빛 비스트로 (양식 1장) | ✅ 완료 |
 | Phase 28 | 14장 — 비스트로 심층부 (양식 2장) | 📋 계획 |
 | Phase 29 | 15장 — 셰프 누아르 최종전 (양식 3장) | 📋 계획 |
 | Phase 30 | 챕터 7~15 밸런스 QA | 📋 계획 |
@@ -867,15 +867,17 @@
 
 ---
 
-## Phase 27-3 — 13장 스테이지 + 레시피 구현
+## Phase 27-3 — 13장 스테이지 + 레시피 구현 ✅ 완료
 
 > `visual_change: none` | 27-2 에셋 완성 후 진행
 
-- [ ] ingredientData.js: 트러플(truffle) 추가 — 누적 22종
-- [ ] enemyData.js: wine_specter, foie_gras_knight 등록
-- [ ] stageData.js: 스테이지 13-1 ~ 13-5 배치 (13-6은 Phase 29-1에서 chef_noir)
-- [ ] recipeData.js: 트러플 조합 레시피 ~10종 (트러플 파스타, 꽁피 드 카나르 등)
-- [ ] 서비스 설정 (13장 손님 패턴)
+- [x] gameData.js: 트러플(truffle) 재료 추가 — 누적 22종
+- [x] gameData.js: wine_specter, foie_gras_knight 적 등록
+- [x] stageData.js: 스테이지 13-1 ~ 13-5 배치 (13-6은 Phase 29-1에서 chef_noir)
+- [x] recipeData.js: 트러플 서빙 레시피 8종 + 버프 2종 추가 (156→166종)
+- [x] storyData.js: 13장 스토리 트리거 4건 등록
+- [x] dialogueData.js: chapter13_clear 대화 추가
+- [x] 서비스 설정 (13장 손님 패턴)
 
 ---
 
