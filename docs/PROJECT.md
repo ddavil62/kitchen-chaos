@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-14 (Phase 32-2 완료)
+> 최종 업데이트: 2026-04-14 (Phase 32-3 완료)
 
 ## 프로젝트 개요
 
@@ -107,8 +107,8 @@ kitchen-chaos/
       OrderManager.js        # 오더(미션) 시스템
     data/
       gameData.js            # 적(33종)/도구(TOOL_DEFS)/재료(26종) 정의
-      stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~16장, placeholder: 8/14/17~24장)
-      recipeData.js          # 레시피 201종 정의 (서빙 163 + 버프 38)
+      stageData.js           # 스테이지 데이터 138슬롯 (구현: 1~7/9~13/15~17장, placeholder: 8/14/18~24장)
+      recipeData.js          # 레시피 213종 정의 (서빙 173 + 버프 40)
       dialogueData.js        # 대화 스크립트 76종 + 캐릭터 11종 정의 (시즌2 7~15장 31종, 16장 4종, 17장 3종 포함)
       storyData.js           # STORY_TRIGGERS 트리거 데이터 77항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
@@ -157,8 +157,8 @@ kitchen-chaos/
 |------|------|------|
 | 코어 TD | 아이소메트릭 그리드, 도구 배치/회수/재배치, 적 AI, 재료 드롭 | 완료 |
 | 3단계 루프 | GatheringScene(재료 채집) + ServiceScene(영업) + MerchantScene(행상인) + ResultScene | 완료 |
-| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~13/15~16장, 보스 10종, 별점 시스템 | 완료 |
-| 레시피 | 201종 (서빙 163 + 버프 38), 5등급, 도감 | 완료 |
+| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~13/15~17장, 보스 10종, 별점 시스템 | 완료 |
+| 레시피 | 213종 (서빙 173 + 버프 40), 5등급, 도감 | 완료 |
 | 셰프 시스템 | 5종 셰프(유키/라오 데이터 등록+잠금 표시, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
@@ -179,6 +179,7 @@ kitchen-chaos/
 | 16장 스테이지+레시피 (Phase 31-3) | 스테이지 16-1~16-5 구현, 인도 요리 레시피 15종, curry_djinn 텔레포트/naan_golem 자가회복 메커닉 | 완료 |
 | 17장 대화 스크립트 (Phase 32-1) | 16장 에필로그 + 17장 대화 3종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17), 트리거 4건 등록 | 완료 |
 | 17장 에셋 생성 (Phase 32-2) | 적 2종(incense_specter 176px, spice_elemental 164px), spice_palace_interior 타일셋, 재료 아이콘 1종(chai) | 완료 |
+| 17장 스테이지+레시피+메카닉 (Phase 32-3) | 스테이지 17-1~17-5 구현, chai 활용 레시피 12종(서빙 10+버프 2), confuseOnHit/elementalResistance 메카닉 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -187,8 +188,8 @@ kitchen-chaos/
 | 적 | 44종 (일반 33 + 미니보스 1 + 보스 10) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
 | 재료 | 26종 |
-| 레시피 | 201종 (서빙 163 + 버프 38) |
-| 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~16장, placeholder: 8/14/17~24장) |
+| 레시피 | 213종 (서빙 173 + 버프 40) |
+| 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~17장, placeholder: 8/14/18~24장) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
 | 세이브 버전 | v16 |
 

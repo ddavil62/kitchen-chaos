@@ -1,5 +1,40 @@
 # Changelog
 
+## [Phase 32-3] 2026-04-14 — 17장 스테이지 구현
+
+### Added
+- stageData.js: 17-1~17-5 완전 구현 (theme: 'spice_palace', placeholder 제거)
+  - 17-1 향신료 궁전 내원: W자 변형 경로, 5웨이브, curry_djinn+naan_golem 중심
+  - 17-2 향신료 제단: 대각 Z자형 경로, 5웨이브, 16장 적 점진적 퇴장
+  - 17-3 향 제례당: 역U자형 경로, 6웨이브, incense_specter 첫 등장 (wave 3~6)
+  - 17-4 정령 의식장: 계단형 경로, 6웨이브, spice_elemental 첫 등장 (wave 2~6)
+  - 17-5 향신료 성역: 십자 역방향형 경로, 5웨이브 고밀도, incense_specter+spice_elemental 전 웨이브
+  - service: duration 348~370, maxCustomers 59~66, customerInterval 2.1~1.9 (16-5 기준 344에서 선형 증가)
+- recipeData.js: chai 활용 서빙 10종 + 버프 2종 추가 (누적 213종 = 서빙 173 + 버프 40)
+  - 서빙 2성: chai_masala, spiced_chai_bread (gateStage 17-1)
+  - 서빙 3성: chai_rice (17-1), incense_soup (17-2)
+  - 서빙 4성: chai_chicken (17-2), deep_spice_stew (17-3)
+  - 서빙 5성: chai_grand_curry (17-3), incense_palace_feast (17-4), elemental_platter (17-4), sanctum_grand_feast (17-5)
+  - 버프 3성: chai_shield (17-2, 받는 피해 -20% 2웨이브)
+  - 버프 4성: incense_blessing (17-4, 공격력+속도 +50% 2웨이브)
+- Enemy.js: takeDamage 시그니처 `takeDamage(amount, towerType = null)` 변경
+  - elementalResistance 처리: resistTypes 해당 타워 피해에 resistMultiplier(0.50) 적용 (L.883-886)
+  - confuseOnHit 처리: 피격 시 confuseChance(0.35) 확률로 'enemy_confuse' 이벤트 emit, x/y/duration 포함 (L.925-931)
+  - 자기 피해(burn, DoT)는 towerType=null로 호출 -- elementalResistance 미적용
+- Projectile.js: _hit() 기본 피해 `takeDamage(this.damage, this.towerType)`, splash 피해 `takeDamage(splashDamage, this.towerType)` 변경
+
+### 변경
+- recipeData.js @fileoverview: 201종 -> 213종 (스펙 211종에서 Coder가 실제 계산 후 213종으로 정정)
+
+### 참고
+- 커밋: 53773ce
+- 스펙: `.claude/specs/2026-04-14-kc-phase32-3-spec.md`
+- QA: `.claude/specs/2026-04-14-kc-phase32-3-qa.md`
+- QA LOW 소견: confuseOnHit가 towerType 무관하게 발동하여 burn/DoT 자기 피해에도 confuse emit 가능. 현재 수신측(TowerManager) 미구현이므로 실질적 영향 없음.
+- confuse 이벤트 수신 측(TowerManager) 로직 구현은 스코프 외 -- emit만 구현
+
+---
+
 ## [Phase 32-2] 2026-04-14 — 17장 신규 에셋 4종 생성
 
 ### Added
