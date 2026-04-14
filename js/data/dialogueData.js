@@ -20,6 +20,7 @@
  * Phase 29-1: 15장 셰프 누아르 최종전 대화 5종 추가 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b). 누적 69종.
  * Phase 31-1: 16장 향신료 궁전 대화 3종 추가 (chapter16_intro, chapter16_mid, team_side_16). 누적 72종.
  * Phase 32-1: 16장 에필로그 + 17장 향신료 궁전 심층부 대화 4종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17). 누적 76종.
+ * Phase 32-4: 18장 대화 6종 추가 (chapter18_intro, chapter18_mid, chapter18_boss, chapter18_clear, chapter18_epilogue, team_side_18). CHARACTERS에 masala_guide(아르준), maharaja 추가. 17장 ??? 대사 아르준으로 소급 수정. 누적 82종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1142,14 +1143,14 @@ export const DIALOGUES = {
     skippable: true,
     lines: [
       { speaker: 'narrator', portrait: '', text: '시장 깊숙한 곳, 향신료 탑들 사이. 갑자기 사방에서 등불이 켜진다.' },
-      { speaker: '???', portrait: '🧿', text: '(낮고 단호한 목소리로) 멈춰라. 이 구역은 외부인 출입 금지다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(낮고 단호한 목소리로) 멈춰라. 이 구역은 외부인 출입 금지다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '누, 누구야?! 갑자기 나타나서!' },
-      { speaker: '???', portrait: '🧿', text: '우리는 마살라 문파. 이 시장의 식란을 대대로 다스려온 자들이다. 당신들은 누구이고, 무슨 목적으로 왔나.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '우리는 마살라 문파. 이 시장의 식란을 대대로 다스려온 자들이다. 당신들은 누구이고, 무슨 목적으로 왔나.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(한 걸음 앞으로 나서며) 저희는 WCA 소속 미력사입니다. 새로운 식란 징후를 추적해왔습니다.' },
-      { speaker: '???', portrait: '🧿', text: '(비웃듯) WCA? 유럽 미력사들이 인도까지 왔군. 우리 일에 간섭하려고?' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(비웃듯) WCA? 유럽 미력사들이 인도까지 왔군. 우리 일에 간섭하려고?' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(팔짱을 끼며) 식란이 국경을 알겠어? 혼자 다 막을 수 있다면 진작 막았겠지.' },
-      { speaker: '???', portrait: '🧿', text: '(잠시 침묵) ...말이 거칩구나, 중국인. 하지만 틀린 말은 아니야.' },
-      { speaker: '???', portrait: '🧿', text: '지금 당장 협력하겠다는 건 아니다. 하지만 쫓아내지도 않겠다. 일단... 지켜보겠어.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(잠시 침묵) ...말이 거칩구나, 중국인. 하지만 틀린 말은 아니야.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '지금 당장 협력하겠다는 건 아니다. 하지만 쫓아내지도 않겠다. 일단... 지켜보겠어.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(작은 목소리로) ...경계하는 건지 인정하는 건지 모르겠어.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(미미 귀에 속삭이며) 쫓겨나지 않았잖아. 우린 늘 이렇게 시작하는 거야!' },
     ],
@@ -1181,9 +1182,9 @@ export const DIALOGUES = {
       { speaker: 'narrator', portrait: '', text: '시장 외곽의 식란이 잦아들었다. 그러나 중심부의 공기는 여전히 뜨겁다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '전부 다 끝난 건 아니지? 저 안쪽이 더 진하게 느껴져.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '미력 반응 수치가 오히려 올라갑니다. 심층부가 진원지입니다.' },
-      { speaker: '???', portrait: '🧿', text: '(낮은 목소리로) 거기까지 들어가려면… 각오가 있어야 한다. 그 안에 있는 것은 우리도 오래 봉인해온 것이다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(낮은 목소리로) 거기까지 들어가려면… 각오가 있어야 한다. 그 안에 있는 것은 우리도 오래 봉인해온 것이다.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '봉인이 풀리고 있다는 뜻이야?' },
-      { speaker: '???', portrait: '🧿', text: '그렇다. 그래서 너희가 온 것이 운이 좋다고 생각하기 시작했다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '그렇다. 그래서 너희가 온 것이 운이 좋다고 생각하기 시작했다.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(작게) 첫 인사보다 많이 풀렸는걸~' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(결의를 다지며) 좋아. 심층부로 간다. 함께 막아요.' },
       { speaker: 'narrator', portrait: '', text: '팀은 향신료 궁전의 심층부, 금고의 층으로 발걸음을 내디뎠다.' },
@@ -1197,13 +1198,13 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '거대한 석문이 열리자 향신료 먼지가 폭포처럼 쏟아졌다. 안쪽에는 황금빛 항아리들이 천장까지 쌓여 있었다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '이게… 향신료 금고야? 이 양이 다 뭐야!' },
-      { speaker: '???', portrait: '🧿', text: '수백 년 전, 우리 조상이 미력을 담은 향신료들을 봉인해 쌓아온 장소다. 그것이 지금 풀려나고 있다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '수백 년 전, 우리 조상이 미력을 담은 향신료들을 봉인해 쌓아온 장소다. 그것이 지금 풀려나고 있다.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(주위를 살피며) 내부에서 누군가 건드렸다는 흔적이 있습니다. 봉인이 저절로 풀리지 않아요.' },
-      { speaker: '???', portrait: '🧿', text: '(표정이 굳으며) …맞다. 안에서부터 열린 것이다. 우리가 알아채지 못한 사이에.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(표정이 굳으며) …맞다. 안에서부터 열린 것이다. 우리가 알아채지 못한 사이에.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '누가 이걸 열 수 있는 겁니까? 마살라 문파 외부 인물이?' },
-      { speaker: '???', portrait: '🧿', text: '(긴 침묵 후, 낮게) …그 이름을 입에 올리고 싶지 않지만. 마하라자. 그 이름이 떠오른다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(긴 침묵 후, 낮게) …그 이름을 입에 올리고 싶지 않지만. 마하라자. 그 이름이 떠오른다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '마하라자? 누구야?' },
-      { speaker: '???', portrait: '🧿', text: '나중에 설명하겠다. 지금은 먼저 이 안을 정화해라.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '나중에 설명하겠다. 지금은 먼저 이 안을 정화해라.' },
     ],
   },
 
@@ -1214,15 +1215,15 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '금고 한 층이 고요해졌다. 황금빛 먼지가 천천히 가라앉으며, 벽에 새겨진 문양이 드러났다.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(문양을 가리키며) 이 각인… 마살라 문파의 봉인 문양과 다릅니다. 형태가 달라요.' },
-      { speaker: '???', portrait: '🧿', text: '(표정이 굳으며) …그건 마하라자의 인장이다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(표정이 굳으며) …그건 마하라자의 인장이다.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '마하라자. 아까 그 이름이군요. 설명해줄 수 있습니까?' },
-      { speaker: '???', portrait: '🧿', text: '300년 전, 우리 문파에서 추방된 미력사다. 향신료의 미력을 무기로 바꾸려 했다. 정화가 아닌 — 지배를.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '300년 전, 우리 문파에서 추방된 미력사다. 향신료의 미력을 무기로 바꾸려 했다. 정화가 아닌 — 지배를.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(차갑게) 추방됐다면 이미 죽었을 텐데.' },
-      { speaker: '???', portrait: '🧿', text: '그가 죽었는지는 모른다. 하지만 이 인장은… 그의 기술로 다시 새겨진 것이다. 누군가가 그의 방법을 재현했다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '그가 죽었는지는 모른다. 하지만 이 인장은… 그의 기술로 다시 새겨진 것이다. 누군가가 그의 방법을 재현했다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '추종자가 있다는 거야?' },
-      { speaker: '???', portrait: '🧿', text: '(고개를 끄덕이며) 그리고 그들이 이 금고를 열고, 안에 잠든 것을 깨우려 하고 있다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '(고개를 끄덕이며) 그리고 그들이 이 금고를 열고, 안에 잠든 것을 깨우려 하고 있다.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(긴장된 표정으로) 안에 잠든 게 뭔데?' },
-      { speaker: '???', portrait: '🧿', text: '금고의 수호자. 봉인이 풀리면 — 그것이 깨어난다. 다음 층에서 마주칠 것이다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '금고의 수호자. 봉인이 풀리면 — 그것이 깨어난다. 다음 층에서 마주칠 것이다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(프라이팬을 단단히 쥐며) …이 팀이라면 막을 수 있어. 같이 간다.' },
     ],
   },
@@ -1241,6 +1242,118 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코!! 그거 무단으로 가져온 거야?!' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '정화된 거니까 반환 완료 아닌가요~?' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(한숨) …그 논리, 절대 통하지 않습니다.' },
+    ],
+  },
+
+  // ── 18장: 향신료 궁전 최심층 — 마하라자 (Phase 32-4) ──────────────
+
+  // chapter18_intro — 18-1 진입 시, 아르준 신원 공개
+  chapter18_intro: {
+    id: 'chapter18_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '금고의 마지막 층. 향신료 먼지가 가라앉고, 황금빛 인장이 새겨진 거대한 문이 드러났다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '...여기까지 와줬으니 이제 말해야겠어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '아르준 씨?' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '내 이름은 아르준. 마살라 문파 12대 계승자야. 17장 내내 이름을 숨긴 건... 이 봉인이 풀리는 걸 막지 못할 경우를 대비해서였어.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '혼자 책임지려 했던 거야?' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '마하라자는 300년 전 우리 문파가 봉인했어. 미력을 정화가 아닌 지배를 위해 쓴 자야. 음식의 힘을 독점해 왕국 전체를 통제했지.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '...그래서 WCA 어디에도 기록이 없었군요. 마살라 문파가 역사를 지웠던 거예요.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '수치스러운 역사니까. 우리 조상이 만든 괴물이니까.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '과거가 어떻든, 지금 막아야 한다는 건 변함없어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(아르준의 어깨에 손을 얹으며) 혼자 짊어진 거 내려놔요. 지금은 같이 가는 거야.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '...고마워. 같이 가자.' },
+      { speaker: 'narrator', portrait: '', text: '문이 열렸다. 300년간 잠들어 있던 미력이 방 전체를 가득 채웠다.' },
+    ],
+  },
+
+  // chapter18_mid — 18-3 첫 클리어 후, 정화할수록 각성하는 마하라자
+  chapter18_mid: {
+    id: 'chapter18_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '세 층이 정화되었다. 그러나 미력 농도는 내려가지 않았다 — 오히려 올라가고 있었다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '이상해. 정화할수록 미력 수치가 올라가고 있어.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '...알고 있었어. 말하지 못했지만.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '아르준 씨?' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '마하라자의 봉인은 분산형이야. 정화하면 억제력이 줄어들어.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '즉, 우리가 정화할수록 마하라자가 깨어난다는 거야.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '최심층에서 그의 잔영이 완전히 응집되면 — 그게 진짜 마하라자야. 응집 완료 전에 직접 정화해야 해.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '위험한 도박이네요.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '나는 이 위험을 혼자 처리하려 했어. 하지만 이제 포기했어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포기한 게 아니야. 우리한테 맡긴 거잖아.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '좋아, 진짜 마하라자 잡으러 가는 거야. 완벽한 클라이맥스 아니야~?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '가자.' },
+    ],
+  },
+
+  // chapter18_boss — 18-6 진입 시, 마하라자 각성
+  chapter18_boss: {
+    id: 'chapter18_boss',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '최심층. 황금빛 연기가 사람의 형체를 이루기 시작했다.' },
+      { speaker: '마하라자', portrait: '👑', portraitKey: 'maharaja', text: '...300년. 오래 기다렸다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '마하라자...!' },
+      { speaker: '마하라자', portrait: '👑', portraitKey: 'maharaja', text: '작은 미력사들. 나를 정화하러 왔는가. 참으로 오만하군.' },
+      { speaker: '마하라자', portrait: '👑', portraitKey: 'maharaja', text: '미력이란 지배하는 자만이 다룰 수 있다. 너희는 재료를 낭비하고 있을 뿐이야.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '마하라자. 나는 마살라 문파 12대 계승자 아르준이다. 조상을 대신해 선언한다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '당신의 봉인을 해제한 건 실수였어. 하지만 당신을 정화하는 건 우리의 책임이야.' },
+      { speaker: '마하라자', portrait: '👑', portraitKey: 'maharaja', text: '계승자라고? 문파의 잔재가 이 꼴이라니. 실망스럽군.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '실망스러우면 직접 확인해봐.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '모두, 간다!' },
+    ],
+  },
+
+  // chapter18_clear — 18-6 첫 클리어 후, 마하라자 정화 완료 + 에필로그 연쇄
+  chapter18_clear: {
+    id: 'chapter18_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '황금빛 형체가 흩어지기 시작했다. 마지막 미력이 조각조각 풀려나며 향신료 향기로 변했다.' },
+      { speaker: '마하라자', portrait: '👑', portraitKey: 'maharaja', text: '...이런 결말이라니. 내 미력이... 이렇게 작은 손들에게.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '당신의 미력은 지배를 위한 게 아니었어요. 원래는 요리를 위한 것이었겠죠.' },
+      { speaker: '마하라자', portrait: '👑', portraitKey: 'maharaja', text: '...300년 전. 처음 그 향신료를 다뤘을 때. 나는 단지... 영원히 맛있는 것을 만들고 싶었을 뿐이었지.' },
+      { speaker: 'narrator', portrait: '', text: '황금빛 연기가 천천히 사라지며, 금고 전체에 따뜻한 향신료 향이 퍼졌다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '마살라 문파 12대 계승자 아르준, 여기서 봉인을 영구히 해제하겠습니다. 이 짐은 더 이상 다음 세대로 이어지지 않아도 됩니다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '...잘 했어요.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '야, 향신료 냄새 때문에 눈이 매워서 그래. 진짜야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '인도의 봉인이 풀렸어요. 이제 진짜 끝났군요.' },
+    ],
+  },
+
+  // chapter18_epilogue — chapter18_clear onComplete에서 딜레이 1200ms 후 연쇄 재생
+  chapter18_epilogue: {
+    id: 'chapter18_epilogue',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '향신료 궁전 밖. 석양빛 인도의 하늘이 붉게 물들어 있었다.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '...끝났어. 300년 동안 우리 문파를 짓눌렀던 것이.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '아르준 씨는 이제 어쩔 거예요?' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '마살라 문파를 다시 세울 거야. 이번엔 봉인을 지키는 게 아니라, 미력을 요리로 해방하는 문파로.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: 'WCA와도 협력할 수 있을 것 같아요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '우리 다음엔 어디야?' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '다음 식란 정보~ 멕시코에서 왔어. 타코 재료가 폭주 중이래!' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '멕시코! 타코!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '벌써 요리 생각을 하는군요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '요리와 정화는 같은 거잖아요! 가자, 다음 여정!' },
+      { speaker: 'narrator', portrait: '', text: '인도 아크 완결. 향신료 궁전의 300년 봉인이 풀렸다.' },
+    ],
+  },
+
+  // team_side_18 — merchant_enter에서 1회, 18장 진입 후 팀원 리액션
+  team_side_18: {
+    id: 'team_side_18',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '아, 맞다. 아르준한테 마살라 향신료 몇 가지 달라고 해도 되겠지?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '친해졌다고 바로 요구하지는 마.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '이미 챙겨놨어. 이 정도는 감사 표시지.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '아르준! 역시! 눈치가 빨라~' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '아르준 씨도 포코 페이스에 적응한 거야?' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '...어느 순간부터 익숙해졌어.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '저도 처음엔 이 팀 분위기가 낯설었는데, 지금은 없으면 어색할 것 같아요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '그게 팀의 무서움이죠.' },
     ],
   },
 };
@@ -1266,4 +1379,7 @@ export const CHARACTERS = {
   andre: { id: 'andre', nameKo: '앙드레', portrait: '🥐', portraitKey: 'andre', color: 0x4169e1, role: 'ally', desc: 'WCA 유럽 지부장. 파리 출신 미력사로, 별빛 비스트로 식란 사태를 조사 중이다.' },
   // ── Phase 29-1: 15장 보스 캐릭터 ──
   chef_noir: { id: 'chef_noir', nameKo: '셰프 누아르', portrait: '🍴', portraitKey: 'chef_noir', color: 0x1a1a2e, role: 'boss', desc: '파리 카타콩브 출신의 전 WCA 수석 미력사. 식란을 자연적 해방으로 보는 극단적 요리 철학의 소유자. 양식 아크 최종 보스.' },
+  // ── Phase 32-4: 18장 인도 아크 캐릭터 ──
+  masala_guide: { id: 'masala_guide', nameKo: '아르준', portrait: '🪬', portraitKey: 'masala_guide', color: 0xd4a017, role: 'ally', desc: '마살라 문파 12대 계승자. 인도 향신료 시장의 식란을 대대로 수호해온 비밀 결사의 후계자.' },
+  maharaja: { id: 'maharaja', nameKo: '마하라자', portrait: '👑', portraitKey: 'maharaja', color: 0xb8860b, role: 'boss', desc: '300년 전 향신료 왕국을 지배했던 자. 미력을 지배의 도구로 삼았다가 마살라 문파에 봉인되었다. 인도 아크 최종 보스.' },
 };
