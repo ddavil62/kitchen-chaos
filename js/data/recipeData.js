@@ -7,6 +7,7 @@
  * Phase 25-1: + 서빙 8종 + 버프 2종 = 146종 (11장 용의 주방 심층부).
  * Phase 26-1: + 서빙 8종 + 버프 2종 = 156종 (12장 용의 궁전 결전).
  * Phase 27-3: + 서빙 8종 + 버프 2종 = 166종 (13장 별빛 비스트로).
+ * Phase 29-2: + 서빙 16종 + 버프 4종 = 186종 (15장 카타콩브).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -818,6 +819,96 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { truffle: 2, butter: 1, mushroom: 1, meat: 1, egg: 1 }, baseReward: 185, cookTime: 15500,
     unlockCost: 290, gateStage: '13-5',
   },
+
+  // ── Phase 29-2 신규 서빙 레시피 (15장 카타콩브) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'herb_soup', nameKo: '허브 수프', icon: '🍲', category: 'soup',
+    tier: 2, ingredients: { herb_bundle: 1 }, baseReward: 65, cookTime: 6500,
+    unlockCost: 48, gateStage: '15-1',
+  },
+  {
+    id: 'herb_bread', nameKo: '허브 빵', icon: '🍞', category: 'grill',
+    tier: 2, ingredients: { herb_bundle: 1, flour: 1 }, baseReward: 68, cookTime: 7000,
+    unlockCost: 52, gateStage: '15-1',
+  },
+
+  // ★★★ 3성 (6종)
+  {
+    id: 'herb_butter_saute', nameKo: '허브 버터 소테', icon: '🧈', category: 'grill',
+    tier: 3, ingredients: { herb_bundle: 1, butter: 1 }, baseReward: 90, cookTime: 8500,
+    unlockCost: 78, gateStage: '15-1',
+  },
+  {
+    id: 'herb_mushroom_soup', nameKo: '허브 버섯 스프', icon: '🍲', category: 'soup',
+    tier: 3, ingredients: { herb_bundle: 1, mushroom: 1 }, baseReward: 88, cookTime: 8500,
+    unlockCost: 75, gateStage: '15-1',
+  },
+  {
+    id: 'herb_truffle_cream', nameKo: '허브 트러플 크림', icon: '🍄', category: 'soup',
+    tier: 3, ingredients: { herb_bundle: 1, truffle: 1, butter: 1 }, baseReward: 105, cookTime: 9500,
+    unlockCost: 92, gateStage: '15-2',
+  },
+  {
+    id: 'herb_escargot', nameKo: '허브 에스카르고', icon: '🐌', category: 'special',
+    tier: 3, ingredients: { herb_bundle: 1, butter: 1, mushroom: 1 }, baseReward: 108, cookTime: 9500,
+    unlockCost: 95, gateStage: '15-2',
+  },
+  {
+    id: 'herb_ragout', nameKo: '허브 라구', icon: '🥩', category: 'grill',
+    tier: 3, ingredients: { herb_bundle: 1, meat: 1, egg: 1 }, baseReward: 102, cookTime: 9000,
+    unlockCost: 88, gateStage: '15-2',
+  },
+  {
+    id: 'herb_fish_meuniere', nameKo: '허브 피시 뫼니에르', icon: '🐟', category: 'grill',
+    tier: 3, ingredients: { herb_bundle: 1, fish: 1, butter: 1 }, baseReward: 98, cookTime: 9000,
+    unlockCost: 85, gateStage: '15-3',
+  },
+
+  // ★★★★ 4성 (5종)
+  {
+    id: 'catacomb_herb_plate', nameKo: '카타콩브 허브 플레이트', icon: '🍽️', category: 'special',
+    tier: 4, ingredients: { herb_bundle: 1, truffle: 1, meat: 1, butter: 1 }, baseReward: 128, cookTime: 11500,
+    unlockCost: 155, gateStage: '15-3',
+  },
+  {
+    id: 'herb_duck_confit', nameKo: '허브 오리 콩피', icon: '🦆', category: 'grill',
+    tier: 4, ingredients: { herb_bundle: 1, meat: 1, mushroom: 1, butter: 1 }, baseReward: 132, cookTime: 12000,
+    unlockCost: 160, gateStage: '15-3',
+  },
+  {
+    id: 'noir_herb_bisque', nameKo: '누아르 허브 비스크', icon: '🍲', category: 'soup',
+    tier: 4, ingredients: { herb_bundle: 2, fish: 1, shrimp: 1 }, baseReward: 125, cookTime: 11000,
+    unlockCost: 148, gateStage: '15-4',
+  },
+  {
+    id: 'herb_grand_platter', nameKo: '허브 그랑 플래터', icon: '🌟', category: 'special',
+    tier: 4, ingredients: { herb_bundle: 1, truffle: 1, mushroom: 1, meat: 1, butter: 1 }, baseReward: 145, cookTime: 13000,
+    unlockCost: 178, gateStage: '15-4',
+  },
+  {
+    id: 'catacomb_tasting_menu', nameKo: '카타콩브 테이스팅 메뉴', icon: '⭐', category: 'special',
+    tier: 4, ingredients: { herb_bundle: 1, truffle: 1, fish: 1, egg: 1, rice: 1 }, baseReward: 138, cookTime: 12500,
+    unlockCost: 168, gateStage: '15-5',
+  },
+
+  // ★★★★★ 5성 (3종)
+  {
+    id: 'noir_herb_course', nameKo: '누아르 허브 코스', icon: '✨', category: 'special',
+    tier: 5, ingredients: { herb_bundle: 2, truffle: 1, meat: 1, mushroom: 1, butter: 1 }, baseReward: 195, cookTime: 16000,
+    unlockCost: 310, gateStage: '15-5',
+  },
+  {
+    id: 'catacomb_grand_feast', nameKo: '카타콩브 그랑 피스트', icon: '🎖️', category: 'special',
+    tier: 5, ingredients: { herb_bundle: 2, truffle: 2, fish: 1, shrimp: 1, egg: 1 }, baseReward: 205, cookTime: 17000,
+    unlockCost: 340, gateStage: '15-5',
+  },
+  {
+    id: 'chefs_noir_tribute', nameKo: '셰프 누아르 헌정 요리', icon: '👨‍🍳', category: 'special',
+    tier: 5, ingredients: { herb_bundle: 2, truffle: 2, meat: 1, mushroom: 1, butter: 1, egg: 1 }, baseReward: 225, cookTime: 18500,
+    unlockCost: 380, gateStage: '15-6',
+  },
 ];
 
 /**
@@ -1062,6 +1153,44 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.35,
     duration: 2, durationUnit: 'wave',
     unlockCost: 105, gateStage: '13-4',
+  },
+
+  // ── Phase 29-2 신규 버프 레시피 (15장 카타콩브) ──
+  {
+    id: 'herb_essence', nameKo: '허브 에센스', icon: '🌿', category: 'buff',
+    tier: 3, ingredients: { herb_bundle: 2 },
+    effectDesc: '이동속도 -25% (2웨이브)',
+    effectType: 'debuff_slow',
+    effectValue: 0.25,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 72, gateStage: '15-2',
+  },
+  {
+    id: 'catacomb_mist', nameKo: '카타콩브 안개', icon: '🌫️', category: 'buff',
+    tier: 3, ingredients: { herb_bundle: 1, mushroom: 1 },
+    effectDesc: '범위 적 혼란 +공격속도 +20% (2웨이브)',
+    effectType: 'buff_and_confuse',
+    effectValue: 0.20,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 78, gateStage: '15-3',
+  },
+  {
+    id: 'noir_herb_elixir', nameKo: '누아르 허브 엘릭서', icon: '⚗️', category: 'buff',
+    tier: 4, ingredients: { herb_bundle: 1, truffle: 1, mushroom: 1 },
+    effectDesc: '공격력+속도 +40% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.40,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 112, gateStage: '15-4',
+  },
+  {
+    id: 'chefs_noir_blessing', nameKo: '셰프 누아르의 축복', icon: '🙏', category: 'buff',
+    tier: 4, ingredients: { herb_bundle: 2, truffle: 1, butter: 1 },
+    effectDesc: '전 도구 공격력 +30% + 재료 드롭률 +50% (3웨이브)',
+    effectType: 'buff_attack_drop',
+    effectValue: 0.30,
+    duration: 3, durationUnit: 'wave',
+    unlockCost: 125, gateStage: '15-5',
   },
 ];
 

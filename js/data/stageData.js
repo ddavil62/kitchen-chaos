@@ -6,6 +6,7 @@
  * Phase 25-1: 11장 용의 주방 심층부 11-1~11-5 웨이브 데이터 추가 (11-6은 placeholder 유지).
  * Phase 26-2: 10-6 sake_master 보스전으로 교체, 11-6 완성 (dragon_wok 약화 선등장), 12-1~12-6 완성 (dragon_wok 최종 보스전).
  * Phase 27-3: 13-1~13-5 스테이지 구현. 테마: bistro_parisian.
+ * Phase 29-2: 13-6 + 15-1~15-6 (카타콩브) 구현 완료.
  * 각 스테이지는 고유 경로, 웨이브, 손님 구성을 가진다.
  */
 
@@ -5910,7 +5911,58 @@ export const STAGES = {
     service: { duration: 315, customerInterval: 2.4, maxCustomers: 51, customerPatience: 22 },
   },
 
-  '13-6': { id: '13-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 13-6: 비스트로 비밀 지하실 (보너스) ──
+  '13-6': {
+    id: '13-6',
+    nameKo: '비스트로 비밀 지하실',
+    theme: 'bistro_parisian',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // T자 패턴
+    pathSegments: [
+      { type: 'horizontal', row: 2, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 2, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'wine_specter', count: 22, interval: 1000 },
+        { type: 'foie_gras_knight', count: 16, interval: 1700 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'wine_specter', count: 26, interval: 900 },
+        { type: 'foie_gras_knight', count: 18, interval: 1600 },
+        { type: 'cellar_phantom', count: 6, interval: 2200 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'wine_specter', count: 30, interval: 820 },
+        { type: 'foie_gras_knight', count: 20, interval: 1500 },
+        { type: 'cellar_phantom', count: 10, interval: 2000 },
+        { type: 'cheese_golem', count: 8, interval: 1900 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'wine_specter', count: 36, interval: 740 },
+        { type: 'foie_gras_knight', count: 24, interval: 1400 },
+        { type: 'cellar_phantom', count: 14, interval: 1800 },
+        { type: 'sommelier_wraith', count: 4, interval: 2800 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'wine_specter', count: 42, interval: 670 },
+        { type: 'foie_gras_knight', count: 28, interval: 1300 },
+        { type: 'cellar_phantom', count: 16, interval: 1700 },
+        { type: 'sommelier_wraith', count: 8, interval: 2500 },
+        { type: 'milk_phantom', count: 12, interval: 1200 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'bistro_full_course', patience: 9000, baseReward: 118, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'noir_tasting_course', patience: 8500, baseReward: 132, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 148, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 165, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'noir_tasting_course', patience: 8000, baseReward: 185, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 28, two: 21 },
+    service: { duration: 320, customerInterval: 2.4, maxCustomers: 52, customerPatience: 22 },
+  },
 
   // ══════════════════════════════════════════════════════════════
   // ── 시즌 2: 14장 (미구현) ──
@@ -5924,15 +5976,367 @@ export const STAGES = {
   '14-6': { id: '14-6', nameKo: '미구현', theme: 'placeholder' },
 
   // ══════════════════════════════════════════════════════════════
-  // ── 시즌 2: 15장 (미구현) ──
+  // ── 시즌 2: 15장 카타콩브 (Phase 29-2) ──
   // ══════════════════════════════════════════════════════════════
 
-  '15-1': { id: '15-1', nameKo: '미구현', theme: 'placeholder' },
-  '15-2': { id: '15-2', nameKo: '미구현', theme: 'placeholder' },
-  '15-3': { id: '15-3', nameKo: '미구현', theme: 'placeholder' },
-  '15-4': { id: '15-4', nameKo: '미구현', theme: 'placeholder' },
-  '15-5': { id: '15-5', nameKo: '미구현', theme: 'placeholder' },
-  '15-6': { id: '15-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 15-1: 카타콩브 입구 ──
+  '15-1': {
+    id: '15-1',
+    nameKo: '카타콩브 입구',
+    theme: 'wine_cellar',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 뱀형(M자) 패턴
+    pathSegments: [
+      { type: 'vertical', col: 1, rowStart: 0, rowEnd: 3 },
+      { type: 'horizontal', row: 3, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 3, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 1, colEnd: 7 },
+      { type: 'vertical', col: 1, rowStart: 6, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 14, interval: 1600 },
+        { type: 'wine_specter', count: 16, interval: 1100 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 18, interval: 1450 },
+        { type: 'wine_specter', count: 20, interval: 980 },
+        { type: 'foie_gras_knight', count: 10, interval: 1700 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 22, interval: 1300 },
+        { type: 'sommelier_wraith', count: 8, interval: 2300 },
+        { type: 'wine_specter', count: 24, interval: 880 },
+        { type: 'flour_ghost', count: 14, interval: 900 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 26, interval: 1200 },
+        { type: 'sommelier_wraith', count: 12, interval: 2100 },
+        { type: 'wine_specter', count: 28, interval: 800 },
+        { type: 'cheese_golem', count: 8, interval: 1800 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 32, interval: 1050 },
+        { type: 'sommelier_wraith', count: 16, interval: 1900 },
+        { type: 'wine_specter', count: 34, interval: 720 },
+        { type: 'foie_gras_knight', count: 14, interval: 1500 },
+        { type: 'milk_phantom', count: 10, interval: 1200 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'herb_soup', patience: 9000, baseReward: 72, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'herb_bread', patience: 8500, baseReward: 82, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'herb_butter_saute', patience: 8500, baseReward: 95, tipMultiplier: 1.5 }] },
+      { wave: 4, customers: [{ dish: 'herb_mushroom_soup', patience: 8000, baseReward: 108, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'herb_escargot', patience: 8000, baseReward: 122, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 28, two: 21 },
+    service: { duration: 318, customerInterval: 2.4, maxCustomers: 52, customerPatience: 22 },
+  },
+
+  // ── 15-2: 카타콩브 통로 ──
+  '15-2': {
+    id: '15-2',
+    nameKo: '카타콩브 통로',
+    theme: 'wine_cellar',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 소용돌이형 패턴 (나선 변형)
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 8, rowStart: 1, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 8 },
+      { type: 'vertical', col: 2, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 16, interval: 1500 },
+        { type: 'sommelier_wraith', count: 8, interval: 2200 },
+        { type: 'wine_specter', count: 18, interval: 1050 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 20, interval: 1350 },
+        { type: 'sommelier_wraith', count: 12, interval: 2000 },
+        { type: 'wine_specter', count: 22, interval: 940 },
+        { type: 'foie_gras_knight', count: 12, interval: 1600 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 24, interval: 1250 },
+        { type: 'sommelier_wraith', count: 14, interval: 1900 },
+        { type: 'wine_specter', count: 26, interval: 850 },
+        { type: 'cheese_golem', count: 9, interval: 1750 },
+        { type: 'flour_ghost', count: 14, interval: 880 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 28, interval: 1150 },
+        { type: 'sommelier_wraith', count: 16, interval: 1800 },
+        { type: 'wine_specter', count: 30, interval: 770 },
+        { type: 'foie_gras_knight', count: 16, interval: 1500 },
+        { type: 'mushroom_scout', count: 12, interval: 900 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 34, interval: 1000 },
+        { type: 'sommelier_wraith', count: 20, interval: 1650 },
+        { type: 'wine_specter', count: 36, interval: 700 },
+        { type: 'foie_gras_knight', count: 18, interval: 1400 },
+        { type: 'milk_phantom', count: 12, interval: 1150 },
+        { type: 'butter_ghost', count: 12, interval: 820 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'herb_butter_saute', patience: 9000, baseReward: 92, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'herb_ragout', patience: 8500, baseReward: 105, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'herb_truffle_cream', patience: 8500, baseReward: 118, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'herb_escargot', patience: 8000, baseReward: 132, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'herb_fish_meuniere', patience: 8000, baseReward: 148, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 29, two: 22 },
+    service: { duration: 322, customerInterval: 2.4, maxCustomers: 53, customerPatience: 22 },
+  },
+
+  // ── 15-3: 카타콩브 지하 홀 ──
+  '15-3': {
+    id: '15-3',
+    nameKo: '카타콩브 지하 홀',
+    theme: 'wine_cellar',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 십자형 패턴
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 18, interval: 1400 },
+        { type: 'sommelier_wraith', count: 12, interval: 1950 },
+        { type: 'wine_specter', count: 20, interval: 1000 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 22, interval: 1280 },
+        { type: 'sommelier_wraith', count: 14, interval: 1800 },
+        { type: 'wine_specter', count: 26, interval: 890 },
+        { type: 'foie_gras_knight', count: 14, interval: 1550 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 26, interval: 1180 },
+        { type: 'sommelier_wraith', count: 18, interval: 1700 },
+        { type: 'wine_specter', count: 30, interval: 800 },
+        { type: 'cheese_golem', count: 10, interval: 1700 },
+        { type: 'milk_phantom', count: 12, interval: 1150 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 30, interval: 1080 },
+        { type: 'sommelier_wraith', count: 20, interval: 1600 },
+        { type: 'wine_specter', count: 34, interval: 730 },
+        { type: 'foie_gras_knight', count: 18, interval: 1450 },
+        { type: 'mushroom_scout', count: 14, interval: 880 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 36, interval: 970 },
+        { type: 'sommelier_wraith', count: 24, interval: 1520 },
+        { type: 'wine_specter', count: 40, interval: 660 },
+        { type: 'foie_gras_knight', count: 22, interval: 1380 },
+        { type: 'butter_ghost', count: 16, interval: 790 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'cellar_phantom', count: 42, interval: 880 },
+        { type: 'sommelier_wraith', count: 28, interval: 1420 },
+        { type: 'wine_specter', count: 44, interval: 610 },
+        { type: 'cheese_golem', count: 14, interval: 1600 },
+        { type: 'milk_phantom', count: 14, interval: 1100 },
+        { type: 'mushroom_scout', count: 16, interval: 840 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'herb_escargot', patience: 9000, baseReward: 108, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'herb_truffle_cream', patience: 8500, baseReward: 120, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'catacomb_herb_plate', patience: 8500, baseReward: 135, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'herb_duck_confit', patience: 8000, baseReward: 150, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'catacomb_herb_plate', patience: 8000, baseReward: 165, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'herb_grand_platter', patience: 8000, baseReward: 182, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 31, two: 23 },
+    service: { duration: 328, customerInterval: 2.3, maxCustomers: 54, customerPatience: 21 },
+  },
+
+  // ── 15-4: 카타콩브 제단 ──
+  '15-4': {
+    id: '15-4',
+    nameKo: '카타콩브 제단',
+    theme: 'wine_cellar',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // Z자 패턴
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 6 },
+      { type: 'vertical', col: 6, rowStart: 1, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 2, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 20, interval: 1350 },
+        { type: 'sommelier_wraith', count: 14, interval: 1850 },
+        { type: 'wine_specter', count: 22, interval: 970 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 24, interval: 1220 },
+        { type: 'sommelier_wraith', count: 18, interval: 1720 },
+        { type: 'wine_specter', count: 28, interval: 860 },
+        { type: 'foie_gras_knight', count: 16, interval: 1500 },
+        { type: 'cheese_golem', count: 10, interval: 1700 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 28, interval: 1120 },
+        { type: 'sommelier_wraith', count: 22, interval: 1620 },
+        { type: 'wine_specter', count: 34, interval: 780 },
+        { type: 'foie_gras_knight', count: 20, interval: 1420 },
+        { type: 'milk_phantom', count: 14, interval: 1100 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 32, interval: 1030 },
+        { type: 'sommelier_wraith', count: 26, interval: 1540 },
+        { type: 'wine_specter', count: 38, interval: 710 },
+        { type: 'foie_gras_knight', count: 22, interval: 1350 },
+        { type: 'butter_ghost', count: 18, interval: 760 },
+        { type: 'mushroom_scout', count: 14, interval: 860 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 38, interval: 940 },
+        { type: 'sommelier_wraith', count: 30, interval: 1450 },
+        { type: 'wine_specter', count: 44, interval: 640 },
+        { type: 'foie_gras_knight', count: 26, interval: 1280 },
+        { type: 'cheese_golem', count: 14, interval: 1600 },
+      ]},
+      { wave: 6, enemies: [
+        { type: 'cellar_phantom', count: 44, interval: 850 },
+        { type: 'sommelier_wraith', count: 34, interval: 1360 },
+        { type: 'wine_specter', count: 50, interval: 580 },
+        { type: 'foie_gras_knight', count: 30, interval: 1200 },
+        { type: 'milk_phantom', count: 16, interval: 1050 },
+        { type: 'butter_ghost', count: 18, interval: 720 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'herb_duck_confit', patience: 9000, baseReward: 122, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'noir_herb_bisque', patience: 8500, baseReward: 136, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'herb_grand_platter', patience: 8500, baseReward: 152, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'catacomb_tasting_menu', patience: 8000, baseReward: 168, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'catacomb_tasting_menu', patience: 8000, baseReward: 188, tipMultiplier: 2.0, vip: true }] },
+      { wave: 6, customers: [{ dish: 'noir_herb_course', patience: 8000, baseReward: 210, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 33, two: 25 },
+    service: { duration: 335, customerInterval: 2.3, maxCustomers: 56, customerPatience: 21 },
+  },
+
+  // ── 15-5: 셰프 누아르의 어둠 ──
+  '15-5': {
+    id: '15-5',
+    nameKo: '셰프 누아르의 어둠',
+    theme: 'wine_cellar',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 역T자 패턴
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 0, rowStart: 7, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cellar_phantom', count: 24, interval: 1280 },
+        { type: 'sommelier_wraith', count: 18, interval: 1750 },
+        { type: 'wine_specter', count: 26, interval: 930 },
+        { type: 'foie_gras_knight', count: 16, interval: 1480 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 28, interval: 1160 },
+        { type: 'sommelier_wraith', count: 22, interval: 1640 },
+        { type: 'wine_specter', count: 32, interval: 840 },
+        { type: 'foie_gras_knight', count: 20, interval: 1380 },
+        { type: 'cheese_golem', count: 12, interval: 1650 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 32, interval: 1060 },
+        { type: 'sommelier_wraith', count: 26, interval: 1540 },
+        { type: 'wine_specter', count: 38, interval: 760 },
+        { type: 'foie_gras_knight', count: 24, interval: 1300 },
+        { type: 'milk_phantom', count: 16, interval: 1080 },
+        { type: 'butter_ghost', count: 16, interval: 740 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'cellar_phantom', count: 38, interval: 970 },
+        { type: 'sommelier_wraith', count: 30, interval: 1460 },
+        { type: 'wine_specter', count: 44, interval: 680 },
+        { type: 'foie_gras_knight', count: 28, interval: 1230 },
+        { type: 'mushroom_scout', count: 18, interval: 820 },
+        { type: 'cheese_golem', count: 14, interval: 1580 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'cellar_phantom', count: 44, interval: 880 },
+        { type: 'sommelier_wraith', count: 34, interval: 1380 },
+        { type: 'wine_specter', count: 50, interval: 620 },
+        { type: 'foie_gras_knight', count: 32, interval: 1160 },
+        { type: 'milk_phantom', count: 18, interval: 1030 },
+        { type: 'butter_ghost', count: 18, interval: 700 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'catacomb_tasting_menu', patience: 9000, baseReward: 145, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'noir_herb_course', patience: 8500, baseReward: 162, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'catacomb_grand_feast', patience: 8500, baseReward: 182, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'noir_herb_course', patience: 8000, baseReward: 202, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'catacomb_grand_feast', patience: 8000, baseReward: 228, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 34, two: 26 },
+    service: { duration: 340, customerInterval: 2.3, maxCustomers: 57, customerPatience: 21 },
+  },
+
+  // ── 15-6: 최후의 결전 (보스전) ──
+  '15-6': {
+    id: '15-6',
+    nameKo: '최후의 결전',
+    theme: 'wine_cellar',
+    isBossBattle: true,
+    boss: {
+      type: 'chef_noir',
+      hp: 9000,
+      speed: 60,
+      reward: 800,
+      dialogue: { enter: 'chapter15_boss', defeat: 'chapter15_clear' },
+    },
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 직선 패턴 (보스전용)
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'chef_noir', count: 1, interval: 0 },
+        { type: 'cellar_phantom', count: 12, interval: 1500 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cellar_phantom', count: 20, interval: 1200 },
+        { type: 'sommelier_wraith', count: 16, interval: 1600 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cellar_phantom', count: 28, interval: 1000 },
+        { type: 'sommelier_wraith', count: 22, interval: 1450 },
+        { type: 'wine_specter', count: 36, interval: 680 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'chefs_noir_tribute', patience: 9000, baseReward: 250, tipMultiplier: 2.5, vip: true }] },
+      { wave: 2, customers: [{ dish: 'catacomb_grand_feast', patience: 9000, baseReward: 280, tipMultiplier: 2.5, vip: true }] },
+      { wave: 3, customers: [{ dish: 'chefs_noir_tribute', patience: 9000, baseReward: 320, tipMultiplier: 3.0, vip: true }] },
+    ],
+    starThresholds: { three: 20, two: 15 },
+    service: { duration: 360, customerInterval: 3.0, maxCustomers: 20, customerPatience: 25 },
+  },
 
   // ── 그룹 3 placeholder (16~24장) ──
   '16-1': { id: '16-1', nameKo: '미구현', theme: 'placeholder' },
