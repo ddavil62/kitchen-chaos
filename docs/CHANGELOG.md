@@ -1,5 +1,39 @@
 # Changelog
 
+## [Phase 30] 2026-04-14
+
+### Added
+- EndlessWaveGenerator.js: POOL_TIER_5 (그룹2 적 10종, 웨이브 21+ 적용)
+  - sushi_ninja, tempura_monk, sake_specter, oni_minion, dumpling_warrior, wok_phantom, shadow_dragon_spawn, wok_guardian, wine_specter, foie_gras_knight
+- EndlessWaveGenerator.js: BOSS_POOL에 그룹2 보스 3종 추가 (sake_oni, sake_master, dragon_wok, 총 9종)
+- EndlessWaveGenerator.js: `_getEnemyPool`에 `waveNumber >= 21` 분기 추가
+- storyData.js: 14장 STORY_TRIGGERS 4건 선등록 (chapter14_intro, chapter14_mid, team_side_14, chapter14_clear)
+- storyData.js: stage_first_clear 제외 목록에 14-1/14-3/14-5 추가
+- ROADMAP.md: Phase 28-3a(8장 구현), Phase 28-4(14장 구현) 항목 추가
+
+### Analysis
+- 7~15장(8·14장 제외) 구현 스테이지 42개 DPS/HP 커브 검증 완료
+  - 장별 보스 HP 커브: oni_herald(800) → sake_oni(6000) → sake_master(7500) → dragon_wok(7000) → chef_noir(9000)
+  - 과밀 경고 스테이지: 9-4~9-5, 12-4~12-5, 13-4~13-5, 15-4~15-5 (후속 Phase 조정 대상)
+- wasabi_cannon, spice_grinder Lv1~3 DPS 적정 범위 확인 (조정 불필요)
+  - wasabi_cannon Lv3: 33.3 DPS + 스플래시(55px) + 둔화(35%), CC 역할 특화
+  - spice_grinder Lv3: 53.3 DPS (직접 29.3 + DoT 24.0), grill 대비 낮으나 역할 분리
+- yuki_chef(cryo_execute), lao_chef(power_surge) 스킬 밸런스 양호 (조정 불필요)
+  - cryo_execute: 빙결 수 의존 제한, 쿨다운 90초
+  - power_surge: 전 도구 5초 2배, 쿨다운 120초 (업타임 4.2%)
+
+### Known Issues
+- chapter14_clear 대화가 dialogueData.js에 미등록 (14장 placeholder 상태, Phase 28-4에서 추가 필수)
+- cellar_phantom, sommelier_wraith ENEMY_TYPES 미등록 (13-6/15장 DPS 판정 보류)
+- chef_noir ENEMY_TYPES 미등록 (BOSS_POOL 제외 유지)
+
+### 참고
+- QA 전체 PASS (13항목: PASS 11, PASS(WARN) 2)
+- 스펙: `.claude/specs/2026-04-14-kc-phase30-spec.md`
+- QA: `.claude/specs/2026-04-14-kc-phase30-qa.md`
+
+---
+
 ## [Phase 29-2] 2026-04-14
 
 ### Added
