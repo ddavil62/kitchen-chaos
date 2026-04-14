@@ -1,5 +1,45 @@
 # Changelog
 
+## [2026-04-14] - Phase 29-1 15장 셰프 누아르 보스 에셋 + 대화 스크립트
+
+### 추가
+
+- **chef_noir 보스 스프라이트** (`assets/bosses/chef_noir/`)
+  - PixelLab pro 모드, 64px 캐릭터, 124x124px 캔버스 (스펙 92px에서 PixelLab 출력 기준 124px로 변경, 런타임 영향 없음)
+  - 8방향 rotations + 8방향 x 8프레임 walking 애니메이션 (animating-96100c0f)
+  - 제트 블랙 셰프복, 토크 블랑슈(셰프 모자), 네온 그린(#4AFFA0) 미력 오라, 치비 비율
+  - metadata.json export_version 2.0, character.name="chef_noir", template_id="mannequin"
+
+- **대화 스크립트 5종** (`js/data/dialogueData.js`, 누적 69종)
+  - chapter15_boss (14줄): 카타콩브 최심부, 셰프 누아르 첫 대면, "강요된 정화야말로 예술의 폭력이다" 철학 대립
+  - chapter15_clear (12줄): 누아르 정화 후, 양식 아크 완결, WCA 자수 결정
+  - chapter15_epilogue (13줄): 앙드레-누아르 사제 관계 공개, WCA 내부 개혁 암시, 포코 유머
+  - side_15a (9줄): 전투 후 회복, 포코 할인 쿠폰, 캐릭터 개성
+  - side_15b (11줄): 유럽 바깥 새 식란 징후, 다음 여정 암시 (시즌 확장 복선)
+
+- **CHARACTERS.chef_noir** (`js/data/dialogueData.js`)
+  - id='chef_noir', nameKo='셰프 누아르', portraitKey='chef_noir', role='boss', color=0x1a1a2e
+
+### 변경
+
+- **SpriteLoader.js** (`js/managers/SpriteLoader.js`)
+  - BOSS_IDS: 9종 -> 10종 (chef_noir 추가, 인덱스 9)
+  - BOSS_WALK_HASHES: chef_noir='animating-96100c0f' 추가
+  - fileoverview 주석: "Phase 29-1: 15장 보스 1종(chef_noir) 추가"
+
+- **dialogueData.js** fileoverview 주석: "Phase 29-1: 15장 셰프 누아르 최종전 대화 5종 추가 ... 누적 69종"
+
+### 참고
+
+- QA 15/15 PASS (에셋 5 + SpriteLoader 5 + dialogueData 5)
+- 캔버스 크기 124px는 스펙 기술 92px와 다르지만, PixelLab pro 모드 64px 캐릭터의 실제 출력값. 런타임 영향 없음
+- WALK_FRAME_COUNT=6 vs 8프레임 에셋 불일치는 Phase 21부터 존재하는 기존 이슈 (scope 외)
+- 스펙: `.claude/specs/2026-04-14-kc-phase29-1-spec.md`
+- QA: `.claude/specs/2026-04-14-kc-phase29-1-qa.md`
+- AD 컨셉: `.claude/specs/2026-04-14-phase29-1-art-concept.md`
+
+---
+
 ## [2026-04-14] - Phase 28-2 14장 에셋 생성
 
 ### 추가
