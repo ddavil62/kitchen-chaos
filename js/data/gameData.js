@@ -9,6 +9,7 @@
  * Phase 26-1: sake_master(일식 양조 보스) 추가. 누적 보스 9종.
  * Phase 27-3: 적 2종(wine_specter, foie_gras_knight), 재료 1종(truffle) 추가. 누적 적 29종, 재료 22종.
  * Phase 31-2: 적 2종(curry_djinn, naan_golem), 재료 2종(curry_leaf, saffron) 추가. 누적 적 31종, 재료 25종.
+ * Phase 32-2: 적 2종(incense_specter, spice_elemental), 재료 1종(chai) 추가. 누적 적 33종, 재료 26종.
  */
 
 // ── 적 타입 정의 ──
@@ -564,6 +565,35 @@ export const ENEMY_TYPES = {
     regenRate: 6,           // 6 HP/초 자연 재생
     canvasSize: 120,         // PixelLab pro 모드 생성 크기 (SpriteLoader 스케일 참조용)
   },
+  // ── Phase 32-2 신규 적 (17장 향신료 궁전 심층부) ──
+  incense_specter: {
+    id: 'incense_specter',
+    nameKo: '향 혼령',
+    hp: 420,
+    speed: 58,
+    ingredient: 'chai',
+    bodyColor: 0xe8e0f0,
+    confuseOnHit: true,
+    confuseDuration: 3000,
+    confuseChance: 0.35,
+    canvasSize: 176,
+    group: 2,
+    reward: 30,
+  },
+  spice_elemental: {
+    id: 'spice_elemental',
+    nameKo: '향신료 정령',
+    hp: 500,
+    speed: 45,
+    ingredient: 'saffron',
+    bodyColor: 0xe84000,
+    elementalResistance: true,
+    resistTypes: ['freezer', 'wasabi_cannon'],
+    resistMultiplier: 0.50,
+    canvasSize: 164,
+    group: 2,
+    reward: 35,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -951,6 +981,13 @@ export const INGREDIENT_TYPES = {
     nameKo: '사프란',
     color: 0xff6f00,   // 황금 오렌지
     icon: 'assets/ingredients/saffron.png',
+  },
+  // ── Phase 32-2 신규 재료 (17장 향신료 궁전 심층부) ──
+  chai: {
+    id: 'chai',
+    nameKo: '차이',
+    color: 0xc08050,   // 따뜻한 갈색 (밀크티)
+    icon: 'assets/ingredients/chai.png',
   },
 };
 
