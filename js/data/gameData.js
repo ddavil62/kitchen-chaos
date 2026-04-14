@@ -8,6 +8,7 @@
  * Phase 25-1: 적 2종(shadow_dragon_spawn, wok_guardian), 재료 1종(star_anise) 추가. 누적 적 25종.
  * Phase 26-1: sake_master(일식 양조 보스) 추가. 누적 보스 9종.
  * Phase 27-3: 적 2종(wine_specter, foie_gras_knight), 재료 1종(truffle) 추가. 누적 적 29종, 재료 22종.
+ * Phase 31-2: 적 2종(curry_djinn, naan_golem), 재료 2종(curry_leaf, saffron) 추가. 누적 적 31종, 재료 25종.
  */
 
 // ── 적 타입 정의 ──
@@ -536,6 +537,33 @@ export const ENEMY_TYPES = {
     enrageHpThreshold: 0.35,
     enrageSpeedMultiplier: 1.8,
   },
+  // ── Phase 31-2 신규 적 (16장 향신료 궁전) ──
+  curry_djinn: {
+    id: 'curry_djinn',
+    nameKo: '카레 지니',
+    hp: 380,
+    speed: 72,
+    ingredient: 'saffron',
+    bodyColor: 0xff8c00,   // 황금 오렌지
+    // 텔레포트 메커닉: teleportInterval마다 랜덤 위치로 순간이동
+    // Enemy.js에서 teleportEnabled 플래그로 분기 처리 (Phase 31-3 구현)
+    teleportEnabled: true,
+    teleportInterval: 6000,  // 6초마다 텔레포트
+    teleportRadius: 200,     // 텔레포트 가능 반경
+    canvasSize: 164,         // PixelLab pro 모드 생성 크기 (SpriteLoader 스케일 참조용)
+  },
+  naan_golem: {
+    id: 'naan_golem',
+    nameKo: '난 골렘',
+    hp: 450,
+    speed: 28,
+    ingredient: 'curry_leaf',
+    bodyColor: 0xd2a679,   // 밀/황토색
+    // 자가 회복 메커닉: cheese_golem(3 HP/초)보다 강화
+    // Enemy.js에서 regenRate 필드로 처리 (기존 cheese_golem 로직 재사용)
+    regenRate: 6,           // 6 HP/초 자연 재생
+    canvasSize: 120,         // PixelLab pro 모드 생성 크기 (SpriteLoader 스케일 참조용)
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -910,6 +938,19 @@ export const INGREDIENT_TYPES = {
     nameKo: '흑트러플',
     color: 0x2c1810,   // 짙은 흑갈색
     icon: '🍄',         // 임시. 실제 아이콘은 truffle.png로 교체
+  },
+  // ── Phase 31-2 신규 재료 (16장 향신료 궁전) ──
+  curry_leaf: {
+    id: 'curry_leaf',
+    nameKo: '카레 잎',
+    color: 0x2e7d32,   // 짙은 녹색
+    icon: '🌿',        // 임시. 실제 아이콘은 curry_leaf.png로 교체
+  },
+  saffron: {
+    id: 'saffron',
+    nameKo: '사프란',
+    color: 0xff6f00,   // 황금 오렌지
+    icon: '✨',        // 임시. 실제 아이콘은 saffron.png로 교체
   },
 };
 
