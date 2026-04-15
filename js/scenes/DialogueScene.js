@@ -5,18 +5,19 @@
  * Phase 16-3: 선택지(choices) 분기 UI 추가 — 버튼 클릭으로 대화 분기 진행.
  * 하단 180px 반투명 패널에 캐릭터 이름, 초상화, 대사 텍스트(타이핑 애니메이션)를 표시.
  *
- * 레이아웃 (360x640 기준):
+ * 레이아웃 (360x640 기준, C1+M 확정):
  *   y=460~640: 대화 패널 (높이 180px)
- *   y=470: 이름 + 초상화 (좌측) / 건너뛰기 (우측)
- *   y=524~620: 대사 텍스트 (wordWrap 320px, 초상화 아래)
- *   y=620, x=340: 진행 힌트 "▼" (텍스트 완료 시만 깜빡임)
+ *   y=352~448: 포트레이트 96px (패널 위로 돌출)
+ *   y=468: 이름 18px (좌측) / 건너뛰기 14px (우측) — 같은 행
+ *   y=496~: 대사 텍스트 16px (wordWrap 328px)
+ *   y=628, x=340: 진행 힌트 "▼" (텍스트 완료 시만 깜빡임)
  */
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
 
-// ── 레이아웃 상수 ──
+// ── 레이아웃 상수 (C1+M 확정) ──
 const PANEL_Y = 460;
 const PANEL_HEIGHT = 180;
 const PANEL_COLOR = 0x1a0a00;
@@ -24,19 +25,22 @@ const PANEL_ALPHA = 0.88;
 const PANEL_DEPTH = 200;
 const TEXT_DEPTH = 201;
 
-const NAME_X = 20;
-const NAME_Y = 472;
-const PORTRAIT_SIZE = 48;
+const PORTRAIT_SIZE = 96;
+const PORTRAIT_CENTER_X = 16 + PORTRAIT_SIZE / 2;   // 64
+const PORTRAIT_CENTER_Y = PANEL_Y - 12 - PORTRAIT_SIZE / 2; // 400 (패널 위 돌출)
 
-const DIALOGUE_X = 20;
-const DIALOGUE_Y = 524;
-const DIALOGUE_MAX_W = 320;
+const NAME_X = 16;
+const NAME_Y = PANEL_Y + 8;   // 468
 
-const SKIP_X = 340;
-const SKIP_Y = 472;
+const DIALOGUE_X = 16;
+const DIALOGUE_Y = PANEL_Y + 36;  // 496
+const DIALOGUE_MAX_W = 328;       // 360 - 16*2
+
+const SKIP_X = 344;
+const SKIP_Y = PANEL_Y + 10;  // 470
 
 const HINT_X = 340;
-const HINT_Y = 620;
+const HINT_Y = 628;
 
 const TYPING_SPEED_MS = 30;
 
@@ -105,29 +109,30 @@ export class DialogueScene extends Phaser.Scene {
       0xff6b35, 0.6
     ).setDepth(PANEL_DEPTH);
 
-    // ── 캐릭터 초상화: 스프라이트 이미지 + 이모지 fallback (Phase 14-2b) ──
-    this._portraitImage = this.add.image(NAME_X + PORTRAIT_SIZE / 2, NAME_Y + PORTRAIT_SIZE / 2, '__DEFAULT')
+    // ── 캐릭터 초상화: 패널 위 돌출 (C1 레이아웃) ──
+    this._portraitImage = this.add.image(PORTRAIT_CENTER_X, PORTRAIT_CENTER_Y, '__DEFAULT')
       .setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE)
       .setDepth(TEXT_DEPTH)
       .setVisible(false);
 
-    this._portraitEmoji = this.add.text(NAME_X, NAME_Y, '', {
-      fontSize: '24px',
-    }).setDepth(TEXT_DEPTH);
+    this._portraitEmoji = this.add.text(PORTRAIT_CENTER_X, PORTRAIT_CENTER_Y, '', {
+      fontSize: '48px',
+    }).setOrigin(0.5).setDepth(TEXT_DEPTH);
 
-    this._nameText = this.add.text(NAME_X + PORTRAIT_SIZE + 6, NAME_Y + 2, '', {
-      fontSize: '14px',
+    // ── 캐릭터 이름 (패널 최상단 좌측, M사이즈 18px) ──
+    this._nameText = this.add.text(NAME_X, NAME_Y, '', {
+      fontSize: '18px',
       fontStyle: 'bold',
       color: '#ffd700',
       stroke: '#000000',
       strokeThickness: 2,
     }).setDepth(TEXT_DEPTH);
 
-    // ── 대사 텍스트 ──
+    // ── 대사 텍스트 (M사이즈 16px) ──
     this._dialogueText = this.add.text(DIALOGUE_X, DIALOGUE_Y, '', {
-      fontSize: '14px',
+      fontSize: '16px',
       color: '#ffffff',
-      lineSpacing: 6,
+      lineSpacing: 10,
       wordWrap: { width: DIALOGUE_MAX_W },
       stroke: '#000000',
       strokeThickness: 1,
@@ -152,7 +157,7 @@ export class DialogueScene extends Phaser.Scene {
     // ── 건너뛰기 버튼 (AD 검수: 터치 타겟 44px 이상 확보) ──
     if (this._script.skippable) {
       this._skipBtn = this.add.text(SKIP_X, SKIP_Y, '건너뛰기', {
-        fontSize: '13px',
+        fontSize: '14px',
         color: '#aaaaaa',
         stroke: '#000000',
         strokeThickness: 1,
@@ -205,13 +210,18 @@ export class DialogueScene extends Phaser.Scene {
       this._dialogueText.setFontStyle('italic');
       this._dialogueText.setColor('#cccccc');
     } else {
-      // 초상화: 스프라이트 이미지 우선, 로드 실패 시 이모지 fallback (Phase 14-2b)
+      // 초상화: 스프라이트 이미지 우선, 로드 실패 시 이모지 fallback
       const portraitKey = line.portraitKey ? `portrait_${line.portraitKey}` : '';
       if (portraitKey && SpriteLoader.hasTexture(this, portraitKey)) {
-        this._portraitImage.setTexture(portraitKey).setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE).setVisible(true);
+        this._portraitImage.setTexture(portraitKey)
+          .setPosition(PORTRAIT_CENTER_X, PORTRAIT_CENTER_Y)
+          .setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE)
+          .setVisible(true);
         this._portraitEmoji.setVisible(false);
       } else {
-        this._portraitEmoji.setText(line.portrait || '').setVisible(true);
+        this._portraitEmoji.setText(line.portrait || '')
+          .setPosition(PORTRAIT_CENTER_X, PORTRAIT_CENTER_Y)
+          .setVisible(true);
         this._portraitImage.setVisible(false);
       }
       this._nameText.setText(line.speaker);

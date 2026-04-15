@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>C1 텍스트 크기 비교</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+  h1 { text-align: center; margin-bottom: 10px; font-size: 18px; color: #ffd700; }
+  .subtitle { text-align: center; color: #999; font-size: 12px; margin-bottom: 30px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+  .mockup-card {
+    background: #222;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #444;
+  }
+  .mockup-card h2 { font-size: 13px; color: #ffd700; margin-bottom: 4px; }
+  .mockup-card .desc { font-size: 11px; color: #aaa; margin-bottom: 8px; line-height: 1.5; }
+  .game-frame {
+    width: 360px;
+    height: 640px;
+    background: #1a0a00;
+    position: relative;
+    overflow: visible;
+    image-rendering: pixelated;
+    border: 2px solid #333;
+  }
+  .bg-title {
+    position: absolute;
+    top: 140px;
+    width: 100%;
+    text-align: center;
+    font-size: 42px;
+    font-weight: bold;
+    color: #ff6b35;
+    text-shadow: 3px 3px 0 #000;
+    font-style: italic;
+  }
+  .bg-subtitle {
+    position: absolute;
+    top: 230px;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    color: #999;
+  }
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,0.35); }
+
+  /* ── 공통: C1 레이아웃 ── */
+  .c1 .panel {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 180px;
+    background: rgba(26,10,0,0.92);
+    border-top: 2px solid rgba(255,107,53,0.6);
+  }
+  .c1 .portrait {
+    position: absolute;
+    bottom: 192px; left: 16px;
+    width: 96px; height: 96px;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.8));
+    z-index: 10;
+  }
+  .c1 .char-name {
+    position: absolute;
+    left: 16px;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 1px 1px 0 #000;
+  }
+  .c1 .skip-btn {
+    position: absolute;
+    right: 16px;
+    color: #aaa;
+  }
+  .c1 .dialogue-text {
+    position: absolute;
+    left: 16px; right: 16px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+  }
+  .c1 .hint {
+    position: absolute;
+    bottom: 12px; right: 16px;
+    color: #ffd700; font-size: 14px;
+  }
+
+  /* ── S: 이름 15px / 대사 14px ── */
+  .size-s .char-name { top: 10px; font-size: 15px; }
+  .size-s .skip-btn  { top: 10px; font-size: 13px; }
+  .size-s .dialogue-text { top: 34px; font-size: 14px; line-height: 1.7; }
+
+  /* ── M: 이름 18px / 대사 16px ── */
+  .size-m .char-name { top: 8px; font-size: 18px; }
+  .size-m .skip-btn  { top: 10px; font-size: 14px; }
+  .size-m .dialogue-text { top: 36px; font-size: 16px; line-height: 1.65; }
+
+  /* ── L: 이름 20px / 대사 18px ── */
+  .size-l .char-name { top: 6px; font-size: 20px; }
+  .size-l .skip-btn  { top: 10px; font-size: 15px; }
+  .size-l .dialogue-text { top: 36px; font-size: 18px; line-height: 1.6; }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 6px; }
+  .tag-current { background: #555; color: #ccc; }
+  .tag-s { background: #66aaff33; color: #66aaff; border: 1px solid #66aaff55; }
+  .tag-m { background: #66ff9933; color: #66ff99; border: 1px solid #66ff9955; }
+  .tag-l { background: #ff669933; color: #ff6699; border: 1px solid #ff669955; }
+</style>
+</head>
+<body>
+<h1>C1 확정 — 텍스트 크기 비교</h1>
+<p class="subtitle">360x640 | 포트레이트 96px 돌출 | 패널 180px | 이름+건너뛰기 같은 행</p>
+
+<div class="grid">
+
+  <!-- S: 현재 크기 -->
+  <div class="mockup-card">
+    <h2>S. 이름 15 / 대사 14 <span class="tag tag-s">SMALL</span></h2>
+    <p class="desc">현재 크기 그대로<br>이름 15px, 대사 14px, line-height 1.7</p>
+    <div class="game-frame c1 size-s">
+      <div class="bg-title">Kitchen<br>Chaos</div>
+      <div class="bg-subtitle">Tycoon</div>
+      <div class="dim"></div>
+      <img class="portrait" src="/sprites/portraits/portrait_mage.png" alt="mage">
+      <div class="panel">
+        <div class="char-name">메이지</div>
+        <div class="skip-btn">건너뛰기</div>
+        <div class="dialogue-text">이 해변에서 비정상적인 미력 농도가 측정되었는데... 흥미롭군요. 식란 발생 패턴을 분석한 결과, 의미있는 점을 발견했어요.</div>
+        <div class="hint">▼</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- M: 중간 -->
+  <div class="mockup-card">
+    <h2>M. 이름 18 / 대사 16 <span class="tag tag-m">MEDIUM</span></h2>
+    <p class="desc">이름 18px, 대사 16px, line-height 1.65<br>건너뛰기 14px</p>
+    <div class="game-frame c1 size-m">
+      <div class="bg-title">Kitchen<br>Chaos</div>
+      <div class="bg-subtitle">Tycoon</div>
+      <div class="dim"></div>
+      <img class="portrait" src="/sprites/portraits/portrait_mage.png" alt="mage">
+      <div class="panel">
+        <div class="char-name">메이지</div>
+        <div class="skip-btn">건너뛰기</div>
+        <div class="dialogue-text">이 해변에서 비정상적인 미력 농도가 측정되었는데... 흥미롭군요. 식란 발생 패턴을 분석한 결과, 의미있는 점을 발견했어요.</div>
+        <div class="hint">▼</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L: 큰 -->
+  <div class="mockup-card">
+    <h2>L. 이름 20 / 대사 18 <span class="tag tag-l">LARGE</span></h2>
+    <p class="desc">이름 20px, 대사 18px, line-height 1.6<br>건너뛰기 15px</p>
+    <div class="game-frame c1 size-l">
+      <div class="bg-title">Kitchen<br>Chaos</div>
+      <div class="bg-subtitle">Tycoon</div>
+      <div class="dim"></div>
+      <img class="portrait" src="/sprites/portraits/portrait_mage.png" alt="mage">
+      <div class="panel">
+        <div class="char-name">메이지</div>
+        <div class="skip-btn">건너뛰기</div>
+        <div class="dialogue-text">이 해변에서 비정상적인 미력 농도가 측정되었는데... 흥미롭군요. 식란 발생 패턴을 분석한 결과, 의미있는 점을 발견했어요.</div>
+        <div class="hint">▼</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
