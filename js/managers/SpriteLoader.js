@@ -159,8 +159,8 @@ const WALK_DIRS = ['south', 'south-east', 'east', 'north-east', 'north', 'north-
 /** 걷기 애니메이션 프레임 수 */
 const WALK_FRAME_COUNT = 6;
 
-// ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가) ──
-const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao'];
+// ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가, Phase 27-1: andre, Phase 32-4: arjun 추가) ──
+const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'masala_guide'];
 
 // ── 타일셋 ID 목록 (14종, Phase 32-2: spice_palace_interior 추가) ──
 const TILESET_IDS = [
