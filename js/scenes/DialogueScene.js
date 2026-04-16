@@ -7,7 +7,7 @@
  *
  * 레이아웃 (360x640 기준, C1+M 확정):
  *   y=460~640: 대화 패널 (높이 180px)
- *   y=352~448: 포트레이트 96px (패널 위로 돌출)
+ *   y=364~460: 포트레이트 96px (패널 상단 밀착)
  *   y=468: 이름 18px (좌측) / 건너뛰기 14px (우측) — 같은 행
  *   y=496~: 대사 텍스트 16px (wordWrap 328px)
  *   y=628, x=340: 진행 힌트 "▼" (텍스트 완료 시만 깜빡임)
@@ -27,7 +27,7 @@ const TEXT_DEPTH = 201;
 
 const PORTRAIT_SIZE = 96;
 const PORTRAIT_CENTER_X = 16 + PORTRAIT_SIZE / 2;   // 64
-const PORTRAIT_CENTER_Y = PANEL_Y - 12 - PORTRAIT_SIZE / 2; // 400 (패널 위 돌출)
+const PORTRAIT_CENTER_Y = PANEL_Y - PORTRAIT_SIZE / 2; // 412 (패널 상단에 밀착)
 
 const NAME_X = 16;
 const NAME_Y = PANEL_Y + 8;   // 468
