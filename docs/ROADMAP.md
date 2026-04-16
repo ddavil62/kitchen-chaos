@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-16
-> 기준: Phase 32-5 완료 (18장 인도 아크 완성)
+> 기준: Phase 33 완료 (19장 선인장 칸티나)
 
 ---
 
@@ -43,7 +43,7 @@
 | Phase 30 | 챕터 7~15 밸런스 QA | ✅ 완료 |
 | Phase 31 | 16장 — 향신료 궁전 (인도 1장) | ✅ 완료 |
 | Phase 32 | 17~18장 — 향신료 궁전 심층부 + 마하라자 최종전 (인도 2~3장) | ✅ 완료 |
-| Phase 33 | 19장 — 선인장 칸티나 (멕시칸 1장) | 🔄 진행중 |
+| Phase 33 | 19장 — 선인장 칸티나 (멕시칸 1장) | ✅ 완료 |
 | Phase 34 | 20장 — 칸티나 심층부 (멕시칸 2장) | 📋 계획 |
 | Phase 35 | 21장 — 엘 디아블로 최종전 (멕시칸 3장) | 📋 계획 |
 | Phase 36 | 22장 — 슈가 드림랜드 (디저트 1장) | 📋 계획 |
@@ -53,17 +53,17 @@
 | Phase 40 | 업적 시스템 (30~50개, 보상, 업적 UI) | 📋 계획 |
 | Phase 41 | 아트 리워크 — 레거시 스프라이트 64px 재생성 | 🎨 예정 |
 
-**현재 구현 완성도**: Phase 32-5 완료 (시즌3 16~18장 인도 아크 — 적 17종+보스 5종+재료 4종+레시피 35종+스토리 13종+텔레포트/자가회복/혼란/원소저항/다단계 메커닉)
+**현재 구현 완성도**: Phase 33 완료 (시즌3 16~19장 인도+멕시칸 — 적 19종+보스 5종+재료 5종+레시피 47종+스토리 16종+텔레포트/자가회복/혼란/원소저항/다단계/회피/돌진 메커닉)
 
 ### 현재 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 종류 | 46종 (일반 34 + 미니보스 1 + 보스 11) |
+| 적 종류 | 48종 (일반 36 + 미니보스 1 + 보스 11) |
 | 도구 종류 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) — 영구 보유, 업그레이드 3단계 |
-| 재료 종류 | 27종 |
-| 레시피 | 221종 (서빙 180 + 버프 41) |
-| 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~18장, placeholder: 8/14/19~24장) |
+| 재료 종류 | 28종 |
+| 레시피 | 233종 (서빙 190 + 버프 43) |
+| 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~19장, placeholder: 8/14/20~24장) |
 | 셰프 | 5종 (꼬마/불꽃/얼음/유키/라오) — 패시브 + 액티브 스킬 (유키/라오는 데이터 등록, 스킬 로직 미구현) |
 | 영구 업그레이드 | 4종 |
 | 테이블 | 4~8석 (5단계 업그레이드) |
@@ -71,8 +71,8 @@
 | 직원 | 2종 (서빙/세척 도우미, IAP 추상화) |
 | 사운드 | SFX 20종 + BGM 5종 (Web Audio API 프로시저럴) |
 | VFX | 파티클 + 스크린 효과 + 플로팅 텍스트 (Canvas2D) |
-| 대화 스크립트 | 82종 |
-| 스토리 트리거 | 82항목 (triggerPoint 8종) |
+| 대화 스크립트 | 85종 |
+| 스토리 트리거 | 85항목 (triggerPoint 8종) |
 | 세이브 버전 | v16 |
 
 ### 게임 루프
@@ -98,6 +98,9 @@
 | Phase 9 | 설탕(🍬), 우유(🥛) | 15종 | sugar_fairy, milk_phantom, lava_dessert_golem | ✅ |
 | Phase 20 | 참치(🍣 sashimi_tuna), 와사비(🌿 wasabi) | 17종 | sushi_ninja, tempura_monk, sake_oni | ✅ |
 | Phase 21 | 두부(tofu), 고수(cilantro) | 19종 | dumpling_warrior, mini_dumpling, wok_phantom, dragon_wok | ✅ |
+| Phase 22~30 | sake, truffle, herb_bundle 등 | 23종 | sake_specter, oni_minion, wine_specter, foie_gras_knight 등 | ✅ |
+| Phase 31~32 | 커리잎, 사프란, 차이, 카다멈 | 27종 | curry_djinn, naan_golem, incense_specter, spice_elemental, masala_guide, maharaja | ✅ |
+| Phase 33 | 할라피뇨(jalapeno) | 28종 | taco_bandit, burrito_juggernaut | ✅ |
 
 ### 레시피 확장 이력
 
@@ -110,6 +113,9 @@
 | Phase 10 | +15 | +2 | 106 | 특선/전설 등급 집중 | ✅ |
 | Phase 20 | +8 | +2 | 116 | 참치/와사비 일식 조합, 사쿠라 가이세키 | ✅ |
 | Phase 21 | +8 | +2 | 126 | 두부/고수 중식 조합, 용의 만찬 | ✅ |
+| Phase 22~30 | +50 | +10 | 186 | 일식/중식/양식 아크 추가분 | ✅ |
+| Phase 31~32 | +25 | +10 | 221 | 인도 아크 (커리잎/사프란/차이/카다멈 조합) | ✅ |
+| Phase 33 | +10 | +2 | 233 | 멕시칸 아크 1장 (할라피뇨 조합, 타코/나초/과카몰리 계열) | ✅ |
 
 ### 등급 분포 (현재)
 
@@ -1033,203 +1039,94 @@
 
 ---
 
-## Phase 33-1 — 에셋 + 스크립트 (18장: 향신료 마하라자 최종전)
+## ✅ Phase 33 — 19장 선인장 칸티나 (멕시칸 1장) 완료
 
-> `visual_change: art` | 보스 스프라이트 + 대사
+> 완료: 2026-04-16 | `visual_change: both` | 3서브페이즈 (33-1, 33-2, 33-3)
 
-- [ ] spice_maharaja 보스 스프라이트 (PixelLab, 64px pro)
-- [ ] dialogueData.js: chapter18_boss 작성 (마하라자 — "향신료는 지배의 언어다")
-- [ ] dialogueData.js: chapter18_clear 작성 (향신료 비밀 해명, 인도 아크 엔딩)
-- [ ] 사이드 대화 1~2종
+### 33-1. 대화 스크립트
 
----
+- [x] dialogueData.js: chapter19_intro (10줄), chapter19_mid (10줄), team_side_19 (9줄) 추가 — 누적 85종
+- [x] storyData.js: 19-1 gathering_enter -> chapter19_intro, 19-3 result_clear -> chapter19_mid, merchant_enter(ch>=19) -> team_side_19
 
-## Phase 33-2 — 18장 스테이지 구현 (인도 아크 완성)
+### 33-2. 에셋 생성
 
-> `visual_change: none` | 33-1 에셋 완성 후 진행
+- [x] taco_bandit 스프라이트 (160px, PixelLab pro, 8방향 rotations + animating-a8a759af)
+- [x] burrito_juggernaut 스프라이트 (172px, PixelLab pro, 8방향 rotations + animating-ca0e68fa)
+- [x] cactus_cantina 타일셋 (Wang 128x128px, 사막 점토 바닥 + 탈라베라 패턴)
+- [x] jalapeno 재료 아이콘 (32px, 투명 배경)
+- [x] SpriteLoader.js: ENEMY_IDS 37종, TILESET_IDS 15종, INGREDIENT_FILE_MAP jalapeno 추가
 
-- [ ] stageData.js: 스테이지 18-1 ~ 18-5 + 18-6 spice_maharaja 보스전
-- [ ] recipeData.js: 차이 조합 추가분 (누적 ~216종)
-- [ ] 인도 아크 밸런스 점검 (16~18장 DPS 커브)
+### 33-3. 스테이지 + 레시피 + 메카닉
 
----
-
-## Phase 34-1 — 스크립트 (19장: 선인장 칸티나)
-
-> `visual_change: none` | 스토리 대사 집필만
-
-- [ ] dialogueData.js: chapter19_intro 작성 (사막 도착, 실종 미력사 단서)
-- [ ] dialogueData.js: chapter19_mid 작성 (칸티나 지하 탐색, 균열 감지)
-- [ ] 사이드 대화 1종
+- [x] gameData.js: taco_bandit (hp:300, speed:115, dodgeOnHit, dodgeChance:0.25), burrito_juggernaut (hp:580, speed:38, chargeEnabled, chargeInterval:8000), jalapeno 재료 — 적 48종, 재료 28종
+- [x] stageData.js: 19-1~19-5 실제 웨이브 데이터 (theme:cactus_cantina, duration 350->375 점진 상승), 19-6 placeholder 유지
+- [x] recipeData.js: 서빙 10종 + 버프 2종 (할라피뇨 기반 멕시칸 요리) — 누적 233종
+- [x] Enemy.js: dodgeOnHit 회피 메카닉 (25% 확률 피해 무효화), chargeEnabled 돌진 메카닉 (8초마다 2배속 돌진, _moveAlongPath 통합)
+- [x] enemy_charge_impact 이벤트 emit (TowerManager 수신 로직은 후속 스코프)
 
 ---
 
-## Phase 34-2 — 에셋 생성 (19장 신규 적)
+## Phase 34 — 20장 칸티나 심층부 (멕시칸 2장)
 
-> `visual_change: art` | PixelLab 스프라이트 + 타일셋
+> `visual_change: both` | 스크립트 + 에셋 + 스테이지
 
-- [ ] taco_bandit: HP ~400, 빠른 이동+회피 — PixelLab 생성
-- [ ] burrito_juggernaut: HP ~500, 고HP 돌진 — PixelLab 생성
-- [ ] 멕시칸 칸티나 타일셋 (사막+네온) — PixelLab tiles
-- [ ] 재료 아이콘: 할라피뇨(jalapeno) 32px
-
----
-
-## Phase 34-3 — 19장 스테이지 + 레시피 구현
-
-> `visual_change: none` | 34-2 에셋 완성 후 진행
-
-- [ ] ingredientData.js: 할라피뇨(jalapeno) 추가 — 누적 27종
-- [ ] enemyData.js: taco_bandit, burrito_juggernaut 등록
-- [ ] stageData.js: 스테이지 19-1 ~ 19-5 배치
-- [ ] recipeData.js: 할라피뇨 조합 레시피 ~10종 (타코, 나초, 과카몰리 등)
-- [ ] 서비스 설정 (19장 손님 패턴)
-
----
-
-## Phase 35-1 — 스크립트 (20장: 칸티나 심층부)
-
-> `visual_change: none` | 스토리 대사 집필만
-
-- [ ] dialogueData.js: chapter20_intro 작성 (균열 근원지 접근)
-- [ ] dialogueData.js: chapter20_mid 작성 (엘 디아블로의 등장 — 압도적 위기감)
-- [ ] 사이드 대화 1종
-
----
-
-## Phase 35-2 — 에셋 생성 (20장 신규 적)
-
-> `visual_change: art` | PixelLab 스프라이트 + 타일셋
-
-- [ ] cactus_wraith: HP ~430, 가시 반격 — PixelLab 생성
-- [ ] luchador_ghost: HP ~460, 도발+회피 — PixelLab 생성
-- [ ] 칸티나 지하 타일셋 (균열+암석) — PixelLab tiles
-- [ ] 재료 아이콘: 아보카도(avocado) 32px
-
----
-
-## Phase 35-3 — 20장 스테이지 + 레시피 구현
-
-> `visual_change: none` | 35-2 에셋 완성 후 진행
-
-- [ ] ingredientData.js: 아보카도(avocado) 추가 — 누적 28종
-- [ ] enemyData.js: cactus_wraith, luchador_ghost 등록
+- [ ] dialogueData.js: chapter20_intro (균열 근원지 접근), chapter20_mid (엘 디아블로의 등장), 사이드 대화 1종
+- [ ] cactus_wraith (HP ~430, 가시 반격), luchador_ghost (HP ~460, 도발+회피) — PixelLab 생성
+- [ ] 칸티나 지하 타일셋 (균열+암석), 재료 아이콘: 아보카도(avocado) 32px
 - [ ] stageData.js: 스테이지 20-1 ~ 20-5 배치
-- [ ] recipeData.js: 아보카도 조합 레시피 ~10종 (부리토, 과카몰리 2.0 등)
-- [ ] 서비스 설정 (20장 손님 패턴)
+- [ ] recipeData.js: 아보카도 조합 레시피 ~10종
 
 ---
 
-## Phase 36-1 — 에셋 + 스크립트 (21장: 엘 디아블로 최종전)
+## Phase 35 — 21장 엘 디아블로 최종전 (멕시칸 3장)
 
-> `visual_change: art` | 보스 스프라이트 + 대사
+> `visual_change: both` | 보스 스프라이트 + 스테이지
 
 - [ ] el_diablo_pepper 보스 스프라이트 (PixelLab, 64px pro)
-- [ ] dialogueData.js: chapter21_boss 작성 (엘 디아블로 — "맵고 뜨거운 것이 진짜다")
-- [ ] dialogueData.js: chapter21_clear 작성 (균열 봉인, 멕시칸 아크 엔딩)
-- [ ] 사이드 대화 1~2종
-
----
-
-## Phase 36-2 — 21장 스테이지 구현 (멕시칸 아크 완성)
-
-> `visual_change: none` | 36-1 에셋 완성 후 진행
-
+- [ ] dialogueData.js: chapter21_boss, chapter21_clear, 사이드 대화 1~2종
 - [ ] stageData.js: 스테이지 21-1 ~ 21-5 + 21-6 el_diablo_pepper 보스전
-- [ ] recipeData.js: 아보카도 조합 추가분 (누적 ~236종)
+- [ ] recipeData.js: 아보카도 조합 추가분 (누적 ~250종)
 - [ ] 멕시칸 아크 밸런스 점검 (19~21장 DPS 커브)
 
 ---
 
-## Phase 37-1 — 스크립트 (22장: 슈가 드림랜드)
+## Phase 36 — 22장 슈가 드림랜드 (디저트 1장)
 
-> `visual_change: none` | 스토리 대사 집필만
+> `visual_change: both` | 스크립트 + 에셋 + 스테이지
 
-- [ ] dialogueData.js: chapter22_intro 작성 (드림랜드 진입 — 이세계의 위화감)
-- [ ] dialogueData.js: chapter22_mid 작성 (미각의 여왕 존재 암시, 팀의 불안)
-- [ ] 사이드 대화 1종
-
----
-
-## Phase 37-2 — 에셋 생성 (22장 신규 적)
-
-> `visual_change: art` | PixelLab 스프라이트 + 타일셋
-
-- [ ] candy_soldier: HP ~450, 경화 방어 — PixelLab 생성
-- [ ] cake_witch: HP ~500, 소환+버프 — PixelLab 생성
-- [ ] 드림랜드 타일셋 (과자+사탕+파스텔) — PixelLab tiles
-- [ ] 재료 아이콘: 카카오(cacao), 바닐라(vanilla) 32px
-
----
-
-## Phase 37-3 — 22장 스테이지 + 레시피 구현
-
-> `visual_change: none` | 37-2 에셋 완성 후 진행
-
-- [ ] ingredientData.js: 카카오(cacao), 바닐라(vanilla) 추가 — 누적 30종
-- [ ] enemyData.js: candy_soldier, cake_witch 등록
+- [ ] dialogueData.js: chapter22_intro (드림랜드 진입), chapter22_mid (미각의 여왕 존재 암시), 사이드 대화 1종
+- [ ] candy_soldier (HP ~450, 경화 방어), cake_witch (HP ~500, 소환+버프) — PixelLab 생성
+- [ ] 드림랜드 타일셋 (과자+사탕+파스텔), 재료 아이콘: 카카오(cacao), 바닐라(vanilla) 32px
 - [ ] stageData.js: 스테이지 22-1 ~ 22-5 배치
-- [ ] recipeData.js: 카카오+바닐라 조합 레시피 ~10종 (트러플 초콜릿, 바닐라 크림 등)
-- [ ] 서비스 설정 (22장 손님 패턴)
+- [ ] recipeData.js: 카카오+바닐라 조합 레시피 ~10종
 
 ---
 
-## Phase 38-1 — 스크립트 (23장: 드림랜드 심층부)
+## Phase 37 — 23장 드림랜드 심층부 (디저트 2장)
 
-> `visual_change: none` | 스토리 대사 집필만
+> `visual_change: both` | 스크립트 + 에셋 + 스테이지
 
-- [ ] dialogueData.js: chapter23_intro 작성 (여왕의 실체 접근 — 드림랜드의 진실)
-- [ ] dialogueData.js: chapter23_mid 작성 (최종 결전 준비, 팀의 결의)
-- [ ] 사이드 대화 1종
-
----
-
-## Phase 38-2 — 에셋 생성 (23장 신규 적)
-
-> `visual_change: art` | PixelLab 스프라이트 + 타일셋
-
-- [ ] macaron_knight: HP ~500, 마법 방어 — PixelLab 생성
-- [ ] sugar_specter: HP ~480, 분열 — PixelLab 생성
-- [ ] 드림랜드 심층 타일셋 (어두워지는 과자 세계) — PixelLab tiles
-- [ ] 재료 아이콘: 크림(cream) 32px
-
----
-
-## Phase 38-3 — 23장 스테이지 + 레시피 구현
-
-> `visual_change: none` | 38-2 에셋 완성 후 진행
-
-- [ ] ingredientData.js: 크림(cream) 추가 — 누적 31종
-- [ ] enemyData.js: macaron_knight, sugar_specter 등록
+- [ ] dialogueData.js: chapter23_intro (여왕의 실체 접근), chapter23_mid (최종 결전 준비), 사이드 대화 1종
+- [ ] macaron_knight (HP ~500, 마법 방어), sugar_specter (HP ~480, 분열) — PixelLab 생성
+- [ ] 드림랜드 심층 타일셋, 재료 아이콘: 크림(cream) 32px
 - [ ] stageData.js: 스테이지 23-1 ~ 23-5 배치
-- [ ] recipeData.js: 크림 조합 레시피 ~10종 (크렘 브륄레, 마카롱, 파르페 등)
-- [ ] 서비스 설정 (23장 손님 패턴)
+- [ ] recipeData.js: 크림 조합 레시피 ~10종
 
 ---
 
-## Phase 39-1 — 에셋 + 스크립트 (24장: 미각의 여왕 최종전)
+## Phase 38 — 24장 미각의 여왕 최종전
 
-> `visual_change: art` | 최종 보스 스프라이트 + 전체 엔딩 대사
+> `visual_change: both` | 최종 보스 스프라이트 + 엔딩 대사 + 스테이지
 
 - [ ] queen_of_taste 보스 스프라이트 (PixelLab, 64px pro — 3페이즈 별도 이미지)
-- [ ] dialogueData.js: chapter24_boss 작성 (여왕 — "식란은 내가 만든 게 아니야")
-- [ ] dialogueData.js: chapter24_final_battle 작성 (3페이즈 전환 대사)
-- [ ] dialogueData.js: chapter24_ending 작성 (진 엔딩 — 식란의 원인, 팀의 미래)
-- [ ] 사이드 대화 2~3종 (전원 회상, 각자 에필로그)
-
----
-
-## Phase 39-2 — 24장 스테이지 구현 (최종 완성)
-
-> `visual_change: none` | 39-1 에셋 완성 후 진행
-
+- [ ] dialogueData.js: chapter24_boss, chapter24_final_battle, chapter24_ending, 사이드 대화 2~3종
 - [ ] stageData.js: 스테이지 24-1 ~ 24-5 + 24-6 queen_of_taste 3페이즈 보스전
-- [ ] recipeData.js: 크림 조합 추가분 (누적 ~266종)
+- [ ] recipeData.js: 추가분 (누적 ~266종)
 - [ ] 최종 보스 3페이즈 밸런스 집중 점검
 
 ---
 
-## Phase 40 — 챕터 16~24 밸런스 QA
+## Phase 39 — 챕터 16~24 밸런스 QA
 
 > 목표: 그룹3 전체 밸런스 검증 + 전체 게임 최종 정합성 확인
 
@@ -1241,24 +1138,15 @@
 
 ---
 
-## Phase 41-1 — 업적 데이터 + 로직
+## Phase 40 — 업적 시스템
 
-> `visual_change: none` | 데이터 설계 + 매니저 구현
+> `visual_change: ui` | 데이터 + 로직 + UI
 
 - [ ] achievementData.js: 30~50개 정의 (스토리/전투/수집/경제/엔드리스 카테고리)
 - [ ] AchievementManager.js: 해금 조건 판정, 진행도 추적, 보상 지급
 - [ ] SaveManager 버전업: achievements 필드 추가 + 마이그레이션
+- [ ] AchievementScene: 카테고리 탭, 진행률 바, 잠금 해제 표시, 보상 수령
 - [ ] 업적 달성 알림 (플로팅 토스트, SFX)
-
----
-
-## Phase 41-2 — 업적 UI 구현
-
-> `visual_change: ui` | AchievementScene + 보상 버튼
-
-- [ ] AchievementScene (또는 팝업): 카테고리 탭, 진행률 바, 잠금 해제 표시
-- [ ] 보상 수령 버튼 + 애니메이션
-- [ ] 업적 보상 종류: 코인, 골드, 한정 레시피, 셰프 스킨 등
 
 ---
 
