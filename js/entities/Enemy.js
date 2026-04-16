@@ -12,6 +12,7 @@
  * Phase 26-1: 양조 주기(brewCycle) + 봉인 방어막(sealShield) + hpOverride 스폰 파라미터 메카닉.
  * Phase 31-3: 텔레포트(teleportEnabled) 메카닉 (curry_djinn).
  * Phase 32-3: 원소 저항(elementalResistance) + 혼란 디버프(confuseOnHit) 메카닉.
+ * Phase 33-3: 회피(dodgeOnHit) + 돌진(chargeEnabled) 메카닉.
  */
 
 import Phaser from 'phaser';
@@ -490,6 +491,36 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._updateTeleport(delta);
     }
 
+    // ── Phase 33-3: 돌진 메카닉 (burrito_juggernaut) ──
+    if (this.data_.chargeEnabled) {
+      if (this.chargeTimer_ === undefined) {
+        this.chargeTimer_ = 0;
+      }
+      this.chargeTimer_ += delta;
+      if (this.chargeTimer_ >= this.data_.chargeInterval) {
+        this.chargeTimer_ = 0;
+        // 돌진 발동: chargeSpeedMultiplier 배속 적용 (0.8초간)
+        this.chargeBurst_ = {
+          duration: 800,
+          elapsed: 0,
+          speedMultiplier: this.data_.chargeSpeedMultiplier,
+        };
+        // 돌진 충격 반경 내 타워 피해 emit
+        this.scene?.events?.emit('enemy_charge_impact', {
+          x: this.x, y: this.y,
+          radius: this.data_.chargeRadius,
+          damageRatio: this.data_.chargeTowerDamage,
+        });
+      }
+      // 돌진 중 속도 배율 적용/해제
+      if (this.chargeBurst_) {
+        this.chargeBurst_.elapsed += delta;
+        if (this.chargeBurst_.elapsed >= this.chargeBurst_.duration) {
+          this.chargeBurst_ = null;
+        }
+      }
+    }
+
     // ── 이동 ──
     this._moveAlongPath(delta);
   }
@@ -812,7 +843,9 @@ export class Enemy extends Phaser.GameObjects.Container {
     const dist = Math.sqrt(dx * dx + dy * dy);
     // 아우라 속도 버프 적용
     const auraMultiplier = 1 + (this._auraSpeedBuff || 0);
-    const moveAmount = this.speed * this.slowFactor * auraMultiplier * (delta / 1000);
+    // Phase 33-3: 돌진 중 속도 배율 (burrito_juggernaut)
+    const chargeMultiplier = this.chargeBurst_ ? this.chargeBurst_.speedMultiplier : 1;
+    const moveAmount = this.speed * this.slowFactor * auraMultiplier * chargeMultiplier * (delta / 1000);
 
     // Phase 12: 이동 방향에 따라 걷기 애니메이션 전환
     if (this._hasWalkAnim && dist > 0.1) {
@@ -869,6 +902,11 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // Phase 20: 배리어 활성 시 피해 무효
     if (this._barrierActive) return;
+
+    // Phase 33-3: 회피 메카닉 (taco_bandit) — dodgeChance 확률로 피해 완전 무효화
+    if (this.data_.dodgeOnHit && Math.random() < this.data_.dodgeChance) {
+      return;
+    }
 
     // 생선 기사: 전면 피해 50% 감소 (이동 방향 기준, 진행 중이면 전면 피격으로 간주)
     if (this.data_.shieldFront && this.waypointIndex < this._waypoints.length) {

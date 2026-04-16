@@ -11,6 +11,7 @@
  * Phase 31-3: + 서빙 13종 + 버프 2종 = 201종 (16장 향신료 궁전).
  * Phase 32-3: + 서빙 10종 + 버프 2종 = 213종 (17장 향신료 궁전 심층부).
  * Phase 32-5: + 서빙 7종 + 버프 1종 = 221종 (18장 향신료 궁전 최심부).
+ * Phase 33-3: + 서빙 8종 + customers 전용 2종 + 버프 2종 = 233종 (19장 선인장 칸티나).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -1090,6 +1091,68 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { cardamom: 2, saffron: 2, meat: 1, butter: 1, curry_leaf: 2, chai: 2, truffle: 1 }, baseReward: 415, cookTime: 24000,
     unlockCost: 665, gateStage: '18-5',
   },
+
+  // ── Phase 33-3 신규 서빙 레시피 (19장 선인장 칸티나) ──
+
+  // ★★ 2성 (2종)
+  {
+    id: 'jalapeno_salsa', nameKo: '할라피뇨 살사', icon: '🫙', category: 'soup',
+    tier: 2, ingredients: { jalapeno: 1 }, baseReward: 78, cookTime: 6500,
+    unlockCost: 58, gateStage: '19-1',
+  },
+  {
+    id: 'jalapeno_cornbread', nameKo: '할라피뇨 콘브레드', icon: '🌽', category: 'grill',
+    tier: 2, ingredients: { jalapeno: 1, flour: 1 }, baseReward: 84, cookTime: 7000,
+    unlockCost: 63, gateStage: '19-1',
+  },
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'nachos_fuego', nameKo: '나초스 푸에고', icon: '🧀', category: 'fry',
+    tier: 3, ingredients: { jalapeno: 1, cheese: 1 }, baseReward: 108, cookTime: 8500,
+    unlockCost: 90, gateStage: '19-1',
+  },
+  {
+    id: 'guacamole_bowl', nameKo: '과카몰리 볼', icon: '🥑', category: 'soup',
+    tier: 3, ingredients: { jalapeno: 1, tomato: 1 }, baseReward: 115, cookTime: 9000,
+    unlockCost: 98, gateStage: '19-2',
+  },
+
+  // ★★★★ 4성 (2종)
+  {
+    id: 'taco_supreme', nameKo: '타코 수프리모', icon: '🌮', category: 'special',
+    tier: 4, ingredients: { jalapeno: 1, meat: 1, cheese: 1, tomato: 1 }, baseReward: 148, cookTime: 12000,
+    unlockCost: 185, gateStage: '19-2',
+  },
+  {
+    id: 'enchilada_roja', nameKo: '엔칠라다 로하', icon: '🌯', category: 'special',
+    tier: 4, ingredients: { jalapeno: 1, meat: 1, flour: 1, tomato: 1 }, baseReward: 155, cookTime: 12500,
+    unlockCost: 195, gateStage: '19-3',
+  },
+
+  // ★★★★★ 5성 (2종 — 서빙 레시피)
+  {
+    id: 'cantina_platter', nameKo: '칸티나 플래터', icon: '🌟', category: 'special',
+    tier: 5, ingredients: { jalapeno: 2, meat: 1, cheese: 1, tomato: 1, flour: 1 }, baseReward: 268, cookTime: 17500,
+    unlockCost: 430, gateStage: '19-3',
+  },
+  {
+    id: 'burrito_grande', nameKo: '부리토 그란데', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { jalapeno: 2, meat: 1, cheese: 1, tomato: 1, flour: 1, rice: 1 }, baseReward: 290, cookTime: 18500,
+    unlockCost: 465, gateStage: '19-4',
+  },
+
+  // ★★★★★ 5성 (2종 — customers 전용 고급 레시피)
+  {
+    id: 'cactus_grand_feast', nameKo: '선인장 그랑 피스트', icon: '🏆', category: 'special',
+    tier: 5, ingredients: { jalapeno: 2, meat: 1, cheese: 1, tomato: 1, flour: 1, rice: 1, egg: 1 }, baseReward: 320, cookTime: 20000,
+    unlockCost: 510, gateStage: '19-4',
+  },
+  {
+    id: 'desert_cantina_banquet', nameKo: '사막 칸티나 연회', icon: '🎊', category: 'special',
+    tier: 5, ingredients: { jalapeno: 2, meat: 1, cheese: 2, tomato: 1, flour: 1, rice: 1, butter: 1 }, baseReward: 350, cookTime: 21500,
+    unlockCost: 555, gateStage: '19-5',
+  },
 ];
 
 /**
@@ -1423,6 +1486,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.20,
     duration: 2, durationUnit: 'wave',
     unlockCost: 140, gateStage: '18-3',
+  },
+
+  // ── Phase 33-3 신규 버프 레시피 (19장 선인장 칸티나) ──
+  {
+    id: 'salsa_boost', nameKo: '살사 부스트', icon: '🫙', category: 'buff',
+    tier: 3, ingredients: { jalapeno: 2 },
+    effectDesc: '공격 속도 +30% (2웨이브)',
+    effectType: 'buff_attack_speed',
+    effectValue: 0.30,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 85, gateStage: '19-2',
+  },
+  {
+    id: 'fuego_blessing', nameKo: '불꽃의 축복', icon: '🌶️', category: 'buff',
+    tier: 4, ingredients: { jalapeno: 1, meat: 1, tomato: 1 },
+    effectDesc: '전 타워 피해 +40% + 공격 속도 +20% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.40,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 138, gateStage: '19-4',
   },
 ];
 

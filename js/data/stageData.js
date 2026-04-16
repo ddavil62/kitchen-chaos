@@ -10,6 +10,7 @@
  * Phase 31-3: 16-1~16-5 (향신료 궁전) 구현 완료. curry_djinn 16-3 첫 등장, naan_golem 16-4 첫 등장.
  * Phase 32-3: 17-1~17-5 (향신료 궁전 심층부) 구현 완료. incense_specter 17-3 첫 등장, spice_elemental 17-4 첫 등장.
  * Phase 32-5: 18-1~18-6 (향신료 궁전 최심부) 구현 완료. masala_guide 18-1 첫 등장, maharaja 18-6 보스전.
+ * Phase 33-3: 19-1~19-5 (선인장 칸티나) 구현 완료. taco_bandit 19-3 첫 등장, burrito_juggernaut 19-4 첫 등장.
  * 각 스테이지는 고유 경로, 웨이브, 손님 구성을 가진다.
  */
 
@@ -7322,11 +7323,303 @@ export const STAGES = {
     starThresholds: { three: 52, two: 42 },
     service: { duration: 400, customerInterval: 1.72, maxCustomers: 78, customerPatience: 15 },
   },
-  '19-1': { id: '19-1', nameKo: '미구현', theme: 'placeholder' },
-  '19-2': { id: '19-2', nameKo: '미구현', theme: 'placeholder' },
-  '19-3': { id: '19-3', nameKo: '미구현', theme: 'placeholder' },
-  '19-4': { id: '19-4', nameKo: '미구현', theme: 'placeholder' },
-  '19-5': { id: '19-5', nameKo: '미구현', theme: 'placeholder' },
+  // ── 19-1: 사막의 칸티나 앞마당 (멕시칸 아크 도입부) ──
+  '19-1': {
+    id: '19-1',
+    nameKo: '사막의 칸티나 앞마당',
+    theme: 'cactus_cantina',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // Z자형
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 7 },
+      { type: 'vertical',   col: 7, rowStart: 1, rowEnd: 6 },
+      { type: 'horizontal', row: 6, colStart: 0, colEnd: 7 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 14, interval: 1800 },
+        { type: 'curry_djinn', count: 18, interval: 1560 },
+        { type: 'naan_golem', count: 12, interval: 1820 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 18, interval: 1680 },
+        { type: 'curry_djinn', count: 24, interval: 1440 },
+        { type: 'naan_golem', count: 16, interval: 1700 },
+        { type: 'butter_ghost', count: 14, interval: 610 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'masala_guide', count: 22, interval: 1560 },
+        { type: 'curry_djinn', count: 30, interval: 1320 },
+        { type: 'naan_golem', count: 20, interval: 1580 },
+        { type: 'milk_phantom', count: 14, interval: 870 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'masala_guide', count: 28, interval: 1440 },
+        { type: 'curry_djinn', count: 38, interval: 1200 },
+        { type: 'naan_golem', count: 25, interval: 1460 },
+        { type: 'mushroom_scout', count: 16, interval: 780 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'jalapeno_salsa', patience: 9200, baseReward: 155, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'jalapeno_cornbread', patience: 8800, baseReward: 172, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'nachos_fuego', patience: 8800, baseReward: 192, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'nachos_fuego', patience: 8400, baseReward: 215, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 34, two: 26 },
+    service: { duration: 350, customerInterval: 2.10, maxCustomers: 67, customerPatience: 17 },
+  },
+
+  // ── 19-2: 선인장 군락지 ──
+  '19-2': {
+    id: '19-2',
+    nameKo: '선인장 군락지',
+    theme: 'cactus_cantina',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 역U자형
+    pathSegments: [
+      { type: 'horizontal', row: 2, colStart: 0, colEnd: 8 },
+      { type: 'vertical',   col: 8, rowStart: 2, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 0, colEnd: 8 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 16, interval: 1740 },
+        { type: 'curry_djinn', count: 22, interval: 1500 },
+        { type: 'naan_golem', count: 14, interval: 1760 },
+        { type: 'incense_specter', count: 6, interval: 2200 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 20, interval: 1620 },
+        { type: 'curry_djinn', count: 28, interval: 1380 },
+        { type: 'naan_golem', count: 18, interval: 1640 },
+        { type: 'incense_specter', count: 9, interval: 2050 },
+        { type: 'butter_ghost', count: 12, interval: 600 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'masala_guide', count: 24, interval: 1500 },
+        { type: 'curry_djinn', count: 34, interval: 1260 },
+        { type: 'naan_golem', count: 22, interval: 1520 },
+        { type: 'incense_specter', count: 12, interval: 1900 },
+        { type: 'spice_elemental', count: 5, interval: 2500 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'masala_guide', count: 28, interval: 1380 },
+        { type: 'curry_djinn', count: 40, interval: 1160 },
+        { type: 'naan_golem', count: 26, interval: 1400 },
+        { type: 'incense_specter', count: 15, interval: 1760 },
+        { type: 'spice_elemental', count: 8, interval: 2300 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'masala_guide', count: 34, interval: 1260 },
+        { type: 'curry_djinn', count: 48, interval: 1060 },
+        { type: 'naan_golem', count: 32, interval: 1280 },
+        { type: 'incense_specter', count: 19, interval: 1620 },
+        { type: 'spice_elemental', count: 11, interval: 2100 },
+        { type: 'milk_phantom', count: 14, interval: 840 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'nachos_fuego', patience: 9200, baseReward: 178, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'guacamole_bowl', patience: 8800, baseReward: 198, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'guacamole_bowl', patience: 8800, baseReward: 220, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'taco_supreme', patience: 8400, baseReward: 245, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'taco_supreme', patience: 8000, baseReward: 272, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 36, two: 27 },
+    service: { duration: 356, customerInterval: 2.05, maxCustomers: 68, customerPatience: 17 },
+  },
+
+  // ── 19-3: 낡은 칸티나 홀 (taco_bandit 첫 등장) ──
+  '19-3': {
+    id: '19-3',
+    nameKo: '낡은 칸티나 홀',
+    theme: 'cactus_cantina',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // W자형
+    pathSegments: [
+      { type: 'horizontal', row: 0, colStart: 0, colEnd: 5 },
+      { type: 'vertical',   col: 5, rowStart: 0, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 5 },
+      { type: 'vertical',   col: 2, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 20, interval: 1680 },
+        { type: 'curry_djinn', count: 28, interval: 1440 },
+        { type: 'naan_golem', count: 18, interval: 1620 },
+        { type: 'incense_specter', count: 10, interval: 1980 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 24, interval: 1560 },
+        { type: 'curry_djinn', count: 34, interval: 1320 },
+        { type: 'naan_golem', count: 22, interval: 1500 },
+        { type: 'incense_specter', count: 13, interval: 1840 },
+        { type: 'spice_elemental', count: 8, interval: 2280 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'taco_bandit', count: 10, interval: 2200 },
+        { type: 'masala_guide', count: 26, interval: 1440 },
+        { type: 'curry_djinn', count: 38, interval: 1220 },
+        { type: 'naan_golem', count: 24, interval: 1400 },
+        { type: 'incense_specter', count: 15, interval: 1720 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'taco_bandit', count: 14, interval: 2000 },
+        { type: 'masala_guide', count: 30, interval: 1320 },
+        { type: 'curry_djinn', count: 44, interval: 1120 },
+        { type: 'incense_specter', count: 18, interval: 1600 },
+        { type: 'spice_elemental', count: 11, interval: 2100 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'taco_bandit', count: 18, interval: 1800 },
+        { type: 'masala_guide', count: 35, interval: 1220 },
+        { type: 'curry_djinn', count: 52, interval: 1020 },
+        { type: 'naan_golem', count: 28, interval: 1300 },
+        { type: 'incense_specter', count: 22, interval: 1480 },
+        { type: 'spice_elemental', count: 14, interval: 1960 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'taco_supreme', patience: 9200, baseReward: 200, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'enchilada_roja', patience: 8800, baseReward: 222, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'enchilada_roja', patience: 8600, baseReward: 248, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'cantina_platter', patience: 8200, baseReward: 276, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'cantina_platter', patience: 8000, baseReward: 308, tipMultiplier: 2.0, vip: true }] },
+    ],
+    starThresholds: { three: 38, two: 29 },
+    service: { duration: 362, customerInterval: 2.00, maxCustomers: 69, customerPatience: 17 },
+  },
+
+  // ── 19-4: 지하 저장고 (burrito_juggernaut 첫 등장) ──
+  '19-4': {
+    id: '19-4',
+    nameKo: '지하 저장고',
+    theme: 'cactus_cantina',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 계단형
+    pathSegments: [
+      { type: 'vertical',   col: 1, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 1, colEnd: 6 },
+      { type: 'vertical',   col: 6, rowStart: 4, rowEnd: 7 },
+      { type: 'horizontal', row: 7, colStart: 1, colEnd: 8 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'taco_bandit', count: 14, interval: 2000 },
+        { type: 'masala_guide', count: 24, interval: 1400 },
+        { type: 'curry_djinn', count: 32, interval: 1180 },
+        { type: 'incense_specter', count: 12, interval: 1740 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'taco_bandit', count: 18, interval: 1840 },
+        { type: 'burrito_juggernaut', count: 4, interval: 3500 },
+        { type: 'masala_guide', count: 28, interval: 1300 },
+        { type: 'curry_djinn', count: 38, interval: 1100 },
+        { type: 'naan_golem', count: 20, interval: 1360 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'taco_bandit', count: 22, interval: 1700 },
+        { type: 'burrito_juggernaut', count: 7, interval: 3200 },
+        { type: 'masala_guide', count: 32, interval: 1200 },
+        { type: 'incense_specter', count: 15, interval: 1620 },
+        { type: 'spice_elemental', count: 10, interval: 2050 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'taco_bandit', count: 26, interval: 1560 },
+        { type: 'burrito_juggernaut', count: 10, interval: 2900 },
+        { type: 'masala_guide', count: 36, interval: 1120 },
+        { type: 'curry_djinn', count: 44, interval: 1020 },
+        { type: 'incense_specter', count: 18, interval: 1500 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'taco_bandit', count: 32, interval: 1420 },
+        { type: 'burrito_juggernaut', count: 14, interval: 2650 },
+        { type: 'masala_guide', count: 42, interval: 1040 },
+        { type: 'curry_djinn', count: 52, interval: 940 },
+        { type: 'incense_specter', count: 22, interval: 1400 },
+        { type: 'spice_elemental', count: 14, interval: 1920 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'cantina_platter', patience: 9200, baseReward: 258, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'burrito_grande', patience: 8800, baseReward: 288, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'burrito_grande', patience: 8600, baseReward: 320, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'cactus_grand_feast', patience: 8200, baseReward: 358, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'cactus_grand_feast', patience: 8000, baseReward: 400, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 40, two: 31 },
+    service: { duration: 368, customerInterval: 1.98, maxCustomers: 70, customerPatience: 16 },
+  },
+
+  // ── 19-5: 선인장 제단 (클라이맥스) ──
+  '19-5': {
+    id: '19-5',
+    nameKo: '선인장 제단',
+    theme: 'cactus_cantina',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 십자 역방향형
+    pathSegments: [
+      { type: 'vertical',   col: 3, rowStart: 0, rowEnd: 4 },
+      { type: 'horizontal', row: 4, colStart: 0, colEnd: 8 },
+      { type: 'vertical',   col: 6, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'taco_bandit', count: 20, interval: 1800 },
+        { type: 'burrito_juggernaut', count: 8, interval: 3000 },
+        { type: 'masala_guide', count: 28, interval: 1280 },
+        { type: 'curry_djinn', count: 36, interval: 1100 },
+        { type: 'incense_specter', count: 14, interval: 1660 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'taco_bandit', count: 26, interval: 1640 },
+        { type: 'burrito_juggernaut', count: 12, interval: 2750 },
+        { type: 'masala_guide', count: 34, interval: 1180 },
+        { type: 'curry_djinn', count: 44, interval: 1000 },
+        { type: 'incense_specter', count: 18, interval: 1540 },
+        { type: 'spice_elemental', count: 10, interval: 1980 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'taco_bandit', count: 32, interval: 1500 },
+        { type: 'burrito_juggernaut', count: 16, interval: 2500 },
+        { type: 'masala_guide', count: 40, interval: 1080 },
+        { type: 'curry_djinn', count: 52, interval: 920 },
+        { type: 'incense_specter', count: 22, interval: 1420 },
+        { type: 'spice_elemental', count: 14, interval: 1840 },
+      ]},
+      { wave: 4, enemies: [
+        { type: 'taco_bandit', count: 38, interval: 1380 },
+        { type: 'burrito_juggernaut', count: 20, interval: 2300 },
+        { type: 'masala_guide', count: 46, interval: 1000 },
+        { type: 'incense_specter', count: 27, interval: 1320 },
+        { type: 'spice_elemental', count: 18, interval: 1720 },
+        { type: 'milk_phantom', count: 18, interval: 820 },
+      ]},
+      { wave: 5, enemies: [
+        { type: 'taco_bandit', count: 46, interval: 1260 },
+        { type: 'burrito_juggernaut', count: 25, interval: 2100 },
+        { type: 'masala_guide', count: 54, interval: 920 },
+        { type: 'curry_djinn', count: 62, interval: 840 },
+        { type: 'incense_specter', count: 33, interval: 1220 },
+        { type: 'spice_elemental', count: 22, interval: 1600 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'burrito_grande', patience: 9200, baseReward: 310, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'cactus_grand_feast', patience: 8800, baseReward: 348, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'cactus_grand_feast', patience: 8600, baseReward: 390, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'cactus_grand_feast', patience: 8200, baseReward: 435, tipMultiplier: 2.0, vip: true }] },
+      { wave: 5, customers: [{ dish: 'cactus_grand_feast', patience: 8000, baseReward: 485, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 43, two: 33 },
+    service: { duration: 375, customerInterval: 1.95, maxCustomers: 72, customerPatience: 16 },
+  },
   '19-6': { id: '19-6', nameKo: '미구현', theme: 'placeholder' },
   '20-1': { id: '20-1', nameKo: '미구현', theme: 'placeholder' },
   '20-2': { id: '20-2', nameKo: '미구현', theme: 'placeholder' },
