@@ -1,5 +1,24 @@
 # Changelog
 
+## [Phase 36] 2026-04-16 — 22장 슈가 드림랜드 (디저트 아크 시작)
+
+### Added
+- candy_soldier 스프라이트 (PixelLab standard, 48px, 8방향 + walking 애니, hash: walking-4afaa9df)
+- cake_witch 스프라이트 (PixelLab standard, 48px, 8방향 + walking 애니, hash: walking-076ead3d)
+- 재료 아이콘 2종: cacao(카카오), vanilla(바닐라) 32px RGBA
+- gameData.js 적 2종: candy_soldier(HP 450, damageReduction 20%), cake_witch(HP 500, summon @60%)
+- gameData.js 재료 2종: cacao, vanilla (누적 31종)
+- 대화 3종: chapter22_intro, chapter22_mid, team_side_22 (누적 97종)
+- storyData 트리거 4건: 22-1 진입 / 22-3 클리어 / 22-5 클리어 / merchant_enter
+- 스테이지 22-1~22-5 구현 (theme: dream_candy)
+- 레시피 10종 추가: cacao/vanilla 서빙 8종 + 버프 2종 (누적 264종)
+
+### Changed
+- SpriteLoader.js ENEMY_IDS 41종 (candy_soldier, cake_witch 추가)
+- ENEMY_WALK_HASHES: walking-4afaa9df / walking-076ead3d 등록
+
+---
+
 ## [Phase 35] 2026-04-16 — 21장 엘 디아블로 최종전 (멕시칸 아크 완결)
 
 ### Added
