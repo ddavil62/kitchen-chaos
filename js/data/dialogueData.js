@@ -26,6 +26,8 @@
  * Phase 35-1: 21장 대화 6종 추가 (chapter21_intro, chapter21_mid, chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21). CHARACTERS에 el_diablo 추가. 누적 94종.
  * Phase 36-1: 22장 슈가 드림랜드 대화 3종 추가 (chapter22_intro, chapter22_mid, team_side_22). 누적 97종.
  * Phase 37-1: 23장 드림랜드 심층부 대화 3종 추가 (chapter23_intro, chapter23_mid, team_side_23). 누적 100종.
+ * Phase 38-1: 24장 대화 6종 추가 (chapter24_boss, chapter24_mid, chapter24_final_battle,
+ *   chapter24_ending, team_side_24, team_side_24b). 누적 ~106종. CHARACTERS에 queen_of_taste 추가.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1669,6 +1671,104 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코도요?!' },
     ],
   },
+
+  // ── Phase 38-1: 24장 미각의 여왕 최종전 ──
+
+  // chapter24_boss — 24-1 진입 시 (chapter23_cleared 확인), 여왕과의 첫 대면
+  chapter24_boss: {
+    id: 'chapter24_boss',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '드림랜드의 가장 깊은 곳. 공기가 달라졌다. 달콤하지 않았다. 차갑고, 묵직하고, 왠지 모르게 숨막혔다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(멈추며) 저기... 뭔가 있어. 느껴져.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(조용히) 보스야. 이 구역 전체의 미력... 하나로 수렴하고 있어.' },
+      { speaker: '미각의 여왕', portrait: '👑', portraitKey: 'queen_of_taste', text: '(어딘가에서, 목소리만) ...오셨군요. 오래 기다렸어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '누구야?! 어디 있어?!' },
+      { speaker: '미각의 여왕', portrait: '👑', portraitKey: 'queen_of_taste', text: '이 땅의 모든 맛이 나예요. 설탕, 크림, 카카오... 전부 내 미력이 빚은 것들이지.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(미미에게 낮게) 저 목소리... WCA 기록에 없어. 어디서 왔는지 모르는 존재야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(긴장하며) 미력 농도가... 마하라자의 세 배. 이건 단순한 식란이 아니에요.' },
+      { speaker: '미각의 여왕', portrait: '👑', portraitKey: 'queen_of_taste', text: '\'정화\'라고 부르죠? 귀엽네요. 이 완벽한 세계를 되돌리겠다는 발상이.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '완벽하지 않아. 선택할 수 없는 맛은 맛이 아니야.' },
+    ],
+  },
+
+  // chapter24_mid — 24-3 첫 클리어 후, 중반부 위기감
+  chapter24_mid: {
+    id: 'chapter24_mid',
+    skippable: true,
+    lines: [
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(장비를 점검하며) 이 적들... 여왕이 직접 소환한 거예요. 마카롱 기사, 슈가 스펙터 — 전부 그녀의 미력으로 빚은 근위대예요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '소환된 적의 밀도가 24-1보다 40% 이상 높습니다. 후반으로 갈수록 기하급수적으로 늘어날 거예요.' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(잠시 생각하다가) 저 여왕... 여기서 뭘 원하는 거야? 그냥 막는 게 목표인 건지, 아니면 뭔가 다른 게 있는 건지.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '모르겠어. WCA 데이터베이스에도 기록이 없고, 어디서 왔는지도 불분명해. 식란이 이 규모를 만들어낸 건 맞는데...' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(묵묵히) 일단 나아가자. 멈추면 더 모르게 돼.' },
+    ],
+  },
+
+  // chapter24_final_battle — 24-5 첫 클리어 후, 결전 직전
+  chapter24_final_battle: {
+    id: 'chapter24_final_battle',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '마지막 문 앞이었다. 미미의 팀은 아무 말도 하지 않았다. 다들 알고 있었다. 저 안에 답이 있다는 것을.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(팀원들을 천천히 바라보며) 다들... 고마워. 여기까지 함께 와줘서.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(짧게) 아직 안 끝났어요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(끄덕이며) 그래. 끝나고 고마워해도 늦지 않아.' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(이를 악물며) 들어가서 끝냅시다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(배낭을 추스르며) 나는... 뭔가 팔 게 있나 확인하고 있을게. (진지하게) 진심으로 — 잘 해낼 거야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(프라이팬을 쥐며) 가자.' },
+    ],
+  },
+
+  // chapter24_ending — 24-6 첫 클리어 후, 그룹3 최종 엔딩 (코미디 톤 + 여운)
+  chapter24_ending: {
+    id: 'chapter24_ending',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '미각의 여왕이 무릎을 꿇었다. 황금빛 미력이 조용히 흩어졌다. 드림랜드 전체가 처음으로 숨을 쉬었다.' },
+      { speaker: '미각의 여왕', portrait: '👑', portraitKey: 'queen_of_taste', text: '(흐릿해지며) ...당신들의 맛은 제각각이군요. 제가 예상하지 못했어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '그게 맛이라는 거야. 하나로 정해지면 맛이 아니거든.' },
+      { speaker: '미각의 여왕', portrait: '👑', portraitKey: 'queen_of_taste', text: '(마지막으로) ...그렇군요. 아마도 그게... 제가 몰랐던 거겠죠.' },
+      { speaker: 'narrator', portrait: '', text: '여왕이 사라졌다. 어디서 왔는지, 왜 드림랜드를 만들었는지 — 아무도 완전히 알지 못했다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(주변을 두리번거리며) 어... 크림이랑 바닐라가 엄청나게 남았는데. 이거 팔면 대박 나겠는데?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코!!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '아, 맞다. 감동적인 순간이었지. (헛기침) ...그래도 이거 팔면 안 돼?' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(앞을 바라보며) 다음엔 어디야.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(조용히 미소지으며) 일단 식당부터요. 손님이 기다리고 있을 것 같아요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(웃으며) 맞아. 일단 돌아가자. 오늘은... 정말 수고했어, 다들.' },
+      { speaker: 'narrator', portrait: '', text: '식란의 드림랜드가 조용해졌다. 그리고 미미의 식당은, 오늘도 문을 열었다.' },
+    ],
+  },
+
+  // team_side_24 — merchant_enter, 24장 진입 후 1회 (메이지+아르준 디저트 연구 코미디)
+  team_side_24: {
+    id: 'team_side_24',
+    skippable: true,
+    lines: [
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(크림 샘플을 분석하며) 이 크림의 미력 구조... 완전히 새로운 패턴이에요. 논문 쓸 수 있겠는데.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'arjun', text: '(관심 있게) 미력 구조를 논문으로? 향신료 마살라 문파에도 이런 분석법이 있어요. 비교 연구 해보고 싶네요.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '정말요?! 저는 디저트 계열만 봤는데 — 아르준 선생님 쪽은 향신료 미력이잖아요. 완전히 다른 계통이라...' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'arjun', text: '다르기 때문에 흥미로운 거죠. (웃으며) 전통 마살라 조합과 디저트 크림 미력이 어떻게 상호작용하는지 —' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(끼어들며) 그 연구, 나중에 해. 지금은 싸워야 할 것들이 남아있거든.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(당황하며) 아, 맞다! 완전히 빠져들었다...' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '연구 결과 나오면 나한테도 알려줘. 논문이 팔리면 좋으니까.' },
+      { speaker: '아르준', portrait: '🪬', portraitKey: 'arjun', text: '...미력사 협력자는 역시 독특하군요.' },
+    ],
+  },
+
+  // team_side_24b — merchant_enter, team_side_24 시청 후 (라오+유키 여운 사이드)
+  team_side_24b: {
+    id: 'team_side_24b',
+    skippable: true,
+    lines: [
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(조용히) 라오... 여기 오면서 뭔가 이상하게 차분하다는 느낌이 들었어요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(천천히) 디저트랑 싸우는 게 왠지 더 피곤하더라. 고추나 매운 거랑 싸울 때랑 달라.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(웃으며) 달콤한 것들이 더 집요한 것 같아요. 지치게 만드는 방식이.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '맞아. 지고 싶지 않은데 지치게 만들어. (잠시 후) 그래도 여기까지 왔어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '여기까지 왔어요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(짧게 웃으며) ...끝내자.' },
+    ],
+  },
 };
 
 // ── 캐릭터 정의 ──
@@ -1697,4 +1797,6 @@ export const CHARACTERS = {
   maharaja: { id: 'maharaja', nameKo: '마하라자', portrait: '👑', portraitKey: 'maharaja', color: 0xb8860b, role: 'boss', desc: '300년 전 향신료 왕국을 지배했던 자. 미력을 지배의 도구로 삼았다가 마살라 문파에 봉인되었다. 인도 아크 최종 보스.' },
   // ── Phase 35-1: 21장 보스 캐릭터 ──
   el_diablo: { id: 'el_diablo', nameKo: '엘 디아블로', portrait: '😈', portraitKey: 'el_diablo', color: 0x8b0000, role: 'boss', desc: '선인장 땅의 심장을 깨운 자. 고추 형태의 악마 루차도르로 멕시칸 미력의 폭주를 의도적으로 증폭시켰다. 멕시칸 아크 최종 보스.' },
+  // ── Phase 38-1: 24장 최종 보스 캐릭터 ──
+  queen_of_taste: { id: 'queen_of_taste', nameKo: '미각의 여왕', portrait: '👑', portraitKey: 'queen_of_taste', color: 0xd4af37, role: 'boss', desc: '드림랜드의 창조자. 모든 맛을 하나로 통일하려는 의지의 결정체. 디저트 아크 최종 보스.' },
 };

@@ -21,6 +21,9 @@
  * Phase 35-1: 21장 트리거 7건 추가 (chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21, chapter21_intro 포함) + stage_first_clear 제외 목록 갱신 (21-1, 21-3, 21-6 추가).
  * Phase 36-1: 22장 트리거 4건 추가 (chapter22_intro, chapter22_mid, team_side_22, 22-5 currentChapter 23 설정) + stage_first_clear 제외 목록 갱신 (22-1, 22-3 추가).
  * Phase 37-1: 23장 트리거 4건 추가 (chapter23_intro, chapter23_mid, team_side_23, 23-5 currentChapter 24 설정) + stage_first_clear 제외 목록 갱신 (23-1, 23-3 추가).
+ * Phase 38-1: 24장 트리거 7건 추가 (chapter24_boss, chapter24_mid, chapter24_final_battle,
+ *   chapter24_ending, team_side_24, team_side_24b, 24-6 currentChapter=25 설정).
+ *   stage_first_clear 제외 목록 갱신 (24-1, 24-3, 24-6 추가).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -288,7 +291,10 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '22-1' &&   // chapter22_intro 별도 처리
       ctx.stageId !== '22-3' &&   // chapter22_mid 별도 처리
       ctx.stageId !== '23-1' &&   // chapter23_intro 별도 처리
-      ctx.stageId !== '23-3',     // chapter23_mid 별도 처리
+      ctx.stageId !== '23-3' &&   // chapter23_mid 별도 처리
+      ctx.stageId !== '24-1' &&   // chapter24_boss 별도 처리
+      ctx.stageId !== '24-3' &&   // chapter24_mid 별도 처리
+      ctx.stageId !== '24-6',     // chapter24_ending 별도 처리
     delay: 800,
   },
 
@@ -1249,6 +1255,100 @@ export const STORY_TRIGGERS = [
       }
       SaveManager.save(data);
     },
+  },
+
+  // ── 24장: 미각의 여왕 최종전 (Phase 38-1) ─────────────────────────────────
+
+  // 24-1 진입 시 chapter24_boss (chapter23_cleared 확인)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter24_boss',
+    once: true,
+    condition: (ctx, save) =>
+      ctx.stageId === '24-1' &&
+      save.storyProgress?.storyFlags?.chapter23_cleared === true,
+    delay: 400,
+  },
+
+  // 24-3 첫 클리어 시 chapter24_mid + 플래그
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter24_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '24-3',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter24_mid_seen = true;
+      SaveManager.save(data);
+    },
+  },
+
+  // 24-5 첫 클리어 시 chapter24_final_battle + 플래그
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter24_final_battle',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '24-5',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter24_final_revealed = true;
+      SaveManager.save(data);
+    },
+  },
+
+  // 24-6 첫 클리어 시 chapter24_ending + currentChapter=25 + 완결 플래그
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter24_ending',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '24-6',
+    delay: 1000,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter24_cleared = true;
+      data.storyProgress.storyFlags.group3_cleared = true;
+      // 적 도감 해금: 그룹3 전체 적 해금 플래그
+      data.storyProgress.storyFlags.group3_bestiary_unlocked = true;
+      if (data.storyProgress.currentChapter < 25) {
+        data.storyProgress.currentChapter = 25;
+      }
+      SaveManager.save(data);
+    },
+  },
+
+  // merchant_enter에서 team_side_24 (24장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_24',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 24 &&
+      !save.seenDialogues?.includes('team_side_24'),
+  },
+
+  // merchant_enter에서 team_side_24b (team_side_24 시청 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_24b',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 24 &&
+      save.seenDialogues?.includes('team_side_24') &&
+      !save.seenDialogues?.includes('team_side_24b'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────

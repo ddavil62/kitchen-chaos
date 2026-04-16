@@ -951,6 +951,19 @@ export class Enemy extends Phaser.GameObjects.Container {
       amount *= this.data_.resistMultiplier;
     }
 
+    // Phase 38-1: 마법 저항 (macaron_knight) — 마법 계열 타워 피해 magicResistance% 감소
+    // 마법 계열 타워: grill(화염), freezer(냉동), spice_grinder(향신료DoT)
+    const MAGIC_TOWER_TYPES = ['grill', 'freezer', 'spice_grinder'];
+    if (this.data_.magicResistance && towerType && MAGIC_TOWER_TYPES.includes(towerType)) {
+      amount *= (1 - this.data_.magicResistance);
+    }
+
+    // Phase 38-1: 일반 피해 감소 (candy_soldier 등) — magicResistance 없는 적에만 적용
+    // 주의: magicResistance가 있는 적(macaron_knight)에는 적용하지 않음 (중복 감소 방지)
+    if (this.data_.damageReduction && !this.data_.magicResistance) {
+      amount *= (1 - this.data_.damageReduction);
+    }
+
     // Phase 26-1: 봉인 방어막 (sake_master) — 방어막이 피해를 흡수
     if (this._sealShieldActive) {
       this._sealShieldHp -= amount;
@@ -1253,6 +1266,24 @@ export class Enemy extends Phaser.GameObjects.Container {
           x: this.x + Phaser.Math.Between(-10, 10),
           y: this.y + Phaser.Math.Between(-5, 5),
           waypointIndex: this.waypointIndex,
+        });
+      }
+    }
+
+    // Phase 38-1: splitOnDeath (sugar_specter) — 사망 시 소형 버전 스폰
+    // data_.splitOnDeath: { count, hpRatio, speedMultiplier, rewardRatio } 구조
+    if (this.data_.splitOnDeath && !this._splitExecuted) {
+      this._splitExecuted = true;
+      const config = this.data_.splitOnDeath;
+      for (let i = 0; i < config.count; i++) {
+        this.scene.events.emit('enemy_deterministic_split', {
+          type: this.data_.id + '_mini',  // 예: 'sugar_specter_mini'
+          x: this.x + Phaser.Math.Between(-12, 12),
+          y: this.y + Phaser.Math.Between(-6, 6),
+          waypointIndex: this.waypointIndex,
+          hpOverride: Math.floor(this.maxHp * config.hpRatio),
+          speedMultiplier: config.speedMultiplier,
+          rewardOverride: 0,
         });
       }
     }

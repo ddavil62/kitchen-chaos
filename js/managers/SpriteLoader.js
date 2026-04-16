@@ -20,6 +20,7 @@
  * Phase 35-2: 21장 보스 1종(el_diablo_pepper) 추가.
  * Phase 36-2: 22장 적 2종(candy_soldier, cake_witch), 재료 2종(cacao, vanilla) 추가.
  * Phase 37-1: 23장 적 2종(macaron_knight, sugar_specter), 재료 1종(cream) 추가.
+ * Phase 38-1: 24장 보스 1종(queen_of_taste, 3페이즈) 추가. BOSS_WALK_HASHES에 queen_of_taste 3종 등록.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -59,7 +60,7 @@ const ENEMY_IDS = [
   'macaron_knight', 'sugar_specter',       // Phase 37-1 (23장 드림랜드 심층부, 64px standard)
 ];
 
-// ── 보스 ID 목록 (12종, Phase 35-2: el_diablo_pepper 추가) ──
+// ── 보스 ID 목록 (13종, Phase 38-1: queen_of_taste 추가) ──
 const BOSS_IDS = [
   'pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem',
   'master_patissier', 'cuisine_god',
@@ -69,6 +70,7 @@ const BOSS_IDS = [
   'chef_noir',    // Phase 29-1
   'maharaja',     // Phase 32-5
   'el_diablo_pepper', // Phase 35-2
+  'queen_of_taste',   // Phase 38-1
 ];
 
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
@@ -176,6 +178,10 @@ const BOSS_WALK_HASHES = {
   chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
   maharaja: 'animating-2c666ada',     // Phase 32-5 (pro 모드, 212px canvas)
   el_diablo_pepper: 'walking-acae25f3', // Phase 35-2 (pro 모드, 116px canvas)
+  // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (AD 모드2 완료 후 hash 채움)
+  queen_of_taste:   'TBD_PHASE1_HASH',    // 페이즈1 기본형
+  queen_of_taste_2: 'TBD_PHASE2_HASH',    // 페이즈2 변신형 (페이즈 전환 시 setTexture로 교체)
+  queen_of_taste_3: 'TBD_PHASE3_HASH',    // 페이즈3 분노형
 };
 
 /** 걷기 애니메이션 방향 목록 */
@@ -255,6 +261,14 @@ export class SpriteLoader {
         `${SPRITES_ROOT}/bosses/${id}/rotations/south.png`
       );
     }
+    // Phase 38-1: queen_of_taste 페이즈 2/3 정지 이미지 별도 로드
+    const QOT_PHASE_STATICS = ['queen_of_taste_2', 'queen_of_taste_3'];
+    for (const phaseId of QOT_PHASE_STATICS) {
+      scene.load.image(
+        `boss_${phaseId}`,
+        `${SPRITES_ROOT}/bosses/${phaseId}/rotations/south.png`
+      );
+    }
   }
 
   /**
@@ -284,11 +298,24 @@ export class SpriteLoader {
   static _loadBossWalkFrames(scene) {
     for (const id of BOSS_IDS) {
       const hash = BOSS_WALK_HASHES[id];
-      if (!hash) continue;
+      if (!hash || hash.startsWith('TBD')) continue;  // AD 완료 전 skip
       for (const dir of WALK_DIRS) {
         for (let f = 0; f < WALK_FRAME_COUNT; f++) {
           const key = `boss_${id}_walk_${dir}_${f}`;
           const path = `${SPRITES_ROOT}/bosses/${id}/animations/${hash}/${dir}/frame_${String(f).padStart(3, '0')}.png`;
+          scene.load.image(key, path);
+        }
+      }
+    }
+    // Phase 38-1: queen_of_taste 페이즈 2/3 걷기 애니메이션 별도 로딩
+    const QOT_PHASE_SPRITES = ['queen_of_taste_2', 'queen_of_taste_3'];
+    for (const phaseId of QOT_PHASE_SPRITES) {
+      const hash = BOSS_WALK_HASHES[phaseId];
+      if (!hash || hash.startsWith('TBD')) continue;  // AD 완료 전 skip
+      for (const dir of WALK_DIRS) {
+        for (let f = 0; f < WALK_FRAME_COUNT; f++) {
+          const key = `boss_${phaseId}_walk_${dir}_${f}`;
+          const path = `${SPRITES_ROOT}/bosses/${phaseId}/animations/${hash}/${dir}/frame_${String(f).padStart(3, '0')}.png`;
           scene.load.image(key, path);
         }
       }
@@ -325,6 +352,11 @@ export class SpriteLoader {
 
     for (const id of ENEMY_IDS) register('enemy', id);
     for (const id of BOSS_IDS) register('boss', id);
+    // Phase 38-1: queen_of_taste 페이즈 2/3 Phaser 애니메이션 등록
+    for (const phaseId of ['queen_of_taste_2', 'queen_of_taste_3']) {
+      if (!BOSS_WALK_HASHES[phaseId] || BOSS_WALK_HASHES[phaseId].startsWith('TBD')) continue;
+      register('boss', phaseId);
+    }
   }
 
   /**

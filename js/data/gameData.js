@@ -16,6 +16,8 @@
  * Phase 35-2: 보스 1종(el_diablo_pepper) 추가. 누적 적 51종.
  * Phase 36-2: 적 2종(candy_soldier, cake_witch), 재료 2종(cacao, vanilla) 추가. 누적 적 53종, 재료 31종.
  * Phase 37-1: 적 2종(macaron_knight, sugar_specter), 재료 1종(cream) 추가. 누적 적 55종, 재료 32종.
+ * Phase 38-1: 보스 1종(queen_of_taste, 3페이즈), 적 1종(sugar_specter_mini) 추가.
+ *   macaron_knight damageReduction fallback 제거. 누적 적 57종, 보스 13종.
  */
 
 // ── 적 타입 정의 ──
@@ -791,11 +793,9 @@ export const ENEMY_TYPES = {
     speed: 70,
     ingredient: 'cream',
     bodyColor: 0xe8b4cb,           // 파스텔 핑크-라벤더 (마카롱 껍질)
-    // 마법 저항: 원소/마법 계열 공격 60% 경감 (candy_soldier의 damageReduction과 별개 스탯)
-    // 현재 엔진에서 magicResistance 전용 핸들러가 없으므로 damageReduction으로 fallback 처리.
-    // Phase 38에서 magicResistance 전용 로직 구현 시 이 필드로 전환 예정.
+    // 마법 저항: 마법 계열(grill, freezer, spice_grinder) 공격 60% 경감
+    // Phase 38-1: damageReduction fallback 제거 — magicResistance 전용 핸들러로 처리
     magicResistance: 0.60,
-    damageReduction: 0.60,
     canvasSize: 64,
     group: 3,                       // 그룹 3: 디저트 아크
     reward: 35,
@@ -820,6 +820,84 @@ export const ENEMY_TYPES = {
     canvasSize: 64,
     group: 3,
     reward: 30,
+  },
+  // ── Phase 38-1: sugar_specter 분열 소형체 ──
+  sugar_specter_mini: {
+    id: 'sugar_specter_mini',
+    nameKo: '미니 슈가 스펙터',
+    nameEn: 'Mini Sugar Specter',
+    hp: 144,             // sugar_specter HP(480) x 0.30 = 144
+    speed: 96,           // sugar_specter speed(80) x 1.20 = 96
+    ingredient: null,    // 처치 시 재료 드롭 없음 (rewardOverride: 0)
+    bodyColor: 0xc0e8ff, // 더 밝은 흰빛 (소형 유령)
+    canvasSize: 32,      // 소형 버전 (기존 64px -> 32px)
+    group: 3,
+    reward: 0,           // 보상 없음
+    isMini: true,        // 미니 적 플래그
+    // splitOnDeath 없음 (2차 분열 방지)
+  },
+  // ── Phase 38-1: 24장 최종 보스 (디저트 아크 + 그룹3 클라이맥스) ──
+  // 보스 -- queen_of_taste는 BOSS_IDS에 등록 (SpriteLoader에서 /sprites/bosses/ 경로 사용)
+  queen_of_taste: {
+    id: 'queen_of_taste',
+    nameKo: '미각의 여왕',
+    nameEn: 'Queen of Taste',
+    hp: 12000,
+    speed: 15,
+    ingredient: null,
+    bodyColor: 0xd4af37,  // 금색
+    isBoss: true,
+    canvasSize: 92,
+
+    // ── 3페이즈 전환 ──
+    // phaseTransitions: HP 임계값 도달 시 스프라이트 교체 + 속도 보너스
+    phaseTransitions: [
+      {
+        hpThreshold: 0.66,   // HP 66% 이하 -> 페이즈 2
+        phase: 2,
+        speedBonus: 0.10,    // speed x 1.10 적용
+        spriteSuffix: '_2',  // 스프라이트 키: boss_queen_of_taste_2
+        tintColor: 0xffccee, // 분홍빛 틴트 (변신 중간형)
+      },
+      {
+        hpThreshold: 0.33,   // HP 33% 이하 -> 페이즈 3
+        phase: 3,
+        spriteSuffix: '_3',  // 스프라이트 키: boss_queen_of_taste_3
+        tintColor: 0xffd700, // 금색 틴트 (분노형)
+      },
+    ],
+
+    // ── 소환 (전 페이즈 공통) ──
+    summon: true,
+    summonThreshold: 0.75,   // HP 75% 이하부터 주기적 소환 활성화
+    summonInterval: 12000,   // 12초마다 소환 시도
+    summonTypes: [
+      { type: 'macaron_knight', count: 2 },
+      { type: 'sugar_specter', count: 3 },
+    ],
+
+    // ── 분노 (페이즈 3 진입 시 즉시 적용) ──
+    enrageHpThreshold: 0.33,
+    enrageSpeedBonus: 25,    // speed + 25 고정 가산 (비율 아님)
+
+    // ── 크림 브레스 (페이즈 2~3) ──
+    // fireBreathPhases[0]: 페이즈 1 (브레스 비활성), interval=0 으로 동작 안 함
+    // fireBreathPhases[1]: 페이즈 2 진입 시 활성화
+    // fireBreathPhases[2]: 페이즈 3 진입 시 더 빠르고 넓어짐
+    fireBreath: true,
+    fireBreathPhases: [
+      { hpThreshold: 1.0,  interval: 0,    angle: 0,   radius: 0   },  // 페이즈1: 비활성
+      { hpThreshold: 0.66, interval: 5000, angle: 60,  radius: 80  },  // 페이즈2: 크림 브레스
+      { hpThreshold: 0.33, interval: 3000, angle: 120, radius: 100, instantFireZones: 2 },  // 페이즈3
+    ],
+
+    // ── 보상 ──
+    bossReward: 800,
+    bossDrops: [
+      { ingredient: 'cream',   count: 5 },
+      { ingredient: 'cacao',   count: 3 },
+      { ingredient: 'vanilla', count: 3 },
+    ],
   },
 };
 

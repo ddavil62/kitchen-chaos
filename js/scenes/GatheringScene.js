@@ -1441,11 +1441,13 @@ export class GatheringScene extends Phaser.Scene {
   // ── Phase 21: 확정 분열 (dumpling_warrior) ──────────────────────
 
   /**
-   * dumpling_warrior 처치 시 splitType 적을 경로에 스폰한다.
-   * @param {{ type: string, x: number, y: number, waypointIndex: number }} data
+   * 확정 분열 이벤트 핸들러.
+   * dumpling_warrior(split=true)와 sugar_specter(splitOnDeath) 모두 처리.
+   * @param {{ type: string, x: number, y: number, waypointIndex: number,
+   *           hpOverride?: number, speedMultiplier?: number, rewardOverride?: number }} data
    * @private
    */
-  _onDeterministicSplit({ type, x, y, waypointIndex }) {
+  _onDeterministicSplit({ type, x, y, waypointIndex, hpOverride, speedMultiplier, rewardOverride }) {
     const enemyData = ENEMY_TYPES[type];
     if (!enemyData) return;
     const waypoints = this.stageWaypoints || undefined;
@@ -1453,6 +1455,24 @@ export class GatheringScene extends Phaser.Scene {
     enemy.x = x;
     enemy.y = y;
     enemy.waypointIndex = waypointIndex;
+
+    // Phase 38-1: 선택적 오버라이드 파라미터 적용
+    if (hpOverride !== undefined && hpOverride > 0) {
+      enemy.hp = hpOverride;
+      enemy.maxHp = hpOverride;
+      // HP 바 갱신 (Enemy 생성자 이후 수동 조정)
+      if (enemy.hpBar) {
+        enemy.hpBar.width = 26; // 최대 HP 기준 풀 HP
+      }
+    }
+    if (speedMultiplier !== undefined && speedMultiplier !== 1) {
+      enemy.speed = enemy.speed * speedMultiplier;
+    }
+    if (rewardOverride !== undefined) {
+      // reward 오버라이드: _onEnemyDied에서 체크하여 골드 지급 스킵
+      enemy.rewardOverride = rewardOverride;
+    }
+
     this.enemies.add(enemy);
   }
 
