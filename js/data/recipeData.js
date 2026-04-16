@@ -16,6 +16,7 @@
  * Phase 35-3: + 서빙 8종 + 버프 2종 = 254종 (21장 엘 디아블로 최종전).
  * Phase 36-3: + 서빙 8종 + 버프 2종 = 264종 (22장 슈가 드림랜드).
  * Phase 37-2: + 서빙 8종 + 버프 2종 = 274종 (23장 드림랜드 심층부).
+ * Phase 38-2: + 서빙 8종 + 버프 2종 = 284종 (24장 미각의 여왕 최종전).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -1356,6 +1357,54 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { cream: 3, vanilla: 2, cacao: 1, sugar: 1, butter: 1 }, baseReward: 488, cookTime: 27500,
     unlockCost: 786, gateStage: '23-5',
   },
+
+  // ── Phase 38-2 신규 서빙 레시피 (24장 미각의 여왕 최종전) ──
+
+  // ★★★ 3성 (1종)
+  {
+    id: 'royal_cream_tart', nameKo: '로열 크림 타르트', icon: '🥧', category: 'dessert',
+    tier: 3, ingredients: { cream: 1, vanilla: 1, butter: 1 }, baseReward: 142, cookTime: 10800,
+    unlockCost: 128, gateStage: '24-1',
+  },
+
+  // ★★★★ 4성 (3종)
+  {
+    id: 'golden_cacao_dome', nameKo: '황금 카카오 돔', icon: '🍫', category: 'dessert',
+    tier: 4, ingredients: { cacao: 2, cream: 1, butter: 1 }, baseReward: 196, cookTime: 15200,
+    unlockCost: 252, gateStage: '24-1',
+  },
+  {
+    id: 'triple_dream_eclairs', nameKo: '트리플 드림 에클레어', icon: '🍮', category: 'dessert',
+    tier: 4, ingredients: { cream: 2, vanilla: 1, flour: 1 }, baseReward: 202, cookTime: 15800,
+    unlockCost: 260, gateStage: '24-2',
+  },
+  {
+    id: 'cream_vanilla_royale', nameKo: '크림 바닐라 로열', icon: '🎂', category: 'special',
+    tier: 4, ingredients: { cream: 1, vanilla: 2, cacao: 1 }, baseReward: 208, cookTime: 16200,
+    unlockCost: 268, gateStage: '24-3',
+  },
+
+  // ★★★★★ 5성 (4종)
+  {
+    id: 'cacao_velvet_crown', nameKo: '카카오 벨벳 크라운', icon: '👑', category: 'dessert',
+    tier: 5, ingredients: { cacao: 2, cream: 2, vanilla: 1 }, baseReward: 358, cookTime: 22000,
+    unlockCost: 574, gateStage: '24-3',
+  },
+  {
+    id: 'queens_final_soufflee', nameKo: '여왕의 마지막 수플레', icon: '🍰', category: 'special',
+    tier: 5, ingredients: { cream: 2, vanilla: 2, cacao: 1, sugar: 1 }, baseReward: 394, cookTime: 24000,
+    unlockCost: 632, gateStage: '24-4',
+  },
+  {
+    id: 'taste_queens_triumph', nameKo: '미각의 여왕 트라이엄프', icon: '✨', category: 'special',
+    tier: 5, ingredients: { cream: 3, vanilla: 2, cacao: 2 }, baseReward: 462, cookTime: 27000,
+    unlockCost: 742, gateStage: '24-5',
+  },
+  {
+    id: 'dream_arc_finale', nameKo: '드림 아크 피날레', icon: '🌟', category: 'special',
+    tier: 5, ingredients: { cream: 2, vanilla: 2, cacao: 2, butter: 1 }, baseReward: 524, cookTime: 30000,
+    unlockCost: 840, gateStage: '24-6',
+  },
 ];
 
 /**
@@ -1792,6 +1841,28 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.30,
     duration: 2, durationUnit: 'wave',
     unlockCost: 164, gateStage: '23-3',
+  },
+
+  // ── Phase 38-2 신규 버프 레시피 (24장 미각의 여왕 최종전) ──
+  {
+    id: 'queens_mirage_elixir', nameKo: '여왕의 신기루 비약', icon: '💫', category: 'buff',
+    tier: 4, ingredients: { cream: 1, vanilla: 1, cacao: 1 },
+    effectDesc: '전 타워 공격력 +40% + 사거리 +20% (2웨이브)',
+    // 원래 의도: buff_attack_range (공격력+사거리). 엔진 미지원으로 buff_both 대체
+    effectType: 'buff_both',
+    effectValue: 0.40,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 196, gateStage: '24-3',
+  },
+  {
+    id: 'dream_arc_blessing', nameKo: '드림 아크의 축복', icon: '🌠', category: 'buff',
+    tier: 5, ingredients: { cream: 2, vanilla: 1, cacao: 1, sugar: 1 },
+    effectDesc: '전 타워 공격력+속도 +50% + 생명 감소 차단 1회 (2웨이브)',
+    // 원래 의도: buff_ultimate (공격력+속도+생명 차단). 엔진 미지원으로 buff_both 대체
+    effectType: 'buff_both',
+    effectValue: 0.50,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 284, gateStage: '24-4',
   },
 ];
 
