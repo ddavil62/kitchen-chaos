@@ -23,6 +23,7 @@
  * Phase 32-4: 18장 대화 6종 추가 (chapter18_intro, chapter18_mid, chapter18_boss, chapter18_clear, chapter18_epilogue, team_side_18). CHARACTERS에 masala_guide(아르준), maharaja 추가. 17장 ??? 대사 아르준으로 소급 수정. 누적 82종.
  * Phase 33-1: 19장 선인장 칸티나 대화 3종 추가 (chapter19_intro, chapter19_mid, team_side_19). 누적 85종.
  * Phase 34-1: 20장 칸티나 심층부 대화 3종 추가 (chapter20_intro, chapter20_mid, team_side_20). 누적 88종.
+ * Phase 35-1: 21장 대화 6종 추가 (chapter21_intro, chapter21_mid, chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21). CHARACTERS에 el_diablo 추가. 누적 94종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1474,6 +1475,105 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(작게 웃으며) 색은 신경 쓰지 마. 맛만 이러면 돼.' },
     ],
   },
+
+  // ── 21장: 엘 디아블로 최종전 (Phase 35-1) ──────────────────────────────
+
+  // chapter21_intro — 21-1 진입 시 (선인장 땅의 심층부 마지막 구역 진입)
+  chapter21_intro: {
+    id: 'chapter21_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '가장 깊은 곳. 선인장 뿌리가 더 이상 자라지 않는 공간. 팀은 El Diablo의 흔적을 따라 마지막 구역에 발을 디뎠다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '여기야. 여기가 끝이야.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(긴장한 표정으로) 도구 점검해. 어떤 것도 내려놓지 마.' },
+    ],
+  },
+
+  // chapter21_mid — 21-3 첫 클리어 후, 보스전 전 마지막 준비
+  chapter21_mid: {
+    id: 'chapter21_mid',
+    skippable: true,
+    lines: [
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(수치를 분석하며) 미력 농도가 정점에 가까워지고 있어요. 이 패턴... 마하라자 보스전 직전과 유사합니다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '즉, 다음 전투가 결전이에요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(팀원들을 둘러보며) 다들... 괜찮아?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(짧게) 늘 그래왔어. 지금도 마찬가지야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(고개를 끄덕이며) 그래. 함께라면 괜찮아.' },
+    ],
+  },
+
+  // chapter21_boss — 21-6 진입 직전 GatheringScene, 보스전 전야 재회
+  chapter21_boss: {
+    id: 'chapter21_boss',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '21번째 전투지에 발을 딛자마자, 공기가 달라졌다. 뜨겁고 짙은 열기 — 고추가 불에 닿을 때 나는 그 냄새가 공간 전체를 가득 채웠다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(주변을 둘러보며) 이 냄새... 지난번이랑 같아. 그 사람이 여기 있어.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(탐지기를 확인하며) 미력 수치가 이전과 차원이 달라요. 20장의 세 배 이상입니다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(냉정하게) 즉, 이번엔 도망치지 않는다는 거예요.' },
+      { speaker: 'narrator', portrait: '', text: '바닥 균열에서 붉은 불꽃이 솟구쳤다. 그 중심에서 El Diablo가 천천히 모습을 드러냈다. 이번엔 물러서지 않는 눈빛이었다.' },
+      { speaker: 'El Diablo', portrait: '😈', portraitKey: 'el_diablo', text: '(낮게) ...드디어 왔군. 이 자리까지 올 줄 알았어.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '당신이 이 모든 식란을 일으킨 거잖아. 왜? 대체 왜!' },
+      { speaker: 'El Diablo', portrait: '😈', portraitKey: 'el_diablo', text: '(느릿하게 웃으며) 왜라고. 선인장은 태양 없이 자라지 않아. 나는 그저... 이 땅에 태양이 되었을 뿐이지.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(이를 갈며) 말장난은 됐어. 정화하면 끝난다.' },
+      { speaker: 'El Diablo', portrait: '😈', portraitKey: 'el_diablo', text: '(검붉은 불꽃을 손에 감으며) 정화? 아이야... 이 불꽃은 꺼지지 않아. 멕시칸 땅의 심장이 타오르는 한.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(프라이팬을 꽉 쥐며) 그래도 우리가 끌 거야. 반드시!' },
+      { speaker: 'narrator', portrait: '', text: '고추 형태의 악마가 두 발을 딛었다. 바닥이 진동했다. 결전이 시작되었다.' },
+    ],
+  },
+
+  // chapter21_clear — 21-6 첫 클리어 후, 멕시칸 아크 클라이맥스
+  chapter21_clear: {
+    id: 'chapter21_clear',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '마지막 불꽃이 꺼졌다. El Diablo의 실루엣이 천천히 빛으로 분해되기 시작했다.' },
+      { speaker: 'El Diablo', portrait: '😈', portraitKey: 'el_diablo', text: '(무릎을 꿇으며, 낮은 목소리로) ...이렇게 되는군. 미력사가 이 땅에 다시 발을 딛는 날이 올 줄은.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(숨을 고르며) 끝났어. 이 아크는... 끝났어.' },
+      { speaker: 'El Diablo', portrait: '😈', portraitKey: 'el_diablo', text: '(빛 속에서) 선인장은 또 자라. 뿌리가 남아 있는 한... 언젠가 다시 깨어난다. 그걸 알아두어라.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(조용히) 그 뿌리까지 우리가 정화하면 되죠.' },
+      { speaker: 'narrator', portrait: '', text: 'El Diablo가 사라졌다. 붉은 불꽃도, 고추 향도, 균열의 진동도 함께 가라앉았다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(탐지기를 응시하며) ...수치가 정상으로 돌아왔습니다. 이 구역의 식란 — 완전히 소멸했습니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(길게 숨을 내쉬며) 그래. 이제 끝이야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(눈물을 참으며) 선인장 칸티나... 할머니가 남겨주신 단서의 끝이 여기였구나.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(조용히) 네 할머니도 여기까지 왔었어. 하지만 혼자였지. 그래서 뒤로 물러날 수밖에 없었던 거야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(포코를 보며) 포코...' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '이번엔 혼자가 아니었어. 그래서 이길 수 있었던 거야.' },
+      { speaker: 'narrator', portrait: '', text: '멕시칸 아크가 끝났다. 선인장 땅의 심장이 처음으로 조용히 숨을 쉬었다.' },
+    ],
+  },
+
+  // chapter21_epilogue — chapter21_clear 체인 연결, 22장 예고
+  chapter21_epilogue: {
+    id: 'chapter21_epilogue',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '이틀 후. 칸티나 지상부로 올라온 팀은 처음으로 사막의 석양을 온전히 바라볼 수 있었다.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(데이터를 정리하며) 멕시칸 아크 전체 데이터를 WCA 본부에 전송했습니다. 이 규모의 식란 발생 패턴은 전례가 없어요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '의도적인 미력 증폭. 배후가 있다는 뜻이죠. El Diablo 혼자서는 이 규모를 만들 수 없었을 거예요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(하늘을 바라보며) 다음은 어디일까요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(수첩을 꺼내며) 할머니 수첩에 마지막 페이지가 하나 있었어. "달콤한 것들이 무너지는 날." — 무슨 뜻인지 몰랐는데.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '달콤한 것들? 디저트 아크 같은 소리네.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(눈을 가늘게 뜨며) ...설마 슈가 드림랜드?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(고개를 들며) 가야지. 다음 땅이 어디든.' },
+      { speaker: 'narrator', portrait: '', text: '멕시칸 아크가 완전히 막을 내렸다. 팀은 새로운 지도 위의 한 점을 향해 발걸음을 옮겼다.' },
+    ],
+  },
+
+  // team_side_21 — merchant_enter에서 1회, 21장 진입 후 팀원 리액션 (경량 대화)
+  team_side_21: {
+    id: 'team_side_21',
+    skippable: true,
+    lines: [
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(아보카도 씨앗을 들고) 선인장 지대를 정화한 기념으로... 이 씨앗을 심어보는 건 어떨까요. 아보카도는 건조한 땅에서도 자라니까요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '칸티나 안에 나무를 심겠다는 거예요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '정화된 장소에 생명이 자라면... 나쁘지 않다고 생각해요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(잠깐 생각하더니) ...해봐. 그게 자라면 내가 첫 번째 요리에 쓸게.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '둘 다 이미 레시피 생각부터 하고 있잖아.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(손을 들며) 나는 묘목 파는 루트도 알아~ 물론 정가야!' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '...역시 포코다.' },
+    ],
+  },
 };
 
 // ── 캐릭터 정의 ──
@@ -1500,4 +1600,6 @@ export const CHARACTERS = {
   // ── Phase 32-4: 18장 인도 아크 캐릭터 ──
   masala_guide: { id: 'masala_guide', nameKo: '아르준', portrait: '🪬', portraitKey: 'masala_guide', color: 0xd4a017, role: 'ally', desc: '마살라 문파 12대 계승자. 인도 향신료 시장의 식란을 대대로 수호해온 비밀 결사의 후계자.' },
   maharaja: { id: 'maharaja', nameKo: '마하라자', portrait: '👑', portraitKey: 'maharaja', color: 0xb8860b, role: 'boss', desc: '300년 전 향신료 왕국을 지배했던 자. 미력을 지배의 도구로 삼았다가 마살라 문파에 봉인되었다. 인도 아크 최종 보스.' },
+  // ── Phase 35-1: 21장 보스 캐릭터 ──
+  el_diablo: { id: 'el_diablo', nameKo: '엘 디아블로', portrait: '😈', portraitKey: 'el_diablo', color: 0x8b0000, role: 'boss', desc: '선인장 땅의 심장을 깨운 자. 고추 형태의 악마 루차도르로 멕시칸 미력의 폭주를 의도적으로 증폭시켰다. 멕시칸 아크 최종 보스.' },
 };

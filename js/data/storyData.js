@@ -18,6 +18,7 @@
  * Phase 32-4: 18장 트리거 5건 추가 (chapter18_intro, chapter18_mid, chapter18_boss, chapter18_clear, team_side_18) + stage_first_clear 제외 목록 갱신 (18-1, 18-3, 18-6 추가).
  * Phase 33-1: 19장 트리거 3건 추가 (chapter19_intro, chapter19_mid, team_side_19) + stage_first_clear 제외 목록 갱신 (19-1, 19-3 추가).
  * Phase 34-1: 20장 트리거 3건 추가 (chapter20_intro, chapter20_mid, team_side_20) + stage_first_clear 제외 목록 갱신 (20-1, 20-3 추가).
+ * Phase 35-1: 21장 트리거 7건 추가 (chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21, chapter21_intro 포함) + stage_first_clear 제외 목록 갱신 (21-1, 21-3, 21-6 추가).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -277,7 +278,11 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '19-1' &&   // chapter19_intro 별도 처리
       ctx.stageId !== '19-3' &&   // chapter19_mid 별도 처리
       ctx.stageId !== '20-1' &&   // chapter20_intro 별도 처리
-      ctx.stageId !== '20-3',     // chapter20_mid 별도 처리
+      ctx.stageId !== '20-3' &&   // chapter20_mid 별도 처리
+      ctx.stageId !== '21-1' &&   // chapter21_intro 별도 처리
+      ctx.stageId !== '21-3' &&   // chapter21_mid 별도 처리
+      ctx.stageId !== '21-5' &&   // chapter21_boss 별도 처리
+      ctx.stageId !== '21-6',     // chapter21_clear 별도 처리
     delay: 800,
   },
 
@@ -1029,6 +1034,85 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.storyProgress?.currentChapter >= 20 &&
       !save.seenDialogues?.includes('team_side_20'),
+  },
+
+  // ── 21장: 엘 디아블로 최종전 (Phase 35-1) ─────────────────────────────────
+
+  // 21-1 진입 시 chapter21_intro (chapter20_mid가 이미 재생된 경우에만)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter21_intro',
+    once: true,
+    condition: (ctx, save) =>
+      ctx.stageId === '21-1' &&
+      save.storyProgress?.storyFlags?.el_diablo_appeared === true,
+    delay: 400,
+  },
+
+  // 21-3 첫 클리어 시 chapter21_mid + 플래그 저장
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter21_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '21-3',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter21_mid_seen = true;
+      SaveManager.save(data);
+    },
+  },
+
+  // 21-5 첫 클리어 시 chapter21_boss (보스전 진입 전 전야 대사)
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter21_boss',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '21-5',
+    delay: 800,
+  },
+
+  // 21-6 진입 시 stage_boss_warning 트리거 — 기존 gathering_enter endsWith('-6') 규칙으로 자동 처리됨 (별도 트리거 불필요)
+
+  // 21-6 첫 클리어 시 chapter21_clear + currentChapter 22 설정 + chapter21_epilogue 연쇄
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter21_clear',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '21-6',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter21_cleared = true;
+      data.storyProgress.storyFlags.mexican_arc_cleared = true;
+      if (data.storyProgress.currentChapter < 22) {
+        data.storyProgress.currentChapter = 22;
+      }
+      SaveManager.save(data);
+    },
+    chain: {
+      dialogueId: 'chapter21_epilogue',
+      delay: 1200,
+    },
+  },
+
+  // merchant_enter 에서 team_side_21 (21장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_21',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 21 &&
+      !save.seenDialogues?.includes('team_side_21'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────
