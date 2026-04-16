@@ -24,6 +24,7 @@
  * Phase 33-1: 19장 선인장 칸티나 대화 3종 추가 (chapter19_intro, chapter19_mid, team_side_19). 누적 85종.
  * Phase 34-1: 20장 칸티나 심층부 대화 3종 추가 (chapter20_intro, chapter20_mid, team_side_20). 누적 88종.
  * Phase 35-1: 21장 대화 6종 추가 (chapter21_intro, chapter21_mid, chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21). CHARACTERS에 el_diablo 추가. 누적 94종.
+ * Phase 36-1: 22장 슈가 드림랜드 대화 3종 추가 (chapter22_intro, chapter22_mid, team_side_22). 누적 97종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1572,6 +1573,49 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '둘 다 이미 레시피 생각부터 하고 있잖아.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(손을 들며) 나는 묘목 파는 루트도 알아~ 물론 정가야!' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '...역시 포코다.' },
+    ],
+  },
+
+  // ── Phase 36-1: 22장 슈가 드림랜드 (디저트 아크 1장) ──
+
+  // chapter22_intro — 22-1 진입 시 (mexican_arc_cleared 플래그 확인 후)
+  chapter22_intro: {
+    id: 'chapter22_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '멕시칸 대지를 뒤로하고 팀이 발을 내디딘 곳. 공기부터 달랐다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '이게... 설탕 냄새야? 진짜 설탕 냄새가 나!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '슈가 드림랜드야. 과자와 디저트로 이루어진 땅이지. 달콤하다고 방심하면 안 돼.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(땅을 발로 툭 치며) 바닥이 쿠키 재질이네. 신기하군.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '미력이... 뭔가 다른 주파수예요. 멕시칸 아크보다 더 섬세하고 복잡한 파장이에요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '달콤한 것들이 폭주한다는 게 어떤 모습인지... 직접 보게 되겠지.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(귀를 쫑긋 세우며) 저 안쪽에 "미각의 여왕"이 있다는 소문이 돌아. 조심해.' },
+    ],
+  },
+
+  // chapter22_mid — 22-3 첫 클리어 후 (캔디 솔저 전투 경험 후 중반부 대화)
+  chapter22_mid: {
+    id: 'chapter22_mid',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '캔디 솔저... 설탕 결정이 굳어서 갑옷이 된 거야? 공격이 제대로 안 먹혔어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '경화 미력이에요. 단단하게 굳는 방향으로 식란이 폭주한 거죠.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '여왕이 이걸 만들었다면... 단순히 달콤한 세계가 아니야. 의도적으로 군대를 꾸리고 있어.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '여왕은 이 땅의 미력 전체를 자신의 입맛대로 바꾸려 하고 있어. "내가 원하는 맛만이 진짜 맛"이라는 신념으로.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(주먹을 쥐며) 그게 사람들이 원하는 맛인지는 여왕이 결정할 게 아니잖아.' },
+    ],
+  },
+
+  // team_side_22 — merchant_enter 조건, 22장 진입 후 팀원 가벼운 리액션
+  team_side_22: {
+    id: 'team_side_22',
+    skippable: true,
+    lines: [
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(주변을 보며) 마카롱 돌, 초콜릿 강... 파티시에로서 이 땅은 꿈의 재료 창고예요. 하지만 폭주한 미력이 섞여 있으면 이야기가 달라지죠.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '폭주한 카카오가 어떻게 생겼을지 생각만 해도 무서워.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '달콤할수록 독할 수 있지. 설탕이 발효되면 결국 독이 되는 것처럼.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(팔짱을 끼며) 그래도 싸우고 나면 레시피 연구를 해볼 수 있겠죠. 카카오와 바닐라... 조합이 기대돼요.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '이 땅에서 얻은 재료, 제대로 쓰자. 달콤함에 지지 않게.' },
     ],
   },
 };

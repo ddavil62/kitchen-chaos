@@ -19,6 +19,7 @@
  * Phase 33-1: 19장 트리거 3건 추가 (chapter19_intro, chapter19_mid, team_side_19) + stage_first_clear 제외 목록 갱신 (19-1, 19-3 추가).
  * Phase 34-1: 20장 트리거 3건 추가 (chapter20_intro, chapter20_mid, team_side_20) + stage_first_clear 제외 목록 갱신 (20-1, 20-3 추가).
  * Phase 35-1: 21장 트리거 7건 추가 (chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21, chapter21_intro 포함) + stage_first_clear 제외 목록 갱신 (21-1, 21-3, 21-6 추가).
+ * Phase 36-1: 22장 트리거 4건 추가 (chapter22_intro, chapter22_mid, team_side_22, 22-5 currentChapter 23 설정) + stage_first_clear 제외 목록 갱신 (22-1, 22-3 추가).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -282,7 +283,9 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '21-1' &&   // chapter21_intro 별도 처리
       ctx.stageId !== '21-3' &&   // chapter21_mid 별도 처리
       ctx.stageId !== '21-5' &&   // chapter21_boss 별도 처리
-      ctx.stageId !== '21-6',     // chapter21_clear 별도 처리
+      ctx.stageId !== '21-6' &&   // chapter21_clear 별도 처리
+      ctx.stageId !== '22-1' &&   // chapter22_intro 별도 처리
+      ctx.stageId !== '22-3',     // chapter22_mid 별도 처리
     delay: 800,
   },
 
@@ -1113,6 +1116,71 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.storyProgress?.currentChapter >= 21 &&
       !save.seenDialogues?.includes('team_side_21'),
+  },
+
+  // ── 22장: 슈가 드림랜드 (Phase 36-1) ─────────────────────────────────
+
+  // 22-1 진입 시 chapter22_intro (mexican_arc_cleared 플래그 확인)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter22_intro',
+    once: true,
+    condition: (ctx, save) =>
+      ctx.stageId === '22-1' &&
+      save.storyProgress?.storyFlags?.mexican_arc_cleared === true,
+    delay: 400,
+  },
+
+  // 22-3 첫 클리어 시 chapter22_mid + 플래그 저장
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter22_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '22-3',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter22_mid_seen = true;
+      data.storyProgress.storyFlags.queen_of_taste_hinted = true;
+      SaveManager.save(data);
+    },
+  },
+
+  // merchant_enter에서 team_side_22 (22장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_22',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 22 &&
+      !save.seenDialogues?.includes('team_side_22'),
+  },
+
+  // 22-5 첫 클리어 시 currentChapter = 23 설정 (23장 진입 준비)
+  // 주의: 22-6 보스전은 Phase 38에서 구현 예정. 현재는 22-5 클리어로 23장 unlocking 처리.
+  // Phase 38에서 이 트리거는 22-6으로 이동될 예정.
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: null,
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '22-5',
+    delay: 0,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter22_cleared = true;
+      if (data.storyProgress.currentChapter < 23) {
+        data.storyProgress.currentChapter = 23;
+      }
+      SaveManager.save(data);
+    },
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────
