@@ -22,6 +22,7 @@
  * Phase 32-1: 16장 에필로그 + 17장 향신료 궁전 심층부 대화 4종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17). 누적 76종.
  * Phase 32-4: 18장 대화 6종 추가 (chapter18_intro, chapter18_mid, chapter18_boss, chapter18_clear, chapter18_epilogue, team_side_18). CHARACTERS에 masala_guide(아르준), maharaja 추가. 17장 ??? 대사 아르준으로 소급 수정. 누적 82종.
  * Phase 33-1: 19장 선인장 칸티나 대화 3종 추가 (chapter19_intro, chapter19_mid, team_side_19). 누적 85종.
+ * Phase 34-1: 20장 칸티나 심층부 대화 3종 추가 (chapter20_intro, chapter20_mid, team_side_20). 누적 88종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1410,6 +1411,67 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '언제 그걸 챙겼어?!' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '탐색 중에 발견한 거야. 재료를 낭비하면 안 되지. 자, 한 입씩~' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(짧게 웃으며) ...그래, 먹자.' },
+    ],
+  },
+
+  // ── 20장: 칸티나 심층부 (Phase 34-1) ──────────────────────────────
+
+  // chapter20_intro — 20-1 진입 시, 균열 근원지 진입 + 불길한 기운
+  chapter20_intro: {
+    id: 'chapter20_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '지하로 내려갈수록 공기가 달라졌다. 사막의 건조함 대신 뜨겁고 눅진한 열기, 그리고 선인장 미력의 불빛이 바닥과 벽을 물들이고 있었다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(손을 벽에 짚으며) 뿌리가 살아 있어. 이 깊이까지 침투해 있는 게 자연이 아니야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(탐지기를 응시하며) 지상의 열 배는 넘어요. 탐지기 값이 경고 범위를 넘었어요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '이 농도라면 식란이 이미 \'근원 단계\'에 접어들었을 가능성이 있어요. 이 정도 규모가 혼자 발생하기는 어렵습니다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '의도적이라는 거요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(표정을 굳히며) 그렇게 봐야 합니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(바닥에서 무언가를 집어 들며) 이건... 미력사 도구 파편이야. WCA 로고가 있어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(확인하며) 최근 것은 아니에요. 수년 전이에요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '즉, 누군가가 먼저 여기까지 들어왔다는 거야. 그리고 돌아가지 못했다는 거고.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(짧게 숨을 들이쉬며) 경계를 최고로 올립니다. 여기서부터는 전투가 뒤섞일 수 있어요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(프라이팬 손잡이를 꽉 쥐며) 그래도 가야 해요. 이게 식란의 근원이면, 여기서 끝내야 해요.' },
+      { speaker: 'narrator', portrait: '', text: '팀은 말을 줄이고 전진했다. 선인장 뿌리의 붉은 빛이 그들의 발치를 길처럼 이어졌다.' },
+    ],
+  },
+
+  // chapter20_mid — 20-3 첫 클리어 후, 엘 디아블로 첫 등장 + 최종전 암시
+  chapter20_mid: {
+    id: 'chapter20_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '세 번째 전투가 끝난 순간이었다. 열기가 급격히 치솟으며 공기 자체가 일그러지기 시작했다.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(주위를 살피며) 뭔가... 온도가 이상해요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '탐지기 수치가 급등하고 있어요. 이건 스테이지 잔류 미력이 아니에요.' },
+      { speaker: 'narrator', portrait: '', text: '통로 깊은 곳에서 천천히 형체가 나타났다. 검붉은 세라페를 두른, 키가 큰 인물이었다.' },
+      { speaker: 'El Diablo', portrait: '😈', text: '(낮고 느린 목소리로) ...잘들 왔군. 이 깊은 곳까지.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(경계하며) 당신이 이 식란을 일으킨 거예요?' },
+      { speaker: 'El Diablo', portrait: '😈', text: '(비웃듯) 일으켰다? 아니. 나는 그저 이미 잠들어 있던 것을 깨웠을 뿐이야. 선인장은 원래 배고프다. 아주, 오래전부터.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(낮게) 저 미력 수치... WCA 데이터베이스에 없는 종류예요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '대체 당신은 누구예요?' },
+      { speaker: 'El Diablo', portrait: '😈', text: '(돌아서며) 지금은 소개할 시간이 없어. 아직 준비가 안 됐으니까. — 하지만 곧.' },
+      { speaker: 'narrator', portrait: '', text: '형체는 어둠 속으로 사라졌다. 열기도, 붉은 빛도, 함께 사라졌다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(조용히) ...저 사람이 배후예요. 이 선인장 아크 전체의.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(고개를 끄덕이며) 알아요. 그리고 우리를 시험하고 있는 것 같아요. — 다음 번에는 끝낼 거예요.' },
+    ],
+  },
+
+  // team_side_20 — merchant_enter에서 1회, 20장 진입 후 아보카도 레시피 개발 시도
+  team_side_20: {
+    id: 'team_side_20',
+    skippable: true,
+    lines: [
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(아보카도를 들고 진지하게) 지하실 창고에서 신선한 아보카도를 발견했습니다. 이 재료라면... 과카몰리 소스 기반의 새 레시피가 가능할 것 같아요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(관심 없는 표정으로) 지금 그게 중요해?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '전투 외 시간에도 재료를 연구해야 합니다. 라오 씨도 아실 거예요, 레시피는 준비된 자에게만 열립니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(팔짱을 끼며) ...알겠어. 해봐.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(10분 후, 그릇을 들고 등장하며) 완성입니다. 과카몰리 드레싱 리솔레.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(그릇을 들여다보며) ...이게 왜 초록색이야?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(당황하며) 아보카도가... 너무 잘 익었나봐요. 색이 조금 진하게 나왔습니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(한 숟가락 먹으며 표정이 바뀌고) ...맛은 있어.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(안도하며) 다음 번엔 색도 잡겠습니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(작게 웃으며) 색은 신경 쓰지 마. 맛만 이러면 돼.' },
     ],
   },
 };
