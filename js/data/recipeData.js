@@ -12,6 +12,7 @@
  * Phase 32-3: + 서빙 10종 + 버프 2종 = 213종 (17장 향신료 궁전 심층부).
  * Phase 32-5: + 서빙 7종 + 버프 1종 = 221종 (18장 향신료 궁전 최심부).
  * Phase 33-3: + 서빙 8종 + customers 전용 2종 + 버프 2종 = 233종 (19장 선인장 칸티나).
+ * Phase 34-3: + 서빙 8종 + customers 전용 1종 + 버프 2종 = 244종 (20장 칸티나 심층부).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -1153,6 +1154,61 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { jalapeno: 2, meat: 1, cheese: 2, tomato: 1, flour: 1, rice: 1, butter: 1 }, baseReward: 350, cookTime: 21500,
     unlockCost: 555, gateStage: '19-5',
   },
+
+  // ── Phase 34-3 신규 서빙 레시피 (20장 칸티나 심층부) ──
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'guacamole', nameKo: '과카몰리', icon: '🥑', category: 'soup',
+    tier: 3, ingredients: { avocado: 1, cilantro: 1, jalapeno: 1 }, baseReward: 118, cookTime: 9000,
+    unlockCost: 105, gateStage: '20-1',
+  },
+  {
+    id: 'avocado_toast', nameKo: '아보카도 토스트', icon: '🍞', category: 'grill',
+    tier: 3, ingredients: { avocado: 1, tomato: 1 }, baseReward: 112, cookTime: 8500,
+    unlockCost: 98, gateStage: '20-1',
+  },
+
+  // ★★★★ 4성 (3종)
+  {
+    id: 'avocado_burrito', nameKo: '아보카도 부리토', icon: '🌯', category: 'special',
+    tier: 4, ingredients: { avocado: 1, flour: 1, jalapeno: 1 }, baseReward: 158, cookTime: 12500,
+    unlockCost: 200, gateStage: '20-1',
+  },
+  {
+    id: 'avocado_taco', nameKo: '아보카도 타코', icon: '🌮', category: 'special',
+    tier: 4, ingredients: { avocado: 1, meat: 1, jalapeno: 1 }, baseReward: 165, cookTime: 13000,
+    unlockCost: 210, gateStage: '20-2',
+  },
+  {
+    id: 'avocado_salad', nameKo: '아보카도 샐러드', icon: '🥗', category: 'soup',
+    tier: 4, ingredients: { avocado: 1, tomato: 1, cilantro: 1 }, baseReward: 152, cookTime: 11500,
+    unlockCost: 192, gateStage: '20-2',
+  },
+
+  // ★★★★★ 5성 (3종)
+  {
+    id: 'avocado_quesadilla', nameKo: '아보카도 케사디아', icon: '🧀', category: 'special',
+    tier: 5, ingredients: { avocado: 1, cheese: 1, flour: 1 }, baseReward: 278, cookTime: 17500,
+    unlockCost: 445, gateStage: '20-2',
+  },
+  {
+    id: 'avocado_soup', nameKo: '아보카도 수프', icon: '🍲', category: 'soup',
+    tier: 5, ingredients: { avocado: 1, cilantro: 1, jalapeno: 1, egg: 1 }, baseReward: 295, cookTime: 18500,
+    unlockCost: 472, gateStage: '20-3',
+  },
+  {
+    id: 'avocado_rice_bowl', nameKo: '아보카도 라이스볼', icon: '🍚', category: 'special',
+    tier: 5, ingredients: { avocado: 1, rice: 1, jalapeno: 1 }, baseReward: 285, cookTime: 18000,
+    unlockCost: 456, gateStage: '20-3',
+  },
+
+  // ★★★★★ 5성 (1종 — customers 전용 고급 레시피)
+  {
+    id: 'diablo_feast', nameKo: '엘 디아블로 피스트', icon: '🔥', category: 'special',
+    tier: 5, ingredients: { avocado: 2, jalapeno: 2, meat: 1, cheese: 1, flour: 1, tomato: 1 }, baseReward: 420, cookTime: 23500,
+    unlockCost: 680, gateStage: '20-4',
+  },
 ];
 
 /**
@@ -1506,6 +1562,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.40,
     duration: 2, durationUnit: 'wave',
     unlockCost: 138, gateStage: '19-4',
+  },
+
+  // ── Phase 34-3 신규 버프 레시피 (20장 칸티나 심층부) ──
+  {
+    id: 'avocado_armor_boost', nameKo: '아보카도 방어 강화', icon: '🥑', category: 'buff',
+    tier: 3, ingredients: { avocado: 1, butter: 1 },
+    effectDesc: '전 타워 방어력 +35% (2웨이브)',
+    effectType: 'buff_defense',
+    effectValue: 0.35,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 95, gateStage: '20-2',
+  },
+  {
+    id: 'guacamole_fury', nameKo: '과카몰리 분노', icon: '🌶️', category: 'buff',
+    tier: 4, ingredients: { avocado: 1, jalapeno: 1, pepper: 1 },
+    effectDesc: '공격속도 +45% + 공격력 +20% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.45,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 148, gateStage: '20-3',
   },
 ];
 
