@@ -175,6 +175,8 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // 투명 적: 기본 반투명
     if (this.isInvisible) this.setAlpha(0.3);
+    // sugar_specter: 반투명 설탕 유령 시각 효과 (Phase 37-1, AD 모드2 지시)
+    if (enemyData.id === 'sugar_specter') this.setAlpha(0.82);
 
     scene.add.existing(this);
     this.setDepth(10 + Math.floor(spawn.y));

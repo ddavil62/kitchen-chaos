@@ -1,5 +1,40 @@
 # Changelog
 
+## [Phase 37] 2026-04-16 — 23장 드림랜드 심층부 (디저트 아크 2장)
+
+### Added
+- macaron_knight 스프라이트 (PixelLab standard, 92px, 8방향 + animating 애니, hash: animating-de406b54)
+- sugar_specter 스프라이트 (PixelLab standard, 92px, 8방향 + animating 애니, hash: animating-7f31cfcf)
+- 재료 아이콘 1종: cream(크림) 32px RGBA
+- dream_deep 타일셋 에셋 (dream_deep_floor.png)
+- gameData.js 적 2종: macaron_knight(HP 500, magicResistance 0.60 + damageReduction 0.60 fallback), sugar_specter(HP 480, splitOnDeath 데이터 예약 등록)
+- gameData.js 재료 1종: cream (누적 32종)
+- 대화 3종: chapter23_intro(8라인), chapter23_mid(7라인), team_side_23(9라인) (누적 100종)
+- storyData 트리거 4건: 23-1 진입(gathering_enter) / 23-3 클리어(result_clear + queen_revealed 플래그) / merchant_enter(team_side_23) / 23-5 클리어(currentChapter=24 해금)
+- storyData stage_first_clear 제외 목록에 '23-1', '23-3' 추가
+- 스테이지 23-1~23-5 구현 (theme: dream_deep, macaron_knight 23-1 첫 등장, sugar_specter 23-2 첫 등장)
+- 레시피 10종 추가: cream 조합 서빙 8종(cream_macaron_delight, cream_puff_tower, vanilla_cream_opera, cacao_cream_entremet, dream_deep_gateau, cream_specter_verrine, deep_dream_mille_feuille, queen_cream_supreme) + 버프 2종(cream_magic_veil, specter_seal_cream) (누적 274종)
+- Enemy.js: sugar_specter setAlpha(0.82) 반투명 처리
+
+### Changed
+- SpriteLoader.js ENEMY_IDS 43종 (macaron_knight, sugar_specter 추가)
+- ENEMY_WALK_HASHES: animating-de406b54 / animating-7f31cfcf 등록
+- INGREDIENT_FILE_MAP: cream 추가
+
+### Notes
+- macaron_knight의 magicResistance 전용 핸들러가 엔진에 없어 damageReduction: 0.60으로 fallback 처리. 물리+마법 모두 60% 경감됨. Phase 38에서 전용 핸들러 구현 시 damageReduction 제거 필요.
+- sugar_specter의 splitOnDeath는 데이터만 등록. 엔진 핸들러 미구현으로 현재 일반 적처럼 동작. Phase 38에서 onEnemyDeath 핸들러 구현 예정.
+- cream_magic_veil의 effectType: 원래 buff_attack_magic_pierce 의도였으나 엔진 미지원으로 buff_attack_piercing으로 대체. 주석에 원래 의도 명기.
+- specter_seal_cream의 effectType: 원래 buff_speed_split_block 의도였으나 엔진 미지원으로 buff_all로 대체. 주석에 원래 의도 명기.
+- queen_cream_supreme 재료 8개 슬롯은 기존 최대(7개)를 초과. 서빙 UI 인게임 검증은 Phase 38 QA에서 추적.
+- 23-1 wave5 순수 HP ~213,240은 22-5 wave5 ~218,320 대비 -2.3%이나, macaron_knight magicResistance(60%) 기믹으로 실질 DPS 기준 +8~12% 상승.
+- 23-5 wave5 순수 HP ~284,880은 22-5 대비 +30.5%. 목표 범위(+25~33%) 충족.
+- 적 누적: 55종 (일반 42 + 미니보스 1 + 보스 12)
+- 스펙: `.claude/specs/2026-04-16-kc-phase37-1-spec.md`, `.claude/specs/2026-04-16-kc-phase37-2-spec.md`
+- QA: `.claude/specs/2026-04-16-kc-phase37-qa.md`
+
+---
+
 ## [Phase 36] 2026-04-16 — 22장 슈가 드림랜드 (디저트 아크 시작)
 
 ### Added

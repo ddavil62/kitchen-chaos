@@ -20,6 +20,7 @@
  * Phase 34-1: 20장 트리거 3건 추가 (chapter20_intro, chapter20_mid, team_side_20) + stage_first_clear 제외 목록 갱신 (20-1, 20-3 추가).
  * Phase 35-1: 21장 트리거 7건 추가 (chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21, chapter21_intro 포함) + stage_first_clear 제외 목록 갱신 (21-1, 21-3, 21-6 추가).
  * Phase 36-1: 22장 트리거 4건 추가 (chapter22_intro, chapter22_mid, team_side_22, 22-5 currentChapter 23 설정) + stage_first_clear 제외 목록 갱신 (22-1, 22-3 추가).
+ * Phase 37-1: 23장 트리거 4건 추가 (chapter23_intro, chapter23_mid, team_side_23, 23-5 currentChapter 24 설정) + stage_first_clear 제외 목록 갱신 (23-1, 23-3 추가).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -285,7 +286,9 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '21-5' &&   // chapter21_boss 별도 처리
       ctx.stageId !== '21-6' &&   // chapter21_clear 별도 처리
       ctx.stageId !== '22-1' &&   // chapter22_intro 별도 처리
-      ctx.stageId !== '22-3',     // chapter22_mid 별도 처리
+      ctx.stageId !== '22-3' &&   // chapter22_mid 별도 처리
+      ctx.stageId !== '23-1' &&   // chapter23_intro 별도 처리
+      ctx.stageId !== '23-3',     // chapter23_mid 별도 처리
     delay: 800,
   },
 
@@ -1178,6 +1181,71 @@ export const STORY_TRIGGERS = [
       data.storyProgress.storyFlags.chapter22_cleared = true;
       if (data.storyProgress.currentChapter < 23) {
         data.storyProgress.currentChapter = 23;
+      }
+      SaveManager.save(data);
+    },
+  },
+
+  // ── 23장: 드림랜드 심층부 (Phase 37-1) ─────────────────────────────────
+
+  // 23-1 진입 시 chapter23_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter23_intro',
+    once: true,
+    condition: (ctx, save) =>
+      ctx.stageId === '23-1' &&
+      save.storyProgress?.storyFlags?.chapter22_cleared === true,
+    delay: 400,
+  },
+
+  // 23-3 첫 클리어 시 chapter23_mid + 플래그 저장
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter23_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '23-3',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter23_mid_seen = true;
+      data.storyProgress.storyFlags.queen_revealed = true;
+      SaveManager.save(data);
+    },
+  },
+
+  // merchant_enter에서 team_side_23 (23장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_23',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 23 &&
+      !save.seenDialogues?.includes('team_side_23'),
+  },
+
+  // 23-5 첫 클리어 시 currentChapter = 24 설정 (24장 해금)
+  // 주의: 23-6 보스전은 Phase 38에서 구현 예정. 현재는 23-5 클리어로 24장 unlocking 처리.
+  // Phase 38에서 이 트리거는 23-6으로 이동될 예정.
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: null,
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '23-5',
+    delay: 0,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter23_cleared = true;
+      if (data.storyProgress.currentChapter < 24) {
+        data.storyProgress.currentChapter = 24;
       }
       SaveManager.save(data);
     },

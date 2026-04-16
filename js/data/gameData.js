@@ -15,6 +15,7 @@
  * Phase 34-2: 적 2종(cactus_wraith, luchador_ghost), 재료 1종(avocado) 추가. 누적 적 39종, 재료 29종.
  * Phase 35-2: 보스 1종(el_diablo_pepper) 추가. 누적 적 51종.
  * Phase 36-2: 적 2종(candy_soldier, cake_witch), 재료 2종(cacao, vanilla) 추가. 누적 적 53종, 재료 31종.
+ * Phase 37-1: 적 2종(macaron_knight, sugar_specter), 재료 1종(cream) 추가. 누적 적 55종, 재료 32종.
  */
 
 // ── 적 타입 정의 ──
@@ -781,6 +782,45 @@ export const ENEMY_TYPES = {
     bossReward: 0,
     canvasSize: 0,
   },
+  // ── Phase 37-1: 23장 신규 일반 적 (드림랜드 심층부) ──
+  macaron_knight: {
+    id: 'macaron_knight',
+    nameKo: '마카롱 기사',
+    nameEn: 'Macaron Knight',
+    hp: 500,
+    speed: 70,
+    ingredient: 'cream',
+    bodyColor: 0xe8b4cb,           // 파스텔 핑크-라벤더 (마카롱 껍질)
+    // 마법 저항: 원소/마법 계열 공격 60% 경감 (candy_soldier의 damageReduction과 별개 스탯)
+    // 현재 엔진에서 magicResistance 전용 핸들러가 없으므로 damageReduction으로 fallback 처리.
+    // Phase 38에서 magicResistance 전용 로직 구현 시 이 필드로 전환 예정.
+    magicResistance: 0.60,
+    damageReduction: 0.60,
+    canvasSize: 64,
+    group: 3,                       // 그룹 3: 디저트 아크
+    reward: 35,
+  },
+  sugar_specter: {
+    id: 'sugar_specter',
+    nameKo: '슈가 스펙터',
+    nameEn: 'Sugar Specter',
+    hp: 480,
+    speed: 80,
+    ingredient: 'cream',
+    bodyColor: 0xe8f4ff,           // 반투명 흰빛 (설탕 유령)
+    // 분열 사망: 사망 시 HP의 30%를 가진 소형 sugar_specter 2마리 스폰
+    // 현재 엔진에서 splitOnDeath 메카닉을 지원하지 않으므로 데이터만 예약 등록.
+    // Phase 38에서 GatheringScene의 onEnemyDeath 훅에 splitOnDeath 핸들러 구현 예정.
+    splitOnDeath: {
+      count: 2,
+      hpRatio: 0.30,               // 원본 HP x 0.30 = 144HP의 소형 유령 2마리
+      speedMultiplier: 1.20,       // 소형 유령은 원본보다 20% 빠름
+      rewardRatio: 0.00,           // 소형 유령 처치 시 보상 없음 (중복 방지)
+    },
+    canvasSize: 64,
+    group: 3,
+    reward: 30,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -1212,6 +1252,14 @@ export const INGREDIENT_TYPES = {
     nameEn: 'Vanilla',
     color: 0xf5f5dc,
     icon: 'assets/ingredients/vanilla.png',
+  },
+  // ── Phase 37-1 신규 재료 (23장 드림랜드 심층부) ──
+  cream: {
+    id: 'cream',
+    nameKo: '크림',
+    nameEn: 'Cream',
+    color: 0xfff8f0,               // 연한 크림색
+    icon: 'assets/ingredients/cream.png',
   },
 };
 

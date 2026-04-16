@@ -15,6 +15,7 @@
  * Phase 34-3: + 서빙 8종 + customers 전용 1종 + 버프 2종 = 244종 (20장 칸티나 심층부).
  * Phase 35-3: + 서빙 8종 + 버프 2종 = 254종 (21장 엘 디아블로 최종전).
  * Phase 36-3: + 서빙 8종 + 버프 2종 = 264종 (22장 슈가 드림랜드).
+ * Phase 37-2: + 서빙 8종 + 버프 2종 = 274종 (23장 드림랜드 심층부).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -1307,6 +1308,54 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { cacao: 2, vanilla: 2, sugar: 1, butter: 1, milk: 1 }, baseReward: 462, cookTime: 26000,
     unlockCost: 745, gateStage: '22-5',
   },
+
+  // ── Phase 37-2 신규 서빙 레시피 (23장 드림랜드 심층부) ──
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'cream_macaron_delight', nameKo: '크림 마카롱 딜라이트', icon: '🍪', category: 'dessert',
+    tier: 3, ingredients: { cream: 1, vanilla: 1, sugar: 1 }, baseReward: 138, cookTime: 10500,
+    unlockCost: 124, gateStage: '23-1',
+  },
+  {
+    id: 'cream_puff_tower', nameKo: '크림 퍼프 타워', icon: '🍮', category: 'dessert',
+    tier: 3, ingredients: { cream: 1, flour: 1, egg: 1 }, baseReward: 132, cookTime: 10000,
+    unlockCost: 118, gateStage: '23-1',
+  },
+
+  // ★★★★ 4성 (3종)
+  {
+    id: 'vanilla_cream_opera', nameKo: '바닐라 크림 오페라', icon: '🎂', category: 'dessert',
+    tier: 4, ingredients: { cream: 1, vanilla: 1, cacao: 1, butter: 1 }, baseReward: 186, cookTime: 14500,
+    unlockCost: 238, gateStage: '23-2',
+  },
+  {
+    id: 'cacao_cream_entremet', nameKo: '카카오 크림 앙트르메', icon: '🍫', category: 'dessert',
+    tier: 4, ingredients: { cream: 2, cacao: 1, sugar: 1 }, baseReward: 190, cookTime: 15000,
+    unlockCost: 244, gateStage: '23-2',
+  },
+  {
+    id: 'dream_deep_gateau', nameKo: '드림 딥 가토', icon: '🎂', category: 'special',
+    tier: 4, ingredients: { cream: 1, vanilla: 1, cacao: 1, flour: 1 }, baseReward: 183, cookTime: 14200,
+    unlockCost: 234, gateStage: '23-3',
+  },
+
+  // ★★★★★ 5성 (3종)
+  {
+    id: 'cream_specter_verrine', nameKo: '크림 스펙터 베린', icon: '👻', category: 'special',
+    tier: 5, ingredients: { cream: 2, vanilla: 1, cacao: 1, sugar: 1 }, baseReward: 334, cookTime: 21000,
+    unlockCost: 536, gateStage: '23-3',
+  },
+  {
+    id: 'deep_dream_mille_feuille', nameKo: '딥 드림 밀푀유', icon: '🍰', category: 'dessert',
+    tier: 5, ingredients: { cream: 2, cacao: 2, butter: 1, flour: 1 }, baseReward: 346, cookTime: 21500,
+    unlockCost: 554, gateStage: '23-4',
+  },
+  {
+    id: 'queen_cream_supreme', nameKo: '여왕의 크림 수프림', icon: '👑', category: 'special',
+    tier: 5, ingredients: { cream: 3, vanilla: 2, cacao: 1, sugar: 1, butter: 1 }, baseReward: 488, cookTime: 27500,
+    unlockCost: 786, gateStage: '23-5',
+  },
 ];
 
 /**
@@ -1721,6 +1770,28 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.35,
     duration: 2, durationUnit: 'wave',
     unlockCost: 152, gateStage: '22-3',
+  },
+
+  // ── Phase 37-2 신규 버프 레시피 (23장 드림랜드 심층부) ──
+  {
+    id: 'cream_magic_veil', nameKo: '크림 마법 베일', icon: '✨', category: 'buff',
+    tier: 3, ingredients: { cream: 2, vanilla: 1 },
+    effectDesc: '마법 저항 무력화 + 전 타워 공격력 +25% (2웨이브)',
+    // 원래 의도: buff_attack_magic_pierce (macaron_knight magicResistance 무효화). 엔진 미지원으로 buff_attack_piercing 대체 (Phase 36-3 선례)
+    effectType: 'buff_attack_piercing',
+    effectValue: 0.25,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 108, gateStage: '23-2',
+  },
+  {
+    id: 'specter_seal_cream', nameKo: '스펙터 봉인 크림', icon: '🔮', category: 'buff',
+    tier: 4, ingredients: { cream: 1, cacao: 1, vanilla: 1, sugar: 1 },
+    effectDesc: '분열 차단 + 전 타워 공격속도 +30% (2웨이브)',
+    // 원래 의도: buff_speed_split_block (sugar_specter splitOnDeath 억제). 엔진 미지원으로 buff_all 대체
+    effectType: 'buff_all',
+    effectValue: 0.30,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 164, gateStage: '23-3',
   },
 ];
 

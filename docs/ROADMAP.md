@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-16
-> 기준: Phase 36 완료 (22장 슈가 드림랜드, 디저트 아크 시작)
+> 기준: Phase 37 완료 (23장 드림랜드 심층부, 디저트 아크 2장)
 
 ---
 
@@ -47,23 +47,23 @@
 | Phase 34 | 20장 — 칸티나 심층부 (멕시칸 2장) | ✅ 완료 |
 | Phase 35 | 21장 — 엘 디아블로 최종전 (멕시칸 3장) | ✅ 완료 |
 | Phase 36 | 22장 — 슈가 드림랜드 (디저트 1장) | ✅ 완료 |
-| Phase 37 | 23장 — 드림랜드 심층부 (디저트 2장) | 📋 계획 |
+| Phase 37 | 23장 — 드림랜드 심층부 (디저트 2장) | ✅ 완료 |
 | Phase 38 | 24장 — 미각의 여왕 최종전 (최종) | 📋 계획 |
 | Phase 39 | 챕터 16~24 밸런스 QA | 📋 계획 |
 | Phase 40 | 업적 시스템 (30~50개, 보상, 업적 UI) | 📋 계획 |
 | Phase 41 | 아트 리워크 — 레거시 스프라이트 64px 재생성 | 🎨 예정 |
 
-**현재 구현 완성도**: Phase 36 완료 (시즌3 16~22장 인도+멕시칸+디저트 — 적 25종+보스 7종+재료 7종+레시피 77종+스토리 31종+텔레포트/자가회복/혼란/원소저항/다단계/회피/돌진/fireZone/소환/분노/damageReduction 메커닉, 디저트 아크 시작)
+**현재 구현 완성도**: Phase 37 완료 (시즌3 16~23장 인도+멕시칸+디저트 — 적 27종+보스 7종+재료 8종+레시피 87종+스토리 34종+텔레포트/자가회복/혼란/원소저항/다단계/회피/돌진/fireZone/소환/분노/damageReduction/magicResistance/splitOnDeath 메커닉, 디저트 아크 2장 완료)
 
 ### 현재 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 종류 | 53종 (일반 40 + 미니보스 1 + 보스 12) |
+| 적 종류 | 55종 (일반 42 + 미니보스 1 + 보스 12) |
 | 도구 종류 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) — 영구 보유, 업그레이드 3단계 |
-| 재료 종류 | 31종 |
-| 레시피 | 264종 |
-| 스테이지 | 138슬롯 (구현 완료: 1~7/9~13/15~22장(22-1~22-5), placeholder: 8/14/22-6~24장) |
+| 재료 종류 | 32종 |
+| 레시피 | 274종 |
+| 스테이지 | 143슬롯 (구현 완료: 1~7/9~13/15~23장(23-1~23-5), placeholder: 8/14/23-6~24장) |
 | 셰프 | 5종 (꼬마/불꽃/얼음/유키/라오) — 패시브 + 액티브 스킬 (유키/라오는 데이터 등록, 스킬 로직 미구현) |
 | 영구 업그레이드 | 4종 |
 | 테이블 | 4~8석 (5단계 업그레이드) |
@@ -71,8 +71,8 @@
 | 직원 | 2종 (서빙/세척 도우미, IAP 추상화) |
 | 사운드 | SFX 20종 + BGM 5종 (Web Audio API 프로시저럴) |
 | VFX | 파티클 + 스크린 효과 + 플로팅 텍스트 (Canvas2D) |
-| 대화 스크립트 | 97종 |
-| 스토리 트리거 | 100항목 (triggerPoint 8종) |
+| 대화 스크립트 | 100종 |
+| 스토리 트리거 | 104항목 (triggerPoint 8종) |
 | 세이브 버전 | v16 |
 
 ### 게임 루프
@@ -104,6 +104,7 @@
 | Phase 34 | 아보카도(avocado) | 29종 | cactus_wraith, luchador_ghost | ✅ |
 | Phase 35 | - (보스만 추가) | 29종 | el_diablo_pepper(보스) | ✅ |
 | Phase 36 | 카카오(cacao), 바닐라(vanilla) | 31종 | candy_soldier, cake_witch | ✅ |
+| Phase 37 | 크림(cream) | 32종 | macaron_knight, sugar_specter | ✅ |
 
 ### 레시피 확장 이력
 
@@ -122,6 +123,7 @@
 | Phase 34 | +10 | +1 | 244 | 멕시칸 아크 2장 (아보카도 조합, 과카몰리/아보카도 토스트/부리토 등) | ✅ |
 | Phase 35 | +8 | +2 | 254 | 멕시칸 아크 3장 (diablo 테마 특선 + 아보카도 조합) | ✅ |
 | Phase 36 | +8 | +2 | 264 | 디저트 아크 1장 (카카오/바닐라 조합 서빙 8종 + 버프 2종) | ✅ |
+| Phase 37 | +8 | +2 | 274 | 디저트 아크 2장 (크림 조합 서빙 8종 + 버프 2종) | ✅ |
 
 ### 등급 분포 (현재)
 
@@ -1127,15 +1129,19 @@
 
 ---
 
-## Phase 37 — 23장 드림랜드 심층부 (디저트 2장)
+## Phase 37 — 23장 드림랜드 심층부 (디저트 2장) ✅ 2026-04-16
 
 > `visual_change: both` | 스크립트 + 에셋 + 스테이지
 
-- [ ] dialogueData.js: chapter23_intro (여왕의 실체 접근), chapter23_mid (최종 결전 준비), 사이드 대화 1종
-- [ ] macaron_knight (HP ~500, 마법 방어), sugar_specter (HP ~480, 분열) — PixelLab 생성
-- [ ] 드림랜드 심층 타일셋, 재료 아이콘: 크림(cream) 32px
-- [ ] stageData.js: 스테이지 23-1 ~ 23-5 배치
-- [ ] recipeData.js: 크림 조합 레시피 ~10종
+- [x] dialogueData.js: chapter23_intro (8라인), chapter23_mid (7라인), team_side_23 (9라인) — 누적 100종
+- [x] macaron_knight (HP 500, magicResistance 0.60 + damageReduction fallback), sugar_specter (HP 480, splitOnDeath 데이터 예약) — PixelLab 92px 8방향
+- [x] dream_deep 타일셋, 재료 아이콘: cream(크림) 32px — 누적 32종
+- [x] storyData.js: 트리거 4건 추가 (23-1 진입/23-3 클리어/merchant_enter/23-5 클리어→ch24 해금) — 누적 104항목
+- [x] stageData.js: 스테이지 23-1~23-5 구현 (theme: dream_deep, macaron_knight 23-1 첫 등장, sugar_specter 23-2 첫 등장)
+- [x] recipeData.js: 크림 조합 레시피 10종 (서빙 8종 + 버프 2종) — 누적 274종
+- [x] SpriteLoader.js: ENEMY_IDS 43종 갱신, ENEMY_WALK_HASHES macaron_knight/sugar_specter 등록
+- [x] Enemy.js: sugar_specter setAlpha(0.82) 반투명 처리
+- [x] 디저트 아크(22~24장) 2장 완료
 
 ---
 
@@ -1267,8 +1273,8 @@
 | ~~35-2~~ | ~~에셋 생성 (cactus_wraith, luchador_ghost, 타일셋)~~ | 233 | 29 | ✅ 완료 |
 | ~~35-3~~ | ~~20장 스테이지 + 레시피~~ | 244 | 29 | ✅ 완료 |
 | ~~36~~ | ~~22장 슈가 드림랜드 (candy_soldier, cake_witch, cacao, vanilla)~~ | 264 | 31 | ✅ 완료 |
-| 37-1 | 스크립트 + 에셋 (chapter23, macaron_knight, sugar_specter) | ~264 | 31 | 📋 계획 |
-| 37-2 | 23장 스테이지 + 레시피 | ~274 | 32 | 📋 계획 |
+| ~~37-1~~ | ~~스크립트 + 에셋 (chapter23, macaron_knight, sugar_specter)~~ | 264 | 32 | ✅ 완료 |
+| ~~37-2~~ | ~~23장 스테이지 + 레시피~~ | 274 | 32 | ✅ 완료 |
 | 38-1 | 에셋 + 스크립트 (queen_of_taste 3페이즈, 엔딩) | ~274 | 32 | 📋 계획 |
 | 38-2 | 24장 스테이지 (최종 완성) | ~284 | 32 | 📋 계획 |
 | 40 | 챕터 16~24 밸런스 QA | ~266 | 31 | 📋 계획 |

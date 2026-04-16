@@ -19,6 +19,7 @@
  * Phase 34-2: 20장 적 2종(cactus_wraith, luchador_ghost), 재료 1종(avocado) 추가.
  * Phase 35-2: 21장 보스 1종(el_diablo_pepper) 추가.
  * Phase 36-2: 22장 적 2종(candy_soldier, cake_witch), 재료 2종(cacao, vanilla) 추가.
+ * Phase 37-1: 23장 적 2종(macaron_knight, sugar_specter), 재료 1종(cream) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -37,7 +38,7 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (41종, Phase 36-2: candy_soldier, cake_witch 추가) ──
+// ── 적 ID 목록 (43종, Phase 37-1: macaron_knight, sugar_specter 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
@@ -55,6 +56,7 @@ const ENEMY_IDS = [
   'taco_bandit', 'burrito_juggernaut',    // Phase 33-2 (160px/172px, pro)
   'cactus_wraith', 'luchador_ghost',      // Phase 34-2 (216px/252px, pro)
   'candy_soldier', 'cake_witch',           // Phase 36-2 (22장 슈가 드림랜드)
+  'macaron_knight', 'sugar_specter',       // Phase 37-1 (23장 드림랜드 심층부, 64px standard)
 ];
 
 // ── 보스 ID 목록 (12종, Phase 35-2: el_diablo_pepper 추가) ──
@@ -109,9 +111,10 @@ const INGREDIENT_FILE_MAP = {
   avocado: 'avocado',        // Phase 34-2
   cacao: 'cacao',            // Phase 36-2
   vanilla: 'vanilla',        // Phase 36-2
+  cream: 'cream',            // Phase 37-1
 };
 
-// ── 재료 ID 목록 (26종, 게임 내 ID 기준) ──
+// ── 재료 ID 목록 (32종, Phase 37-1: cream 추가) ──
 const INGREDIENT_IDS = Object.keys(INGREDIENT_FILE_MAP);
 
 // ── 걷기 애니메이션 폴더 해시 맵 (Phase 12) ──
@@ -156,6 +159,8 @@ const ENEMY_WALK_HASHES = {
   luchador_ghost: 'animating-0469ac97',  // Phase 34-2 (252px, pro)
   candy_soldier: 'walking-4afaa9df',     // Phase 36-2 (22장 슈가 드림랜드)
   cake_witch: 'walking-076ead3d',        // Phase 36-2 (22장 슈가 드림랜드)
+  macaron_knight: 'animating-de406b54',  // Phase 37-1 (23장 드림랜드 심층부, 64px standard)
+  sugar_specter: 'animating-7f31cfcf',   // Phase 37-1 (23장 드림랜드 심층부, 64px standard)
 };
 
 const BOSS_WALK_HASHES = {

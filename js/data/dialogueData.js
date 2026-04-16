@@ -25,6 +25,7 @@
  * Phase 34-1: 20장 칸티나 심층부 대화 3종 추가 (chapter20_intro, chapter20_mid, team_side_20). 누적 88종.
  * Phase 35-1: 21장 대화 6종 추가 (chapter21_intro, chapter21_mid, chapter21_boss, chapter21_clear, chapter21_epilogue, team_side_21). CHARACTERS에 el_diablo 추가. 누적 94종.
  * Phase 36-1: 22장 슈가 드림랜드 대화 3종 추가 (chapter22_intro, chapter22_mid, team_side_22). 누적 97종.
+ * Phase 37-1: 23장 드림랜드 심층부 대화 3종 추가 (chapter23_intro, chapter23_mid, team_side_23). 누적 100종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1616,6 +1617,56 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '달콤할수록 독할 수 있지. 설탕이 발효되면 결국 독이 되는 것처럼.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(팔짱을 끼며) 그래도 싸우고 나면 레시피 연구를 해볼 수 있겠죠. 카카오와 바닐라... 조합이 기대돼요.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '이 땅에서 얻은 재료, 제대로 쓰자. 달콤함에 지지 않게.' },
+    ],
+  },
+
+  // ── Phase 37-1: 23장 드림랜드 심층부 (디저트 아크 2장) ──
+
+  // chapter23_intro — 23-1 진입 시 (chapter22_cleared 플래그 확인 후)
+  chapter23_intro: {
+    id: 'chapter23_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '슈가 드림랜드를 뒤로하고 들어선 심층부. 공기가 달라졌다. 달콤함보다 무거운 무언가가 섞여 있었다.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '여기는... 냄새가 달라. 설탕 냄새가 아니라 뭔가 더 진하고 농밀한 느낌이야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '미력의 파장이 굉장히 조밀해요. 22장보다 훨씬 집약되어 있어요. 여왕이 이 깊이를 직접 통제하고 있다는 증거예요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(주먹을 쥐며) 벽이 마카롱이야. 계단도 마카롱이야. 어디에 발을 디뎌야 할지 모르겠군.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(낮은 목소리로) 이건 단순한 디저트 세계가 아니에요. 계획된 공간이에요. 누군가가 이 땅 전체를 설계했어요.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '여왕이 여기서 뭔가를 만들고 있어. "완벽한 맛"이라는 걸.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '완벽한 맛? 그게 뭔데?' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '모든 사람이 같은 맛을 원하게 만드는 것. 선택권이 없는 완벽함이지.' },
+    ],
+  },
+
+  // chapter23_mid — 23-3 첫 클리어 후 (macaron_knight/sugar_specter 조우 후 중반부)
+  chapter23_mid: {
+    id: 'chapter23_mid',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '마카롱 기사... 마법이 아예 안 먹혀. 원소 공격이 전부 흡수되는 느낌이야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '마법 저항 미력이에요. 마카롱의 알록달록한 껍질 자체가 원소 에너지를 차단하는 구조예요. 물리 공격에 집중해야 해요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(목소리를 낮추며) 그리고 그 설탕 유령... 죽어도 죽지 않아. 두 개로 갈라져서 다시 온다.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '분열 미력이에요. 사망 순간 미력이 두 덩이로 나뉘는 거예요. 개념상으로는 알고 있었지만 실전에서 보니...' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '그리고 저 너머에 여왕이 있다는 거야. 이 두 가지를 넘어야만 갈 수 있는 방에.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(귀를 눕히며) 미미. 다음 방에 여왕이 있어. 거기가 마지막이야. 준비됐어?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '...응. 할머니가 이 길을 걸었을 거야. 나도 걸을게.' },
+    ],
+  },
+
+  // team_side_23 — merchant_enter 조건, 23장 진입 후 린의 크림 디저트 코미디 대화
+  team_side_23: {
+    id: 'team_side_23',
+    skippable: true,
+    lines: [
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(크림 덩어리를 집어 들며) 이 크림... 미력이 빠지면 그냥 먹을 수 있을 것 같은데.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '린! 그거 방금 폭주한 크림이잖아!' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(진지하게) 맛은 봐야 알지. 적을 알려면 먼저 먹어봐야 한다고.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(단호하게) 그건 논리가 아니야.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(몰래 조금 뜯으며) ...사실 저도 궁금하긴 해요. 농도가 상당히 좋아 보여서요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(한숨) 둘 다요?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '정화 먼저. 레시피 연구는 그 다음이야.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(소매 안에서 작은 스푼을 꺼내며) 미미, 나도 잠깐만 —' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코도요?!' },
     ],
   },
 };
