@@ -146,8 +146,8 @@ const ENEMY_WALK_HASHES = {
   masala_guide: 'animating-3594d863',     // Phase 32-5 (108px, pro)
   taco_bandit: 'animating-a8a759af',      // Phase 33-2 (160px, pro)
   burrito_juggernaut: 'animating-ca0e68fa', // Phase 33-2 (172px, pro)
-  cactus_wraith: null,                    // Phase 34-2 (216px, pro) — 애니메이션 미생성, 정지 이미지 fallback
-  luchador_ghost: null,                   // Phase 34-2 (252px, pro) — 애니메이션 미생성, 정지 이미지 fallback
+  cactus_wraith: 'animating-377c9fa7',    // Phase 34-2 (216px, pro)
+  luchador_ghost: 'animating-0469ac97',  // Phase 34-2 (252px, pro)
 };
 
 const BOSS_WALK_HASHES = {

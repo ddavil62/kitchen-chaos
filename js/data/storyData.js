@@ -975,6 +975,22 @@ export const STORY_TRIGGERS = [
       !save.seenDialogues?.includes('team_side_19'),
   },
 
+  // 19-5 첫 클리어 시 currentChapter 20 설정 (20장 해금)
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: null,
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '19-5',
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (data.storyProgress.currentChapter < 20) {
+        data.storyProgress.currentChapter = 20;
+      }
+      SaveManager.save(data);
+    },
+  },
+
   // ── 20장: 칸티나 심층부 (Phase 34-1) ─────────────────────────────────
 
   // 20-1 진입 시 chapter20_intro
