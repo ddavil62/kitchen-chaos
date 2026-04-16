@@ -1,5 +1,33 @@
 # Changelog
 
+## [Phase 35] 2026-04-16 — 21장 엘 디아블로 최종전 (멕시칸 아크 완결)
+
+### Added
+- el_diablo_pepper 보스 스프라이트 (PixelLab pro, 64px, 8방향 + walking 애니메이션)
+- gameData.js: el_diablo_pepper 보스 등록 — HP 2600, speed 22, fireZone + 소환 + 분노 메커닉
+- dialogueData.js: 대화 6종 추가 (누적 94종)
+  - chapter21_intro: 21-1 진입 시, 엘 디아블로 등장
+  - chapter21_mid: 21장 중반, 스토리 전개
+  - chapter21_boss: 21-6 진입 시, 보스전 직전 대사
+  - chapter21_clear: 21-6 첫 클리어, 멕시칸 아크 완결
+  - chapter21_epilogue: chapter21_clear 연쇄, 에필로그
+  - team_side_21: 행상인 진입 시 팀원 리액션
+- dialogueData.js: CHARACTERS에 el_diablo 추가 (portraitKey: 'el_diablo', boss 역할) — 누적 14종
+- storyData.js: 트리거 7건 추가 (21장 전체 스토리 흐름) — 누적 96항목
+- stageData.js: 21-1~21-6 구현 (21-1~21-5 일반, 21-6 el_diablo_pepper 보스전, theme: cactus_cantina)
+- recipeData.js: 레시피 10종 추가 (diablo 테마 특선 레시피 + 아보카도 조합) — 누적 254종
+- 멕시칸 아크(19~21장) 3챕터 아크 완결
+
+### Changed
+- SpriteLoader.js: BOSS_IDS 12종으로 갱신 (el_diablo_pepper 추가)
+- SpriteLoader.js: BOSS_WALK_HASHES — el_diablo_pepper 'walking-acae25f3' 등록
+
+### 참고
+- 적 누적: 51종 (일반 38 + 미니보스 1 + 보스 12)
+- 시즌3 멕시칸 아크(19~21장) 완결 — 다음: 22장 슈가 드림랜드 (디저트 아크)
+
+---
+
 ## [Phase 32-5] 2026-04-14 — 18장 스테이지 구현 + maharaja/masala_guide/cardamom
 
 ### Added
