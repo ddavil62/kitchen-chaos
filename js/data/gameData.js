@@ -11,6 +11,7 @@
  * Phase 31-2: 적 2종(curry_djinn, naan_golem), 재료 2종(curry_leaf, saffron) 추가. 누적 적 31종, 재료 25종.
  * Phase 32-2: 적 2종(incense_specter, spice_elemental), 재료 1종(chai) 추가. 누적 적 33종, 재료 26종.
  * Phase 32-5: 적 1종(masala_guide), 보스 1종(maharaja), 재료 1종(cardamom) 추가. 누적 적 35종, 재료 27종.
+ * Phase 33-2: 적 2종(taco_bandit, burrito_juggernaut), 재료 1종(jalapeno) 추가. 누적 적 37종, 재료 28종.
  */
 
 // ── 적 타입 정의 ──
@@ -646,6 +647,38 @@ export const ENEMY_TYPES = {
     ],
     canvasSize: 212,
   },
+  // ── Phase 33-2 신규 적 (19장 선인장 칸티나) ──
+  taco_bandit: {
+    id: 'taco_bandit',
+    nameKo: '타코 도적',
+    hp: 300,
+    speed: 115,
+    ingredient: 'jalapeno',
+    bodyColor: 0xc0392b,   // 선홍색 세라페
+    // 회피 메커닉: 공격 수신 시 dodgeChance 확률로 완전 무효화 (Phase 33-3 구현)
+    dodgeOnHit: true,
+    dodgeChance: 0.25,     // 피격마다 25% 확률 회피
+    canvasSize: 160,
+    group: 2,
+    reward: 28,
+  },
+  burrito_juggernaut: {
+    id: 'burrito_juggernaut',
+    nameKo: '부리토 저거넛',
+    hp: 580,
+    speed: 38,
+    ingredient: 'jalapeno',
+    bodyColor: 0xd2b48c,   // 밀가루 토르티야 베이지
+    // 돌진 메커닉: charge 발동 시 speed 2배 + 충돌 시 주변 타워 피해 (Phase 33-3 구현)
+    chargeEnabled: true,
+    chargeInterval: 8000,  // 8초마다 돌진
+    chargeSpeedMultiplier: 2.0,
+    chargeRadius: 48,      // 돌진 충격 반경 (px)
+    chargeTowerDamage: 0.15, // 타워 현재 HP의 15% 피해
+    canvasSize: 172,
+    group: 2,
+    reward: 38,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -1047,6 +1080,13 @@ export const INGREDIENT_TYPES = {
     nameKo: '카다멈',
     color: 0x4caf50,            // 초록빛 씨앗 껍질
     icon: 'assets/ingredients/cardamom.png',
+  },
+  // ── Phase 33-2 신규 재료 (19장 선인장 칸티나) ──
+  jalapeno: {
+    id: 'jalapeno',
+    nameKo: '할라피뇨',
+    color: 0x27ae60,           // 선명한 초록
+    icon: 'assets/ingredients/jalapeno.png',
   },
 };
 
