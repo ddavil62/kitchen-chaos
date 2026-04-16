@@ -13,6 +13,7 @@
  * Phase 32-5: 적 1종(masala_guide), 보스 1종(maharaja), 재료 1종(cardamom) 추가. 누적 적 35종, 재료 27종.
  * Phase 33-2: 적 2종(taco_bandit, burrito_juggernaut), 재료 1종(jalapeno) 추가. 누적 적 37종, 재료 28종.
  * Phase 34-2: 적 2종(cactus_wraith, luchador_ghost), 재료 1종(avocado) 추가. 누적 적 39종, 재료 29종.
+ * Phase 35-2: 보스 1종(el_diablo_pepper) 추가. 누적 적 51종.
  */
 
 // ── 적 타입 정의 ──
@@ -714,6 +715,45 @@ export const ENEMY_TYPES = {
     canvasSize: 252,
     group: 2,
     reward: 18,
+  },
+  // ── Phase 35-2: 21장 보스 (멕시칸 아크 최종 보스) ──
+  // 보스 — el_diablo_pepper는 BOSS_IDS에 등록 (SpriteLoader에서 /sprites/bosses/ 경로 사용)
+  el_diablo_pepper: {
+    id: 'el_diablo_pepper',
+    nameKo: '엘 디아블로 페퍼',
+    nameEn: 'El Diablo Pepper',
+    hp: 2600,
+    speed: 22,
+    ingredient: null,
+    bodyColor: 0x8b0000,        // 검붉은 다크레드
+    isBoss: true,
+    // 화염 장판: fireZoneInterval마다 현재 위치 주변에 화염 장판 생성
+    // 화염 장판 내 도구는 공격력/공격속도 동시 디버프 (spice_elemental의 fireZone 패턴 계승)
+    fireZone: true,
+    fireZoneInterval: 5000,       // 5초마다 화염 장판 생성
+    fireZoneRadius: 60,           // 장판 반경 px
+    fireZoneDuration: 4000,       // 장판 지속 시간 ms
+    fireZoneDebuffDuration: 3000, // 도구 디버프 지속 시간 ms
+    fireZoneDebuffEffect: { damageReduction: 0.30, attackSpeedReduction: 0.20 }, // 공격력 -30%, 공격속도 -20%
+    // 소환: HP summonThreshold 이하 시 멕시칸 아크 적 혼합 소환 (1회)
+    summon: true,
+    summonThreshold: 0.55,        // HP 55% 이하 시 소환 트리거
+    summonTypes: [
+      { type: 'cactus_wraith', count: 2 },
+      { type: 'luchador_ghost', count: 2 },
+      { type: 'taco_bandit', count: 3 },
+    ],
+    // 분노: HP enrageHpThreshold 이하 시 속도 상승 + fireZoneInterval 단축
+    enrageHpThreshold: 0.30,      // HP 30% 이하
+    enrageSpeedBonus: 38,         // 분노 시 speed → 38로 상승
+    enrageFireZoneInterval: 2500, // 분노 시 fireZoneInterval → 2500ms로 단축
+    bossReward: 520,
+    bossDrops: [
+      { ingredient: 'avocado', count: 4 },
+      { ingredient: 'jalapeno', count: 3 },
+      { ingredient: 'cilantro', count: 2 },
+    ],
+    canvasSize: 116,
   },
 };
 

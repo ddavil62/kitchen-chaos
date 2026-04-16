@@ -17,6 +17,7 @@
  * Phase 32-5: 18장 보스 1종(maharaja), 적 1종(masala_guide), 재료 1종(cardamom) 추가.
  * Phase 33-2: 19장 적 2종(taco_bandit, burrito_juggernaut), 타일셋 1종(cactus_cantina), 재료 1종(jalapeno) 추가.
  * Phase 34-2: 20장 적 2종(cactus_wraith, luchador_ghost), 재료 1종(avocado) 추가.
+ * Phase 35-2: 21장 보스 1종(el_diablo_pepper) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -54,7 +55,7 @@ const ENEMY_IDS = [
   'cactus_wraith', 'luchador_ghost',      // Phase 34-2 (216px/252px, pro)
 ];
 
-// ── 보스 ID 목록 (11종, Phase 32-5: maharaja 추가) ──
+// ── 보스 ID 목록 (12종, Phase 35-2: el_diablo_pepper 추가) ──
 const BOSS_IDS = [
   'pasta_boss', 'dragon_ramen', 'seafood_kraken', 'lava_dessert_golem',
   'master_patissier', 'cuisine_god',
@@ -63,6 +64,7 @@ const BOSS_IDS = [
   'sake_master',  // Phase 26-1
   'chef_noir',    // Phase 29-1
   'maharaja',     // Phase 32-5
+  'el_diablo_pepper', // Phase 35-2
 ];
 
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
@@ -162,6 +164,7 @@ const BOSS_WALK_HASHES = {
   sake_master: 'animating-8d3d020e',   // Phase 26-1 신규
   chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
   maharaja: 'animating-2c666ada',     // Phase 32-5 (pro 모드, 212px canvas)
+  el_diablo_pepper: 'walking-acae25f3', // Phase 35-2 (pro 모드, 116px canvas)
 };
 
 /** 걷기 애니메이션 방향 목록 */

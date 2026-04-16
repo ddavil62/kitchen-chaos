@@ -13,6 +13,7 @@
  * Phase 32-5: + 서빙 7종 + 버프 1종 = 221종 (18장 향신료 궁전 최심부).
  * Phase 33-3: + 서빙 8종 + customers 전용 2종 + 버프 2종 = 233종 (19장 선인장 칸티나).
  * Phase 34-3: + 서빙 8종 + customers 전용 1종 + 버프 2종 = 244종 (20장 칸티나 심층부).
+ * Phase 35-3: + 서빙 8종 + 버프 2종 = 254종 (21장 엘 디아블로 최종전).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -1209,6 +1210,54 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { avocado: 2, jalapeno: 2, meat: 1, cheese: 1, flour: 1, tomato: 1 }, baseReward: 420, cookTime: 23500,
     unlockCost: 680, gateStage: '20-4',
   },
+
+  // ── Phase 35-3 신규 서빙 레시피 (21장 엘 디아블로 최종전) ──
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'diablo_fire_salsa', nameKo: '디아블로 파이어 살사', icon: '🌶️', category: 'soup',
+    tier: 3, ingredients: { avocado: 1, jalapeno: 1, tomato: 1 }, baseReward: 128, cookTime: 9500,
+    unlockCost: 112, gateStage: '21-1',
+  },
+  {
+    id: 'cactus_avocado_bowl', nameKo: '선인장 아보카도 볼', icon: '🥑', category: 'soup',
+    tier: 3, ingredients: { avocado: 1, cilantro: 1, tomato: 1 }, baseReward: 122, cookTime: 9000,
+    unlockCost: 106, gateStage: '21-1',
+  },
+
+  // ★★★★ 4성 (3종)
+  {
+    id: 'el_diablo_salsa_negra', nameKo: '엘 디아블로 살사 네그라', icon: '🔥', category: 'special',
+    tier: 4, ingredients: { avocado: 1, jalapeno: 2, cilantro: 1 }, baseReward: 172, cookTime: 13500,
+    unlockCost: 218, gateStage: '21-2',
+  },
+  {
+    id: 'pepper_enchilada_diablo', nameKo: '페퍼 엔칠라다 디아블로', icon: '🌯', category: 'special',
+    tier: 4, ingredients: { avocado: 1, jalapeno: 1, flour: 1, meat: 1 }, baseReward: 178, cookTime: 14000,
+    unlockCost: 226, gateStage: '21-2',
+  },
+  {
+    id: 'avocado_pepper_stew', nameKo: '아보카도 고추 스튜', icon: '🍲', category: 'soup',
+    tier: 4, ingredients: { avocado: 2, jalapeno: 1, tomato: 1 }, baseReward: 168, cookTime: 12500,
+    unlockCost: 212, gateStage: '21-3',
+  },
+
+  // ★★★★★ 5성 (3종 — 서빙 레시피)
+  {
+    id: 'pepper_supremo_feast', nameKo: '페퍼 수프리모 피스트', icon: '🌟', category: 'special',
+    tier: 5, ingredients: { avocado: 2, jalapeno: 2, cilantro: 1, flour: 1 }, baseReward: 308, cookTime: 19000,
+    unlockCost: 492, gateStage: '21-3',
+  },
+  {
+    id: 'el_diablo_grand_feast', nameKo: '엘 디아블로 그랑 피스트', icon: '👑', category: 'special',
+    tier: 5, ingredients: { avocado: 2, jalapeno: 2, meat: 1, cheese: 1, flour: 1, cilantro: 1 }, baseReward: 445, cookTime: 25000,
+    unlockCost: 720, gateStage: '21-5',
+  },
+  {
+    id: 'final_diablo_course', nameKo: '최후의 디아블로 코스', icon: '⭐', category: 'special',
+    tier: 5, ingredients: { avocado: 3, jalapeno: 2, meat: 1, cheese: 1, flour: 1, tomato: 1, cilantro: 1 }, baseReward: 490, cookTime: 27000,
+    unlockCost: 780, gateStage: '21-6',
+  },
 ];
 
 /**
@@ -1582,6 +1631,27 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.45,
     duration: 2, durationUnit: 'wave',
     unlockCost: 148, gateStage: '20-3',
+  },
+
+  // ── Phase 35-3 신규 버프 레시피 (21장 엘 디아블로 최종전) ──
+  {
+    id: 'diablo_pepper_blaze', nameKo: '디아블로 페퍼 블레이즈', icon: '🌶️', category: 'buff',
+    tier: 4, ingredients: { avocado: 1, jalapeno: 2, cilantro: 1 },
+    effectDesc: '전 타워 공격력 +40% + 사거리 +15% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.40,
+    effectRangeValue: 0.15,
+    duration: 2,
+    unlockCost: 130, gateStage: '21-2',
+  },
+  {
+    id: 'final_flame_blessing', nameKo: '최후의 불꽃 축복', icon: '🔥', category: 'buff',
+    tier: 5, ingredients: { avocado: 2, jalapeno: 2, cilantro: 1, tomato: 1 },
+    effectDesc: '전 타워 공격력+공격속도 +50% (2웨이브)',
+    effectType: 'buff_both',
+    effectValue: 0.50,
+    duration: 2,
+    unlockCost: 185, gateStage: '21-4',
   },
 ];
 
