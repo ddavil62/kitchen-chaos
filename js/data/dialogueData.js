@@ -21,6 +21,7 @@
  * Phase 31-1: 16장 향신료 궁전 대화 3종 추가 (chapter16_intro, chapter16_mid, team_side_16). 누적 72종.
  * Phase 32-1: 16장 에필로그 + 17장 향신료 궁전 심층부 대화 4종 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17). 누적 76종.
  * Phase 32-4: 18장 대화 6종 추가 (chapter18_intro, chapter18_mid, chapter18_boss, chapter18_clear, chapter18_epilogue, team_side_18). CHARACTERS에 masala_guide(아르준), maharaja 추가. 17장 ??? 대사 아르준으로 소급 수정. 누적 82종.
+ * Phase 33-1: 19장 선인장 칸티나 대화 3종 추가 (chapter19_intro, chapter19_mid, team_side_19). 누적 85종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -1354,6 +1355,61 @@ export const DIALOGUES = {
       { speaker: '아르준', portrait: '🪬', portraitKey: 'masala_guide', text: '...어느 순간부터 익숙해졌어.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '저도 처음엔 이 팀 분위기가 낯설었는데, 지금은 없으면 어색할 것 같아요.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '그게 팀의 무서움이죠.' },
+    ],
+  },
+
+  // ── 19장: 선인장 칸티나 (Phase 33-1) ──────────────────────────────
+
+  // chapter19_intro — 19-1 진입 시, 사막 도착 + 칸티나 발견 + 멕시칸 미력사 단서
+  chapter19_intro: {
+    id: 'chapter19_intro',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '인도의 열기를 뒤로 하고 사흘이 지났다. 지평선 끝까지 펼쳐진 붉은 사막, 그 한가운데 낡은 간판 하나가 보였다.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(눈을 가리며) 저게 뭐야? 사막 한복판에 식당이?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '선인장 칸티나... 음식 냄새가 나. 근데 뭔가 이상해.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(계기를 들여다보며) 미력 반응 확인됩니다. 선인장 군락 전체에서 에너지가 폭주하고 있어요. 멕시코 식란입니다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(칸티나 문을 밀며) 사람이 있었던 것 같은데. 최근까지.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(바닥에서 수첩을 집으며) 이건... WCA 마크예요. 하지만 수첩이 많이 낡았어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(수첩을 받아 펼치며) 멕시칸 미력사가 있었던 거야? 왜 아무도 모르고 있었지?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(조용히) WCA 실종 기록에 이 지역 담당자가 두 명 있어요. 오래된 케이스들이에요.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(진지하게) 즉, 먼저 들어갔다가 안 돌아온 사람들이 있다는 거야.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(프라이팬을 꽉 쥐며) 찾아야 해. 그리고 이 식란도 막아야 해. 들어가자.' },
+    ],
+  },
+
+  // chapter19_mid — 19-3 첫 클리어 후, 칸티나 지하 탐색 + 균열 감지
+  chapter19_mid: {
+    id: 'chapter19_mid',
+    skippable: true,
+    lines: [
+      { speaker: 'narrator', portrait: '', text: '칸티나 내부의 식란이 잦아들었다. 그러나 발 아래, 바닥 깊은 곳에서 진동이 느껴졌다.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(무릎을 꿇고 바닥을 짚으며) 진동이 아래에서 올라온다. 지하 구조가 있어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(미력 탐지기를 보며) 지상보다 지하의 미력 농도가 두 배 이상이에요. 선인장 뿌리들이 전부 아래로 뻗어 있어요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(수첩을 다시 열며) 잠깐... 여기 수첩에 적혀 있어. "칸티나 바닥 아래에 고대 제단이 있다. 선인장이 전부 그걸 향해 자란다. 이걸 알아낸 날부터 이상한 소리가 들린다."' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(표정을 굳히며) 그 이후 페이지는?' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(침묵 후) 비어 있어.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(조용히) ...여기서 무슨 일이 있었는지 알 것 같아.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(일어서며) 내려가야 해. 그게 식란의 근원일 가능성이 높아.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(고개를 끄덕이며) 그래. 지하까지 끝내야 진짜 끝인 거야.' },
+      { speaker: 'narrator', portrait: '', text: '균열 너머에서 건조한 열기가 올라왔다. 선인장 향과 낡은 흙 냄새가 섞였다.' },
+    ],
+  },
+
+  // team_side_19 — merchant_enter에서 1회, 19장 진입 후 팀원 리액션
+  team_side_19: {
+    id: 'team_side_19',
+    skippable: true,
+    lines: [
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(수첩을 들여다보며) 이 수첩의 마지막 날짜... 4년 전이에요. 그동안 아무도 이 지역을 확인하지 않았다는 건가요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: 'WCA 담당 구역이 너무 넓었거나, 아니면 의도적으로 누가 보고를 막았거나.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(팔짱을 끼며) 낙관적으로 보면 전자겠지.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '어느 쪽이든 우리가 여기 있어. 이제 확인할 수 있어.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '그렇죠. 일단 지금 할 수 있는 것부터.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(어딘가에서 타코를 꺼내며) 오, 칸티나에 이게 남아 있었어! 할라피뇨 타코! 비상식량으로 완벽해~' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '언제 그걸 챙겼어?!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '탐색 중에 발견한 거야. 재료를 낭비하면 안 되지. 자, 한 입씩~' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(짧게 웃으며) ...그래, 먹자.' },
     ],
   },
 };

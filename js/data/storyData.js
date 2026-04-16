@@ -16,6 +16,7 @@
  * Phase 31-1: 15장 트리거 5건 추가 (chapter15_boss, chapter15_clear, chapter15_epilogue, side_15a, side_15b) + 16장 트리거 3건 추가 (chapter16_intro, chapter16_mid, team_side_16) + stage_first_clear 제외 목록 갱신.
  * Phase 32-1: 16-5 에필로그 트리거 + 17장 트리거 4건 추가 (chapter16_epilogue, chapter17_intro, chapter17_mid, team_side_17) + stage_first_clear 제외 목록 갱신.
  * Phase 32-4: 18장 트리거 5건 추가 (chapter18_intro, chapter18_mid, chapter18_boss, chapter18_clear, team_side_18) + stage_first_clear 제외 목록 갱신 (18-1, 18-3, 18-6 추가).
+ * Phase 33-1: 19장 트리거 3건 추가 (chapter19_intro, chapter19_mid, team_side_19) + stage_first_clear 제외 목록 갱신 (19-1, 19-3 추가).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -271,7 +272,9 @@ export const STORY_TRIGGERS = [
       ctx.stageId !== '17-3' &&   // chapter17_mid 별도 처리
       ctx.stageId !== '18-1' &&   // chapter18_intro 별도 처리
       ctx.stageId !== '18-3' &&   // chapter18_mid 별도 처리
-      ctx.stageId !== '18-6',     // chapter18_boss / chapter18_clear 별도 처리
+      ctx.stageId !== '18-6' &&   // chapter18_boss / chapter18_clear 별도 처리
+      ctx.stageId !== '19-1' &&   // chapter19_intro 별도 처리
+      ctx.stageId !== '19-3',     // chapter19_mid 별도 처리
     delay: 800,
   },
 
@@ -928,6 +931,45 @@ export const STORY_TRIGGERS = [
     condition: (ctx, save) =>
       save.storyProgress?.currentChapter >= 18 &&
       !save.seenDialogues?.includes('team_side_18'),
+  },
+
+  // ── 19장: 선인장 칸티나 (Phase 33-1) ─────────────────────────────────
+
+  // 19-1 진입 시 chapter19_intro
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'chapter19_intro',
+    once: true,
+    condition: (ctx) => ctx.stageId === '19-1',
+    delay: 400,
+  },
+
+  // 19-3 첫 클리어 시 chapter19_mid + 플래그 저장
+  {
+    triggerPoint: 'result_clear',
+    dialogueId: 'chapter19_mid',
+    once: true,
+    condition: (ctx) =>
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '19-3',
+    delay: 800,
+    onComplete: () => {
+      const data = SaveManager.load();
+      if (!data.storyProgress.storyFlags || Array.isArray(data.storyProgress.storyFlags)) {
+        data.storyProgress.storyFlags = {};
+      }
+      data.storyProgress.storyFlags.chapter19_mid_seen = true;
+      SaveManager.save(data);
+    },
+  },
+
+  // merchant_enter 에서 team_side_19 (19장 진입 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_19',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyProgress?.currentChapter >= 19 &&
+      !save.seenDialogues?.includes('team_side_19'),
   },
 
   // ── 시즌 2 프롤로그 (Phase 19-3) ─────────────────────────────────
