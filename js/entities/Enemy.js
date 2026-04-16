@@ -13,6 +13,7 @@
  * Phase 31-3: 텔레포트(teleportEnabled) 메카닉 (curry_djinn).
  * Phase 32-3: 원소 저항(elementalResistance) + 혼란 디버프(confuseOnHit) 메카닉.
  * Phase 33-3: 회피(dodgeOnHit) + 돌진(chargeEnabled) 메카닉.
+ * Phase 34-2: 가시 반격(thornReflect) + 도발(tauntEnabled) 메카닉 추가.
  */
 
 import Phaser from 'phaser';
@@ -521,6 +522,24 @@ export class Enemy extends Phaser.GameObjects.Container {
       }
     }
 
+    // ── Phase 34-2: 도발 메카닉 (luchador_ghost) ──
+    if (this.data_.tauntEnabled) {
+      if (this.tauntTimer_ === undefined) {
+        this.tauntTimer_ = 0;
+      }
+      this.tauntTimer_ += delta;
+      if (this.tauntTimer_ >= this.data_.tauntInterval) {
+        this.tauntTimer_ = 0;
+        // 범위 내 투사체 어그로 변경 이벤트 emit
+        this.scene?.events?.emit('enemy_taunt', {
+          x: this.x,
+          y: this.y,
+          radius: this.data_.tauntRadius,
+          targetId: this.id,   // 투사체 타겟을 이 적 ID로 변경
+        });
+      }
+    }
+
     // ── 이동 ──
     this._moveAlongPath(delta);
   }
@@ -896,8 +915,9 @@ export class Enemy extends Phaser.GameObjects.Container {
   /**
    * @param {number} amount - 피해량
    * @param {string|null} [towerType=null] - 피해를 준 타워 타입 ID (Projectile._hit에서 전달)
+   * @param {object|null} [attackerRef=null] - 공격원 참조 (Phase 34-2: 가시 반격용)
    */
-  takeDamage(amount, towerType = null) {
+  takeDamage(amount, towerType = null, attackerRef = null) {
     if (this.isDead) return;
 
     // Phase 20: 배리어 활성 시 피해 무효
@@ -906,6 +926,11 @@ export class Enemy extends Phaser.GameObjects.Container {
     // Phase 33-3: 회피 메카닉 (taco_bandit) — dodgeChance 확률로 피해 완전 무효화
     if (this.data_.dodgeOnHit && Math.random() < this.data_.dodgeChance) {
       return;
+    }
+
+    // Phase 34-2: 가시 반격 메카닉 (cactus_wraith) — 피격 시 공격원에게 thornReflectDamage 적용
+    if (this.data_.thornReflect && attackerRef && typeof attackerRef.takeDamage === 'function') {
+      attackerRef.takeDamage(this.data_.thornReflectDamage);
     }
 
     // 생선 기사: 전면 피해 50% 감소 (이동 방향 기준, 진행 중이면 전면 피격으로 간주)

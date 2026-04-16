@@ -16,6 +16,7 @@
  * Phase 32-2: 17장 적 2종(incense_specter, spice_elemental), 타일셋 1종(spice_palace_interior), 재료 1종(chai) 추가.
  * Phase 32-5: 18장 보스 1종(maharaja), 적 1종(masala_guide), 재료 1종(cardamom) 추가.
  * Phase 33-2: 19장 적 2종(taco_bandit, burrito_juggernaut), 타일셋 1종(cactus_cantina), 재료 1종(jalapeno) 추가.
+ * Phase 34-2: 20장 적 2종(cactus_wraith, luchador_ghost), 재료 1종(avocado) 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -34,7 +35,7 @@
 // ── 에셋 경로 루트 ──
 const SPRITES_ROOT = '/sprites';
 
-// ── 적 ID 목록 (37종, Phase 33-2: taco_bandit, burrito_juggernaut 추가) ──
+// ── 적 ID 목록 (39종, Phase 34-2: cactus_wraith, luchador_ghost 추가) ──
 const ENEMY_IDS = [
   'carrot_goblin', 'meat_ogre', 'octopus_mage', 'chili_demon',
   'cheese_golem', 'flour_ghost', 'egg_sprite', 'rice_slime',
@@ -50,6 +51,7 @@ const ENEMY_IDS = [
   'incense_specter', 'spice_elemental',   // Phase 32-2 (176px/164px, pro)
   'masala_guide',                          // Phase 32-5 (108px, pro)
   'taco_bandit', 'burrito_juggernaut',    // Phase 33-2 (160px/172px, pro)
+  'cactus_wraith', 'luchador_ghost',      // Phase 34-2 (216px/252px, pro)
 ];
 
 // ── 보스 ID 목록 (11종, Phase 32-5: maharaja 추가) ──
@@ -100,6 +102,7 @@ const INGREDIENT_FILE_MAP = {
   chai: 'chai',              // Phase 32-2
   cardamom: 'cardamom',      // Phase 32-5
   jalapeno: 'jalapeno',      // Phase 33-2
+  avocado: 'avocado',        // Phase 34-2
 };
 
 // ── 재료 ID 목록 (26종, 게임 내 ID 기준) ──
@@ -143,6 +146,8 @@ const ENEMY_WALK_HASHES = {
   masala_guide: 'animating-3594d863',     // Phase 32-5 (108px, pro)
   taco_bandit: 'animating-a8a759af',      // Phase 33-2 (160px, pro)
   burrito_juggernaut: 'animating-ca0e68fa', // Phase 33-2 (172px, pro)
+  cactus_wraith: null,                    // Phase 34-2 (216px, pro) — 애니메이션 미생성, 정지 이미지 fallback
+  luchador_ghost: null,                   // Phase 34-2 (252px, pro) — 애니메이션 미생성, 정지 이미지 fallback
 };
 
 const BOSS_WALK_HASHES = {

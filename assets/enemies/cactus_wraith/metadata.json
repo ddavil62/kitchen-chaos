@@ -1,0 +1,30 @@
+{
+  "character": {
+    "id": "7f7a69df-01ff-493e-9ade-e616fb9b9174",
+    "name": "cactus_wraith",
+    "prompt": "desert cactus ghost with spiky green cactus arms and glowing thorn crown aura, floating spirit with fading lower body, burning red eyes, green thorns radiating outward, ethereal cactus spirit enemy, pixel art, mexican cantina theme",
+    "size": {
+      "width": 216,
+      "height": 216
+    },
+    "template_id": "mannequin",
+    "directions": 8,
+    "view": "low top-down",
+    "created_at": "2026-04-16T09:33:25.635936+00:00"
+  },
+  "frames": {
+    "rotations": {
+      "south": "rotations/south.png",
+      "south-east": "rotations/south-east.png",
+      "east": "rotations/east.png",
+      "north-east": "rotations/north-east.png",
+      "north": "rotations/north.png",
+      "north-west": "rotations/north-west.png",
+      "west": "rotations/west.png",
+      "south-west": "rotations/south-west.png"
+    },
+    "animations": {}
+  },
+  "export_version": "2.0",
+  "export_date": "2026-04-16T09:39:42.062940"
+}

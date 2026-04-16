@@ -12,6 +12,7 @@
  * Phase 32-2: 적 2종(incense_specter, spice_elemental), 재료 1종(chai) 추가. 누적 적 33종, 재료 26종.
  * Phase 32-5: 적 1종(masala_guide), 보스 1종(maharaja), 재료 1종(cardamom) 추가. 누적 적 35종, 재료 27종.
  * Phase 33-2: 적 2종(taco_bandit, burrito_juggernaut), 재료 1종(jalapeno) 추가. 누적 적 37종, 재료 28종.
+ * Phase 34-2: 적 2종(cactus_wraith, luchador_ghost), 재료 1종(avocado) 추가. 누적 적 39종, 재료 29종.
  */
 
 // ── 적 타입 정의 ──
@@ -679,6 +680,41 @@ export const ENEMY_TYPES = {
     group: 2,
     reward: 38,
   },
+  // ── Phase 34-2 신규 적 (20장 칸티나 심층부) ──
+  cactus_wraith: {
+    id: 'cactus_wraith',
+    nameKo: '선인장 망령',
+    nameEn: 'Cactus Wraith',
+    hp: 430,
+    speed: 100,
+    ingredient: 'avocado',
+    bodyColor: 0x2e8b57,   // 짙은 선인장 초록
+    // 가시 반격 메카닉: 피격 시 공격원에게 thornReflectDamage 적용
+    thornReflect: true,
+    thornReflectDamage: 15,
+    canvasSize: 216,
+    group: 2,
+    reward: 16,
+  },
+  luchador_ghost: {
+    id: 'luchador_ghost',
+    nameKo: '루차도르 유령',
+    nameEn: 'Luchador Ghost',
+    hp: 460,
+    speed: 120,
+    ingredient: 'avocado',
+    bodyColor: 0x9b59b6,   // 스펙트럴 퍼플
+    // 회피 메카닉: dodgeChance 확률로 피해 완전 무효화 (taco_bandit보다 5% 높음)
+    dodgeOnHit: true,
+    dodgeChance: 0.30,
+    // 도발 메카닉: tauntRadius 내 투사체 어그로를 자신으로 변경
+    tauntEnabled: true,
+    tauntRadius: 150,
+    tauntInterval: 5000,   // 5초마다 도발 발동
+    canvasSize: 252,
+    group: 2,
+    reward: 18,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -1087,6 +1123,14 @@ export const INGREDIENT_TYPES = {
     nameKo: '할라피뇨',
     color: 0x27ae60,           // 선명한 초록
     icon: 'assets/ingredients/jalapeno.png',
+  },
+  // ── Phase 34-2 신규 재료 (20장 칸티나 심층부) ──
+  avocado: {
+    id: 'avocado',
+    nameKo: '아보카도',
+    nameEn: 'Avocado',
+    color: 0x5d8a2e,           // 아보카도 짙은 초록
+    icon: 'assets/ingredients/avocado.png',
   },
 };
 
