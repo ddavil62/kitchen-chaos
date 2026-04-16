@@ -44,7 +44,7 @@
 | Phase 31 | 16장 — 향신료 궁전 (인도 1장) | ✅ 완료 |
 | Phase 32 | 17~18장 — 향신료 궁전 심층부 + 마하라자 최종전 (인도 2~3장) | ✅ 완료 |
 | Phase 33 | 19장 — 선인장 칸티나 (멕시칸 1장) | ✅ 완료 |
-| Phase 34 | 20장 — 칸티나 심층부 (멕시칸 2장) | 📋 계획 |
+| Phase 34 | 20장 — 칸티나 심층부 (멕시칸 2장) | ✅ 완료 |
 | Phase 35 | 21장 — 엘 디아블로 최종전 (멕시칸 3장) | 📋 계획 |
 | Phase 36 | 22장 — 슈가 드림랜드 (디저트 1장) | 📋 계획 |
 | Phase 37 | 23장 — 드림랜드 심층부 (디저트 2장) | 📋 계획 |
@@ -101,6 +101,7 @@
 | Phase 22~30 | sake, truffle, herb_bundle 등 | 23종 | sake_specter, oni_minion, wine_specter, foie_gras_knight 등 | ✅ |
 | Phase 31~32 | 커리잎, 사프란, 차이, 카다멈 | 27종 | curry_djinn, naan_golem, incense_specter, spice_elemental, masala_guide, maharaja | ✅ |
 | Phase 33 | 할라피뇨(jalapeno) | 28종 | taco_bandit, burrito_juggernaut | ✅ |
+| Phase 34 | 아보카도(avocado) | 29종 | cactus_wraith, luchador_ghost | ✅ |
 
 ### 레시피 확장 이력
 
@@ -116,6 +117,7 @@
 | Phase 22~30 | +50 | +10 | 186 | 일식/중식/양식 아크 추가분 | ✅ |
 | Phase 31~32 | +25 | +10 | 221 | 인도 아크 (커리잎/사프란/차이/카다멈 조합) | ✅ |
 | Phase 33 | +10 | +2 | 233 | 멕시칸 아크 1장 (할라피뇨 조합, 타코/나초/과카몰리 계열) | ✅ |
+| Phase 34 | +10 | +1 | 244 | 멕시칸 아크 2장 (아보카도 조합, 과카몰리/아보카도 토스트/부리토 등) | ✅ |
 
 ### 등급 분포 (현재)
 
@@ -1066,15 +1068,27 @@
 
 ---
 
-## Phase 34 — 20장 칸티나 심층부 (멕시칸 2장)
+## Phase 34 — 20장 칸티나 심층부 (멕시칸 2장) ✅ 완료
 
 > `visual_change: both` | 스크립트 + 에셋 + 스테이지
+> 완료: 2026-04-16
 
-- [ ] dialogueData.js: chapter20_intro (균열 근원지 접근), chapter20_mid (엘 디아블로의 등장), 사이드 대화 1종
-- [ ] cactus_wraith (HP ~430, 가시 반격), luchador_ghost (HP ~460, 도발+회피) — PixelLab 생성
-- [ ] 칸티나 지하 타일셋 (균열+암석), 재료 아이콘: 아보카도(avocado) 32px
-- [ ] stageData.js: 스테이지 20-1 ~ 20-5 배치
-- [ ] recipeData.js: 아보카도 조합 레시피 ~10종
+### 34-1. 대화 스크립트
+
+- [x] dialogueData.js: chapter20_intro, chapter20_mid (El Diablo 첫 등장), team_side_20 추가 — 누적 88종
+- [x] storyData.js: 트리거 4개 추가 (20-1 진입, 20-3 클리어, merchant, 19-5 클리어→ch20 해금) — 누적 89항목
+
+### 34-2. 에셋 + 코드 등록
+
+- [x] cactus_wraith: 8방향 스프라이트 + animating-377c9fa7 (8방향x8프레임), HP 430, thornReflect 메카닉
+- [x] luchador_ghost: 8방향 스프라이트 + animating-0469ac97 (8방향x8프레임), HP 460, tauntEnabled+dodgeOnHit 메카닉
+- [x] avocado: 32px 재료 아이콘 추가
+- [x] 적 누적: 48종 → 50종, 재료 누적: 28종 → 29종
+
+### 34-3. 스테이지 + 레시피
+
+- [x] stageData.js: 20-1~20-5 구현 (theme:'cactus_cantina'), 20-6 placeholder 유지
+- [x] recipeData.js: 아보카도 레시피 10종 추가 (과카몰리, 아보카도 토스트, 부리토 등) — 누적 244종
 
 ---
 
@@ -1085,7 +1099,7 @@
 - [ ] el_diablo_pepper 보스 스프라이트 (PixelLab, 64px pro)
 - [ ] dialogueData.js: chapter21_boss, chapter21_clear, 사이드 대화 1~2종
 - [ ] stageData.js: 스테이지 21-1 ~ 21-5 + 21-6 el_diablo_pepper 보스전
-- [ ] recipeData.js: 아보카도 조합 추가분 (누적 ~250종)
+- [ ] recipeData.js: 아보카도 조합 추가분 (누적 ~254종)
 - [ ] 멕시칸 아크 밸런스 점검 (19~21장 DPS 커브)
 
 ---
@@ -1235,12 +1249,12 @@
 | 32-3 | 17장 스테이지 + 레시피 | ~206 | 26 | 📋 계획 |
 | 33-1 | 에셋 + 스크립트 (spice_maharaja, chapter18) | ~206 | 26 | 📋 계획 |
 | 33-2 | 18장 스테이지 (인도 아크 완성) | ~216 | 26 | 📋 계획 |
-| 34-1 | 스크립트 (chapter19 대사) | ~216 | 26 | 📋 계획 |
-| 34-2 | 에셋 생성 (taco_bandit, burrito_juggernaut, 타일셋) | ~216 | 26 | 📋 계획 |
-| 34-3 | 19장 스테이지 + 레시피 | ~226 | 27 | 📋 계획 |
-| 35-1 | 스크립트 (chapter20 대사) | ~226 | 27 | 📋 계획 |
-| 35-2 | 에셋 생성 (cactus_wraith, luchador_ghost, 타일셋) | ~226 | 27 | 📋 계획 |
-| 35-3 | 20장 스테이지 + 레시피 | ~236 | 28 | 📋 계획 |
+| ~~34-1~~ | ~~스크립트 (chapter19 대사)~~ | 221 | 27 | ✅ 완료 |
+| ~~34-2~~ | ~~에셋 생성 (taco_bandit, burrito_juggernaut, 타일셋)~~ | 221 | 28 | ✅ 완료 |
+| ~~34-3~~ | ~~19장 스테이지 + 레시피~~ | 233 | 28 | ✅ 완료 |
+| ~~35-1~~ | ~~스크립트 (chapter20 대사)~~ | 233 | 28 | ✅ 완료 |
+| ~~35-2~~ | ~~에셋 생성 (cactus_wraith, luchador_ghost, 타일셋)~~ | 233 | 29 | ✅ 완료 |
+| ~~35-3~~ | ~~20장 스테이지 + 레시피~~ | 244 | 29 | ✅ 완료 |
 | 36-1 | 에셋 + 스크립트 (el_diablo_pepper, chapter21) | ~236 | 28 | 📋 계획 |
 | 36-2 | 21장 스테이지 (멕시칸 아크 완성) | ~246 | 28 | 📋 계획 |
 | 37-1 | 스크립트 (chapter22 대사) | ~246 | 28 | 📋 계획 |
