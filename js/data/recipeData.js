@@ -14,6 +14,7 @@
  * Phase 33-3: + 서빙 8종 + customers 전용 2종 + 버프 2종 = 233종 (19장 선인장 칸티나).
  * Phase 34-3: + 서빙 8종 + customers 전용 1종 + 버프 2종 = 244종 (20장 칸티나 심층부).
  * Phase 35-3: + 서빙 8종 + 버프 2종 = 254종 (21장 엘 디아블로 최종전).
+ * Phase 36-3: + 서빙 8종 + 버프 2종 = 264종 (22장 슈가 드림랜드).
  *
  * - starter: true인 레시피는 항상 해금 상태 (코인 불필요)
  * - gateStage: 해당 스테이지 클리어 후 상점에 출현
@@ -1258,6 +1259,54 @@ export const ALL_SERVING_RECIPES = [
     tier: 5, ingredients: { avocado: 3, jalapeno: 2, meat: 1, cheese: 1, flour: 1, tomato: 1, cilantro: 1 }, baseReward: 490, cookTime: 27000,
     unlockCost: 780, gateStage: '21-6',
   },
+
+  // ── Phase 36-3 신규 서빙 레시피 (22장 슈가 드림랜드) ──
+
+  // ★★★ 3성 (2종)
+  {
+    id: 'cacao_vanilla_latte', nameKo: '카카오 바닐라 라떼', icon: '☕', category: 'dessert',
+    tier: 3, ingredients: { cacao: 1, vanilla: 1, milk: 1 }, baseReward: 132, cookTime: 10000,
+    unlockCost: 118, gateStage: '22-1',
+  },
+  {
+    id: 'vanilla_dream_cake', nameKo: '바닐라 드림 케이크', icon: '🎂', category: 'dessert',
+    tier: 3, ingredients: { vanilla: 1, flour: 1, sugar: 1 }, baseReward: 126, cookTime: 9500,
+    unlockCost: 112, gateStage: '22-1',
+  },
+
+  // ★★★★ 4성 (3종)
+  {
+    id: 'cacao_truffle_tart', nameKo: '카카오 트러플 타르트', icon: '🍮', category: 'dessert',
+    tier: 4, ingredients: { cacao: 1, vanilla: 1, butter: 1 }, baseReward: 178, cookTime: 14000,
+    unlockCost: 226, gateStage: '22-2',
+  },
+  {
+    id: 'cotton_candy_mousse', nameKo: '솜사탕 무스', icon: '🍬', category: 'dessert',
+    tier: 4, ingredients: { vanilla: 1, sugar: 1, milk: 1, egg: 1 }, baseReward: 182, cookTime: 14500,
+    unlockCost: 232, gateStage: '22-2',
+  },
+  {
+    id: 'vanilla_sugar_parfait', nameKo: '바닐라 슈가 파르페', icon: '🍦', category: 'dessert',
+    tier: 4, ingredients: { vanilla: 1, cacao: 1, sugar: 1 }, baseReward: 175, cookTime: 13500,
+    unlockCost: 222, gateStage: '22-3',
+  },
+
+  // ★★★★★ 5성 (3종)
+  {
+    id: 'cacao_fantasy_fondant', nameKo: '카카오 판타지 퐁당', icon: '🍫', category: 'dessert',
+    tier: 5, ingredients: { cacao: 2, vanilla: 1, butter: 1 }, baseReward: 318, cookTime: 20000,
+    unlockCost: 508, gateStage: '22-3',
+  },
+  {
+    id: 'dream_candy_platter', nameKo: '드림 캔디 플래터', icon: '🍭', category: 'special',
+    tier: 5, ingredients: { cacao: 1, vanilla: 2, sugar: 1, flour: 1 }, baseReward: 328, cookTime: 20500,
+    unlockCost: 524, gateStage: '22-4',
+  },
+  {
+    id: 'sugar_dream_supreme', nameKo: '슈가 드림 수프림', icon: '👑', category: 'special',
+    tier: 5, ingredients: { cacao: 2, vanilla: 2, sugar: 1, butter: 1, milk: 1 }, baseReward: 462, cookTime: 26000,
+    unlockCost: 745, gateStage: '22-5',
+  },
 ];
 
 /**
@@ -1652,6 +1701,26 @@ export const ALL_BUFF_RECIPES = [
     effectValue: 0.50,
     duration: 2,
     unlockCost: 185, gateStage: '21-4',
+  },
+
+  // ── Phase 36-3 신규 버프 레시피 (22장 슈가 드림랜드) ──
+  {
+    id: 'vanilla_sweet_blessing', nameKo: '바닐라 달콤한 축복', icon: '🌸', category: 'buff',
+    tier: 3, ingredients: { vanilla: 2 },
+    effectDesc: '재료 드롭률 +40% + 수집 속도 +20% (2웨이브)',
+    effectType: 'buff_drop_gather',
+    effectValue: 0.40,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 98, gateStage: '22-2',
+  },
+  {
+    id: 'cacao_dark_boost', nameKo: '카카오 다크 부스트', icon: '🍫', category: 'buff',
+    tier: 4, ingredients: { cacao: 1, vanilla: 1, sugar: 1 },
+    effectDesc: '전 타워 공격력 +35% + 경화 방어 무력화 (2웨이브)',
+    effectType: 'buff_attack_piercing',
+    effectValue: 0.35,
+    duration: 2, durationUnit: 'wave',
+    unlockCost: 152, gateStage: '22-3',
   },
 ];
 
