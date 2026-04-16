@@ -14,6 +14,7 @@
  * Phase 33-2: 적 2종(taco_bandit, burrito_juggernaut), 재료 1종(jalapeno) 추가. 누적 적 37종, 재료 28종.
  * Phase 34-2: 적 2종(cactus_wraith, luchador_ghost), 재료 1종(avocado) 추가. 누적 적 39종, 재료 29종.
  * Phase 35-2: 보스 1종(el_diablo_pepper) 추가. 누적 적 51종.
+ * Phase 36-2: 적 2종(candy_soldier, cake_witch), 재료 2종(cacao, vanilla) 추가. 누적 적 53종, 재료 31종.
  */
 
 // ── 적 타입 정의 ──
@@ -755,6 +756,31 @@ export const ENEMY_TYPES = {
     ],
     canvasSize: 116,
   },
+  // ── Phase 36: 22장 슈가 드림랜드 적 2종 ──
+  candy_soldier: {
+    id: 'candy_soldier',
+    nameKo: '캔디 솔저',
+    hp: 450,
+    speed: 28,
+    isBoss: false,
+    bodyColor: 0xffb6c1,
+    damageReduction: 0.20,
+    bossReward: 0,
+    canvasSize: 0,
+  },
+  cake_witch: {
+    id: 'cake_witch',
+    nameKo: '케이크 위치',
+    hp: 500,
+    speed: 20,
+    isBoss: false,
+    bodyColor: 0xff69b4,
+    summon: true,
+    summonThreshold: 0.60,
+    summonTypes: [{ type: 'candy_soldier', count: 3 }],
+    bossReward: 0,
+    canvasSize: 0,
+  },
 };
 
 // ── 타워 타입 정의 ──
@@ -1171,6 +1197,21 @@ export const INGREDIENT_TYPES = {
     nameEn: 'Avocado',
     color: 0x5d8a2e,           // 아보카도 짙은 초록
     icon: 'assets/ingredients/avocado.png',
+  },
+  // ── Phase 36-2 신규 재료 (22장 슈가 드림랜드) ──
+  cacao: {
+    id: 'cacao',
+    nameKo: '카카오',
+    nameEn: 'Cacao',
+    color: 0x5c3317,
+    icon: 'assets/ingredients/cacao.png',
+  },
+  vanilla: {
+    id: 'vanilla',
+    nameKo: '바닐라',
+    nameEn: 'Vanilla',
+    color: 0xf5f5dc,
+    icon: 'assets/ingredients/vanilla.png',
   },
 };
 
