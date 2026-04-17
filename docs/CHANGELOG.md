@@ -1,5 +1,30 @@
 # Changelog
 
+## [Phase 47-3] 2026-04-18 -- 일반 적 41종 death 애니메이션 완료
+
+### Added
+
+- **ENEMY_DEATH_HASHES 41종 추가** (`js/managers/SpriteLoader.js`)
+  - 기존 carrot_goblin 1종 → 42종 (전 일반 적 커버)
+  - 추가된 41종: meat_ogre, octopus_mage, chili_demon, cheese_golem, flour_ghost, egg_sprite, rice_slime, fish_knight, mushroom_scout, cheese_rat, shrimp_samurai, tomato_bomber, butter_ghost, sugar_fairy, milk_phantom, sushi_ninja, tempura_monk, dumpling_warrior, mini_dumpling, wok_phantom, sake_specter, oni_minion, shadow_dragon_spawn, wok_guardian, wine_specter, foie_gras_knight, cellar_phantom, sommelier_wraith, curry_djinn, naan_golem, incense_specter, spice_elemental, masala_guide, taco_bandit, burrito_juggernaut, cactus_wraith, luchador_ghost, candy_soldier, cake_witch, macaron_knight, sugar_specter
+- **일반 적 41종 death 에셋** (`assets/enemies/{id}/animations/falling_backward-{hash}/{dir}/frame_NNN.png`)
+  - 41종 x 4방향(south/north/east/west) x 7프레임 = 1,148 PNG
+  - PixelLab falling-back-death 템플릿으로 생성, AD Mode 2 APPROVED
+- **다운로드 스크립트** (`scripts/download_death_anims_47_3.sh`): 41종 에셋 일괄 다운로드용
+
+### Notes
+
+- Phase 47 애니메이션 시스템 전체 완결: 47-1(아키텍처+파일럿) → 47-2(보스 13종) → 47-3(일반 적 41종)
+- ENEMY_DEATH_HASHES 42종 + BOSS_DEATH_HASHES 13종 = 전 적/보스 55종 death anim 커버
+- 총 death 에셋: 일반 적 1,176 PNG (42종) + 보스 364 PNG (13종) = 1,540 PNG
+- visual_change: art
+- QA: PASS (수용 기준 4/4, 에셋 1,176 PNG 무결성 확인, 코드-파일시스템 해시 100% 일치, 빌드 PASS, 회귀 없음)
+- AD Mode 2: APPROVED (1,148 PNG 구조/유효성 전 항목 통과)
+- 스펙: `.claude/specs/2026-04-17-kc-phase47-3-spec.md`
+- QA: `.claude/specs/2026-04-18-kc-phase47-3-qa.md`
+- AD Mode 1: `.claude/specs/2026-04-17-kc-phase47-3-ad1.md`
+- AD Mode 2: `.claude/specs/2026-04-18-kc-phase47-3-ad2.md`
+
 ## [Phase 47-2] 2026-04-17 -- 보스 13종 death 애니메이션 지원
 
 ### Added

@@ -211,10 +211,52 @@ const WALK_DIRS = ['south', 'south-east', 'east', 'north-east', 'north', 'north-
 /** 걷기 애니메이션 프레임 수 */
 const WALK_FRAME_COUNT = 6;
 
-// ── death 애니메이션 폴더 해시 맵 (Phase 47-1) ──
+// ── death 애니메이션 폴더 해시 맵 (Phase 47-1~47-3) ──
 // walk hash와 별도 관리. AD 모드2 승인 후 hash를 기입한다.
 const ENEMY_DEATH_HASHES = {
-  carrot_goblin: 'falling_backward-10a27983',  // Phase 47-1 파일럿 (PixelLab falling-back-death 템플릿)
+  carrot_goblin:       'falling_backward-10a27983',  // Phase 47-1 파일럿
+  // Phase 47-3: 일반 적 41종
+  meat_ogre:           'falling_backward-1dcb3925',
+  octopus_mage:        'falling_backward-a5626f46',
+  chili_demon:         'falling_backward-238579d1',
+  cheese_golem:        'falling_backward-f870b6a3',
+  flour_ghost:         'falling_backward-8e782eea',
+  egg_sprite:          'falling_backward-01e1a20f',
+  rice_slime:          'falling_backward-b01cd02f',
+  fish_knight:         'falling_backward-070b26eb',
+  mushroom_scout:      'falling_backward-3144afe7',
+  cheese_rat:          'falling_backward-ebbb6c57',
+  shrimp_samurai:      'falling_backward-bec5dc6a',
+  tomato_bomber:       'falling_backward-b04b417e',
+  butter_ghost:        'falling_backward-1199988e',
+  sugar_fairy:         'falling_backward-cd70b305',
+  milk_phantom:        'falling_backward-5cfc354e',
+  sushi_ninja:         'falling_backward-036fb035',
+  tempura_monk:        'falling_backward-ea0f855c',
+  dumpling_warrior:    'falling_backward-5adb5411',
+  mini_dumpling:       'falling_backward-254f2d4c',
+  wok_phantom:         'falling_backward-fcb57ede',
+  sake_specter:        'falling_backward-5ec8cea7',
+  oni_minion:          'falling_backward-b07d776d',
+  shadow_dragon_spawn: 'falling_backward-ba7cab6b',
+  wok_guardian:        'falling_backward-b8766bba',
+  wine_specter:        'falling_backward-01346db3',
+  foie_gras_knight:    'falling_backward-e5db70f7',
+  cellar_phantom:      'falling_backward-90fd913d',
+  sommelier_wraith:    'falling_backward-85b3115e',
+  curry_djinn:         'falling_backward-43dd0623',
+  naan_golem:          'falling_backward-a4d544a1',
+  incense_specter:     'falling_backward-76eecf73',
+  spice_elemental:     'falling_backward-96fa0264',
+  masala_guide:        'falling_backward-a14b001f',
+  taco_bandit:         'falling_backward-894b20e3',
+  burrito_juggernaut:  'falling_backward-debe07a7',
+  cactus_wraith:       'falling_backward-0e691e8a',
+  luchador_ghost:      'falling_backward-92e75030',
+  candy_soldier:       'falling_backward-f539198c',
+  cake_witch:          'falling_backward-247afbee',
+  macaron_knight:      'falling_backward-013fd96c',
+  sugar_specter:       'falling_backward-129e3534',
 };
 
 /** death 방향 목록 (4방향 기본, PixelLab 생성 결과에 따라 8방향으로 확장 가능) */
