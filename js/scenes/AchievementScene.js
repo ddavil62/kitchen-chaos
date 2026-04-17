@@ -113,7 +113,7 @@ export class AchievementScene extends Phaser.Scene {
       const x = 5 + i * tabW;
       const w = tabW - 2;
 
-      const bg = this.add.rectangle(x + w / 2, TAB_Y, w, 28, 0x333333)
+      const bg = this.add.rectangle(x + w / 2, TAB_Y, w, 36, 0x333333)
         .setInteractive({ useHandCursor: true });
       const txt = this.add.text(x + w / 2, TAB_Y, cat.labelKo, {
         fontSize: '11px', fontStyle: 'bold', color: '#aaaaaa',

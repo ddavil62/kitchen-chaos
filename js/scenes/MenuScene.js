@@ -145,12 +145,12 @@ export class MenuScene extends Phaser.Scene {
     achieveBtn.on('pointerover', () => achieveBtn.setFillStyle(0xaa8800));
     achieveBtn.on('pointerout', () => achieveBtn.setFillStyle(0x886600));
 
-    // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570) ──
+    // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570 -> 578) ──
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x444444;
-    const endlessBtn = this.add.rectangle(GAME_WIDTH / 2, 570, 180, 40, endlessColor)
+    const endlessBtn = this.add.rectangle(GAME_WIDTH / 2, 578, 180, 40, endlessColor)
       .setInteractive({ useHandCursor: isEndlessUnlocked });
 
     const endlessLabel = isEndlessUnlocked
@@ -158,7 +158,7 @@ export class MenuScene extends Phaser.Scene {
       : '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (6-3 \uD074\uB9AC\uC5B4 \uD544\uC694)';
     const endlessLabelColor = isEndlessUnlocked ? '#cc88ff' : '#666666';
 
-    this.add.text(GAME_WIDTH / 2, 570, endlessLabel, {
+    this.add.text(GAME_WIDTH / 2, 578, endlessLabel, {
       fontSize: '14px', fontStyle: 'bold', color: endlessLabelColor,
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -174,29 +174,29 @@ export class MenuScene extends Phaser.Scene {
       endlessBtn.on('pointerout', () => endlessBtn.setFillStyle(0x6622cc));
     }
 
-    // 엔드리스 베스트 기록 표시 (Phase 42: y 574 -> 593)
+    // 엔드리스 베스트 기록 표시 (Phase 42: y 574 -> 593 -> 602)
     if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
-      this.add.text(GAME_WIDTH / 2, 593, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
+      this.add.text(GAME_WIDTH / 2, 602, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
         fontSize: '11px', color: '#aa88cc',
       }).setOrigin(0.5);
     }
 
-    // 평판 + 수집률 (Phase 42: y 598 -> 610)
+    // 평판 + 수집률 (Phase 42: y 598 -> 610 -> 618)
     const { current, max } = SaveManager.getTotalStars();
     const { unlocked, total, percent } = RecipeManager.getCollectionProgress();
-    this.add.text(GAME_WIDTH / 2, 610, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
+    this.add.text(GAME_WIDTH / 2, 618, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
       fontSize: '12px', color: '#aaaaaa',
     }).setOrigin(0.5);
 
-    // 하단 설명 (Phase 42: y 614 -> 624)
-    this.add.text(GAME_WIDTH / 2, 624, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
+    // 하단 설명 (Phase 42: y 614 -> 624 -> 629)
+    this.add.text(GAME_WIDTH / 2, 629, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
       fontSize: '12px',
       color: '#777777',
       align: 'center',
     }).setOrigin(0.5);
 
-    // ── 버전 표기 (Phase 42: y 632 -> 636) ──
-    this.add.text(GAME_WIDTH / 2, 636, `v${APP_VERSION}`, {
+    // ── 버전 표기 (Phase 42: y 632 -> 636 -> 634) ──
+    this.add.text(GAME_WIDTH / 2, 634, `v${APP_VERSION}`, {
       fontSize: '10px',
       color: '#555555',
     }).setOrigin(0.5);
