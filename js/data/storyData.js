@@ -25,6 +25,7 @@
  *   chapter24_ending, team_side_24, team_side_24b, 24-6 currentChapter=25 설정).
  *   stage_first_clear 제외 목록 갱신 (24-1, 24-3, 24-6 추가).
  * Phase 40-3: 22-6 트리거 이동 (22-5 currentChapter 23 설정 → 22-6으로 교체).
+ * Phase 41: 23-6 트리거 이동 (23-5 currentChapter 24 설정 → 23-6으로 교체).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -1234,15 +1235,14 @@ export const STORY_TRIGGERS = [
       !save.seenDialogues?.includes('team_side_23'),
   },
 
-  // 23-5 첫 클리어 시 currentChapter = 24 설정 (24장 해금)
-  // 주의: 23-6 보스전은 Phase 38에서 구현 예정. 현재는 23-5 클리어로 24장 unlocking 처리.
-  // Phase 38에서 이 트리거는 23-6으로 이동될 예정.
+  // 23-6 첫 클리어 시 currentChapter = 24 설정 (24장 해금)
+  // Phase 41: 23-6 여왕의 호위대 구현으로 트리거를 23-5에서 23-6으로 이동.
   {
     triggerPoint: 'result_clear',
     dialogueId: null,
     once: true,
     condition: (ctx) =>
-      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '23-5',
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '23-6',
     delay: 0,
     onComplete: () => {
       const data = SaveManager.load();
