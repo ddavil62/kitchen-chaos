@@ -149,6 +149,8 @@ export class GatheringScene extends Phaser.Scene {
     this.events.on('dragon_fire_breath', this._onDragonFireBreath, this);
     // Phase 38-1: 3페이즈 보스 페이즈 전환 이벤트 (queen_of_taste)
     this.events.on('boss_phase_changed', this._onBossPhaseChanged, this);
+    // Phase 46: 돌진 충격 이벤트 (burrito_juggernaut)
+    this.events.on('enemy_charge_impact', this._onEnemyChargeImpact, this);
     /** @type {Array<{gfx: Phaser.GameObjects.Graphics, x: number, y: number, radius: number, debuffDuration: number, timer: Phaser.Time.TimerEvent}>} */
     this._fireZones = [];
 
@@ -1240,6 +1242,42 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
+   * 적 돌진 충격 이벤트 처리.
+   * burrito_juggernaut의 돌진 발동 시 반경 내 배치 도구에 VFX + 경고 표시.
+   * Tower에 HP 시스템 없음 -- 시각적 피드백만 제공 (Phase 46).
+   * @param {{ x: number, y: number, radius: number, damageRatio: number }} data
+   * @private
+   */
+  _onEnemyChargeImpact(data) {
+    const { x, y, radius } = data;
+    // 범위 내 타워 탐색
+    this.towers.getChildren().forEach(tower => {
+      if (!tower.active) return;
+      const dx = tower.x - x;
+      const dy = tower.y - y;
+      if (Math.sqrt(dx * dx + dy * dy) <= radius) {
+        // VFX: 충격 플래시 (알파 깜빡임)
+        this.tweens.add({
+          targets: tower, alpha: 0.3,
+          duration: 100, yoyo: true, repeat: 1,
+        });
+        // 플로팅 텍스트: 돌진 경고
+        const popup = this.add.text(tower.x, tower.y - 16, '돌진!', {
+          fontSize: '11px', color: '#ff4400', fontStyle: 'bold',
+          stroke: '#000000', strokeThickness: 2,
+        }).setOrigin(0.5).setDepth(115);
+        this.tweens.add({
+          targets: popup, y: popup.y - 25, alpha: 0,
+          duration: 800,
+          onComplete: () => popup.destroy(),
+        });
+      }
+    });
+    // 화면 흔들림 (경미)
+    this.vfx?.screenShake?.(3, 150);
+  }
+
+  /**
    * 적 분열 이벤트 - 죽은 위치에서 소형 분열체 생성.
    * @param {{ type: string, x: number, y: number, hp: number, waypointIndex: number }} data
    */
@@ -2141,6 +2179,7 @@ export class GatheringScene extends Phaser.Scene {
     this.events.off('enemy_fire_zone', this._onEnemyFireZone, this);
     this.events.off('dragon_fire_breath', this._onDragonFireBreath, this);
     this.events.off('boss_phase_changed', this._onBossPhaseChanged, this);
+    this.events.off('enemy_charge_impact', this._onEnemyChargeImpact, this);  // Phase 46
     if (this._fireZones) {
       this._fireZones.forEach(zone => {
         zone.gfx?.destroy();

@@ -1,0 +1,15 @@
+{
+  "character": {
+    "id": "unknown",
+    "name": "queen_of_taste",
+    "prompt": "",
+    "size": {
+      "width": 136,
+      "height": 136
+    },
+    "directions": 8,
+    "view": "low top-down"
+  },
+  "export_version": "2.0",
+  "export_date": "2026-04-17"
+}

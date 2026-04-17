@@ -26,5 +26,16 @@
         "south-west"
       ]
     }
+  },
+  "character": {
+    "id": "incense_specter",
+    "name": "incense_specter",
+    "prompt": "",
+    "size": {
+      "width": 92,
+      "height": 92
+    },
+    "directions": 8,
+    "view": "low top-down"
   }
 }
