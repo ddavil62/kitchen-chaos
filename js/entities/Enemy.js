@@ -444,13 +444,17 @@ export class Enemy extends Phaser.GameObjects.Container {
         if (this._summonTimer >= this.data_.summonInterval) {
           this._summonTimer = 0;
           // Fix #4: summonTypes 배열(queen_of_taste) vs summonType 단일 문자열(구 보스) 분기
+          // Fix #5: entry.count 반영 — 타입당 count만큼 반복 소환 (Phase 39-1)
           if (this.data_.summonTypes?.length) {
             for (const entry of this.data_.summonTypes) {
-              this.scene.events.emit('boss_summon', {
-                type: entry.type,
-                x: this.x + Phaser.Math.Between(-20, 20),
-                y: this.y + Phaser.Math.Between(-10, 10),
-              });
+              const spawnCount = entry.count || 1;
+              for (let i = 0; i < spawnCount; i++) {
+                this.scene.events.emit('boss_summon', {
+                  type: entry.type,
+                  x: this.x + Phaser.Math.Between(-24, 24),
+                  y: this.y + Phaser.Math.Between(-12, 12),
+                });
+              }
             }
           } else {
             this.scene.events.emit('boss_summon', {
