@@ -194,7 +194,7 @@ const WALK_FRAME_COUNT = 6;
 // ── death 애니메이션 폴더 해시 맵 (Phase 47-1) ──
 // walk hash와 별도 관리. AD 모드2 승인 후 hash를 기입한다.
 const ENEMY_DEATH_HASHES = {
-  // carrot_goblin: 'dying-XXXXXXXX',  // Phase 47-1 파일럿 — PixelLab 생성 완료 후 hash 기입
+  carrot_goblin: 'falling_backward-10a27983',  // Phase 47-1 파일럿 (PixelLab falling-back-death 템플릿)
 };
 
 /** death 방향 목록 (4방향 기본, PixelLab 생성 결과에 따라 8방향으로 확장 가능) */
@@ -206,8 +206,8 @@ const DEATH_DIR_FALLBACK = {
   'north-east': 'north',
   'north-west': 'north',
 };
-/** death 애니메이션 프레임 수 (PixelLab 기본값) */
-const DEATH_FRAME_COUNT = 6;
+/** death 애니메이션 프레임 수 (falling-back-death 템플릿 기준 7프레임) */
+const DEATH_FRAME_COUNT = 7;
 
 // ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가, Phase 27-1: andre, Phase 32-4: arjun 추가) ──
 const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'masala_guide'];
