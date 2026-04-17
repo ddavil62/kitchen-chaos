@@ -14,6 +14,7 @@
  * Phase 32-3: 원소 저항(elementalResistance) + 혼란 디버프(confuseOnHit) 메카닉.
  * Phase 33-3: 회피(dodgeOnHit) + 돌진(chargeEnabled) 메카닉.
  * Phase 34-2: 가시 반격(thornReflect) + 도발(tauntEnabled) 메카닉 추가.
+ * Phase 38-1: 마법 저항(magicResistance), 일반 피해 감소(damageReduction), splitOnDeath, phaseTransitions, summonTypes 메카닉 추가.
  */
 
 import Phaser from 'phaser';
@@ -144,6 +145,18 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._phaseTransitioned = { 2: false, 3: false };
     }
 
+    // ── Phase 38-1: phaseTransitions (queen_of_taste 3페이즈 전환) ──
+    // phaseTransitions 배열: [{ hpThreshold, phase, speedBonus, tintColor, spriteId }]
+    if (enemyData.phaseTransitions) {
+      this._nextPhaseIdx = 0;  // 다음에 확인할 phaseTransitions 인덱스 (정렬: 높은→낮은 HP 순)
+    }
+
+    // ── Phase 38-1: summonTypes 배열 1회 소환 (el_diablo_pepper, queen_of_taste) ──
+    // summon: true, summonThreshold: 0.N, summonTypes: [{ type, count }] 조합 처리
+    if (enemyData.summon && enemyData.summonTypes) {
+      this._summonTypesFired = false;
+    }
+
     // ── Phase 22-1: 전령 소환 (oni_herald) ──
     if (enemyData.heraldSummon) {
       this._heraldSummonTimer = 0;
@@ -231,11 +244,24 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // HP 바 (스프라이트/도형 공통)
     const hpBarY = isBoss ? -30 : (isMidBoss ? -26 : -22);
-    this.hpBarBg = this.scene.add.rectangle(0, hpBarY, 26, 3, 0x333333);
+    const hpBarW = isBoss ? 40 : 26;  // Phase 38-1: 보스 체력바 너비 확대
+    const hpBarH = isBoss ? 5 : 3;    // Phase 38-1: 보스 체력바 높이 확대
+    this.hpBarBg = this.scene.add.rectangle(0, hpBarY, hpBarW, hpBarH, 0x333333);
     this.add(this.hpBarBg);
-    this.hpBar = this.scene.add.rectangle(-13, hpBarY, 26, 3, 0x44ff44);
+    this.hpBar = this.scene.add.rectangle(-hpBarW / 2, hpBarY, hpBarW, hpBarH, 0x44ff44);
     this.hpBar.setOrigin(0, 0.5);
     this.add(this.hpBar);
+    this._hpBarW = hpBarW;  // takeDamage에서 참조
+
+    // Phase 38-1: 3페이즈 보스 체력바 구분선 (66%/33% 위치에 흰색 세로선)
+    if (isBoss && data.phaseTransitions) {
+      for (const t of data.phaseTransitions) {
+        const lineX = (t.hpThreshold - 1) * hpBarW + hpBarW / 2;  // 비율 → px 위치
+        const marker = this.scene.add.rectangle(lineX, hpBarY, 1, hpBarH + 2, 0xffffff);
+        marker.setOrigin(0.5, 0.5);
+        this.add(marker);
+      }
+    }
 
     // 신선도 바
     const freshBarY = hpBarY - 5;
@@ -410,20 +436,44 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // ── 보스 소환 ──
     if (this.data_.isBoss && this.data_.summonInterval) {
-      this._summonTimer += delta;
-      if (this._summonTimer >= this.data_.summonInterval) {
-        this._summonTimer = 0;
-        this.scene.events.emit('boss_summon', {
-          type: this.data_.summonType,
-          x: this.x, y: this.y,
-        });
+      // Fix #4: summonThreshold 이하일 때만 주기적 소환 타이머 작동 (queen_of_taste 등)
+      const summonGate = !this.data_.summonThreshold ||
+        (this.hp / this.maxHp <= this.data_.summonThreshold);
+      if (summonGate) {
+        this._summonTimer += delta;
+        if (this._summonTimer >= this.data_.summonInterval) {
+          this._summonTimer = 0;
+          // Fix #4: summonTypes 배열(queen_of_taste) vs summonType 단일 문자열(구 보스) 분기
+          if (this.data_.summonTypes?.length) {
+            for (const entry of this.data_.summonTypes) {
+              this.scene.events.emit('boss_summon', {
+                type: entry.type,
+                x: this.x + Phaser.Math.Between(-20, 20),
+                y: this.y + Phaser.Math.Between(-10, 10),
+              });
+            }
+          } else {
+            this.scene.events.emit('boss_summon', {
+              type: this.data_.summonType,
+              x: this.x, y: this.y,
+            });
+          }
+        }
       }
-      // 격노 (HP 임계 이하 → 속도 2배)
+      // Fix #3: 분노 (HP 임계 이하 → 속도 증가)
+      // - enrageSpeedBonus 있으면 고정 가산 (queen_of_taste: +25), 없으면 x2 (구 보스)
+      // - phaseTransitions 보스는 틴트를 phaseTransitions에서 관리하므로 여기서는 생략
       if (!this._enraged && this.data_.enrageHpThreshold &&
           this.hp / this.maxHp <= this.data_.enrageHpThreshold) {
         this._enraged = true;
-        this.speed = this.data_.speed * 2;
-        this.setTint(0xff4444);
+        if (this.data_.enrageSpeedBonus !== undefined) {
+          this.speed = this.data_.speed + this.data_.enrageSpeedBonus;
+        } else {
+          this.speed = this.data_.speed * 2;
+        }
+        if (!this.data_.phaseTransitions) {
+          this.setTint(0xff4444);
+        }
       }
       // 보스 디버프 (dragon_ramen: HP 40% 이하 시 1회 전체 타워 공격속도 감소)
       if (!this._bossDebuffFired && this.data_.bossDebuff &&
@@ -788,6 +838,11 @@ export class Enemy extends Phaser.GameObjects.Container {
       this.scene.vfx.screenFlash(0xff4400, 200);
     }
 
+    // Phase 38-1: phaseTransitions를 사용하는 보스(queen_of_taste)는
+    // 스프라이트/속도/틴트를 phaseTransitions에서 관리하므로 dragon_wok 전용 효과를 스킵.
+    // 단, this._phase 업데이트는 이미 완료되어 _updateFireBreath는 올바른 페이즈 사용.
+    if (this.data_.phaseTransitions) return;
+
     if (phase === 2) {
       // 페이즈 2: 속도 +15%, mini_dumpling 3마리 1회 소환
       this.speed = this.data_.speed * 1.15;
@@ -1009,14 +1064,64 @@ export class Enemy extends Phaser.GameObjects.Container {
     }
 
     const ratio = Math.max(0, this.hp / this.maxHp);
-    this.hpBar.width = 26 * ratio;
-    if (ratio < 0.4) this.hpBar.setFillStyle(0xff4444);
+    this.hpBar.width = (this._hpBarW || 26) * ratio;
+    // Phase 38-1: 체력 색상 단계 4단계 (빨강/주황/노랑/녹색)
+    if (ratio < 0.2) this.hpBar.setFillStyle(0xff4444);
+    else if (ratio < 0.4) this.hpBar.setFillStyle(0xff6600);
     else if (ratio < 0.7) this.hpBar.setFillStyle(0xffaa00);
 
     // 피격 시 투명 해제 (2초)
     if (this.isInvisible) {
       this.setAlpha(0.8);
       this.visibleTimer = 2000;
+    }
+
+    // Phase 38-1: phaseTransitions 체크 (queen_of_taste 3페이즈 전환)
+    // hpThreshold 내림차순 정렬 기준, ratio가 임계값 이하로 떨어지면 1회 발동
+    if (this.data_.phaseTransitions && this._nextPhaseIdx !== undefined) {
+      const transitions = this.data_.phaseTransitions;
+      while (this._nextPhaseIdx < transitions.length) {
+        const t = transitions[this._nextPhaseIdx];
+        if (ratio > t.hpThreshold) break;  // 아직 임계값 미도달 (정렬 전제)
+        this._nextPhaseIdx++;
+        // Fix #2: speedBonus는 기본 속도 기준 배율 (0.10 = +10%)
+        if (t.speedBonus) {
+          this.speed = this.data_.speed * (1 + t.speedBonus);
+        }
+        // 틴트 적용 (페이즈 색상)
+        if (t.tintColor) this.setTint(t.tintColor);
+        // Fix #1: spriteSuffix → 실제 스프라이트 ID 조합 (e.g. queen_of_taste + _2 → queen_of_taste_2)
+        if (t.spriteSuffix) {
+          const spriteId = `${this.data_.id}${t.spriteSuffix}`;
+          const newPrefix = `boss_${spriteId}_walk`;
+          const curDir = this._currentDir || 'south';
+          const newAnimKey = `${newPrefix}_${curDir}`;
+          if (this.scene.anims.exists(newAnimKey)) {
+            this._walkPrefix = newPrefix;
+            this._bodySprite?.play(newAnimKey, true);
+          }
+        }
+        // 페이즈 전환 카메라 셰이크 + 씬 이벤트
+        if (this.scene.cameras?.main) this.scene.cameras.main.shake(350, 0.012);
+        this.scene.events.emit('boss_phase_changed', { phase: t.phase, x: this.x, y: this.y });
+      }
+    }
+
+    // Phase 38-1: summonTypes 배열 1회 소환 (el_diablo_pepper, queen_of_taste)
+    // HP summonThreshold 이하가 되면 summonTypes 배열의 각 적 유형을 count만큼 소환 (1회)
+    if (this.data_.summon && this.data_.summonTypes && !this._summonTypesFired) {
+      if (ratio <= this.data_.summonThreshold) {
+        this._summonTypesFired = true;
+        for (const entry of this.data_.summonTypes) {
+          for (let i = 0; i < entry.count; i++) {
+            this.scene.events.emit('boss_summon', {
+              type: entry.type,
+              x: this.x + Phaser.Math.Between(-24, 24),
+              y: this.y + Phaser.Math.Between(-12, 12),
+            });
+          }
+        }
+      }
     }
 
     // Phase 20: 배리어 트리거 (tempura_monk) — HP가 임계치 이하로 떨어지면 활성화

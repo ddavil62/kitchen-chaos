@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-16 (Phase 37 완료)
+> 최종 업데이트: 2026-04-17 (Phase 38 완료)
 
 ## 프로젝트 개요
 
@@ -107,11 +107,11 @@ kitchen-chaos/
       ChefManager.js         # 셰프 선택/스킬 관리
       OrderManager.js        # 오더(미션) 시스템
     data/
-      gameData.js            # 적(55종)/도구(TOOL_DEFS)/재료(32종) 정의
-      stageData.js           # 스테이지 데이터 143슬롯 (구현: 1~7/9~13/15~23장(23-1~23-5), placeholder: 8/14/23-6~24장)
-      recipeData.js          # 레시피 274종 정의
-      dialogueData.js        # 대화 스크립트 100종 + 캐릭터 14종 정의 (시즌2 7~15장 31종, 시즌3 16~23장 포함)
-      storyData.js           # STORY_TRIGGERS 트리거 데이터 104항목 (triggerPoint 8종, import SaveManager)
+      gameData.js            # 적(57종)/도구(TOOL_DEFS)/재료(32종) 정의
+      stageData.js           # 스테이지 데이터 143슬롯 (구현: 1~7/9~13/15~24장(24-6까지), placeholder: 8/14/23-6)
+      recipeData.js          # 레시피 284종 정의
+      dialogueData.js        # 대화 스크립트 ~106종 + 캐릭터 15종 정의 (시즌2 7~15장 31종, 시즌3 16~24장 포함)
+      storyData.js           # STORY_TRIGGERS 트리거 데이터 ~111항목 (triggerPoint 8종, import SaveManager)
   assets/                    # 스프라이트/타일셋/아이콘 (PixelLab 픽셀아트)
     sprites/portraits/       # 캐릭터 초상화 6종 (64x64 PixelLab)
     sprites/chefs/           # 셰프 스프라이트 5종 (48px)
@@ -122,6 +122,7 @@ kitchen-chaos/
     sprites/bosses/dragon_wok/  # dragon_wok 보스 스프라이트 (64px, 8방향 animating-30e6c64f)
     sprites/bosses/chef_noir/   # chef_noir 보스 스프라이트 (64px pro, 8방향 animating-96100c0f, 124x124px)
     sprites/bosses/maharaja/    # maharaja 보스 스프라이트 (212px pro, 8방향 animating-2c666ada)
+    sprites/bosses/queen_of_taste/ # queen_of_taste 3페이즈 보스 스프라이트 (64px pro, 8방향 walking, 페이즈1/2/3)
     sprites/towers/          # 타워 스프라이트 8종 (32x32)
     tilesets/                # 타일셋 16종 (dream_deep, spice_palace, spice_palace_interior, cactus_cantina 포함)
     icons/                   # 재료 아이콘 32종 (cream, curry_leaf, saffron, chai, cardamom, jalapeno, avocado, cacao, vanilla 32px 포함)
@@ -141,8 +142,8 @@ kitchen-chaos/
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입 |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (다이아몬드 격자+depth sorting+홀 데코), 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 100종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 104항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 ~106종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), ~111항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v16, season3Unlocked, getTotalStars(group) |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
@@ -160,8 +161,8 @@ kitchen-chaos/
 |------|------|------|
 | 코어 TD | 아이소메트릭 그리드, 도구 배치/회수/재배치, 적 AI, 재료 드롭 | 완료 |
 | 3단계 루프 | GatheringScene(재료 채집) + ServiceScene(영업) + MerchantScene(행상인) + ResultScene | 완료 |
-| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~13/15~23장(23-1~23-5), 보스 12종, 별점 시스템 | 완료 |
-| 레시피 | 274종, 5등급, 도감 | 완료 |
+| 캠페인 | 24챕터 체계(그룹1~3), 구현 완료 1~7/9~13/15~24장(24-6까지), 보스 13종, 별점 시스템 | 완료 |
+| 레시피 | 284종, 5등급, 도감 | 완료 |
 | 셰프 시스템 | 5종 셰프(유키/라오 데이터 등록+잠금 표시, 스킬 로직 미구현), 패시브 + 액티브 스킬 (TD/영업) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
@@ -174,7 +175,7 @@ kitchen-chaos/
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
 | 도구/행상인/채집 | 영구 도구 8종, 구매/판매/업그레이드, 행상인 UI, 재료 채집 TD, 도구 도감/팝업 | 완료 |
-| 대화/스토리 | 스크립트 100종, 트리거 104항목, 선택지 분기, 초상화 6종, 14캐릭터 | 완료 |
+| 대화/스토리 | 스크립트 ~106종, 트리거 ~111항목, 선택지 분기, 초상화 6종, 15캐릭터 | 완료 |
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코, 웜 다크 팔레트) | 완료 |
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 인도 아크 (16~18장, Phase 31~32) | 적 6종+보스 1종, 재료 4종, 레시피 35종, 대화 16종, 텔레포트/자가회복/혼란/원소저항/다단계 메커닉 | 완료 |
@@ -183,16 +184,17 @@ kitchen-chaos/
 | 21장 엘 디아블로 최종전 (Phase 35) | 대화 6종, 보스 1종(el_diablo_pepper), 레시피 10종, 스테이지 21-1~21-6, fireZone/소환/분노 메커닉, 멕시칸 아크(19~21장) 완결 | 완료 |
 | 22장 슈가 드림랜드 (Phase 36) | 대화 3종, 적 2종(candy_soldier/cake_witch), 재료 2종(cacao/vanilla), 레시피 10종, 스테이지 22-1~22-5, damageReduction/summon 메커닉, 디저트 아크(22~24장) 시작 | 완료 |
 | 23장 드림랜드 심층부 (Phase 37) | 대화 3종, 적 2종(macaron_knight/sugar_specter), 재료 1종(cream), 레시피 10종, 스테이지 23-1~23-5, magicResistance/splitOnDeath 메커닉(데이터 예약) | 완료 |
+| 24장 미각의 여왕 최종전 (Phase 38) | 대화 6종, 보스 1종(queen_of_taste 3페이즈)+적 1종(sugar_specter_mini), 레시피 10종, 스테이지 24-1~24-6, magicResistance 전용 핸들러, splitOnDeath 엔진 구현, 디저트 아크(22~24장) 완결 | 완료 |
 
 ## 콘텐츠 규모
 
 | 항목 | 수량 |
 |------|------|
-| 적 | 55종 (일반 42 + 미니보스 1 + 보스 12) |
+| 적 | 57종 (일반 43 + 미니보스 1 + 보스 13) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
 | 재료 | 32종 |
-| 레시피 | 274종 |
-| 스테이지 | 143슬롯 (구현 완료: 1~7/9~13/15~23장(23-1~23-5), placeholder: 8/14/23-6~24장) |
+| 레시피 | 284종 (서빙 231 + 버프 53) |
+| 스테이지 | 143슬롯 (구현 완료: 1~7/9~13/15~24장(24-6까지), placeholder: 8/14/23-6) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
 | 세이브 버전 | v16 |
 
@@ -207,6 +209,7 @@ kitchen-chaos/
 
 ## 향후 계획
 
-- Phase 38~: 그룹3(24장) 확장. 상세: `docs/ROADMAP.md`
+- Phase 39: 챕터 16~24 밸런스 QA (54스테이지 전체 시뮬레이션)
 - Phase 28-3a: 8장 placeholder 스테이지 구현 (일식 아크 완성)
 - Phase 28-4: 14장 placeholder 스테이지 구현 (양식 아크 중간)
+- 주기적 소환 entry.count 미사용 수정 (Phase 38 잔여 이슈, LOW)

@@ -178,10 +178,10 @@ const BOSS_WALK_HASHES = {
   chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
   maharaja: 'animating-2c666ada',     // Phase 32-5 (pro 모드, 212px canvas)
   el_diablo_pepper: 'walking-acae25f3', // Phase 35-2 (pro 모드, 116px canvas)
-  // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (AD 모드2 완료 후 hash 채움)
-  queen_of_taste:   'TBD_PHASE1_HASH',    // 페이즈1 기본형
-  queen_of_taste_2: 'TBD_PHASE2_HASH',    // 페이즈2 변신형 (페이즈 전환 시 setTexture로 교체)
-  queen_of_taste_3: 'TBD_PHASE3_HASH',    // 페이즈3 분노형
+  // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (116/112/TBD px canvas)
+  queen_of_taste:   'animating-9259ac21',   // 페이즈1 기본형 (116px)
+  queen_of_taste_2: 'animating-96f74fd3',   // 페이즈2 변신형 (112px, 페이즈 전환 시 교체)
+  queen_of_taste_3: 'animating-d170c7e2',   // 페이즈3 분노형 (112px)
 };
 
 /** 걷기 애니메이션 방향 목록 */

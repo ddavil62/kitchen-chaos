@@ -146,6 +146,8 @@ export class GatheringScene extends Phaser.Scene {
     this.events.on('enemy_deterministic_split', this._onDeterministicSplit, this);
     this.events.on('enemy_fire_zone', this._onEnemyFireZone, this);
     this.events.on('dragon_fire_breath', this._onDragonFireBreath, this);
+    // Phase 38-1: 3페이즈 보스 페이즈 전환 이벤트 (queen_of_taste)
+    this.events.on('boss_phase_changed', this._onBossPhaseChanged, this);
     /** @type {Array<{gfx: Phaser.GameObjects.Graphics, x: number, y: number, radius: number, debuffDuration: number, timer: Phaser.Time.TimerEvent}>} */
     this._fireZones = [];
 
@@ -1196,6 +1198,39 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
+   * Phase 38-1: 3페이즈 보스 페이즈 전환 이벤트 처리 (queen_of_taste).
+   * 화면 중앙에 페이즈 번호를 1.5초간 표시한다.
+   * @param {{ phase: number, x: number, y: number }} data
+   */
+  _onBossPhaseChanged({ phase, x, y }) {
+    const phaseColors = { 2: 0xcc88ff, 3: 0xff6666 };
+    const phaseLabels = { 2: 'PHASE 2', 3: 'PHASE 3' };
+    const color = phaseColors[phase] || 0xffffff;
+    const label = phaseLabels[phase] || `PHASE ${phase}`;
+
+    // 화면 중앙에 페이즈 전환 텍스트 표시
+    const cam = this.cameras.main;
+    const cx = cam.scrollX + cam.width / 2;
+    const cy = cam.scrollY + cam.height / 2 - 40;
+    const txt = this.add.text(cx, cy, label, {
+      fontSize: '20px',
+      fontFamily: 'Arial',
+      color: `#${color.toString(16).padStart(6, '0')}`,
+      stroke: '#000000',
+      strokeThickness: 4,
+    }).setOrigin(0.5, 0.5).setDepth(9999);
+
+    // 1.5초 후 페이드아웃 제거
+    this.tweens.add({
+      targets: txt,
+      alpha: 0,
+      y: cy - 30,
+      duration: 1500,
+      onComplete: () => txt.destroy(),
+    });
+  }
+
+  /**
    * 적 분열 이벤트 - 죽은 위치에서 소형 분열체 생성.
    * @param {{ type: string, x: number, y: number, hp: number, waypointIndex: number }} data
    */
@@ -2093,6 +2128,7 @@ export class GatheringScene extends Phaser.Scene {
     this.events.off('enemy_deterministic_split', this._onDeterministicSplit, this);
     this.events.off('enemy_fire_zone', this._onEnemyFireZone, this);
     this.events.off('dragon_fire_breath', this._onDragonFireBreath, this);
+    this.events.off('boss_phase_changed', this._onBossPhaseChanged, this);
     if (this._fireZones) {
       this._fireZones.forEach(zone => {
         zone.gfx?.destroy();

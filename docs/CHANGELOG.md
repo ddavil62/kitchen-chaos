@@ -1,5 +1,81 @@
 # Changelog
 
+## [Phase 38] 2026-04-17 — 24장 미각의 여왕 최종전 (디저트 아크 최종, 그룹3 클라이맥스)
+
+### Added
+
+#### 38-1: 대화 + 스프라이트 + 엔진
+
+- queen_of_taste 3페이즈 보스 스프라이트 3종 (PixelLab 64px pro, 8방향 + walking 애니메이션. 페이즈1 기본형, 페이즈2 변신형, 페이즈3 분노형)
+- gameData.js 보스 1종: queen_of_taste (HP 12000, speed 15, 3페이즈 전환: HP 66% -> 페이즈2, HP 33% -> 페이즈3, fireBreath 페이즈별, summonTypes [macaron_knight x2, sugar_specter x3], enrageSpeedBonus 25, bossReward 800)
+- gameData.js 적 1종: sugar_specter_mini (HP 144, speed 96, reward 0, canvasSize 32, sugar_specter 분열 소형체)
+- 대화 6종: chapter24_boss(10라인), chapter24_mid(5라인), chapter24_final_battle(7라인), chapter24_ending(12라인), team_side_24(8라인), team_side_24b(6라인) (누적 ~106종)
+- CHARACTERS 객체에 queen_of_taste 추가 (누적 15캐릭터)
+- storyData 트리거 7건: 24-1 진입(gathering_enter) / 24-3 클리어(result_clear + chapter24_mid_seen 플래그) / 24-5 클리어(result_clear + chapter24_final_revealed 플래그) / 24-6 클리어(result_clear + chapter24_cleared + group3_cleared + group3_bestiary_unlocked 플래그 + currentChapter=25) / merchant_enter x2 (team_side_24, team_side_24b)
+- storyData stage_first_clear 제외 목록에 '24-1', '24-3', '24-6' 추가
+- Enemy.js takeDamage(): magicResistance 전용 핸들러 (MAGIC_TOWER_TYPES: grill, freezer, spice_grinder에만 마법저항 적용)
+- Enemy.js takeDamage(): damageReduction 핸들러 (magicResistance 없는 적에만 적용, 중복 감소 방지)
+- Enemy.js _die(): splitOnDeath 핸들러 (sugar_specter 사망 시 sugar_specter_mini 2마리 스폰, enemy_deterministic_split 이벤트)
+- GatheringScene.js _onDeterministicSplit(): hpOverride, speedMultiplier, rewardOverride 파라미터 지원
+
+#### 38-2: stageData + 레시피
+
+- 스테이지 24-1~24-6 구현 (24-1 역Z자형, 24-2 S자형, 24-3 역S자형, 24-4 나선형, 24-5 복합형 최고밀도, 24-6 queen_of_taste 3페이즈 보스전)
+- 24-6 보스전 구조: 웨이브 1-2 사전 군중전 + 웨이브 3 queen_of_taste 단독 등장 + 웨이브 4-5 소환적과 함께 지속
+- 서빙 레시피 8종: royal_cream_tart(3성), golden_cacao_dome/triple_dream_eclairs/cream_vanilla_royale(4성), cacao_velvet_crown/queens_final_soufflee/taste_queens_triumph/dream_arc_finale(5성)
+- 버프 레시피 2종: queens_mirage_elixir(4성), dream_arc_blessing(5성)
+- 누적 레시피: 서빙 231 + 버프 53 = 284종
+
+### Changed
+
+- SpriteLoader.js BOSS_IDS에 queen_of_taste 추가 (13종)
+- SpriteLoader.js BOSS_WALK_HASHES에 queen_of_taste/queen_of_taste_2/queen_of_taste_3 해시 등록
+- SpriteLoader.js _loadBosses(), _loadBossWalkFrames(), registerWalkAnimations()에 페이즈 2/3 별도 로딩/등록 코드 추가
+- gameData.js macaron_knight: damageReduction 0.60 fallback 제거 (magicResistance 전용 핸들러로 대체)
+- Enemy.js: phaseTransitions 보스(queen_of_taste)는 enrage 빨간 틴트 생략, 금색 틴트 유지 (`!this.data_.phaseTransitions` 조건)
+- Enemy.js: spriteSuffix 참조로 페이즈별 walkPrefix 조합 (`boss_${id}${t.spriteSuffix}_walk`)
+- Enemy.js: speedBonus 승산 적용 (`this.data_.speed * (1 + t.speedBonus)`)
+- Enemy.js: summonTypes 배열 순회 처리 (배열 없으면 summonType singular fallback)
+- Enemy.js: enrageSpeedBonus !== undefined 분기 추가 (절대값 가산: queen_of_taste 40, maharaja 55, el_diablo_pepper 60)
+
+### Fixed (QA Fix #1~#4)
+
+- Fix #1: spriteSuffix 필드명 불일치 수정 (`t.spriteId` -> `t.spriteSuffix` 참조)
+- Fix #2: speedBonus 연산 방식 수정 (가산 -> 승산, `this.data_.speed * (1 + t.speedBonus)`)
+- Fix #3: enrage 틴트와 phaseTransitions 틴트 충돌 수정 (phaseTransitions 보스는 빨간 틴트 생략)
+- Fix #4: summonTypes 배열 처리 수정 (`summonTypes?.length` 분기로 배열 순회 소환)
+
+### Notes
+
+- buff effectType 대체: queens_mirage_elixir의 `buff_attack_range`와 dream_arc_blessing의 `buff_ultimate`는 엔진 미지원으로 `buff_both`로 대체. 주석에 원래 의도 명기.
+- 24-6 bossStage/bossType 필드는 GatheringScene에서 참조하지 않는 무해한 메타데이터. 기존 보스전(21-6)에는 이 필드 없음.
+- 23-6 placeholder는 미변경 (Phase 38 범위 외).
+- queen_of_taste phaseTransitions: HP 66% -> 페이즈2(spriteSuffix '_2', speedBonus 0.10, 틴트 0xffccee), HP 33% -> 페이즈3(spriteSuffix '_3', 틴트 0xffd700)
+- enrage: HP 33% 이하에서 speed = 15 + 25 = 40. phaseTransitions와 enrage가 동일 HP 임계값(0.33)에서 동시 발동.
+- sugar_specter splitOnDeath: count 2, hpRatio 0.30 (HP 144 = 480 * 0.30), speedMultiplier 1.20 (speed 96 = 80 * 1.20), reward 0
+- macaron_knight magicResistance 0.60: grill/freezer/spice_grinder 타워만 60% 감소, pan/salt/delivery/soup_pot/wasabi_cannon은 감소 없음
+- 잔여 이슈(LOW): 주기적 소환에서 entry.count를 무시하고 타입당 1마리만 소환. 1회성 소환은 count 정상 사용. Phase 39에서 처리 예정.
+- Phaser "Failed to process file" 콘솔 경고는 Phase 37 이후 지속되는 pre-existing 이슈.
+- 생성자 L149 주석의 `spriteId` 언급은 stale comment (기능 무영향).
+
+### QA 결과
+
+- **판정**: PASS (재검증, Fix #1~#4 적용 후)
+- 테스트: Playwright 8개 + Node.js 검증 1개 = 총 9개 전체 통과
+- 시각적 검증: 스크린샷 4장 (메인 화면, 5초 후, 모바일 360x640, 소형 320x568) 모두 PASS
+- 레시피 누적: ALL_SERVING_RECIPES(231) + ALL_BUFF_RECIPES(53) = 284종 (Node.js 검증)
+- queen_of_taste: HP=12000, speed=15, isBoss=true, phaseTransitions 2단계 정상 (Node.js 검증)
+- sugar_specter_mini: HP=144, speed=96, reward=0 (Node.js 검증)
+
+### 참고
+
+- 스펙(38-1): `.claude/specs/2026-04-17-kc-phase38-1-spec.md`
+- 스펙(38-2): `.claude/specs/2026-04-17-kc-phase38-2-spec.md`
+- 리포트(38-1): `.claude/specs/2026-04-17-kc-phase38-1-report.md`
+- 리포트(38-2): `.claude/specs/2026-04-17-kc-phase38-2-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase38-qa.md`
+- Phase 38 기획서: `.claude/specs/2026-04-17-kc-phase38-scope.md`
+
 ## [Phase 37] 2026-04-16 — 23장 드림랜드 심층부 (디저트 아크 2장)
 
 ### Added
