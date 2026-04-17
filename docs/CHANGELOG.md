@@ -1,5 +1,77 @@
 # Changelog
 
+## [Phase 43] 2026-04-17 — 잔여 콘텐츠 구현 (8장/14장 스테이지 + 유키/라오 패시브)
+
+### Added
+
+- 8-1~8-6 스테이지 구현 (theme: `izakaya_deep_entry`, 이자카야 지하 진입로)
+  - 8-1 지하 통로 진입 ~ 8-5 비밀 연회장: 5웨이브 sake_specter/oni_minion 점진적 도입
+  - 8-6 오니의 방 (보스): oni_herald W5 등장, isBossBattle: true
+  - 서비스 스케일: duration 245~285, customerInterval 3.4~2.5, maxCustomers 36~47
+- 14-1~14-6 스테이지 구현 (theme: `bistro_underground`, 비스트로 지하 창고)
+  - 14-1 지하 와인 창고 ~ 14-5 소믈리에의 서재: cellar_phantom/sommelier_wraith 점진적 도입
+  - 14-6 셰프 누아르 전초기지 (보스): chef_noir W1 등장, isBossBattle: true, 3웨이브
+  - 서비스 스케일: duration 328~365, customerInterval 2.6~2.1, maxCustomers 53~63
+- ChefManager: `getHighStarRewardBonus()` 정적 메서드 (yuki_chef: 1.15, 그 외: 1.0)
+- ChefManager: `getDropRateBonus()` 정적 메서드 (lao_chef: 0.10, 그 외: 0.0)
+- gameData.js: cellar_phantom(HP 400, splitOnDeath), sommelier_wraith(HP 380, wineDebuff), chef_noir(HP 9000, isBoss+summon+enrage) ENEMY_TYPES 정식 등록
+
+### Changed
+
+- ServiceScene `_serveToCustomer()`: 유키 패시브 적용 -- recipe.tier >= 3 조건으로 highStarBonus (x1.15) 곱셈 추가
+- IngredientManager `_onEnemyDied()`: 라오 패시브 적용 -- 10% 확률로 드롭 count +1 (ChefManager.getDropRateBonus())
+- stageData.js: 8-1~8-6, 14-1~14-6 placeholder를 완성 데이터로 교체. 전 24장 placeholder 0개 달성
+
+### Notes
+
+- 스펙에서 `recipe.rarity >= 3` 기준이었으나 실제 데이터 구조에 맞게 `recipe.tier >= 3`으로 구현 변경
+- cellar_phantom/sommelier_wraith/chef_noir ENEMY_TYPES 등록은 스펙에서 Coder 선행 확인 후 필요 시 추가하라는 지시에 따라 구현됨
+- Playwright 25/25 PASS (재검증), 빌드 PASS (Vite 6.4.2, 54 modules)
+- visual_change: none
+- 스펙: `.claude/specs/2026-04-17-kc-phase43-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase43-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase43-qa.md`
+
+## [Phase 42] 2026-04-17 — 업적 시스템
+
+### Added
+
+- `js/data/achievementData.js` (신규): 30개 업적 정의 (ACHIEVEMENTS 배열 + ACHIEVEMENT_CATEGORIES + getByCategory 헬퍼)
+  - 스토리 10개: story_first_clear ~ story_all_stages (stage_cleared/chapter_cleared/three_star_count)
+  - 전투 8개: battle_first_kill ~ battle_full_deploy (enemy_total_killed/boss_killed/tool_count_placed)
+  - 수집 5개: collect_10recipes ~ collect_all_recipes (recipe_unlocked, 최대 284종)
+  - 경제 5개: econ_gold1000 ~ econ_max_interior (total_gold_earned/staff_hired/interior_maxed)
+  - 엔드리스 2개: endless_wave20, endless_wave50 (endless_wave)
+- `js/managers/AchievementManager.js` (신규): 정적 클래스 -- check(), increment(), getProgress(), _evaluate(), _unlock(), _getCurrentValue(), 헬퍼 4종
+  - _unlock()은 해금 기록+세이브+토스트만 수행 (보상 지급은 AchievementScene._claimReward()에서만 실행)
+- `js/scenes/AchievementScene.js` (신규): 5 카테고리 탭 + 스크롤 카드 목록 UI, 진행률 바, 수령 버튼, 잔액 표시
+- VFXManager: `achievementToast(scene, nameKo)` 정적 메서드 추가 (depth 2500, scaleX 등장, 1.5s 후 fadeOut)
+- SaveManager v16 -> v17 마이그레이션: achievements 필드 (unlocked/claimed/progress) 추가, getAchievements()/markAchievementClaimed() 메서드
+- MenuScene: 업적 버튼(y=534) 추가, 기존 요소 Y좌표 재배치 (도감 496/엔드리스 570/기록 593/평판 610/설명 624/버전 636)
+- main.js: AchievementScene 씬 등록
+
+### Changed
+
+- GatheringScene `_onEnemyDied`: enemy_total_killed/boss_killed increment+check, `_triggerVictory`에 tool_count_placed check
+- ServiceScene `_endService`: total_gold_earned increment+check, staff_hired/interior_maxed check
+- ResultScene: 캠페인 클리어 시 stage_cleared/chapter_cleared/three_star_count/recipe_unlocked check, 엔드리스 결과에 endless_wave/endless_score check
+
+### Fixed
+
+- BUG-01 (이중 보상): `_unlock()`에서 coin/gold 보상 지급 코드 제거 -- 보상은 AchievementScene._claimReward()에서만 1회 지급
+- BUG-02 (골드 손실): `_unlock()`에서 ToolManager.addGold() 호출 제거로 stale data 덮어쓰기 경로 소멸
+
+### Notes
+
+- 세이브 버전: v16 -> v17 (achievements 필드 추가)
+- QA 초회 FAIL (BUG-01/BUG-02) -> 수정 후 재검증 PASS (8/8 수용 기준 충족)
+- Playwright 32/32 PASS, 빌드 PASS (Vite 6.4.2, 54 modules)
+- visual_change: ui -- AD 모드 3 검수 완료
+- LOW 잔여: ToolManager dead import, _unlock() JSDoc 미갱신, endless_score 조건 유형 미사용 (dead code)
+- 스펙: `.claude/specs/2026-04-17-kc-phase42-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase42-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase42-qa.md`
+
 ## [Phase 41] 2026-04-17 — 23-6 여왕의 호위대 구현 (그룹3 placeholder 완전 해소)
 
 ### Added

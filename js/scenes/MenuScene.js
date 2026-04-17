@@ -174,28 +174,21 @@ export class MenuScene extends Phaser.Scene {
       endlessBtn.on('pointerout', () => endlessBtn.setFillStyle(0x6622cc));
     }
 
-    // 엔드리스 베스트 기록 표시 (Phase 42: y 574 -> 593 -> 602)
+    // 엔드리스 베스트 기록 표시 (Phase 42: y 574 -> 593 -> 602 -> 607)
     if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
-      this.add.text(GAME_WIDTH / 2, 602, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
+      this.add.text(GAME_WIDTH / 2, 607, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
         fontSize: '11px', color: '#aa88cc',
       }).setOrigin(0.5);
     }
 
-    // 평판 + 수집률 (Phase 42: y 598 -> 610 -> 618)
+    // 평판 + 수집률 (Phase 42: y 598 -> 610 -> 618 -> 620)
     const { current, max } = SaveManager.getTotalStars();
     const { unlocked, total, percent } = RecipeManager.getCollectionProgress();
-    this.add.text(GAME_WIDTH / 2, 618, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
+    this.add.text(GAME_WIDTH / 2, 620, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
       fontSize: '12px', color: '#aaaaaa',
     }).setOrigin(0.5);
 
-    // 하단 설명 (Phase 42: y 614 -> 624 -> 629)
-    this.add.text(GAME_WIDTH / 2, 629, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
-      fontSize: '12px',
-      color: '#777777',
-      align: 'center',
-    }).setOrigin(0.5);
-
-    // ── 버전 표기 (Phase 42: y 632 -> 636 -> 634) ──
+    // ── 버전 표기 (Phase 42: y 632 -> 636 -> 634 -> 632 -> 634) ──
     this.add.text(GAME_WIDTH / 2, 634, `v${APP_VERSION}`, {
       fontSize: '10px',
       color: '#555555',

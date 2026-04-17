@@ -1,6 +1,6 @@
 /**
  * @fileoverview 업적 매니저.
- * Phase 42: 업적 해금 조건 판정, 진행도 추적, 보상 지급, 토스트 알림 발행.
+ * Phase 42: 업적 해금 조건 판정, 진행도 추적, 토스트 알림 발행. 보상은 AchievementScene에서 수령 시 지급.
  *
  * StoryManager 패턴을 답습한 정적 클래스.
  * 씬 생명주기와 독립적으로 동작하며 SaveManager만 참조한다.
@@ -8,7 +8,6 @@
 
 import { ACHIEVEMENTS } from '../data/achievementData.js';
 import { SaveManager } from './SaveManager.js';
-import { ToolManager } from './ToolManager.js';
 import { VFXManager } from './VFXManager.js';
 
 export class AchievementManager {
@@ -156,7 +155,7 @@ export class AchievementManager {
   }
 
   /**
-   * 업적 해금 처리 + 보상 지급 + 세이브 + 토스트.
+   * 업적 해금 처리 + 세이브 + 토스트. 보상은 AchievementScene._claimReward()에서 지급.
    * @param {Phaser.Scene|null} scene
    * @param {object} data
    * @param {object} ach
@@ -165,14 +164,7 @@ export class AchievementManager {
   static _unlock(scene, data, ach) {
     data.achievements.unlocked[ach.id] = true;
 
-    // 보상 지급
-    if (ach.reward.gold) {
-      ToolManager.addGold(ach.reward.gold);
-    }
-    if (ach.reward.coin) {
-      data.kitchenCoins = (data.kitchenCoins || 0) + ach.reward.coin;
-    }
-
+    // 보상은 _claimReward()에서만 지급 (이중 지급 방지)
     SaveManager.save(data);
 
     // 토스트 알림 (씬이 활성 상태일 때만)

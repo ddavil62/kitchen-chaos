@@ -29,13 +29,13 @@ const CHAPTERS = [
   { id: 'ch6',  nameKo: '6장: 그랑 가스트로노미', themeColor: '#ffd700', themeHex: 0xffd700, strokeColor: '#886600', icon: '\uD83D\uDC68\u200D\uD83C\uDF73', stages: ['6-1', '6-2', '6-3'] },
   // ── 그룹 2 (ch7~ch15) ──
   { id: 'ch7',  nameKo: '7장: 사쿠라 이자카야',    themeColor: '#ffb7c5', themeHex: 0xffb7c5, strokeColor: '#994466', icon: '\uD83C\uDF38', stages: ['7-1', '7-2', '7-3', '7-4', '7-5', '7-6'] },
-  { id: 'ch8',  nameKo: '8장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['8-1', '8-2', '8-3', '8-4', '8-5', '8-6'], theme: 'placeholder' },
+  { id: 'ch8',  nameKo: '8장: 이자카야 지하 진입로', themeColor: '#cc6688', themeHex: 0xcc6688, strokeColor: '#883344', icon: '\uD83C\uDF76', stages: ['8-1', '8-2', '8-3', '8-4', '8-5', '8-6'] },
   { id: 'ch9',  nameKo: '9장: 사케 오니 최종전',   themeColor: '#cc3333', themeHex: 0xcc3333, strokeColor: '#881111', icon: '\uD83C\uDF76', stages: ['9-1', '9-2', '9-3', '9-4', '9-5', '9-6'] },
   { id: 'ch10', nameKo: '10장: 용의 주방',          themeColor: '#ff4500', themeHex: 0xff4500, strokeColor: '#882200', icon: '\uD83D\uDC09', stages: ['10-1', '10-2', '10-3', '10-4', '10-5', '10-6'] },
   { id: 'ch11', nameKo: '11장: 용의 주방 심층부',    themeColor: '#2a0a3a', themeHex: 0x2a0a3a, strokeColor: '#110022', icon: '\uD83D\uDC09', stages: ['11-1', '11-2', '11-3', '11-4', '11-5', '11-6'] },
   { id: 'ch12', nameKo: '12장: 용의 궁전',            themeColor: '#cc2200', themeHex: 0xcc2200, strokeColor: '#661100', icon: '\uD83D\uDC09', stages: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'] },
   { id: 'ch13', nameKo: '13장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['13-1', '13-2', '13-3', '13-4', '13-5', '13-6'], theme: 'placeholder' },
-  { id: 'ch14', nameKo: '14장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['14-1', '14-2', '14-3', '14-4', '14-5', '14-6'], theme: 'placeholder' },
+  { id: 'ch14', nameKo: '14장: 비스트로 지하 창고',  themeColor: '#8b2040', themeHex: 0x8b2040, strokeColor: '#501020', icon: '\uD83C\uDF77', stages: ['14-1', '14-2', '14-3', '14-4', '14-5', '14-6'] },
   { id: 'ch15', nameKo: '15장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['15-1', '15-2', '15-3', '15-4', '15-5', '15-6'], theme: 'placeholder' },
   // ── 그룹 3 (ch16~ch24) ──
   { id: 'ch16', nameKo: '16장: (미구현)',            themeColor: '#555555', themeHex: 0x555555, strokeColor: '#333333', icon: '\uD83D\uDD12', stages: ['16-1', '16-2', '16-3', '16-4', '16-5', '16-6'], theme: 'placeholder' },
