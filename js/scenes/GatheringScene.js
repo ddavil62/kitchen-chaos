@@ -35,6 +35,7 @@ import { VFXManager } from '../managers/VFXManager.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
 import { ToolManager } from '../managers/ToolManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
+import { AchievementManager } from '../managers/AchievementManager.js';
 
 export class GatheringScene extends Phaser.Scene {
   constructor() {
@@ -1132,6 +1133,14 @@ export class GatheringScene extends Phaser.Scene {
       const isBoss = !!(enemy.data_?.isBoss || enemy.data_?.isMidBoss);
       const color = enemy.data_?.bodyColor || 0xffffff;
       this.vfx.enemyDeath(enemy.x, enemy.y, color, isBoss);
+
+      // ── 업적 카운터 (Phase 42) ──
+      AchievementManager.increment('enemy_total_killed', 1);
+      AchievementManager.check(this, 'enemy_total_killed', 0);
+      if (isBoss) {
+        AchievementManager.increment('boss_killed', 1);
+        AchievementManager.check(this, 'boss_killed', 0);
+      }
     }
     this._checkWaveProgress();
   }
@@ -1721,6 +1730,9 @@ export class GatheringScene extends Phaser.Scene {
     this.isVictory = true;
     // VFX: 클리어 연출
     this.vfx.clearAnnounce();
+
+    // ── 업적: 도구 보유 체크 (Phase 42) ──
+    AchievementManager.check(this, 'tool_count_placed', 0);
 
     // 인벤토리 집계 메시지
     const total = this.inventoryManager.getTotal();

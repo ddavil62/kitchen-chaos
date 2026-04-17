@@ -19,7 +19,7 @@
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 16;
+const SAVE_VERSION = 17;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -89,6 +89,16 @@ function createDefault() {
     storyProgress: {
       currentChapter: 1,      // 플레이어가 도달한 최고 챕터 (1~6)
       storyFlags: {},         // 임의 스토리 플래그 맵 (Phase 19-3: 배열→객체 변환)
+    },
+    // ── Phase 42 추가 ──
+    achievements: {
+      unlocked: {},     // { [achievementId]: true } -- 해금 완료 목록
+      claimed: {},      // { [achievementId]: true } -- 보상 수령 완료 목록
+      progress: {       // 비세이브 집계 불가 누적 카운터
+        enemy_total_killed: 0,
+        boss_killed: 0,
+        total_gold_earned: 0,
+      },
     },
     // ── Phase 11-1 추가 ──
     endless: {
@@ -490,6 +500,30 @@ export class SaveManager {
     }
   }
 
+  // ── 업적 시스템 (Phase 42) ──
+
+  /**
+   * 업적 데이터 객체 반환.
+   * @returns {{ unlocked: object, claimed: object, progress: object }}
+   */
+  static getAchievements() {
+    const data = SaveManager.load();
+    return data.achievements || { unlocked: {}, claimed: {}, progress: {} };
+  }
+
+  /**
+   * 업적 보상 수령 완료 기록.
+   * @param {string} id - 업적 ID
+   */
+  static markAchievementClaimed(id) {
+    const data = SaveManager.load();
+    if (!data.achievements) {
+      data.achievements = { unlocked: {}, claimed: {}, progress: { enemy_total_killed: 0, boss_killed: 0, total_gold_earned: 0 } };
+    }
+    data.achievements.claimed[id] = true;
+    SaveManager.save(data);
+  }
+
   // ── 기존 메서드 ──
 
   /**
@@ -785,6 +819,20 @@ export class SaveManager {
       // 10-6 클리어 기록 유지 (sake_master로 보스 교체 후에도 기존 클리어 기록 보존)
       // 별도 처리 불필요 — stages['10-6'] 클리어 기록은 스테이지 데이터 변경과 독립적
       data.version = 16;
+    }
+
+    // v16 → v17: 업적 시스템 추가 (Phase 42)
+    if (data.version < 17) {
+      data.achievements = data.achievements || {
+        unlocked: {},
+        claimed: {},
+        progress: {
+          enemy_total_killed: 0,
+          boss_killed: 0,
+          total_gold_earned: 0,
+        },
+      };
+      data.version = 17;
     }
 
     return data;

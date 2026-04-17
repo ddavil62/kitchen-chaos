@@ -18,6 +18,8 @@
  * Phase 37-1: 적 2종(macaron_knight, sugar_specter), 재료 1종(cream) 추가. 누적 적 55종, 재료 32종.
  * Phase 38-1: 보스 1종(queen_of_taste, 3페이즈), 적 1종(sugar_specter_mini) 추가.
  *   macaron_knight damageReduction fallback 제거. 누적 적 57종, 보스 13종.
+ * Phase 43: 적 2종(cellar_phantom, sommelier_wraith), 보스 1종(chef_noir) ENEMY_TYPES 등록.
+ *   기존 stageData에서 사용 중이었으나 FALLBACK HP로 동작하던 것을 정식 등록.
  */
 
 // ── 적 타입 정의 ──
@@ -897,6 +899,64 @@ export const ENEMY_TYPES = {
       { ingredient: 'cream',   count: 5 },
       { ingredient: 'cacao',   count: 3 },
       { ingredient: 'vanilla', count: 3 },
+    ],
+  },
+  // ── Phase 43: 양식 아크 적 2종 + 보스 1종 등록 (13~15장 사용) ──
+  cellar_phantom: {
+    id: 'cellar_phantom',
+    nameKo: '지하실 팬텀',
+    hp: 400,
+    speed: 55,
+    ingredient: 'truffle',
+    bodyColor: 0x4a3060,   // 어두운 보라 (지하 어둠)
+    // 유령 특성: 반투명, 냉동고만 타겟 가능
+    invisible: true,
+    // 분열 메커닉: HP 0 시 2마리로 분열 (splitCount=2, splitType 자기자신)
+    splitOnDeath: true,
+    splitCount: 2,
+    splitHpRatio: 0.3,     // 분열체 HP = 원본의 30%
+    group: 2,
+    reward: 22,
+  },
+  sommelier_wraith: {
+    id: 'sommelier_wraith',
+    nameKo: '소믈리에 망령',
+    hp: 380,
+    speed: 48,
+    ingredient: 'truffle',
+    bodyColor: 0x8b0045,   // 딥 와인 레드
+    // 와인 디버프: wine_specter와 동일 메카닉이나 더 강력
+    wineDebuff: true,
+    wineDebuffInterval: 4000,    // 4초마다 발동
+    wineDebuffRadius: 90,        // 90px 범위
+    wineDebuffEffect: { speedReduction: 0.35, duration: 4000 },
+    // 유령 특성
+    invisible: true,
+    group: 2,
+    reward: 28,
+  },
+  // 보스 — chef_noir는 BOSS_IDS에 등록 (SpriteLoader에서 /sprites/bosses/ 경로 사용)
+  chef_noir: {
+    id: 'chef_noir',
+    nameKo: '셰프 누아르',
+    hp: 9000,
+    speed: 60,
+    ingredient: null,
+    bodyColor: 0x1a1a2e,   // 다크 네이비 (누아르)
+    isBoss: true,
+    // 소환: HP summonThreshold 이하 시 cellar_phantom + sommelier_wraith 소환
+    summon: true,
+    summonThreshold: 0.60,
+    summonTypes: [
+      { type: 'cellar_phantom', count: 3 },
+      { type: 'sommelier_wraith', count: 2 },
+    ],
+    // 분노: HP 30% 이하 시 속도 상승
+    enrageHpThreshold: 0.30,
+    enrageSpeedBonus: 80,
+    bossReward: 800,
+    bossDrops: [
+      { ingredient: 'truffle', count: 5 },
     ],
   },
 };

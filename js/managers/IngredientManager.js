@@ -8,6 +8,7 @@
 import { FRESHNESS_WINDOW_MS } from '../config.js';
 import { INGREDIENT_TYPES } from '../data/gameData.js';
 import { GameEventBus } from '../events/GameEventBus.js';
+import { ChefManager } from './ChefManager.js';
 import { UpgradeManager } from './UpgradeManager.js';
 import { SpriteLoader } from './SpriteLoader.js';
 
@@ -49,7 +50,11 @@ export class IngredientManager {
     const type = enemy.ingredientType;
     if (!type || !INGREDIENT_TYPES[type]) return;
 
-    const count = enemy.isFresh ? 2 : 1;
+    let count = enemy.isFresh ? 2 : 1;
+    // lao_chef 패시브: 재료 드롭률 +10% (10% 확률로 1개 추가)
+    if (Math.random() < ChefManager.getDropRateBonus()) {
+      count += 1;
+    }
     this._createDrop(enemy.x, enemy.y, type, count, enemy.isFresh);
   }
 

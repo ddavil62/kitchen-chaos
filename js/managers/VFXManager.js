@@ -506,6 +506,62 @@ export class VFXManager {
     });
   }
 
+  // ── 업적 토스트 (Phase 42) ────────────────────────────────────
+
+  /**
+   * 업적 달성 토스트 알림.
+   * 정적 메서드로 씬에 직접 오브젝트를 생성한다 (VFXManager 인스턴스 불필요).
+   * @param {Phaser.Scene} scene - 토스트를 표시할 씬
+   * @param {string} nameKo - 업적 한국어 이름
+   */
+  static achievementToast(scene, nameKo) {
+    // 씬 활성 상태 검사
+    if (!scene?.sys?.isActive()) return;
+
+    const cx = 180; // GAME_WIDTH / 2
+    const toastY = 80;
+    const toastW = 280;
+    const toastH = 40;
+    const depth = 2500;
+
+    // 배경 사각형
+    const bg = scene.add.rectangle(cx, toastY, toastW, toastH, 0x2a1500)
+      .setStrokeStyle(2, 0xffd700)
+      .setDepth(depth)
+      .setAlpha(0.95)
+      .setScale(0, 1);
+
+    // 텍스트
+    const text = scene.add.text(cx, toastY, `\uD83C\uDFC6 \uC5C5\uC801 \uB2EC\uC131! ${nameKo}`, {
+      fontSize: '13px',
+      fontStyle: 'bold',
+      color: '#ffd700',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(depth + 1).setScale(0, 1);
+
+    // 등장 애니메이션: scaleX 0 -> 1 (150ms)
+    scene.tweens.add({
+      targets: [bg, text],
+      scaleX: 1,
+      duration: 150,
+      ease: 'Back.easeOut',
+    });
+
+    // 퇴장 애니메이션: 1.5초 후 alpha 0 -> destroy (300ms)
+    scene.tweens.add({
+      targets: [bg, text],
+      alpha: 0,
+      duration: 300,
+      delay: 1500,
+      ease: 'Quad.easeIn',
+      onComplete: () => {
+        bg.destroy();
+        text.destroy();
+      },
+    });
+  }
+
   // ── 정리 ──────────────────────────────────────────────────────
 
   /** 씬 파괴 시 정리. 모든 활성 파티클과 풀을 해제한다. */

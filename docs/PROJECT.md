@@ -34,10 +34,11 @@
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 ~106종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), ~111항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v16, season3Unlocked, getTotalStars(group) |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v17, season3Unlocked, getTotalStars(group), achievements |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환 |
+| 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 30개 업적, 해금 판정/보상, 카테고리 탭 UI |
 | 데이터 | stageData.js / gameData.js / recipeData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 284종 |
 
 ### 게임 루프
@@ -71,6 +72,7 @@
 | 영업 씬 비주얼 | 아이소메트릭 홀 (다이아몬드 격자, depth sorting, 에셋 15종, 홀 데코, 웜 다크 팔레트) | 완료 |
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 그룹3 콘텐츠 (16~24장) | 인도(16~18)/멕시칸(19~21)/디저트·최종(22~24) 아크, 적 14종+보스 3종(maharaja/el_diablo_pepper/queen_of_taste 3페이즈), 레시피 57종, 대화 28종, 전 스테이지(16-1~24-6) 구현, 밸런스 QA 완료 | 완료 |
+| 업적 시스템 | 30개 업적 (5카테고리), 조건 판정+보상, 토스트 알림, 전용 AchievementScene UI | 완료 |
 
 ## 콘텐츠 규모
 
@@ -82,7 +84,8 @@
 | 레시피 | 284종 (서빙 231 + 버프 53) |
 | 스테이지 | 143슬롯 (구현: 1~7/9~13/15~24장, 잔여 placeholder: 8장·14장 일부) |
 | 셰프 | 5종 (꼬마/불꽃/얼음 + 유키/라오, 유키/라오는 데이터 등록 상태, 스킬 로직 미구현) |
-| 세이브 버전 | v16 |
+| 업적 | 30개 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 2) |
+| 세이브 버전 | v17 |
 
 ## 알려진 제약사항
 

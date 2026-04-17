@@ -113,10 +113,10 @@ export class MenuScene extends Phaser.Scene {
     shopBtn.on('pointerover', () => shopBtn.setFillStyle(0xaa8800));
     shopBtn.on('pointerout', () => shopBtn.setFillStyle(0x886600));
 
-    // 도감 버튼 (Phase 11-1: y 500으로 이동, Phase 11-3b: Secondary 팔레트 적용)
-    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 500, 160, 36, 0x886600)
+    // 도감 버튼 (Phase 11-1: y 500으로 이동, Phase 11-3b: Secondary 팔레트 적용, Phase 42: y 496)
+    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 496, 160, 36, 0x886600)
       .setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 500, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
+    this.add.text(GAME_WIDTH / 2, 496, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -129,12 +129,28 @@ export class MenuScene extends Phaser.Scene {
     bookBtn.on('pointerover', () => bookBtn.setFillStyle(0xaa8800));
     bookBtn.on('pointerout', () => bookBtn.setFillStyle(0x886600));
 
-    // ── 엔드리스 모드 버튼 (Phase 11-1) ──
+    // ── 업적 버튼 (Phase 42) ──
+    const achieveBtn = this.add.rectangle(GAME_WIDTH / 2, 534, 160, 36, 0x886600)
+      .setInteractive({ useHandCursor: true });
+    this.add.text(GAME_WIDTH / 2, 534, '\uD83C\uDFC6 \uC5C5\uC801', {
+      fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    achieveBtn.on('pointerdown', () => {
+      this.cameras.main.fadeOut(300, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('AchievementScene');
+      });
+    });
+    achieveBtn.on('pointerover', () => achieveBtn.setFillStyle(0xaa8800));
+    achieveBtn.on('pointerout', () => achieveBtn.setFillStyle(0x886600));
+
+    // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570) ──
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x444444;
-    const endlessBtn = this.add.rectangle(GAME_WIDTH / 2, 550, 180, 40, endlessColor)
+    const endlessBtn = this.add.rectangle(GAME_WIDTH / 2, 570, 180, 40, endlessColor)
       .setInteractive({ useHandCursor: isEndlessUnlocked });
 
     const endlessLabel = isEndlessUnlocked
@@ -142,7 +158,7 @@ export class MenuScene extends Phaser.Scene {
       : '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (6-3 \uD074\uB9AC\uC5B4 \uD544\uC694)';
     const endlessLabelColor = isEndlessUnlocked ? '#cc88ff' : '#666666';
 
-    this.add.text(GAME_WIDTH / 2, 550, endlessLabel, {
+    this.add.text(GAME_WIDTH / 2, 570, endlessLabel, {
       fontSize: '14px', fontStyle: 'bold', color: endlessLabelColor,
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -158,29 +174,29 @@ export class MenuScene extends Phaser.Scene {
       endlessBtn.on('pointerout', () => endlessBtn.setFillStyle(0x6622cc));
     }
 
-    // 엔드리스 베스트 기록 표시
+    // 엔드리스 베스트 기록 표시 (Phase 42: y 574 -> 593)
     if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
-      this.add.text(GAME_WIDTH / 2, 574, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
+      this.add.text(GAME_WIDTH / 2, 593, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
         fontSize: '11px', color: '#aa88cc',
       }).setOrigin(0.5);
     }
 
-    // 평판 + 수집률 (Phase 11-1: y 598로 이동)
+    // 평판 + 수집률 (Phase 42: y 598 -> 610)
     const { current, max } = SaveManager.getTotalStars();
     const { unlocked, total, percent } = RecipeManager.getCollectionProgress();
-    this.add.text(GAME_WIDTH / 2, 598, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
+    this.add.text(GAME_WIDTH / 2, 610, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
       fontSize: '12px', color: '#aaaaaa',
     }).setOrigin(0.5);
 
-    // 하단 설명 (Phase 11-1: y 614으로 조정)
-    this.add.text(GAME_WIDTH / 2, 614, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
+    // 하단 설명 (Phase 42: y 614 -> 624)
+    this.add.text(GAME_WIDTH / 2, 624, '\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uC7AC\uB8CC\uAC00 \uB4DC\uB86D\uB429\uB2C8\uB2E4', {
       fontSize: '12px',
       color: '#777777',
       align: 'center',
     }).setOrigin(0.5);
 
-    // ── 버전 표기 (Phase 11-3d) ──
-    this.add.text(GAME_WIDTH / 2, 632, `v${APP_VERSION}`, {
+    // ── 버전 표기 (Phase 42: y 632 -> 636) ──
+    this.add.text(GAME_WIDTH / 2, 636, `v${APP_VERSION}`, {
       fontSize: '10px',
       color: '#555555',
     }).setOrigin(0.5);

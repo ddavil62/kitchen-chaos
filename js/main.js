@@ -27,6 +27,7 @@ import { MerchantScene } from './scenes/MerchantScene.js';
 import { ShopScene } from './scenes/ShopScene.js';
 import { RecipeCollectionScene } from './scenes/RecipeCollectionScene.js';
 import { DialogueScene } from './scenes/DialogueScene.js';
+import { AchievementScene } from './scenes/AchievementScene.js';
 import { GAME_WIDTH, GAME_HEIGHT } from './config.js';
 
 /**
@@ -43,7 +44,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, WorldMapScene, ChefSelectScene, GatheringScene, EndlessScene, ServiceScene, ResultScene, MerchantScene, ShopScene, RecipeCollectionScene, DialogueScene],
+  scene: [BootScene, MenuScene, WorldMapScene, ChefSelectScene, GatheringScene, EndlessScene, ServiceScene, ResultScene, MerchantScene, ShopScene, RecipeCollectionScene, DialogueScene, AchievementScene],
   input: {
     activePointers: 1,
   },

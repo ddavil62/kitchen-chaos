@@ -16,6 +16,7 @@ import { STAGES, STAGE_ORDER } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
+import { AchievementManager } from '../managers/AchievementManager.js';
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -75,6 +76,10 @@ export class ResultScene extends Phaser.Scene {
    */
   _createEndlessResultView() {
     const bestRecord = SaveManager.getEndlessRecord();
+
+    // ── 업적: 엔드리스 체크 (Phase 42) ──
+    AchievementManager.check(this, 'endless_wave', 0);
+    AchievementManager.check(this, 'endless_score', 0);
 
     // 타이틀
     this.add.text(GAME_WIDTH / 2, 40, '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uAC8C\uC784\uC624\uBC84', {
@@ -230,6 +235,12 @@ export class ResultScene extends Phaser.Scene {
       SaveManager.updateBestSatisfaction(this.stageId, Math.round(satisfaction));
       // 챕터 진행도 갱신 (Phase 14-3)
       StoryManager.advanceChapter(this.stageId);
+
+      // ── 업적 체크 (Phase 42) ──
+      AchievementManager.check(this, 'stage_cleared', 0);
+      AchievementManager.check(this, 'chapter_cleared', parseInt(this.stageId.split('-')[0]));
+      AchievementManager.check(this, 'three_star_count', 0);
+      AchievementManager.check(this, 'recipe_unlocked', 0);
     }
 
     // 스크롤 가능한 컨테이너

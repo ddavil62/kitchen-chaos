@@ -36,6 +36,7 @@ import { TutorialManager } from '../managers/TutorialManager.js';
 import { ToolManager } from '../managers/ToolManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
+import { AchievementManager } from '../managers/AchievementManager.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -1902,9 +1903,12 @@ export class ServiceScene extends Phaser.Scene {
     const isSpecial = this.isEndless && this.dailySpecials.includes(recipe.id);
     const specialMultiplier = isSpecial ? 2.0 : 1.0;
 
-    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * 유형배율 * 그릴 * 스페셜
+    // yuki_chef 패시브: tier 3 이상 레시피 보상 +15%
+    const highStarBonus = (recipe.tier >= 3) ? ChefManager.getHighStarRewardBonus() : 1.0;
+
+    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * 유형배율 * 그릴 * 스페셜 * 고급레시피
     const baseGold = cust.baseReward;
-    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * typeMult * grillBonus * specialMultiplier);
+    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * typeMult * grillBonus * specialMultiplier * highStarBonus);
 
     this.totalGold += totalGold;
     this.servedCount++;
@@ -2130,7 +2134,14 @@ export class ServiceScene extends Phaser.Scene {
     const earnedGold = this.totalGold + this.tipTotal;
     if (earnedGold > 0) {
       ToolManager.addGold(earnedGold);
+
+      // ── 업적: 누적 골드 카운터 + 체크 (Phase 42) ──
+      AchievementManager.increment('total_gold_earned', earnedGold);
+      AchievementManager.check(this, 'total_gold_earned', 0);
     }
+    // ── 업적: 직원/인테리어 체크 (Phase 42) ──
+    AchievementManager.check(this, 'staff_hired', 0);
+    AchievementManager.check(this, 'interior_maxed', 0);
 
     this._showMessage(message, 2000);
 

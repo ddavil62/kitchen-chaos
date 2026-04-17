@@ -153,6 +153,26 @@ export class ChefManager {
     return ChefManager._powerSurgeTimer > 0;
   }
 
+  // ── Phase 43: 유키/라오 미구현 패시브 ──
+
+  /**
+   * 고급 레시피(tier >= 3) 보상 배율 (yuki_chef 선택 시 +15%).
+   * @returns {number} 1.15 또는 1.0
+   */
+  static getHighStarRewardBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'yuki_chef' ? 1.15 : 1.0;
+  }
+
+  /**
+   * 재료 추가 드롭 확률 (lao_chef 선택 시 10%).
+   * @returns {number} 0.10 또는 0.0
+   */
+  static getDropRateBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'lao_chef' ? 0.10 : 0.0;
+  }
+
   // ── 영업 액티브 스킬 (Phase 8-6) ──
 
   /**
