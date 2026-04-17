@@ -1,5 +1,41 @@
 # Changelog
 
+## [Phase 44-3] 2026-04-17 — 그룹3 스프라이트 64px 재생성 (16~24장 적 13종 + 보스 3종)
+
+### Added
+
+- 일반 적 13종 64px 스프라이트 (캔버스 92x92px, 8방향 rotations)
+  - Spice Palace (16~18장): curry_djinn, naan_golem, masala_guide, incense_specter, spice_elemental
+  - Mexican Fiesta (19~21장): taco_bandit, burrito_juggernaut, cactus_wraith, luchador_ghost
+  - Candy Kingdom (22~24장): candy_soldier, cake_witch, macaron_knight, sugar_specter
+  - PixelLab create_character API, 앵커: carrot_goblin 64px v2 (`ca774523-aeca-4f33-8495-4fb0db4ba22a`)
+- 보스 2종 80px 스프라이트 (캔버스 112x112px, 8방향 rotations)
+  - maharaja (18장 보스), el_diablo_pepper (21장 보스)
+- 최종보스 queen_of_taste 96px 스프라이트 (캔버스 136x136px, 8방향 rotations)
+  - 24장 최종보스, 신규 생성. v2 재시도(retry)로 최종 확정 (PixelLab ID: `c1622a20-91af-4e88-8d4e-d9ce0bfe4193`)
+- 구 스프라이트 백업 폴더: `rotations_old_bak/` (기존 13종). 신규 3종(queen_of_taste, macaron_knight, sugar_specter)은 백업 대상 없음
+
+### Changed
+
+- `kitchen-chaos/assets/enemies/{13종}/rotations/` — 기존 크기(68~164px) → 92x92px(본체 ~64px) PNG 교체
+- `kitchen-chaos/assets/bosses/maharaja/rotations/` — 212x212px → 112x112px PNG 교체
+- `kitchen-chaos/assets/bosses/el_diablo_pepper/rotations/` — 116x116px → 112x112px PNG 교체
+- `kitchen-chaos/assets/bosses/queen_of_taste/rotations/` — 신규 생성 (136x136px)
+- Phase 44 아트 리워크 전체 완료 (44-1 그룹1 + 44-2 그룹2 + 44-3 그룹3 = 전 캐릭터 통일)
+
+### Notes
+
+- 생성 표준: size 64(적)/80(보스)/96(최종보스), chibi, single color black outline, basic shading, medium detail, low top-down, 8방향
+- visual_change: art
+- AD 모드 1: APPROVED (16종 프롬프트 확정)
+- AD 모드 2: APPROVED (16종 전체 PASS, REVISE 0건)
+- QA: PASS (수용 기준 8/8 충족, 예외 시나리오 3/3 PASS, 128개 PNG 무결성 확인)
+- 스펙: `.claude/specs/2026-04-17-kc-phase44-3-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase44-3-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase44-3-qa.md`
+- AD 모드 1: `.claude/specs/2026-04-17-kc-phase44-3-ad1.md`
+- AD 모드 2: `.claude/specs/2026-04-17-kc-phase44-3-ad2.md`
+
 ## [Phase 44-2] 2026-04-17 — 그룹2 스프라이트 64px 재생성 (7~15장 적 12종 + 보스 4종)
 
 ### Added

@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-17 (Phase 44-2 완료)
+> 최종 업데이트: 2026-04-17 (Phase 44-3 완료)
 
 ## 프로젝트 개요
 
@@ -73,7 +73,7 @@
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 그룹3 콘텐츠 (16~24장) | 인도(16~18)/멕시칸(19~21)/디저트·최종(22~24) 아크, 적 14종+보스 3종(maharaja/el_diablo_pepper/queen_of_taste 3페이즈), 레시피 57종, 대화 28종, 전 스테이지(16-1~24-6) 구현, 밸런스 QA 완료 | 완료 |
 | 업적 시스템 | 30개 업적 (5카테고리), 조건 판정+보상, 토스트 알림, 전용 AchievementScene UI | 완료 |
-| 아트 리워크 | 레거시 스프라이트 64px 재생성 (Phase 44, 4단계). 그룹1(Phase 44-1) + 그룹2(Phase 44-2) 완료 | 진행중 |
+| 아트 리워크 | 레거시 스프라이트 64px 재생성 (Phase 44, 3단계). 그룹1(44-1) + 그룹2(44-2) + 그룹3(44-3) 완료. 전 캐릭터 통일 완료 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -96,7 +96,7 @@
 - cardamom.png 아이콘은 chai.png 복사본 placeholder (고유 아이콘 미생성)
 - enemy_charge_impact 이벤트의 TowerManager 수신 로직 미구현 (돌진 시 타워 피해 미적용, 후속 페이즈에서 구현 필요)
 - queen_cream_supreme 재료 8개 슬롯(cream:3, vanilla:2, cacao:1, sugar:1, butter:1)이 기존 최대(7개)를 초과하여 서빙 UI 인게임 검증 필요
-- Phase 44-1 생성 캐릭터의 metadata.json size 필드가 구 해상도 유지 (후속 페이즈에서 일괄 갱신 예정)
+- Phase 44 생성 캐릭터의 metadata.json size 필드가 구 해상도 유지 (일괄 갱신 필요)
 - pasta_boss rotations/ 파일명이 unhyphenated (southeast.png 등), 나머지 21종은 hyphenated (south-east.png). 현재 게임 런타임 영향 없으나 후속 수정 필요
 
 ## 향후 계획
