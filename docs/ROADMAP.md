@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-17
-> 기준: Phase 44-1 완료 (그룹1 스프라이트 64px 재생성)
+> 기준: Phase 44-2 완료 (그룹2 스프라이트 64px 재생성)
 
 ---
 
@@ -147,10 +147,12 @@ proportions: chibi, view: low top-down, n_directions: 8
 - [x] 최종보스 cuisine_god — 96px (캔버스 136x136px)
 - pasta_boss 초회 REVISE → v2 재생성 후 APPROVED
 
-#### Phase 44-2 — 그룹2 적 + 보스 (7~15장)
+#### Phase 44-2 — 그룹2 적 + 보스 (7~15장) ✅ 완료
 
-- [ ] 일반 적 (~16종) — 32px → 64px
-- [ ] 보스 4종 — 48px → 64px
+- [x] 일반 적 12종 — 기존 크기(48~92px) → 64px (캔버스 92x92px)
+- [x] 보스 4종 — 기존 크기(68~124px) → 80px (캔버스 112x112px)
+- wine_specter, cellar_phantom: 초회 REVISE → v2 재생성 후 APPROVED
+- sake_master, chef_noir: 초회 생성 실패 → 재시도 성공
 
 #### Phase 44-3 — 그룹3 적 + 보스 (16~24장)
 

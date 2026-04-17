@@ -1,5 +1,40 @@
 # Changelog
 
+## [Phase 44-2] 2026-04-17 — 그룹2 스프라이트 64px 재생성 (7~15장 적 12종 + 보스 4종)
+
+### Added
+
+- 일반 적 12종 64px 스프라이트 (캔버스 92x92px, 8방향 rotations)
+  - dumpling_warrior, sushi_ninja, tempura_monk, oni_minion, sake_specter, wok_phantom, shadow_dragon_spawn, wine_specter, foie_gras_knight, cellar_phantom, sommelier_wraith, wok_guardian
+  - PixelLab create_character API, 앵커: carrot_goblin 64px v2 (`ca774523-aeca-4f33-8495-4fb0db4ba22a`)
+- 보스 4종 80px 스프라이트 (캔버스 112x112px, 8방향 rotations)
+  - sake_oni, sake_master, dragon_wok, chef_noir
+  - sake_master, chef_noir: 초회 생성 실패 → 재시도 성공
+- 구 스프라이트 백업 폴더: `rotations_old_bak/` (16종 모두)
+
+### Changed
+
+- `kitchen-chaos/assets/enemies/{12종}/rotations/` — 기존 크기(48~92px) → 92x92px(본체 ~64px) PNG 교체
+- `kitchen-chaos/assets/bosses/{4종}/rotations/` — 기존 크기(68~124px) → 112x112px(본체 ~80px) PNG 교체
+
+### Known Issues
+
+- sake_specter의 3개 방향(north 893B, west 996B, north-west 1001B)이 1KB 미만이나 유효 PNG. 반투명 유령 캐릭터 특성상 데이터량이 적은 것으로 판단.
+- walk 애니메이션(animations/ 폴더)은 미교체. 기존 걷기 프레임 유지. 별도 Phase에서 처리 예정.
+
+### Notes
+
+- 생성 표준: size 64(적)/80(보스), chibi, single color black outline, basic shading, medium detail, low top-down, 8방향
+- visual_change: art
+- AD 모드 1: APPROVED (16종 프롬프트 확정)
+- AD 모드 2: APPROVED (14종 초회 PASS + WARN 8건(해상도 한계 수용), 2종(wine_specter/cellar_phantom) v2 재생성 후 APPROVED)
+- QA: PASS (6/6 수용 기준 충족 — 파일 존재성, 크기, 투명 배경, 파일명 컨벤션, 백업, AD 승인)
+- 스펙: `.claude/specs/2026-04-17-kc-phase44-2-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase44-2-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase44-2-qa.md`
+- AD 모드 1: `.claude/specs/2026-04-17-kc-phase44-2-ad1.md`
+- AD 모드 2: `.claude/specs/2026-04-17-kc-phase44-2-ad2.md`
+
 ## [Phase 44-1] 2026-04-17 — 그룹1 스프라이트 64px 재생성 (1~6장 적 16종 + 보스 6종)
 
 ### Added
