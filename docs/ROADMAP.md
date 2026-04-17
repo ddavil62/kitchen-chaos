@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-17
-> 기준: Phase 44-2 완료 (그룹2 스프라이트 64px 재생성)
+> 기준: Phase 44-3 완료 (전 캐릭터 스프라이트 64px 재생성 완료)
 
 ---
 
@@ -154,15 +154,35 @@ proportions: chibi, view: low top-down, n_directions: 8
 - wine_specter, cellar_phantom: 초회 REVISE → v2 재생성 후 APPROVED
 - sake_master, chef_noir: 초회 생성 실패 → 재시도 성공
 
-#### Phase 44-3 — 그룹3 적 + 보스 (16~24장)
+#### Phase 44-3 — 그룹3 적 + 보스 (16~24장) ✅ 완료
 
-- [ ] 일반 적 (~14종) — 32px → 64px
-- [ ] 보스 3종 — 48px → 64px
+- [x] 일반 적 13종 — 64px (캔버스 92x92px)
+- [x] 보스 2종 — 80px (캔버스 112x112px)
+- [x] 최종보스 queen_of_taste — 96px (캔버스 136x136px)
 
-#### Phase 44-4 — 셰프 캐릭터
+#### Phase 44-4 — 셰프 캐릭터 (예정)
 
-- [ ] 기존 셰프 3종 재생성 (꼬마/불꽃/얼음)
-- [ ] 신규 셰프 2종 생성 (유키/라오)
+- [ ] 기존 셰프 3종 재생성 (꼬마/불꽃/얼음) — 64px
+- [ ] 신규 셰프 2종 생성 (유키/라오) — 64px
+- 설계 포인트: 전투 스프라이트 vs 선택화면 포트레이트 방식 결정 필요
+
+---
+
+## 다음 로드맵
+
+```
+Phase 45: Phase 44-4 — 셰프 스프라이트 5종 (꼬마/불꽃/얼음/유키/라오)
+              ↓
+Phase 46: 에셋 통합 검증 + 스크립트 점검
+              - 새 64px 스프라이트 게임 내 렌더링 확인 (셰프 포함 전체)
+              - metadata.json size 필드 일괄 갱신
+              - pasta_boss 파일명 unhyphenated 수정
+              - enemy_charge_impact TowerManager 수신 구현
+              - cardamom.png 고유 아이콘 생성
+              - queen_cream_supreme 서빙 UI 인게임 검증
+              ↓
+Phase 47: Walk 애니메이션 (범위/비용 검토 후 — 주요 보스 우선 또는 template 제한)
+```
 
 ---
 
