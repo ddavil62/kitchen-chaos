@@ -15,6 +15,7 @@
  * Phase 33-3: 회피(dodgeOnHit) + 돌진(chargeEnabled) 메카닉.
  * Phase 34-2: 가시 반격(thornReflect) + 도발(tauntEnabled) 메카닉 추가.
  * Phase 38-1: 마법 저항(magicResistance), 일반 피해 감소(damageReduction), splitOnDeath, phaseTransitions, summonTypes 메카닉 추가.
+ * Phase 47-1: _animState 상태 머신(IDLE/WALKING/DYING) + death 애니메이션 비동기 재생 시스템.
  */
 
 import Phaser from 'phaser';
@@ -183,6 +184,12 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._teleportTimer = 0;
     }
 
+    // ── Phase 47-1: 애니메이션 상태 머신 ──
+    // 'IDLE': 정지 프레임 (walk anim 없음)
+    // 'WALKING': walk anim 재생 중
+    // 'DYING': death anim 재생 중 (이 상태에서는 이동/피격 무시)
+    this._animState = 'IDLE';
+
     // ── 비주얼 ──
     this._buildVisual(enemyData);
 
@@ -217,6 +224,8 @@ export class Enemy extends Phaser.GameObjects.Container {
     this._walkPrefix = `${prefix}_${id}_walk`;
     this._hasWalkAnim = hasWalkAnim;
     this._currentDir = 'south';
+    // Phase 47-1: 초기 animState 설정
+    this._animState = hasWalkAnim ? 'WALKING' : 'IDLE';
 
     // Phase 12: 크기 25% 증가 (적: 28→35, 미니보스: 42, 보스: 40→50)
     const targetSize = isBoss ? 50 : (isMidBoss ? 42 : 35);
@@ -322,7 +331,7 @@ export class Enemy extends Phaser.GameObjects.Container {
    * @param {number} delta - ms
    */
   update(time, delta) {
-    if (this.isDead || !this.active) return;
+    if (this.isDead || !this.active || this._animState === 'DYING') return;
 
     // ── 신선도 타이머 ──
     if (this.isFresh) {
@@ -979,7 +988,7 @@ export class Enemy extends Phaser.GameObjects.Container {
    * @param {object|null} [attackerRef=null] - 공격원 참조 (Phase 34-2: 가시 반격용)
    */
   takeDamage(amount, towerType = null, attackerRef = null) {
-    if (this.isDead) return;
+    if (this.isDead || this._animState === 'DYING') return;
 
     // Phase 20: 배리어 활성 시 피해 무효
     if (this._barrierActive) return;
@@ -1353,6 +1362,39 @@ export class Enemy extends Phaser.GameObjects.Container {
     if (this.isDead) return;
     this.isDead = true;
     this.active = false;
+
+    // ── Phase 47-1: death 애니메이션 분기 ──
+    const id = this.data_.id;
+    const curDir = this._currentDir || 'south';
+    const deathCheck = SpriteLoader.hasDeathAnim(this.scene, id, curDir);
+
+    if (deathCheck.exists && this._bodySprite?.anims) {
+      // DYING 상태 전환: 이동/피격 차단
+      this._animState = 'DYING';
+      const deathAnimKey = `enemy_${id}_death_${deathCheck.resolvedDir}`;
+      this._bodySprite.play(deathAnimKey, true);
+
+      // 애니메이션 완료 후 실제 제거
+      this._bodySprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        // 씬 shutdown 안전장치
+        if (!this.scene || !this.scene.sys || !this.scene.sys.isActive()) return;
+        this._executeDeath();
+      });
+    } else {
+      // death anim 없음: 기존과 동일하게 즉시 제거
+      this._executeDeath();
+    }
+  }
+
+  /**
+   * 실제 사망 처리 (이벤트 emit + destroy).
+   * _die()에서 직접 호출하거나, death anim 완료 콜백에서 호출.
+   * @private
+   */
+  _executeDeath() {
+    // 중복 실행 방지
+    if (this._deathExecuted) return;
+    this._deathExecuted = true;
 
     // 분열 (egg_sprite): 10% 확률로 소형 분열체 ��성
     if (this.data_.splitChance && Math.random() < this.data_.splitChance) {
