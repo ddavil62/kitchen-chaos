@@ -1,5 +1,27 @@
 # Changelog
 
+## [Phase 41] 2026-04-17 — 23-6 여왕의 호위대 구현 (그룹3 placeholder 완전 해소)
+
+### Added
+
+- 23-6 `여왕의 호위대` (dream_deep, 3웨이브): 그룹3 마지막 placeholder 구현. macaron_knight/sugar_specter 집중 + 전 그룹3 적 혼합 고밀도 구성. 역V자 경로(col3→row5→col6). 24장 미각의 여왕 전(前) 최후 관문.
+  - 웨이브1: macaron_knight(44), sugar_specter(26), candy_soldier(88), cake_witch(24) 외 6종
+  - 웨이브2: 웨이브1보다 20~30% 증량 + milk_phantom 추가 (11종)
+  - 웨이브3: 웨이브2보다 25~30% 증량 클라이맥스 (11종)
+
+### Changed
+
+- storyData.js: chapter23_cleared 트리거 이동 (23-5 → 23-6). currentChapter=24 설정 및 chapter23_cleared 플래그가 이제 23-6 첫 클리어 시 발동.
+
+### Notes
+
+- 그룹1~3 placeholder 0개 달성 (1~24장 캠페인 완전 구현, 8장/14장 별도 아크 제외)
+- Playwright 17/17 PASS, JS pageerror 0건
+- 세이브 버전 v16 유지
+- 스펙: `.claude/specs/2026-04-17-kc-phase41-scope.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase41-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase41-qa.md`
+
 ## [Phase 40] 2026-04-17 — 그룹3 중간 보스/특수 스테이지 5종 구현
 
 ### Added
