@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-17 (Phase 38 완료)
+> 최종 업데이트: 2026-04-17 (Phase 39 완료)
 
 ## 프로젝트 개요
 
@@ -185,6 +185,7 @@ kitchen-chaos/
 | 22장 슈가 드림랜드 (Phase 36) | 대화 3종, 적 2종(candy_soldier/cake_witch), 재료 2종(cacao/vanilla), 레시피 10종, 스테이지 22-1~22-5, damageReduction/summon 메커닉, 디저트 아크(22~24장) 시작 | 완료 |
 | 23장 드림랜드 심층부 (Phase 37) | 대화 3종, 적 2종(macaron_knight/sugar_specter), 재료 1종(cream), 레시피 10종, 스테이지 23-1~23-5, magicResistance/splitOnDeath 메커닉(데이터 예약) | 완료 |
 | 24장 미각의 여왕 최종전 (Phase 38) | 대화 6종, 보스 1종(queen_of_taste 3페이즈)+적 1종(sugar_specter_mini), 레시피 10종, 스테이지 24-1~24-6, magicResistance 전용 핸들러, splitOnDeath 엔진 구현, 디저트 아크(22~24장) 완결 | 완료 |
+| 그룹3 밸런스 QA (Phase 39) | Enemy.js 주기적 소환 entry.count 반영, 밸런스 시뮬레이션 스크립트, 이상치 8스테이지 조정(16-3/17-2/18-1/18-3/19-1/19-5/20-1/20-5), WARN 8->0건(조정 대상 기준) | 완료 |
 
 ## 콘텐츠 규모
 
@@ -206,10 +207,11 @@ kitchen-chaos/
 - cardamom.png 아이콘은 chai.png 복사본 placeholder (고유 아이콘 미생성)
 - enemy_charge_impact 이벤트의 TowerManager 수신 로직 미구현 (돌진 시 타워 피해 미적용, 후속 페이즈에서 구현 필요)
 - queen_cream_supreme 재료 8개 슬롯(cream:3, vanilla:2, cacao:1, sugar:1, butter:1)이 기존 최대(7개)를 초과하여 서빙 UI 인게임 검증 필요
+- 잔여 placeholder 스테이지 6개: 16-6, 17-6, 19-6, 20-6, 22-6, 23-6 (각 챕터 마지막 중보스/특수 스테이지)
+- cellar_phantom(400), sommelier_wraith(380), chef_noir(9000) ENEMY_TYPES 미등록 -- 시뮬레이션에서 FALLBACK HP 사용 중
 
 ## 향후 계획
 
-- Phase 39: 챕터 16~24 밸런스 QA (54스테이지 전체 시뮬레이션)
+- Phase 40: 미구현 placeholder 스테이지(16-6/17-6/19-6/20-6/22-6) 구현 (중보스/특수 스테이지)
 - Phase 28-3a: 8장 placeholder 스테이지 구현 (일식 아크 완성)
 - Phase 28-4: 14장 placeholder 스테이지 구현 (양식 아크 중간)
-- 주기적 소환 entry.count 미사용 수정 (Phase 38 잔여 이슈, LOW)

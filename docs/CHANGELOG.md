@@ -1,5 +1,49 @@
 # Changelog
 
+## [Phase 39] 2026-04-17 — 그룹3 밸런스 QA (16~24장 전체 검증)
+
+### Added
+
+#### 39-1: Enemy.js Fix #5 + 밸런스 시뮬레이션
+
+- Enemy.js L450-451: 주기적 소환 블록에 `entry.count` 반영 루프 추가 (Fix #5)
+  - `const spawnCount = entry.count || 1; for (let i = 0; i < spawnCount; i++)` -- 방어적 fallback
+  - 영향 보스: queen_of_taste만 (12초 주기로 macaron_knight 2마리 + sugar_specter 3마리 = 5마리 정상 소환)
+  - el_diablo_pepper/cake_witch는 1회성 소환(summon: true + summonThreshold)이므로 무관
+- `tests/balance-sim-group3.mjs` 생성: 그룹3 전체 48스테이지 HP/골드 곡선 시뮬레이션 + 이상치 탐지 스크립트
+
+#### 39-2: 이상치 8개 스테이지 밸런스 조정
+
+- 16-3: 6웨이브 -> 5웨이브 축소 (284,312 HP -> 229,592 HP, +41.6% -> +14.4%)
+- 17-2: 고HP 적(curry_djinn/naan_golem/foie_gras_knight) count 8~10% 감소 (215,282 HP -> 195,002 HP, +32.8% -> +20.3%)
+- 18-1: 전 wave 적 count 22~25% 증가 (177,640 HP -> 218,390 HP, -37.8% -> -23.6%), 향신료 아크 내 난이도 역행 해소
+- 18-3: 전 wave 적 count 3~5% 감소 (298,820 HP -> 288,020 HP, +30.4% -> +25.7%)
+- 19-1: 4웨이브 -> 5웨이브 확장 (wave5 신설: masala_guide(32)/curry_djinn(44)/naan_golem(29)/incense_specter(8)/butter_ghost(16)). 106,590 HP -> 151,560 HP, -67.6% -> -54.0%
+- 19-5: 전 wave 적 count 15~17% 감소 (335,640 HP -> 279,490 HP, +45.4% -> +21.1%)
+- 20-1: 4웨이브 -> 5웨이브 확장 (wave5 신설: taco_bandit(46)/burrito_juggernaut(24)/masala_guide(50)/curry_djinn(58)/incense_specter(32)/spice_elemental(19)). 220,980 HP -> 314,780 HP, -34.2% -> OK
+- 20-5: 전 wave 적 count 6~8% 감소 (606,050 HP -> 562,561 HP, +35.4% -> +25.7%)
+- 19-2, 20-2는 수정 없이 19-1/20-1 확장으로 상대 변화율 자동 해소
+
+### Changed
+
+- 수정 스테이지의 starThresholds/service 수치 비례 조정 (16-3: maxCustomers 50, 19-1: starThresholds {three:38, two:29}/maxCustomers 68, 20-1: starThresholds {three:48, two:37}/maxCustomers 76)
+
+### Fixed
+
+- Fix #5: Enemy.js 주기적 소환 블록(L447-458)에서 entry.count 미반영 버그 수정. Phase 38 잔여 이슈 해소.
+
+### Notes
+
+- QA PASS: 시뮬레이션 WARN 조정 대상 8건 -> 0건. 잔여 WARN 6건은 모두 구조적 원인 (16-1: 보스->일반 전환, 18-6/21-6/24-6: 보스 스테이지 특성, 19-1: 아크 전환, 19-2: 경계선 +30.2%)
+- 보스 스테이지 HP 비율: maharaja 0.78x / el_diablo_pepper 0.68x / queen_of_taste 0.28x -- 보스 특수 메카닉(화염/소환/3페이즈)으로 실질 난이도 보정, 설계 의도대로
+- Playwright 스모크 테스트 7/7 통과, JS pageerror 0건
+- 세이브 버전 v16 유지 (데이터 구조 동일, 수치만 변경)
+- 잔여 placeholder: 16-6, 17-6, 19-6, 20-6, 22-6, 23-6 (6개, 별도 Phase)
+- 스펙: `.claude/specs/2026-04-17-kc-phase39-scope.md`
+- 39-1 리포트: `.claude/specs/2026-04-17-kc-phase39-1-report.md`
+- 39-2 리포트: `.claude/specs/2026-04-17-kc-phase39-2-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase39-qa.md`
+
 ## [Phase 38] 2026-04-17 — 24장 미각의 여왕 최종전 (디저트 아크 최종, 그룹3 클라이맥스)
 
 ### Added
