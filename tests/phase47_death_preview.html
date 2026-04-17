@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Phase 47-1 carrot_goblin Death AD Mode 2</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: monospace; margin: 30px; }
+  h1 { color: #f0c040; }
+  .row { display: flex; gap: 24px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 30px; }
+  .item { text-align: center; }
+  .label { font-size: 12px; color: #aaa; margin-bottom: 4px; }
+  .name { font-size: 11px; color: #f0c040; margin-top: 4px; }
+  img { display: block; image-rendering: pixelated; }
+  h2 { color: #ccc; font-size: 14px; margin-top: 28px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+  .dir-block { margin-bottom: 20px; }
+  .dir-label { color: #88f; font-size: 13px; margin-bottom: 8px; }
+  .frames { display: flex; gap: 6px; align-items: flex-end; }
+</style>
+</head>
+<body>
+<h1>Phase 47-1 — carrot_goblin Death 애니메이션 AD Mode 2</h1>
+<p>hash: <code>falling_backward-10a27983</code> | 4방향 × 7프레임</p>
+
+<h2>Walk 프레임 참조 (스타일 일관성 비교)</h2>
+<div class="row">
+  <div class="item">
+    <div class="label">walk south frame_000</div>
+    <img src="../assets/enemies/carrot_goblin/animations/walking-012372c9/south/frame_000.png" width="92" height="92">
+  </div>
+  <div class="item">
+    <div class="label">walk south frame_003</div>
+    <img src="../assets/enemies/carrot_goblin/animations/walking-012372c9/south/frame_003.png" width="92" height="92">
+  </div>
+  <div class="item">
+    <div class="label">walk east frame_000</div>
+    <img src="../assets/enemies/carrot_goblin/animations/walking-012372c9/east/frame_000.png" width="92" height="92">
+  </div>
+  <div class="item">
+    <div class="label">walk north frame_000</div>
+    <img src="../assets/enemies/carrot_goblin/animations/walking-012372c9/north/frame_000.png" width="92" height="92">
+  </div>
+</div>
+
+<h2>Death 프레임 — South</h2>
+<div class="dir-block">
+  <div class="frames" id="south-frames"></div>
+</div>
+
+<h2>Death 프레임 — North</h2>
+<div class="dir-block">
+  <div class="frames" id="north-frames"></div>
+</div>
+
+<h2>Death 프레임 — East</h2>
+<div class="dir-block">
+  <div class="frames" id="east-frames"></div>
+</div>
+
+<h2>Death 프레임 — West</h2>
+<div class="dir-block">
+  <div class="frames" id="west-frames"></div>
+</div>
+
+<h2>4× 확대 (South 프레임 상세)</h2>
+<div class="row" id="south-zoom"></div>
+
+<script>
+const HASH = 'falling_backward-10a27983';
+const BASE = '../assets/enemies/carrot_goblin/animations';
+const DIRS = ['south', 'north', 'east', 'west'];
+const FRAMES = 7;
+
+DIRS.forEach(dir => {
+  const container = document.getElementById(dir + '-frames');
+  for (let f = 0; f < FRAMES; f++) {
+    const d = document.createElement('div');
+    d.className = 'item';
+    d.innerHTML = `<div class="label">f${f}</div>
+      <img src="${BASE}/${HASH}/${dir}/frame_${String(f).padStart(3,'0')}.png" width="92" height="92">`;
+    container.appendChild(d);
+  }
+});
+
+// South 4× zoom
+const zoomContainer = document.getElementById('south-zoom');
+for (let f = 0; f < FRAMES; f++) {
+  const d = document.createElement('div');
+  d.className = 'item';
+  d.innerHTML = `<div class="label">south f${f} (4×)</div>
+    <img src="${BASE}/${HASH}/south/frame_${String(f).padStart(3,'0')}.png" width="368" height="368">`;
+  zoomContainer.appendChild(d);
+}
+</script>
+</body>
+</html>

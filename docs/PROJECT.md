@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-17 (Phase 46 완료)
+> 최종 업데이트: 2026-04-17 (Phase 47-1 완료)
 
 ## 프로젝트 개요
 
@@ -37,8 +37,9 @@
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v17, season3Unlocked, getTotalStars(group), achievements |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트 |
-| 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환 |
+| 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 30개 업적, 해금 판정/보상, 카테고리 탭 UI |
+| 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩, Phaser anim 등록, 방향 폴백 매핑 |
 | 데이터 | stageData.js / gameData.js / recipeData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 284종 |
 
 ### 게임 루프
@@ -74,6 +75,7 @@
 | 그룹3 콘텐츠 (16~24장) | 인도(16~18)/멕시칸(19~21)/디저트·최종(22~24) 아크, 적 14종+보스 3종(maharaja/el_diablo_pepper/queen_of_taste 3페이즈), 레시피 57종, 대화 28종, 전 스테이지(16-1~24-6) 구현, 밸런스 QA 완료 | 완료 |
 | 업적 시스템 | 30개 업적 (5카테고리), 조건 판정+보상, 토스트 알림, 전용 AchievementScene UI | 완료 |
 | 아트 리워크 | 레거시 스프라이트 64px 재생성. Phase 44(적/보스 전종) + Phase 45(셰프 5종) 완료. Phase 46에서 metadata.json 일괄 갱신 + cardamom.png 교체 + 렌더링 검증까지 완결 | 완료 |
+| 애니메이션 시스템 | walk+death 프레임 시퀀스 아키텍처 (SpriteLoader death 로딩/등록, Enemy _animState 상태 머신, 비동기 death anim). carrot_goblin 파일럿 완료 | 진행중 |
 
 ## 콘텐츠 규모
 

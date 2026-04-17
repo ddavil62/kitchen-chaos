@@ -1,5 +1,53 @@
 # Changelog
 
+## [Phase 47-1] 2026-04-17 -- walk+death 애니메이션 시스템 아키텍처 구축
+
+### Added
+
+- **ENEMY_DEATH_HASHES 맵** (`js/managers/SpriteLoader.js`)
+  - `carrot_goblin: 'falling_backward-10a27983'` 등록
+  - 미등록 적은 기존 동작(즉시 destroy) 유지, 회귀 없음
+- **death 애니메이션 로딩/등록 시스템** (`js/managers/SpriteLoader.js`)
+  - `_loadEnemyDeathFrames(scene)`: ENEMY_DEATH_HASHES에 등록된 적의 death 프레임을 `assets/enemies/{id}/animations/{hash}/{dir}/frame_NNN.png`에서 로드
+  - `registerDeathAnimations(scene)`: Phaser anim `enemy_{id}_death_{dir}` 키로 등록. repeat: 0 (1회 재생), frameRate: 8
+  - `hasDeathAnim(scene, id, dir)`: death anim 존재 여부 조회 + 8방향->4방향 폴백 매핑 (`DEATH_DIR_FALLBACK`)
+  - 상수: `DEATH_DIRS` (south/north/east/west 4방향), `DEATH_FRAME_COUNT = 7`
+- **Enemy._animState 상태 머신** (`js/entities/Enemy.js`)
+  - 3상태: `IDLE` (정지 프레임), `WALKING` (walk anim 재생), `DYING` (death anim 재생)
+  - `_buildVisual()`에서 walk anim 유무에 따라 WALKING/IDLE 초기화
+  - `update()`, `takeDamage()` 가드에 `_animState === 'DYING'` 조건 추가 (DYING 중 이동/피격 차단)
+- **_executeDeath() 분리** (`js/entities/Enemy.js`)
+  - 기존 `_die()` 내부 로직(분열/포자/힐/보스보상/emit/destroy)을 `_executeDeath()`로 추출
+  - death anim 있으면: DYING 전환 -> anim 완료 콜백에서 `_executeDeath()` 호출
+  - death anim 없으면: 즉시 `_executeDeath()` (기존 동작 유지)
+  - `_deathExecuted` 가드로 중복 실행 방지
+  - 씬 shutdown 안전장치: `!this.scene || !this.scene.sys || !this.scene.sys.isActive()` 체크
+- **BootScene.js**: `SpriteLoader.registerDeathAnimations(this)` 호출 추가 (registerWalkAnimations 직후)
+- **carrot_goblin death 에셋** (`assets/enemies/carrot_goblin/animations/falling_backward-10a27983/`)
+  - 4방향(south/north/east/west) x 7프레임 = 28개 PNG
+  - PixelLab falling-back-death 템플릿으로 생성
+  - 총 66,404 bytes. walk 에셋(walking-012372c9)과 팔레트/크기/아웃라인 일관성 확인 (AD Mode 2 APPROVED)
+
+### Changed
+
+- `Enemy._die()`: isDead/active 설정 후 death anim 분기 로직 삽입. 기존 즉시 destroy 로직은 _executeDeath()로 이동
+- death anim key: `enemy_{id}_death_{dir}` (스펙의 보스 prefix 동적 분기는 `enemy_` 고정으로 단순화. Phase 47-2에서 보스 지원 시 확장 예정)
+
+### Notes
+
+- 스펙 대비 변경: `DEATH_FRAME_COUNT` 6 -> 7 (PixelLab 템플릿이 7프레임 생성)
+- 스펙 대비 변경: 폴더 해시명 `dying-XXXXXXXX` -> `falling_backward-10a27983` (PixelLab 생성 결과)
+- 스펙 대비 변경: `_die()` 보스 prefix 분기 생략 -> `enemy_` 하드코딩 (ENEMY_IDS만 대상이므로 적절한 단순화)
+- QA 잠재 위험: `hasDeathAnim()`과 death anim key에 `enemy_` 하드코딩. Phase 47-2 보스 death anim 추가 시 prefix 파라미터 또는 별도 함수 필요
+- visual_change: art
+- QA: PASS (수용 기준 15/15, 예외 시나리오 8/8, Playwright 7/7, 시각 검증 4/4)
+- AD Mode 2: APPROVED
+- 스펙: `.claude/specs/2026-04-17-kc-phase47-1-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase47-1-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase47-1-qa.md`
+- AD Mode 1: `.claude/specs/2026-04-17-kc-phase47-1-ad1.md`
+- AD Mode 2: `.claude/specs/2026-04-17-kc-phase47-1-ad2.md`
+
 ## [Phase 46] 2026-04-17 -- 통합 검증 및 잔여 버그 수정
 
 ### Fixed

@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-17
-> 기준: Phase 46 완료 / Phase 47-1~3 walk+death 애니메이션 진행 중
+> 기준: Phase 47-1 완료 / Phase 47-2~3 walk+death 애니메이션 진행 중
 
 ---
 
@@ -55,8 +55,9 @@
 | Phase 44 | 아트 리워크: 적/보스 전종 64px 재생성 (44-1 그룹1 + 44-2 그룹2 + 44-3 그룹3) | ✅ 완료 |
 | Phase 45 | 셰프 5종 92x92px 업그레이드 (재생성 3종 + 신규 2종, 전 캐릭터 아트 통일 완결) | ✅ 완료 |
 | Phase 46 | 통합 검증 및 잔여 버그 수정 (metadata.json 50건 갱신, enemy_charge_impact 구현, cardamom.png 교체, 전 캐릭터 렌더링 검증) | ✅ 완료 |
+| Phase 47-1 | 애니메이션 엔진 구축 + carrot_goblin 파일럿 (SpriteLoader death 로딩/등록, Enemy _animState 상태 머신, _executeDeath 분리, carrot_goblin death 4방향 7프레임) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 46 완료 — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터(적+보스+셰프) 64px chibi 아트 통일 완결. metadata.json 전종 갱신, enemy_charge_impact VFX 구현, cardamom.png 고유 아이콘 교체.
+**현재 구현 완성도**: Phase 47-1 완료 — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템 아키텍처 구축, carrot_goblin death 파일럿 완료(4방향 7프레임).
 
 ### 현재 콘텐츠 규모
 
@@ -183,12 +184,12 @@ Phase 46: 통합 검증 및 잔여 버그 수정 ✅ 완료
               - cardamom.png 고유 아이콘 교체
               - 전 캐릭터 렌더링 + queen_cream_supreme UI 검증
               ↓
-Phase 47-1: 애니메이션 엔진 구축 + carrot_goblin 파일럿
-              - SpriteLoader: 프레임 시퀀스 로딩 시스템 신규 설계
-              - Enemy.js: 상태 머신 추가 (WALKING / DYING / IDLE)
-              - GatheringScene: 상태 전환 트리거 연결
-              - PixelLab: carrot_goblin walk + death 애니메이션 생성 (파일럿)
-              - QA: carrot_goblin 인게임 walk → idle → death 흐름 확인
+Phase 47-1: 애니메이션 엔진 구축 + carrot_goblin 파일럿 ✅ 완료
+              - SpriteLoader: ENEMY_DEATH_HASHES, death 로딩/등록/조회 시스템 구축
+              - Enemy.js: _animState 상태 머신 (IDLE/WALKING/DYING), _executeDeath() 분리
+              - BootScene: registerDeathAnimations() 호출 추가
+              - carrot_goblin death: falling_backward-10a27983, 4방향 7프레임, AD Mode 2 APPROVED
+              - QA PASS (15/15 수용 기준, 8/8 예외, Playwright 7/7)
               ↓
 Phase 47-2: 보스 13종 walk + death 에셋 생성 및 적용
               - PixelLab animate_character (보스 13종 × walk + death = 26 호출)
