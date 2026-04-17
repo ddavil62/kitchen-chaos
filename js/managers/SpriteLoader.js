@@ -22,6 +22,7 @@
  * Phase 37-1: 23장 적 2종(macaron_knight, sugar_specter), 재료 1종(cream) 추가.
  * Phase 38-1: 24장 보스 1종(queen_of_taste, 3페이즈) 추가. BOSS_WALK_HASHES에 queen_of_taste 3종 등록.
  * Phase 47-1: death 애니메이션 프레임 로드 + Phaser anim 등록 시스템 추가.
+ * Phase 47-2: 보스 13종 death 애니메이션 프레임 로드 + Phaser anim 등록 시스템 추가.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -167,6 +168,25 @@ const ENEMY_WALK_HASHES = {
   sugar_specter: 'animating-7f31cfcf',   // Phase 37-1 (23장 드림랜드 심층부, 64px standard)
 };
 
+// ── 보스 death 애니메이션 폴더 해시 맵 (Phase 47-2) ──
+// 에셋 생성(PixelLab AD 모드1) 및 AD 모드2 승인 후 hash를 기입한다.
+// 미기입(null) 보스는 로드/등록 시 skip — 즉시 제거로 fallback.
+const BOSS_DEATH_HASHES = {
+  pasta_boss:          null,  // Phase 47-2: PixelLab 생성 후 기입
+  dragon_ramen:        null,
+  seafood_kraken:      null,
+  lava_dessert_golem:  null,
+  master_patissier:    null,
+  cuisine_god:         null,
+  sake_oni:            null,
+  dragon_wok:          null,
+  sake_master:         null,
+  chef_noir:           null,
+  maharaja:            null,
+  el_diablo_pepper:    null,
+  queen_of_taste:      null,  // 페이즈1 기본형만. 페이즈2/3는 Phase 47-3 이후.
+};
+
 const BOSS_WALK_HASHES = {
   cuisine_god: 'walking-84e4ae22',
   dragon_ramen: 'walking-dcd66668',
@@ -248,6 +268,7 @@ export class SpriteLoader {
     SpriteLoader._loadEnemyWalkFrames(scene);
     SpriteLoader._loadEnemyDeathFrames(scene);  // Phase 47-1
     SpriteLoader._loadBossWalkFrames(scene);
+    SpriteLoader._loadBossDeathFrames(scene);  // Phase 47-2
     SpriteLoader._loadTowers(scene);
     SpriteLoader._loadChefs(scene);
     SpriteLoader._loadIngredients(scene);
@@ -344,6 +365,28 @@ export class SpriteLoader {
   }
 
   /**
+   * 보스 death 애니메이션 프레임 로드.
+   * BOSS_DEATH_HASHES에 등록된 boss_id에 한해 로드.
+   * 미등록(null) 시 스킵 (기존 정지 프레임 유지).
+   * 에셋 경로: sprites/bosses/{id}/animations/{hash}/{dir}/frame_NNN.png
+   * @param {Phaser.Scene} scene
+   * @private
+   */
+  static _loadBossDeathFrames(scene) {
+    for (const id of BOSS_IDS) {
+      const hash = BOSS_DEATH_HASHES[id];
+      if (!hash) continue;
+      for (const dir of DEATH_DIRS) {
+        for (let f = 0; f < DEATH_FRAME_COUNT; f++) {
+          const key = `boss_${id}_death_${dir}_${f}`;
+          const path = `${SPRITES_ROOT}/bosses/${id}/animations/${hash}/${dir}/frame_${String(f).padStart(3, '0')}.png`;
+          scene.load.image(key, path);
+        }
+      }
+    }
+  }
+
+  /**
    * 적/보스 걷기 Phaser 애니메이션을 등록한다.
    * BootScene.create()에서 preload 완료 후 호출해야 한다.
    * @param {Phaser.Scene} scene
@@ -433,21 +476,54 @@ export class SpriteLoader {
   }
 
   /**
-   * 특정 enemy_id + 방향에 대한 death 애니메이션이 등록되어 있는지 확인.
+   * 보스 death Phaser 애니메이션을 등록한다.
+   * BootScene.create()에서 registerDeathAnimations() 직후 호출해야 한다.
+   * repeat: 0 (1회 재생). frameRate: 8.
+   * queen_of_taste_2, queen_of_taste_3 death는 Phase 47-3 이후 별도 추가.
+   * @param {Phaser.Scene} scene
+   */
+  static registerBossDeathAnimations(scene) {
+    for (const id of BOSS_IDS) {
+      if (!BOSS_DEATH_HASHES[id]) continue;
+      for (const dir of DEATH_DIRS) {
+        const animKey = `boss_${id}_death_${dir}`;
+        if (scene.anims.exists(animKey)) continue;
+        const frames = [];
+        for (let f = 0; f < DEATH_FRAME_COUNT; f++) {
+          const frameKey = `boss_${id}_death_${dir}_${f}`;
+          if (scene.textures.exists(frameKey)) {
+            frames.push({ key: frameKey });
+          }
+        }
+        if (frames.length > 0) {
+          scene.anims.create({
+            key: animKey,
+            frames,
+            frameRate: 8,
+            repeat: 0,  // 1회 재생 후 정지
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * 특정 id + 방향에 대한 death 애니메이션이 등록되어 있는지 확인.
    * 폴백 방향(south-east -> south 등)도 체크한다.
    * @param {Phaser.Scene} scene
-   * @param {string} id - enemy_id
+   * @param {string} id - enemy_id 또는 boss_id
    * @param {string} dir - 방향 문자열
+   * @param {string} [prefix='enemy'] - 'enemy' 또는 'boss'
    * @returns {{ exists: boolean, resolvedDir: string }}
    */
-  static hasDeathAnim(scene, id, dir) {
-    const directKey = `enemy_${id}_death_${dir}`;
+  static hasDeathAnim(scene, id, dir, prefix = 'enemy') {
+    const directKey = `${prefix}_${id}_death_${dir}`;
     if (scene.anims.exists(directKey)) {
       return { exists: true, resolvedDir: dir };
     }
     const fallbackDir = DEATH_DIR_FALLBACK[dir];
     if (fallbackDir) {
-      const fallbackKey = `enemy_${id}_death_${fallbackDir}`;
+      const fallbackKey = `${prefix}_${id}_death_${fallbackDir}`;
       if (scene.anims.exists(fallbackKey)) {
         return { exists: true, resolvedDir: fallbackDir };
       }

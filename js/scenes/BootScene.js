@@ -55,8 +55,9 @@ export class BootScene extends Phaser.Scene {
     // ── 걷기 애니메이션 등록 (Phase 12) ──
     SpriteLoader.registerWalkAnimations(this);
 
-    // ── death 애니메이션 등록 (Phase 47-1) ──
+    // ── death 애니메이션 등록 (Phase 47-1: 적, Phase 47-2: 보스) ──
     SpriteLoader.registerDeathAnimations(this);
+    SpriteLoader.registerBossDeathAnimations(this);
 
     // ── 사운드 매니저 초기화 (Phase 10-4) ──
     SoundManager.init(this);

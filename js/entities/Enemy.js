@@ -1363,15 +1363,17 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.isDead = true;
     this.active = false;
 
-    // ── Phase 47-1: death 애니메이션 분기 ──
+    // ── Phase 47-1/47-2: death 애니메이션 분기 ──
     const id = this.data_.id;
     const curDir = this._currentDir || 'south';
-    const deathCheck = SpriteLoader.hasDeathAnim(this.scene, id, curDir);
+    // isBoss/isMidBoss prefix 결정 (constructor와 동일 로직)
+    const deathPrefix = (this.data_.isBoss || this.data_.isMidBoss) ? 'boss' : 'enemy';
+    const deathCheck = SpriteLoader.hasDeathAnim(this.scene, id, curDir, deathPrefix);
 
     if (deathCheck.exists && this._bodySprite?.anims) {
       // DYING 상태 전환: 이동/피격 차단
       this._animState = 'DYING';
-      const deathAnimKey = `enemy_${id}_death_${deathCheck.resolvedDir}`;
+      const deathAnimKey = `${deathPrefix}_${id}_death_${deathCheck.resolvedDir}`;
       this._bodySprite.play(deathAnimKey, true);
 
       // 애니메이션 완료 후 실제 제거
