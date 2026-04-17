@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-17
-> 기준: Phase 46 완료 / Phase 48-1~3 유랑 미력사·고용 셰프 시스템 기획 예정 (Phase 47 이후)
+> 기준: Phase 46 완료 / Phase 47-1~3 walk+death 애니메이션 진행 중
 
 ---
 
@@ -183,7 +183,22 @@ Phase 46: 통합 검증 및 잔여 버그 수정 ✅ 완료
               - cardamom.png 고유 아이콘 교체
               - 전 캐릭터 렌더링 + queen_cream_supreme UI 검증
               ↓
-Phase 47: Walk 애니메이션 (범위/비용 검토 후 — 주요 보스 우선 또는 template 제한)
+Phase 47-1: 애니메이션 엔진 구축 + carrot_goblin 파일럿
+              - SpriteLoader: 프레임 시퀀스 로딩 시스템 신규 설계
+              - Enemy.js: 상태 머신 추가 (WALKING / DYING / IDLE)
+              - GatheringScene: 상태 전환 트리거 연결
+              - PixelLab: carrot_goblin walk + death 애니메이션 생성 (파일럿)
+              - QA: carrot_goblin 인게임 walk → idle → death 흐름 확인
+              ↓
+Phase 47-2: 보스 13종 walk + death 에셋 생성 및 적용
+              - PixelLab animate_character (보스 13종 × walk + death = 26 호출)
+              - 에셋 배치 + SpriteLoader 등록
+              - QA: 보스 전종 인게임 애니메이션 확인
+              ↓
+Phase 47-3: 일반 적 전종 walk + death 에셋 생성 및 적용
+              - PixelLab animate_character (일반 적 43종 × walk + death = ~86 호출)
+              - 에셋 배치 + 등록
+              - QA + 최종 통합 검증
               ↓
 Phase 48-1: [기획] 미력의 정수 — 희귀 화폐 시스템 설계
               - 화폐 정의 및 획득 경로 (스토리 보상 + 특수 손님 NPC)
