@@ -1,5 +1,45 @@
 # Changelog
 
+## [Phase 44-1] 2026-04-17 — 그룹1 스프라이트 64px 재생성 (1~6장 적 16종 + 보스 6종)
+
+### Added
+
+- 일반 적 16종 64px 스프라이트 (캔버스 92x92px, 8방향 rotations)
+  - carrot_goblin, meat_ogre, octopus_mage, chili_demon, cheese_golem, flour_ghost, egg_sprite, rice_slime, fish_knight, mushroom_scout, cheese_rat, shrimp_samurai, tomato_bomber, butter_ghost, sugar_fairy, milk_phantom
+  - PixelLab create_character API, 앵커: carrot_goblin 64px v2 (`ca774523-aeca-4f33-8495-4fb0db4ba22a`)
+- 보스 5종 80px 스프라이트 (캔버스 112x112px, 8방향 rotations)
+  - pasta_boss, dragon_ramen, seafood_kraken, lava_dessert_golem, master_patissier
+  - pasta_boss: 초회 REVISE(황금 뱀 형태, 파스타 소품 불명확) → v2 재생성(PixelLab ID: `1daf8b83-f3b0-4ba8-b463-1a9dcf7c99e7`) 후 APPROVED
+- 최종보스 cuisine_god 96px 스프라이트 (캔버스 136x136px, 8방향 rotations)
+- 구 스프라이트 백업 폴더
+  - 적: `rotations_48px_bak/` (16종)
+  - 보스: `rotations_old_bak/` (6종)
+
+### Changed
+
+- `kitchen-chaos/assets/enemies/{16종}/rotations/` — 48px → 92x92px(본체 ~64px) PNG 교체
+- `kitchen-chaos/assets/bosses/{5종}/rotations/` — 기존 크기(84~92px) → 112x112px(본체 ~80px) PNG 교체
+- `kitchen-chaos/assets/bosses/cuisine_god/rotations/` — 112x112px → 136x136px(본체 ~96px) PNG 교체
+
+### Known Issues
+
+- pasta_boss rotations/ 파일명이 unhyphenated (`southeast.png` 등). 나머지 21종은 hyphenated (`south-east.png`). 현재 게임 코드는 `south.png`만 로드하므로 런타임 영향 없음. 후속 수정 필요.
+- 22종 metadata.json `character.size` 필드가 구 해상도 유지 (적 48x48, 보스 84~112px). 게임 코드가 직접 참조하지 않으므로 긴급하지 않으나 후속 갱신 필요.
+- walk 애니메이션(animations/ 폴더)은 미교체. 기존 48px 걷기 프레임 유지. 별도 Phase에서 처리 예정.
+- dist/sprites/ 에 구 스프라이트 잔존 (vite build 실행 전까지).
+
+### Notes
+
+- 생성 표준: size 64(적)/80(보스)/96(최종보스), chibi, single color black outline, basic shading, medium detail, low top-down, 8방향
+- visual_change: art
+- AD 모드 2: APPROVED (22종 전체 PASS, WARN 3건 — flour_ghost/rice_slime/cheese_rat 색상 유사성, 스타일 위반 아님)
+- QA: PARTIAL (파일 존재성/크기/알파/시각 품질 PASS, 파일명 컨벤션+metadata 정합성 FAIL)
+- 스펙: `.claude/specs/2026-04-17-kc-phase44-1-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase44-1-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase44-1-qa.md`
+- AD 모드 1: `.claude/specs/2026-04-17-kc-phase44-1-ad1.md`
+- AD 모드 2: `.claude/specs/2026-04-17-kc-phase44-1-ad2.md`
+
 ## [Phase 43] 2026-04-17 — 잔여 콘텐츠 구현 (8장/14장 스테이지 + 유키/라오 패시브)
 
 ### Added
