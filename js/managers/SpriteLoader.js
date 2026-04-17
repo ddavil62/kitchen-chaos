@@ -172,19 +172,19 @@ const ENEMY_WALK_HASHES = {
 // 에셋 생성(PixelLab AD 모드1) 및 AD 모드2 승인 후 hash를 기입한다.
 // 미기입(null) 보스는 로드/등록 시 skip — 즉시 제거로 fallback.
 const BOSS_DEATH_HASHES = {
-  pasta_boss:          null,  // Phase 47-2: PixelLab 생성 후 기입
-  dragon_ramen:        null,
-  seafood_kraken:      null,
-  lava_dessert_golem:  null,
-  master_patissier:    null,
-  cuisine_god:         null,
-  sake_oni:            null,
-  dragon_wok:          null,
-  sake_master:         null,
-  chef_noir:           null,
-  maharaja:            null,
-  el_diablo_pepper:    null,
-  queen_of_taste:      null,  // 페이즈1 기본형만. 페이즈2/3는 Phase 47-3 이후.
+  pasta_boss:          'falling_backward-91a21a29',
+  dragon_ramen:        'falling_backward-dfb179e6',
+  seafood_kraken:      'falling_backward-30586cf0',
+  lava_dessert_golem:  'falling_backward-7eea5222',
+  master_patissier:    'falling_backward-a4ffe1ee',
+  cuisine_god:         'falling_backward-217e6c2f',
+  sake_oni:            'falling_backward-d9bee694',
+  dragon_wok:          'falling_backward-13405143',
+  sake_master:         'falling_backward-a0f9a5fe',
+  chef_noir:           'falling_backward-bec39063',
+  maharaja:            'falling_backward-7da945c4',
+  el_diablo_pepper:    'falling_backward-7f8bea1c',
+  queen_of_taste:      'falling_backward-7bf0791d',
 };
 
 const BOSS_WALK_HASHES = {

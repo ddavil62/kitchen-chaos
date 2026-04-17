@@ -1,5 +1,48 @@
 # Changelog
 
+## [Phase 47-2] 2026-04-17 -- 보스 13종 death 애니메이션 지원
+
+### Added
+
+- **BOSS_DEATH_HASHES 맵** (`js/managers/SpriteLoader.js`)
+  - 13종 보스 death 애니메이션 폴더 해시 등록 (전원 non-null):
+    - pasta_boss: `falling_backward-91a21a29`
+    - dragon_ramen: `falling_backward-dfb179e6`
+    - seafood_kraken: `falling_backward-30586cf0`
+    - lava_dessert_golem: `falling_backward-7eea5222`
+    - master_patissier: `falling_backward-a4ffe1ee`
+    - cuisine_god: `falling_backward-217e6c2f`
+    - sake_oni: `falling_backward-d9bee694`
+    - dragon_wok: `falling_backward-13405143`
+    - sake_master: `falling_backward-a0f9a5fe`
+    - chef_noir: `falling_backward-bec39063`
+    - maharaja: `falling_backward-7da945c4`
+    - el_diablo_pepper: `falling_backward-7f8bea1c`
+    - queen_of_taste: `falling_backward-7bf0791d`
+- **`_loadBossDeathFrames()`** (`js/managers/SpriteLoader.js`): 보스 death 프레임 로드. BOSS_DEATH_HASHES 기반, hash null 시 skip. `preload()`에서 호출
+- **`registerBossDeathAnimations()`** (`js/managers/SpriteLoader.js`): 보스 death Phaser anim 등록 (repeat: 0, frameRate: 8). BootScene.create()에서 registerDeathAnimations 직후 호출
+- **보스 13종 death 에셋** (`assets/bosses/{boss_id}/animations/{hash}/{dir}/frame_NNN.png`)
+  - 13종 x 4방향(south/north/east/west) x 7프레임 = 364개 PNG
+  - PixelLab falling-back-death 템플릿으로 생성, AD Mode 2 APPROVED
+
+### Changed
+
+- **`hasDeathAnim()`** (`js/managers/SpriteLoader.js`): `prefix` 파라미터 추가 (기본값 `'enemy'`). `boss_` / `enemy_` 양쪽 키 조회 지원. 기존 호출 코드 하위 호환 유지
+- **`Enemy._die()`** (`js/entities/Enemy.js`): `deathPrefix` 변수 도입 (`isBoss || isMidBoss` ? `'boss'` : `'enemy'`). `hasDeathAnim` 호출 시 prefix 전달, `deathAnimKey` 조합도 `${deathPrefix}_` 방식으로 변경
+- **`BootScene.create()`** (`js/scenes/BootScene.js`): `SpriteLoader.registerBossDeathAnimations(this)` 호출 추가 (59-60행)
+
+### Notes
+
+- 스펙 초기 설계는 BOSS_DEATH_HASHES를 null placeholder로 시작하여 순차 기입 예정이었으나, AD 에셋 생성 완료 후 13종 전부 기입하여 완결됨
+- queen_of_taste_2, queen_of_taste_3 death anim은 Phase 47-2 범위 밖 (별도 Phase에서 추가 예정). 페이즈2/3 상태에서 사망 시 기본형(queen_of_taste) death anim 재생
+- visual_change: art
+- QA: PASS (수용 기준 10/10, 예외 시나리오 10/10, Playwright 11/11, 시각 검증 6/6)
+- AD Mode 2: APPROVED
+- 스펙: `.claude/specs/2026-04-17-kc-phase47-2-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase47-2-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase47-2-qa.md`
+- AD Mode 1: `.claude/specs/2026-04-17-kc-phase47-2-ad1.md`
+
 ## [Phase 47-1] 2026-04-17 -- walk+death 애니메이션 시스템 아키텍처 구축
 
 ### Added
