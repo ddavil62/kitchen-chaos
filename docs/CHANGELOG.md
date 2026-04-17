@@ -1,5 +1,38 @@
 # Changelog
 
+## [Phase 40] 2026-04-17 — 그룹3 중간 보스/특수 스테이지 5종 구현
+
+### Added
+
+#### 40-1: 인도 아크 마무리 (16-6 + 17-6)
+
+- 16-6 `향신료 궁전의 관문` (spice_palace, 3웨이브): maharaja 중보스 첫 등장 스테이지. 웨이브3 maharaja(1) + masala_guide(6) 보스 웨이브. 18-6 최종 보스전 복선.
+- 17-6 `향신료 심층부의 폭풍` (spice_palace, 2웨이브): 대규모 향신료 아크 러시. spice_elemental + cheese_golem 포함. 18장 황금 왕궁 진입 브릿지.
+
+#### 40-2: 멕시칸 아크 마무리 (19-6 + 20-6)
+
+- 19-6 `칸티나의 최후 방어선` (cactus_cantina, 2웨이브): 멕시칸 아크 1막 종결. taco_bandit + burrito_juggernaut 위주 대규모 러시. 20장 균열 근원지 진입 브릿지.
+- 20-6 `균열의 심장` (cactus_cantina, 4웨이브): el_diablo_pepper 중보스 예고전. 웨이브4 el_diablo_pepper(1) + cactus_wraith(3) + luchador_ghost(3) 보스 웨이브. 21-6 최종전 복선.
+
+#### 40-3: 디저트 아크 마무리 (22-6 + storyData)
+
+- 22-6 `케이크 위치의 연회` (dream_candy, 3웨이브): cake_witch(isBoss:false) 다수(18/26/36) + candy_soldier + 교차 아크 혼합 적 가마솥 특수전. 22장 완결 스테이지.
+- storyData.js: chapter22_cleared 트리거 이동 (22-5 → 22-6). currentChapter=23 설정 및 chapter22_cleared 플래그가 이제 22-6 첫 클리어 시 발동.
+
+### Notes
+
+- placeholder 5종 완전 교체: 16-6, 17-6, 19-6, 20-6, 22-6 모두 실제 스테이지로 구현
+- 잔여 placeholder: 23-6 (1개, 별도 Phase)
+- 보스 패턴: 16-6 maharaja / 20-6 el_diablo_pepper 모두 18-6/21-6과 동일한 보스 웨이브 패턴 (count:1, interval:0 + 호위)
+- 신규 스프라이트 없음 (visual_change: none) — 기존 maharaja/el_diablo_pepper/cake_witch 스프라이트 활용
+- Playwright 19/19 PASS, JS pageerror 0건
+- 세이브 버전 v16 유지 (데이터 구조 동일, 신규 스테이지 추가만)
+- 스펙: `.claude/specs/2026-04-17-kc-phase40-scope.md`
+- 40-1 리포트: `.claude/specs/2026-04-17-kc-phase40-1-report.md`
+- 40-2 리포트: `.claude/specs/2026-04-17-kc-phase40-2-report.md`
+- 40-3 리포트: `.claude/specs/2026-04-17-kc-phase40-3-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase40-qa.md`
+
 ## [Phase 39] 2026-04-17 — 그룹3 밸런스 QA (16~24장 전체 검증)
 
 ### Added

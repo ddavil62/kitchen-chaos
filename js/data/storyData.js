@@ -24,6 +24,7 @@
  * Phase 38-1: 24장 트리거 7건 추가 (chapter24_boss, chapter24_mid, chapter24_final_battle,
  *   chapter24_ending, team_side_24, team_side_24b, 24-6 currentChapter=25 설정).
  *   stage_first_clear 제외 목록 갱신 (24-1, 24-3, 24-6 추가).
+ * Phase 40-3: 22-6 트리거 이동 (22-5 currentChapter 23 설정 → 22-6으로 교체).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -1169,15 +1170,14 @@ export const STORY_TRIGGERS = [
       !save.seenDialogues?.includes('team_side_22'),
   },
 
-  // 22-5 첫 클리어 시 currentChapter = 23 설정 (23장 진입 준비)
-  // 주의: 22-6 보스전은 Phase 38에서 구현 예정. 현재는 22-5 클리어로 23장 unlocking 처리.
-  // Phase 38에서 이 트리거는 22-6으로 이동될 예정.
+  // 22-6 첫 클리어 시 currentChapter = 23 설정 (23장 진입 준비)
+  // Phase 40-3: 22-6 케이크 위치 특수 스테이지 구현으로 트리거를 22-5에서 22-6으로 이동.
   {
     triggerPoint: 'result_clear',
     dialogueId: null,
     once: true,
     condition: (ctx) =>
-      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '22-5',
+      ctx.isFirstClear && ctx.stars > 0 && ctx.stageId === '22-6',
     delay: 0,
     onComplete: () => {
       const data = SaveManager.load();

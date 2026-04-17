@@ -6643,8 +6643,49 @@ export const STAGES = {
     service: { duration: 344, customerInterval: 2.2, maxCustomers: 58, customerPatience: 20 },
   },
 
-  // ── 16-6 placeholder (보스전, Phase 31-3 스코프 외) ──
-  '16-6': { id: '16-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 16-6: 향신료 궁전의 관문 (maharaja 중보스전) ──
+  '16-6': {
+    id: '16-6',
+    nameKo: '향신료 궁전의 관문',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // X자 경로 (수직 중앙 + 수평 중앙 교차)
+    pathSegments: [
+      { type: 'vertical', col: 2, rowStart: 0, rowEnd: 9 },
+      { type: 'horizontal', row: 4, colStart: 2, colEnd: 7 },
+      { type: 'vertical', col: 7, rowStart: 4, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 28, interval: 960 },
+        { type: 'curry_djinn', count: 36, interval: 1080 },
+        { type: 'naan_golem', count: 22, interval: 1300 },
+        { type: 'incense_specter', count: 18, interval: 1560 },
+        { type: 'foie_gras_knight', count: 30, interval: 780 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 36, interval: 880 },
+        { type: 'curry_djinn', count: 46, interval: 980 },
+        { type: 'naan_golem', count: 28, interval: 1200 },
+        { type: 'incense_specter', count: 24, interval: 1440 },
+        { type: 'spice_elemental', count: 16, interval: 1960 },
+        { type: 'butter_ghost', count: 22, interval: 610 },
+      ]},
+      // 보스 웨이브 (maharaja 중보스 첫 등장 — 18-6 최종전 복선)
+      { wave: 3, enemies: [
+        { type: 'maharaja', count: 1, interval: 0 },
+        { type: 'masala_guide', count: 6, interval: 3000 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'spice_palace_tasting', patience: 8800, baseReward: 248, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'maharaja_feast', patience: 8400, baseReward: 278, tipMultiplier: 2.0, vip: true }] },
+      { wave: 3, customers: [{ dish: 'saffron_grand_platter', patience: 8000, baseReward: 312, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 28, two: 21 },
+    service: { duration: 302, customerInterval: 2.4, maxCustomers: 46, customerPatience: 22 },
+  },
   // ── 17-1: 향신료 궁전 내원 ──
   '17-1': {
     id: '17-1',
@@ -6946,7 +6987,47 @@ export const STAGES = {
     starThresholds: { three: 43, two: 33 },
     service: { duration: 370, customerInterval: 1.9, maxCustomers: 66, customerPatience: 18 },
   },
-  '17-6': { id: '17-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 17-6: 향신료 심층부의 폭풍 (특수 대규모 러시) ──
+  '17-6': {
+    id: '17-6',
+    nameKo: '향신료 심층부의 폭풍',
+    theme: 'spice_palace',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // S자형 경로 (17-5와 다른 패턴)
+    pathSegments: [
+      { type: 'horizontal', row: 1, colStart: 0, colEnd: 6 },
+      { type: 'vertical', col: 6, rowStart: 1, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 2, colEnd: 6 },
+      { type: 'vertical', col: 2, rowStart: 5, rowEnd: 9 },
+      { type: 'horizontal', row: 9, colStart: 2, colEnd: 8 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'masala_guide', count: 42, interval: 840 },
+        { type: 'curry_djinn', count: 58, interval: 920 },
+        { type: 'naan_golem', count: 40, interval: 1080 },
+        { type: 'incense_specter', count: 42, interval: 1240 },
+        { type: 'spice_elemental', count: 28, interval: 1620 },
+        { type: 'butter_ghost', count: 28, interval: 580 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'masala_guide', count: 56, interval: 770 },
+        { type: 'curry_djinn', count: 74, interval: 840 },
+        { type: 'naan_golem', count: 52, interval: 1000 },
+        { type: 'incense_specter', count: 56, interval: 1140 },
+        { type: 'spice_elemental', count: 38, interval: 1500 },
+        { type: 'cheese_golem', count: 22, interval: 1540 },
+        { type: 'mushroom_scout', count: 26, interval: 750 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'chai_grand_curry', patience: 8600, baseReward: 378, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'sanctum_grand_feast', patience: 8000, baseReward: 428, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 38, two: 29 },
+    service: { duration: 348, customerInterval: 2.05, maxCustomers: 60, customerPatience: 20 },
+  },
   // ── 18-1: 황금 회랑 (진입 — 17-5보다 약간 낮은 난이도) ──
   '18-1': {
     id: '18-1',
@@ -7626,7 +7707,45 @@ export const STAGES = {
     starThresholds: { three: 40, two: 31 },
     service: { duration: 375, customerInterval: 1.95, maxCustomers: 72, customerPatience: 16 },
   },
-  '19-6': { id: '19-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 19-6: 칸티나의 최후 방어선 (멕시칸 아크 1막 종결) ──
+  '19-6': {
+    id: '19-6',
+    nameKo: '칸티나의 최후 방어선',
+    theme: 'cactus_cantina',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 역Z자 경로 (19-1 Z자의 반전)
+    pathSegments: [
+      { type: 'horizontal', row: 7, colStart: 0, colEnd: 7 },
+      { type: 'vertical',   col: 7, rowStart: 2, rowEnd: 7 },
+      { type: 'horizontal', row: 2, colStart: 0, colEnd: 7 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'taco_bandit', count: 46, interval: 1200 },
+        { type: 'burrito_juggernaut', count: 26, interval: 2000 },
+        { type: 'masala_guide', count: 52, interval: 880 },
+        { type: 'curry_djinn', count: 60, interval: 820 },
+        { type: 'incense_specter', count: 30, interval: 1280 },
+        { type: 'spice_elemental', count: 20, interval: 1620 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'taco_bandit', count: 60, interval: 1080 },
+        { type: 'burrito_juggernaut', count: 34, interval: 1840 },
+        { type: 'masala_guide', count: 68, interval: 810 },
+        { type: 'curry_djinn', count: 78, interval: 750 },
+        { type: 'incense_specter', count: 40, interval: 1180 },
+        { type: 'spice_elemental', count: 26, interval: 1500 },
+        { type: 'butter_ghost', count: 30, interval: 600 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'burrito_grande', patience: 8800, baseReward: 498, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'cactus_grand_feast', patience: 8200, baseReward: 562, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 42, two: 32 },
+    service: { duration: 372, customerInterval: 2.0, maxCustomers: 66, customerPatience: 18 },
+  },
   // ── 20-1: 균열 근원지 입구 ──
   '20-1': {
     id: '20-1',
@@ -7963,7 +8082,63 @@ export const STAGES = {
     starThresholds: { three: 51, two: 39 },
     service: { duration: 415, customerInterval: 1.78, maxCustomers: 80, customerPatience: 15 },
   },
-  '20-6': { id: '20-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 20-6: 균열의 심장 (el_diablo_pepper 중보스 예고전 — 21-6 최종전 복선) ──
+  '20-6': {
+    id: '20-6',
+    nameKo: '균열의 심장',
+    theme: 'cactus_cantina',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 대칭 경로 (18-6/21-6 보스전 패턴 — 중앙 세로→가로→중앙 세로)
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cactus_wraith', count: 24, interval: 2000 },
+        { type: 'luchador_ghost', count: 16, interval: 2200 },
+        { type: 'taco_bandit', count: 50, interval: 1100 },
+        { type: 'burrito_juggernaut', count: 28, interval: 1880 },
+        { type: 'masala_guide', count: 45, interval: 860 },
+        { type: 'curry_djinn', count: 58, interval: 780 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cactus_wraith', count: 32, interval: 1840 },
+        { type: 'luchador_ghost', count: 22, interval: 2020 },
+        { type: 'taco_bandit', count: 62, interval: 1000 },
+        { type: 'burrito_juggernaut', count: 34, interval: 1740 },
+        { type: 'masala_guide', count: 56, interval: 800 },
+        { type: 'curry_djinn', count: 70, interval: 720 },
+        { type: 'incense_specter', count: 30, interval: 1240 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cactus_wraith', count: 40, interval: 1680 },
+        { type: 'luchador_ghost', count: 28, interval: 1860 },
+        { type: 'taco_bandit', count: 72, interval: 940 },
+        { type: 'burrito_juggernaut', count: 40, interval: 1600 },
+        { type: 'masala_guide', count: 66, interval: 740 },
+        { type: 'curry_djinn', count: 80, interval: 680 },
+        { type: 'incense_specter', count: 38, interval: 1160 },
+        { type: 'spice_elemental', count: 22, interval: 1520 },
+      ]},
+      // 보스 웨이브 (el_diablo_pepper 중보스 등장 — 21-6 최종전 복선)
+      { wave: 4, enemies: [
+        { type: 'el_diablo_pepper', count: 1, interval: 0 },
+        { type: 'cactus_wraith', count: 3, interval: 4000 },
+        { type: 'luchador_ghost', count: 3, interval: 4200 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'avocado_rice_bowl', patience: 8600, baseReward: 528, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'diablo_feast', patience: 8300, baseReward: 590, tipMultiplier: 1.5 }] },
+      { wave: 3, customers: [{ dish: 'diablo_feast', patience: 8000, baseReward: 658, tipMultiplier: 2.0, vip: true }] },
+      { wave: 4, customers: [{ dish: 'diablo_feast', patience: 7600, baseReward: 735, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 54, two: 42 },
+    service: { duration: 418, customerInterval: 1.76, maxCustomers: 79, customerPatience: 15 },
+  },
   // ── 21-1: 엘 디아블로의 전당 입구 ──
   '21-1': {
     id: '21-1',
@@ -8796,7 +8971,59 @@ export const STAGES = {
     starThresholds: { three: 75, two: 58 },
     service: { duration: 452, customerInterval: 1.58, maxCustomers: 91, customerPatience: 12 },
   },
-  '22-6': { id: '22-6', nameKo: '미구현', theme: 'placeholder' },
+  // ── 22-6: 케이크 위치의 연회 (cake_witch 특수 가마솥 스테이지) ──
+  '22-6': {
+    id: '22-6',
+    nameKo: '케이크 위치의 연회',
+    theme: 'dream_candy',
+    availableTowers: ['pan', 'delivery', 'salt', 'grill', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'],
+    gridCols: 9, gridRows: 10,
+    // 대칭 경로 (18-6/21-6 보스전 패턴 — 케이크 위치 가마솥 이벤트)
+    pathSegments: [
+      { type: 'vertical', col: 4, rowStart: 0, rowEnd: 5 },
+      { type: 'horizontal', row: 5, colStart: 0, colEnd: 8 },
+      { type: 'vertical', col: 4, rowStart: 5, rowEnd: 9 },
+    ],
+    waves: [
+      { wave: 1, enemies: [
+        { type: 'cake_witch', count: 18, interval: 2600 },
+        { type: 'candy_soldier', count: 54, interval: 1540 },
+        { type: 'taco_bandit', count: 66, interval: 1060 },
+        { type: 'burrito_juggernaut', count: 34, interval: 1740 },
+        { type: 'masala_guide', count: 74, interval: 790 },
+        { type: 'curry_djinn', count: 88, interval: 730 },
+        { type: 'incense_specter', count: 46, interval: 1100 },
+      ]},
+      { wave: 2, enemies: [
+        { type: 'cake_witch', count: 26, interval: 2380 },
+        { type: 'candy_soldier', count: 70, interval: 1420 },
+        { type: 'taco_bandit', count: 82, interval: 970 },
+        { type: 'burrito_juggernaut', count: 42, interval: 1600 },
+        { type: 'masala_guide', count: 90, interval: 730 },
+        { type: 'curry_djinn', count: 106, interval: 670 },
+        { type: 'incense_specter', count: 58, interval: 1020 },
+        { type: 'spice_elemental', count: 28, interval: 1380 },
+      ]},
+      { wave: 3, enemies: [
+        { type: 'cake_witch', count: 36, interval: 2180 },
+        { type: 'candy_soldier', count: 90, interval: 1280 },
+        { type: 'taco_bandit', count: 100, interval: 880 },
+        { type: 'burrito_juggernaut', count: 52, interval: 1480 },
+        { type: 'masala_guide', count: 108, interval: 670 },
+        { type: 'curry_djinn', count: 126, interval: 610 },
+        { type: 'incense_specter', count: 72, interval: 940 },
+        { type: 'spice_elemental', count: 36, interval: 1280 },
+        { type: 'milk_phantom', count: 34, interval: 700 },
+      ]},
+    ],
+    customers: [
+      { wave: 1, customers: [{ dish: 'cacao_fantasy_fondant', patience: 8300, baseReward: 606, tipMultiplier: 1.5 }] },
+      { wave: 2, customers: [{ dish: 'dream_candy_platter', patience: 8000, baseReward: 676, tipMultiplier: 2.0, vip: true }] },
+      { wave: 3, customers: [{ dish: 'sugar_dream_supreme', patience: 7700, baseReward: 754, tipMultiplier: 2.5, vip: true }] },
+    ],
+    starThresholds: { three: 72, two: 55 },
+    service: { duration: 445, customerInterval: 1.62, maxCustomers: 88, customerPatience: 13 },
+  },
   // ── 23-1: 마카롱 성벽 앞 (macaron_knight 첫 등장) ──
   '23-1': {
     id: '23-1',
