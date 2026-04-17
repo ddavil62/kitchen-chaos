@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Phase 45 Chef AD Mode 2 Preview</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: monospace; margin: 20px; }
+  h1 { color: #f0c040; }
+  .chef-block { display: inline-block; margin: 20px; text-align: center; vertical-align: top; }
+  .chef-name { font-size: 14px; color: #f0c040; margin-bottom: 8px; font-weight: bold; }
+  .directions { display: grid; grid-template-columns: repeat(3, 92px); grid-gap: 4px; background: #333; padding: 8px; }
+  .dir-cell { text-align: center; }
+  .dir-label { font-size: 10px; color: #aaa; }
+  img { background: transparent; display: block; }
+  .south-highlight { border: 2px solid #f0c040; }
+  .row { display: flex; flex-wrap: wrap; margin-bottom: 30px; }
+</style>
+</head>
+<body>
+<h1>Phase 45 — Chef Sprite AD Mode 2</h1>
+<p>5종 셰프 × 8방향 스프라이트 시각 검증. 앵커: carrot_goblin 64px chibi 스타일 기준.</p>
+
+<div class="row">
+
+<!-- petit_chef -->
+<div class="chef-block">
+  <div class="chef-name">1. petit_chef (꼬마 셰프) #44cc44</div>
+  <div class="directions">
+    <div class="dir-cell"><div class="dir-label">NW</div><img src="../assets/chefs/petit_chef/rotations/north-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">N</div><img src="../assets/chefs/petit_chef/rotations/north.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">NE</div><img src="../assets/chefs/petit_chef/rotations/north-east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">W</div><img src="../assets/chefs/petit_chef/rotations/west.png" width="92" height="92"></div>
+    <div class="dir-cell south-highlight"><div class="dir-label">S (KEY)</div><img src="../assets/chefs/petit_chef/rotations/south.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">E</div><img src="../assets/chefs/petit_chef/rotations/east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">SW</div><img src="../assets/chefs/petit_chef/rotations/south-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">-</div></div>
+    <div class="dir-cell"><div class="dir-label">SE</div><img src="../assets/chefs/petit_chef/rotations/south-east.png" width="92" height="92"></div>
+  </div>
+</div>
+
+<!-- flame_chef -->
+<div class="chef-block">
+  <div class="chef-name">2. flame_chef (불꽃 요리사) #ff4444</div>
+  <div class="directions">
+    <div class="dir-cell"><div class="dir-label">NW</div><img src="../assets/chefs/flame_chef/rotations/north-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">N</div><img src="../assets/chefs/flame_chef/rotations/north.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">NE</div><img src="../assets/chefs/flame_chef/rotations/north-east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">W</div><img src="../assets/chefs/flame_chef/rotations/west.png" width="92" height="92"></div>
+    <div class="dir-cell south-highlight"><div class="dir-label">S (KEY)</div><img src="../assets/chefs/flame_chef/rotations/south.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">E</div><img src="../assets/chefs/flame_chef/rotations/east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">SW</div><img src="../assets/chefs/flame_chef/rotations/south-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">-</div></div>
+    <div class="dir-cell"><div class="dir-label">SE</div><img src="../assets/chefs/flame_chef/rotations/south-east.png" width="92" height="92"></div>
+  </div>
+</div>
+
+<!-- ice_chef -->
+<div class="chef-block">
+  <div class="chef-name">3. ice_chef (얼음 요리장) #44aaff</div>
+  <div class="directions">
+    <div class="dir-cell"><div class="dir-label">NW</div><img src="../assets/chefs/ice_chef/rotations/north-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">N</div><img src="../assets/chefs/ice_chef/rotations/north.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">NE</div><img src="../assets/chefs/ice_chef/rotations/north-east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">W</div><img src="../assets/chefs/ice_chef/rotations/west.png" width="92" height="92"></div>
+    <div class="dir-cell south-highlight"><div class="dir-label">S (KEY)</div><img src="../assets/chefs/ice_chef/rotations/south.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">E</div><img src="../assets/chefs/ice_chef/rotations/east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">SW</div><img src="../assets/chefs/ice_chef/rotations/south-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">-</div></div>
+    <div class="dir-cell"><div class="dir-label">SE</div><img src="../assets/chefs/ice_chef/rotations/south-east.png" width="92" height="92"></div>
+  </div>
+</div>
+
+<!-- yuki_chef -->
+<div class="chef-block">
+  <div class="chef-name">4. yuki_chef (유키) #87ceeb</div>
+  <div class="directions">
+    <div class="dir-cell"><div class="dir-label">NW</div><img src="../assets/chefs/yuki_chef/rotations/north-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">N</div><img src="../assets/chefs/yuki_chef/rotations/north.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">NE</div><img src="../assets/chefs/yuki_chef/rotations/north-east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">W</div><img src="../assets/chefs/yuki_chef/rotations/west.png" width="92" height="92"></div>
+    <div class="dir-cell south-highlight"><div class="dir-label">S (KEY)</div><img src="../assets/chefs/yuki_chef/rotations/south.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">E</div><img src="../assets/chefs/yuki_chef/rotations/east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">SW</div><img src="../assets/chefs/yuki_chef/rotations/south-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">-</div></div>
+    <div class="dir-cell"><div class="dir-label">SE</div><img src="../assets/chefs/yuki_chef/rotations/south-east.png" width="92" height="92"></div>
+  </div>
+</div>
+
+<!-- lao_chef -->
+<div class="chef-block">
+  <div class="chef-name">5. lao_chef (라오) #ff4500</div>
+  <div class="directions">
+    <div class="dir-cell"><div class="dir-label">NW</div><img src="../assets/chefs/lao_chef/rotations/north-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">N</div><img src="../assets/chefs/lao_chef/rotations/north.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">NE</div><img src="../assets/chefs/lao_chef/rotations/north-east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">W</div><img src="../assets/chefs/lao_chef/rotations/west.png" width="92" height="92"></div>
+    <div class="dir-cell south-highlight"><div class="dir-label">S (KEY)</div><img src="../assets/chefs/lao_chef/rotations/south.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">E</div><img src="../assets/chefs/lao_chef/rotations/east.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">SW</div><img src="../assets/chefs/lao_chef/rotations/south-west.png" width="92" height="92"></div>
+    <div class="dir-cell"><div class="dir-label">-</div></div>
+    <div class="dir-cell"><div class="dir-label">SE</div><img src="../assets/chefs/lao_chef/rotations/south-east.png" width="92" height="92"></div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

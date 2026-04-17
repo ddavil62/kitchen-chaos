@@ -1,5 +1,40 @@
 # Changelog
 
+## [Phase 45] 2026-04-17 — 셰프 스프라이트 5종 92x92px 업그레이드
+
+### Art
+
+- petit_chef, flame_chef, ice_chef: 80x80px -> 92x92px chibi 재생성 (`rotations_old_bak/` 백업)
+- yuki_chef (유키), lao_chef (라오): 신규 92x92px chibi 생성
+- 차별화: ice_chef(파란 toque+navy jacket) vs yuki_chef(하늘색 happi+hachimaki), flame_chef(빨간 bandana+leather) vs lao_chef(주황 mandarin jacket+wok)
+- 5종 x 8방향 = 40개 PNG, 전 92x92px RGBA
+- PixelLab IDs: petit(`3286712e`), flame(`6aee50e2`), ice(`098c8ef8`), yuki(`58b0a3ca`), lao(`a61c4979`)
+- 앵커: carrot_goblin 64px v2 (`ca774523-aeca-4f33-8495-4fb0db4ba22a`)
+
+### Changed
+
+- `assets/chefs/{petit,flame,ice}_chef/rotations/` — 80x80 -> 92x92px PNG 교체 (기존 백업 완료)
+- `assets/chefs/{yuki,lao}_chef/rotations/` — 신규 생성 (8방향 x 2종 = 16개 PNG)
+- Phase 44 아트 리워크 + Phase 45 셰프 리워크 = 전 캐릭터(적+보스+셰프) 통일 완결
+
+### Known Issues
+
+- petit_chef, flame_chef, ice_chef의 `metadata.json`에 구 해상도(80x80) 기록 잔존. 게임에서 미참조, 기능 영향 없음. Phase 46에서 일괄 정리 예정.
+- 신규 2종(yuki_chef, lao_chef)에 `metadata.json` 없음.
+
+### Notes
+
+- 생성 표준: size 64, canvas 92x92, chibi, single color black outline, basic shading, medium detail, low top-down, 8방향
+- visual_change: art
+- 코드 변경 없음 (에셋 파일 교체/추가만)
+- AD 모드 2: APPROVED (5종 전원, REVISE 0건)
+- QA: PASS (수용 기준 9/9 충족, 예외 시나리오 5/5, 시각 검증 4/4)
+- 스펙: `.claude/specs/2026-04-17-kc-phase45-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase45-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase45-qa.md`
+- AD 모드 1: `.claude/specs/2026-04-17-kc-phase45-ad1.md`
+- AD 모드 2: `.claude/specs/2026-04-17-kc-phase45-ad2.md`
+
 ## [Phase 44-3] 2026-04-17 — 그룹3 스프라이트 64px 재생성 (16~24장 적 13종 + 보스 3종)
 
 ### Added
