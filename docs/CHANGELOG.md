@@ -1,5 +1,45 @@
 # Changelog
 
+## [Phase 46] 2026-04-17 -- 통합 검증 및 잔여 버그 수정
+
+### Fixed
+
+- metadata.json size 필드 일괄 갱신: 총 50건 (42건 갱신 + 8건 신규 생성)
+  - 일반 적 34종 -> 92x92 (30종 갱신, macaron_knight/sugar_specter/sushi_ninja/tempura_monk 4종 신규)
+  - 보스 13종 -> 112x112 (일반 보스 10종) / 136x136 (cuisine_god, queen_of_taste). queen_of_taste, sake_oni 신규 생성
+  - 셰프 5종 -> 92x92 (3종 갱신, yuki_chef/lao_chef 2종 신규)
+  - incense_specter, spice_elemental: 구 포맷 -> 신 포맷 마이그레이션
+  - 기존 필드(id, prompt, frames, animations, template_id) 전부 보존
+- enemy_charge_impact 이벤트 핸들러 구현 (`js/scenes/GatheringScene.js`)
+  - L153 이벤트 등록, L1251~1278 핸들러 메서드, L2182 shutdown 해제
+  - burrito_juggernaut 돌진 시 반경 내 타워에 알파 깜빡임 + '돌진!' 플로팅 텍스트 + screenShake
+  - Tower 클래스 미수정 (비침습적, VFX 피드백만)
+  - 스펙의 `flashAt`/`floatText` 대신 기존 패턴(`tweens.add` + `add.text` + `vfx.screenShake`) 조합 사용
+- cardamom.png 고유 아이콘 교체 (`assets/ingredients/cardamom.png`)
+  - chai.png 복사본 placeholder -> PixelLab map_object 생성 초록 꼬투리 픽셀아트
+  - 32x32px RGBA, 배경 투명, chai.png와 39.4% 픽셀 상이
+  - AD Mode 2 APPROVED
+
+### Verified
+
+- pasta_boss rotations 파일명: 실측 결과 이미 hyphenated 형식(south-east.png 등)으로 정상. PROJECT.md 오기 삭제
+- 전 캐릭터(적 34종 + 보스 13종 + 셰프 5종) 게임 내 렌더링 정상 (Playwright 10/10 통과)
+- yuki_chef, lao_chef 셰프 선택 화면 정상 표시 (잠금 상태)
+- queen_cream_supreme 서빙 UI 정상 (8개 재료 ingStr 텍스트 잘림 없음)
+- 모바일 뷰포트(360x640) 정상 스케일링
+- 씬 전환 반복 시 에러 없음, 이벤트 리스너 누수 없음
+
+### Notes
+
+- visual_change: art
+- QA: PASS (Playwright 10/10, Python 메타데이터 59건 OK, 스크린샷 7건 시각 확인)
+- AD Mode 2: APPROVED (cardamom.png)
+- 알려진 예외: mini_dumpling metadata 92x92 vs 실제 36x36 (분열 소환 적 의도적 소형)
+- 스펙: `.claude/specs/2026-04-17-kc-phase46-spec.md`
+- 리포트: `.claude/specs/2026-04-17-kc-phase46-report.md`
+- QA: `.claude/specs/2026-04-17-kc-phase46-qa.md`
+- AD Mode 2: `.claude/specs/2026-04-17-kc-phase46-ad2.md`
+
 ## [Phase 45] 2026-04-17 — 셰프 스프라이트 5종 92x92px 업그레이드
 
 ### Art

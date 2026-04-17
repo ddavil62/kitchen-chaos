@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-17 (Phase 45 완료)
+> 최종 업데이트: 2026-04-17 (Phase 46 완료)
 
 ## 프로젝트 개요
 
@@ -73,7 +73,7 @@
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 그룹3 콘텐츠 (16~24장) | 인도(16~18)/멕시칸(19~21)/디저트·최종(22~24) 아크, 적 14종+보스 3종(maharaja/el_diablo_pepper/queen_of_taste 3페이즈), 레시피 57종, 대화 28종, 전 스테이지(16-1~24-6) 구현, 밸런스 QA 완료 | 완료 |
 | 업적 시스템 | 30개 업적 (5카테고리), 조건 판정+보상, 토스트 알림, 전용 AchievementScene UI | 완료 |
-| 아트 리워크 | 레거시 스프라이트 64px 재생성. Phase 44(적/보스 전종) + Phase 45(셰프 5종, 92x92px chibi) 완료. 전 캐릭터 통일 완료 | 완료 |
+| 아트 리워크 | 레거시 스프라이트 64px 재생성. Phase 44(적/보스 전종) + Phase 45(셰프 5종) 완료. Phase 46에서 metadata.json 일괄 갱신 + cardamom.png 교체 + 렌더링 검증까지 완결 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -93,11 +93,9 @@
 - EndlessScene이 WaveManager를 MonkeyPatch로 연동 (공식 override API 없음)
 - 온라인 랭킹 미구현, 엔드리스 ServiceScene은 1장 기준 config
 - removeBuff()가 모든 멀티플라이어를 전역 초기화하므로, 디버프 동시 적용 시 먼저 만료된 디버프가 나머지도 해제할 수 있음 (기존 설계, 향후 멀티 버프 스택 구현 시 개선)
-- cardamom.png 아이콘은 chai.png 복사본 placeholder (고유 아이콘 미생성)
-- enemy_charge_impact 이벤트의 TowerManager 수신 로직 미구현 (돌진 시 타워 피해 미적용, 후속 페이즈에서 구현 필요)
-- queen_cream_supreme 재료 8개 슬롯(cream:3, vanilla:2, cacao:1, sugar:1, butter:1)이 기존 최대(7개)를 초과하여 서빙 UI 인게임 검증 필요
-- Phase 44 생성 캐릭터의 metadata.json size 필드가 구 해상도 유지 (일괄 갱신 필요). Phase 45 셰프 3종(petit/flame/ice)도 동일 이슈
-- pasta_boss rotations/ 파일명이 unhyphenated (southeast.png 등), 나머지 21종은 hyphenated (south-east.png). 현재 게임 런타임 영향 없으나 후속 수정 필요
+- enemy_charge_impact는 VFX/경고 텍스트만 구현 (Tower HP 시스템 미도입). 타워 내구도 도입 시 별도 페이즈에서 검토
+- 신규 생성 metadata.json 8건(macaron_knight, sugar_specter, sushi_ninja, tempura_monk, queen_of_taste, sake_oni, yuki_chef, lao_chef)의 id 필드가 "unknown". 향후 PixelLab 재생성 시 업데이트 필요
+- mini_dumpling metadata 92x92 vs 실제 PNG 36x36 불일치 (분열 소환 적 의도적 소형, SpriteLoader 스케일 처리)
 
 ## 향후 계획
 

@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-17
-> 기준: Phase 45 완료 / Phase 48-1~3 유랑 미력사·고용 셰프 시스템 기획 예정 (Phase 47 이후)
+> 기준: Phase 46 완료 / Phase 48-1~3 유랑 미력사·고용 셰프 시스템 기획 예정 (Phase 47 이후)
 
 ---
 
@@ -54,8 +54,9 @@
 | Phase 43 | 잔여 콘텐츠 (8장·14장 placeholder 구현, 유키/라오 셰프 스킬 완성) | ✅ 완료 |
 | Phase 44 | 아트 리워크: 적/보스 전종 64px 재생성 (44-1 그룹1 + 44-2 그룹2 + 44-3 그룹3) | ✅ 완료 |
 | Phase 45 | 셰프 5종 92x92px 업그레이드 (재생성 3종 + 신규 2종, 전 캐릭터 아트 통일 완결) | ✅ 완료 |
+| Phase 46 | 통합 검증 및 잔여 버그 수정 (metadata.json 50건 갱신, enemy_charge_impact 구현, cardamom.png 교체, 전 캐릭터 렌더링 검증) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 45 완료 — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터(적+보스+셰프) 64px chibi 아트 통일 완결.
+**현재 구현 완성도**: Phase 46 완료 — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터(적+보스+셰프) 64px chibi 아트 통일 완결. metadata.json 전종 갱신, enemy_charge_impact VFX 구현, cardamom.png 고유 아이콘 교체.
 
 ### 현재 콘텐츠 규모
 
@@ -175,13 +176,12 @@ proportions: chibi, view: low top-down, n_directions: 8
 ```
 Phase 45: 셰프 스프라이트 5종 92x92px 업그레이드 ✅ 완료
               ↓
-Phase 46: 에셋 통합 검증 + 스크립트 점검
-              - 새 64px 스프라이트 게임 내 렌더링 확인 (셰프 포함 전체)
-              - metadata.json size 필드 일괄 갱신
-              - pasta_boss 파일명 unhyphenated 수정
-              - enemy_charge_impact TowerManager 수신 구현
-              - cardamom.png 고유 아이콘 생성
-              - queen_cream_supreme 서빙 UI 인게임 검증
+Phase 46: 통합 검증 및 잔여 버그 수정 ✅ 완료
+              - metadata.json 50건 일괄 갱신 (42 갱신 + 8 신규)
+              - pasta_boss 파일명 확인 (이미 정상)
+              - enemy_charge_impact VFX 핸들러 구현
+              - cardamom.png 고유 아이콘 교체
+              - 전 캐릭터 렌더링 + queen_cream_supreme UI 검증
               ↓
 Phase 47: Walk 애니메이션 (범위/비용 검토 후 — 주요 보스 우선 또는 template 제한)
               ↓
