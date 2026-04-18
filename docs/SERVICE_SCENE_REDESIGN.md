@@ -1,7 +1,8 @@
 # Kitchen Chaos — 영업씬(ServiceScene) 비주얼 재구성 기획서
 
 > 작성일: 2026-04-18 (Phase 50 산출물)
-> 상태: 1단계 완료 (Phase 51-4, 2026-04-18), 2~3단계 미착수
+> 최종 수정: 2026-04-18 — 렌더링 아키텍처 전환 결정 (테이블 앞/뒷면 분리 + 손님 독립 스프라이트)
+> 상태: 1단계 완료 (Phase 51-4), 2단계(렌더링 재구성) 설계 확정, 3단계 미착수
 
 ---
 
@@ -44,13 +45,13 @@
 | `customer_normal_sitting.png` | 48×48 | 착석 일반 |
 | `customer_sitting.png` | 48×48 | 착석 (공용) |
 
-#### 렌더링 방식
+#### 렌더링 방식 (현재 — 레거시)
 
-- **테이블**: 착석 시 `table_lv{grade}_occupied.png` 컴포짓 사용. 미로드 시 다이아몬드 폴리곤 fallback.
+- **테이블**: 착석 시 `table_lv{grade}_occupied.png` 컴포짓 사용 (테이블+손님 합성 1장). 미로드 시 다이아몬드 폴리곤 fallback.
 - **손님 아이콘**: 컴포짓 에셋 없을 때 `customer_{type}.png` → 없으면 이모지 텍스트 fallback.
-- **바닥**: `floor_hall.png` 단일 이미지 → 없으면 `0x5C3A1E` 단색 rectangle fallback.
+- **바닥**: `floor_hall_{theme}.png` 128×128 tileSprite 반복 → 없으면 `0x5C3A1E` 단색 rectangle fallback. (Phase 51-4 적용)
 - **격자선**: Graphics API로 다이아몬드 테두리 오버레이 (opacity 0.3).
-- **하단 바**: 순수 `0x0d0d1a` 사각형 (이미지 에셋 없음).
+- **하단 바**: `0x1c0e00` 단색 rectangle. (Phase 51-4에서 색조 수정)
 - **조리/재고/레시피 구역 배경**: `0x1c1008` 단색 rectangle (이미지 에셋 없음).
 - **HUD 배경**: `0x1c0e00` 단색 rectangle.
 
@@ -62,15 +63,23 @@
 4. **조리/재고/레시피 하단 구역**: 이미지 에셋이 전혀 없고 단색 사각형으로만 구성된다. 레스토랑 주방 분위기가 전혀 느껴지지 않는다.
 5. **하단 바**: `0x0d0d1a` 진한 남색 배경. 게임의 웜 다크 테마(`0x1c0e00`)와 색조가 어긋난다.
 6. **테이블 등급 시각 차이**: lv0~lv4 테이블이 색상 차이 외에 형태적 구분이 약하다. 업그레이드 동기 부여가 시각적으로 충분하지 않다.
-7. **챕터 연동 배경 없음**: GatheringScene은 챕터별 타일셋(spice_palace, izakaya_underground, bistro_parisian 등)으로 배경을 차별화하지만, ServiceScene은 챕터와 무관하게 동일한 홀 이미지를 쓴다. 스토리 몰입감이 끊긴다.
+7. **챕터 연동 배경 없음**: GatheringScene은 챕터별 타일셋(spice_palace, izakaya_underground, bistro_parisian 등)으로 배경을 차별화하지만, ServiceScene은 챕터와 무관하게 동일한 홀 이미지를 쓴다. 스토리 몰입감이 끊긴다. (→ Phase 51-4에서 바닥 8종 교체로 부분 해결)
+8. **컴포짓 occupied 시스템의 확장성 한계** ⚠️: `table_lv{n}_occupied.png`가 테이블+손님을 미리 합성한 단일 이미지이므로, 손님 유형이 늘어날수록 `등급 수 × 손님 종류 × 상태` 배수로 에셋이 증가한다. 새 손님 1종 추가 시 최소 5장(등급별)이 필요하고, 손님 애니메이션 도입 시에는 프레임 수까지 곱해진다. 이 구조로는 손님 캐릭터 다양화가 근본적으로 불가능하다.
 
 ---
 
 ## 2. 재구성 방향 설계
 
-### 2-1. 뷰 방식
+### 2-1. 뷰 방식 (확정)
 
-현행 **아이소메트릭 다이아몬드 격자 (Phase 19-5 도입)** 를 유지한다. 뷰 전환(탑다운↔사이드뷰)은 기존 좌표 체계와 depth sorting 로직을 전면 재작성해야 하므로 리스크가 크다. 비주얼 품질은 에셋 교체로 충분히 달성 가능하다.
+**아이소메트릭 다이아몬드 격자 유지** (Phase 19-5 도입 구조 계승).
+
+사이드뷰 전환도 검토했으나 다음 이유로 아이소메트릭을 유지한다:
+- 기존 이소좌표계·격자 렌더링·depth 체계가 모두 재작성 필요 (공수 3~4 phase)
+- GatheringScene(아이소메트릭)과의 시각적 연속성이 끊김
+- **손님 착석 겹침 문제**는 뷰 전환 없이 렌더링 레이어 분리로 해결 가능 (→ 2-3 참조)
+
+바닥 타일은 `square_topdown`이 아닌 **`isometric` 타입**으로 재생성한다. (Phase 51-4에서 생성한 128×128 `square_topdown` 타일은 아이소메트릭 테이블과 원근감이 충돌하므로 차기 단계에서 교체 대상.)
 
 ### 2-2. 챕터별 배경 차별화
 
@@ -89,28 +98,66 @@
 
 뒷벽(`wall_back.png`)과 데코(`decor_plant.png`, `entrance_arch.png`)도 각 테마에 맞는 변형 버전을 제작한다. 단, 데코는 중요도가 낮으므로 1단계에서 배경만 교체하고, 데코는 2단계에서 순차 추가한다.
 
-### 2-3. 손님 캐릭터 비주얼 업그레이드
+### 2-3. 손님 캐릭터 — 렌더링 아키텍처 전환 (핵심 결정) ⭐
 
-현재 5종 손님 유형 × 1장 스탠딩 이미지 구조를 **3프레임 착석 애니메이션** 방식으로 개선한다.
+**컴포짓 방식 → 독립 스프라이트 방식으로 전환한다.**
 
-- 프레임 구성: `idle_0`, `idle_1`, `idle_2` (waiting 루프), `eating_0`, `eating_1` (served 상태)
-- 크기: 64×64 (현행 48×48 → 1.33배 확대, 아이소메트릭 셀 크기 80×60에 맞춤)
-- 유형 추가 연동: 챕터별 손님 외모 변형 (예: 7~9장은 기모노 착용 일반 손님)
-- 컴포짓 방식 유지: `table_lv{n}_occupied.png`를 기반으로 손님 프레임을 별도 오버레이로 분리하거나, 기존 컴포짓 구조를 재활용한다.
+#### 문제: 기존 컴포짓 방식
 
-단, 애니메이션 도입은 Phaser anim 등록과 SpriteLoader 연동이 필요하므로 **3단계**에서 처리한다. 1단계에서는 우선 64×64 단일 프레임 고품질 이미지로 교체한다.
+```
+table_lv2_occupied.png = [테이블 뒷면 + 의자 + 손님 캐릭터 + 테이블 앞면] 합성 1장
+```
+→ 손님 종류 × 테이블 등급 수만큼 에셋 폭증. 확장 불가.
+
+#### 해결: 3레이어 분리 렌더링
+
+```
+레이어 1: table_lv{n}_back.png   (테이블 뒷면 + 의자 뒷부분)   depth = (col+row)*100
+레이어 2: customer_{type}.png    (손님 스프라이트, 독립)        depth = (col+row)*100 + 50
+레이어 3: table_lv{n}_front.png  (테이블 앞면 + 의자 앞부분)    depth = (col+row)*100 + 99
+```
+
+손님이 테이블 뒷면에 가려지고, 테이블 앞면 아래로 숨는 자연스러운 착석 연출이 된다.
+
+#### 에셋 수 비교
+
+| 방식 | 에셋 수 | 손님 1종 추가 시 |
+|------|--------|----------------|
+| 기존 컴포짓 | 5등급 × 손님종류 × 상태 = 75장+ | 5장 추가 |
+| **분리 렌더링** | 테이블 5×2(앞/뒤) + 손님 N×2(대기/착석) | **2장만 추가** |
+
+#### 손님 스프라이트 스펙
+
+- **크기**: 48×64 (아이소메트릭 셀 80×60 기준, 캐릭터가 약간 높게 보임)
+- **상태**: `waiting` (입장 대기/착석 대기), `seated` (음식 받은 후 착석)
+- **추후 확장**: `eating_0`, `eating_1` 애니메이션 프레임 (3단계에서 추가)
+- **종류**: 기존 5종 (normal, vip, gourmet, rushed, group) → 손님 추가 시 2장만 생성
+
+#### depth 계산식
+
+```javascript
+const BASE_DEPTH = (col + row) * 100;
+tableBack.setDepth(BASE_DEPTH);        // 테이블 뒷면
+customer.setDepth(BASE_DEPTH + 50);    // 손님
+tableFront.setDepth(BASE_DEPTH + 99);  // 테이블 앞면
+```
+
+의자는 테이블 뒷면(`_back`)에 포함하여 별도 에셋 불필요.
 
 ### 2-4. 테이블 비주얼 정교화
 
-현행 lv0~lv4 테이블은 색상 차이만 있다. 등급별로 형태를 달리하여 업그레이드 만족감을 높인다.
+현행 lv0~lv4 테이블은 색상 차이만 있다. 등급별 형태 차별화 + 앞/뒤 분리 에셋으로 재생성한다.
 
-| 등급 | 현재 | 개선안 |
-|------|------|--------|
-| lv0 | 기본 갈색 나무 | 낡은 나무 식탁, 흠집 텍스처 |
-| lv1 | 밝은 갈색 | 깔끔한 원목 |
-| lv2 | 베이지 | 원목+체크 식탁보 |
-| lv3 | 골드 테두리 | 대리석 상판 |
-| lv4 | 황금색 | 크리스탈 상판, 화려한 금속 프레임 |
+| 등급 | 디자인 | 앞면 파일 | 뒷면 파일 |
+|------|--------|----------|----------|
+| lv0 | 낡은 나무 식탁 + 플라스틱 의자 | `table_lv0_front.png` | `table_lv0_back.png` |
+| lv1 | 깔끔한 원목 + 나무 의자 | `table_lv1_front.png` | `table_lv1_back.png` |
+| lv2 | 원목+체크 식탁보 + 패딩 의자 | `table_lv2_front.png` | `table_lv2_back.png` |
+| lv3 | 대리석 상판 + 쿠션 의자 | `table_lv3_front.png` | `table_lv3_back.png` |
+| lv4 | 크리스탈 상판 + 벨벳 의자 | `table_lv4_front.png` | `table_lv4_back.png` |
+
+**해상도**: 96×52 (앞면), 96×64 (뒷면+의자 포함). 기존 96×80 단일 에셋에서 분리.
+**기존 `table_lv{n}.png`, `table_lv{n}_occupied.png`**: 분리 렌더링 전환 후 레거시로 유지(fallback용).
 
 ### 2-5. 하단 UI 구역 개선
 
@@ -138,19 +185,46 @@
 | 홀 바닥 — 엔드리스 | 없음 | 미력 에너지 격자 | 360×240 | PixelLab |
 | 뒷벽 | `wall_back.png` | 그룹별 벽지/벽면 변형 (8종) | 512×80 (동일) | PixelLab |
 
-### 3-2. 2단계 에셋 (손님 + 데코, Phase 51 이후)
+### 3-2. 2단계 에셋 (렌더링 재구성 — 테이블 분리 + 손님 독립화)
 
-| 에셋 | 현재 파일 | 개선 방향 | 해상도 | 생성 방법 |
-|------|-----------|---------|--------|----------|
-| 일반 손님 | `customer_normal.png` 48×48 | 고품질 픽셀아트 64×64 | 64×64 | PixelLab |
-| VIP 손님 | `customer_vip.png` 48×48 | 정장+왕관, 64×64 | 64×64 | PixelLab |
-| 미식가 손님 | `customer_gourmet.png` 48×48 | 안경+양복, 64×64 | 64×64 | PixelLab |
-| 급한 손님 | `customer_rushed.png` 48×48 | 달리는 포즈, 64×64 | 64×64 | PixelLab |
-| 단체 손님 | `customer_group.png` 68×68 | 가족 구성 정리, 80×80 | 80×80 | PixelLab |
-| 화분 데코 | `decor_plant.png` 64×96 | 챕터별 변형 (화분/대나무/선인장/허브) | 64×96 | PixelLab |
-| 입구 아치 | `entrance_arch.png` 192×64 | 챕터별 문 디자인 변형 | 192×64 | PixelLab |
-| 테이블 lv0 occupied | `table_lv0_occupied.png` | 새 손님 크기 맞춤 재생성 | 96×96 | PixelLab |
-| 테이블 lv4 occupied | `table_lv4_occupied.png` | 크리스탈 상판 + 새 손님 | 96×96 | PixelLab |
+**핵심 변경**: `_occupied` 컴포짓 방식 폐기 → 테이블 앞/뒤 분리 + 손님 독립 스프라이트
+
+#### 테이블 분리 에셋 (10장)
+
+| 에셋 | 파일명 | 해상도 | 내용 |
+|------|--------|--------|------|
+| lv0 뒷면 | `table_lv0_back.png` | 96×64 | 낡은 원목 뒤판 + 플라스틱 의자 |
+| lv0 앞면 | `table_lv0_front.png` | 96×52 | 낡은 원목 앞판 + 다리 |
+| lv1 뒷면 | `table_lv1_back.png` | 96×64 | 원목 뒤판 + 나무 의자 |
+| lv1 앞면 | `table_lv1_front.png` | 96×52 | 원목 앞판 |
+| lv2 뒷면 | `table_lv2_back.png` | 96×64 | 체크 식탁보 뒤 + 패딩 의자 |
+| lv2 앞면 | `table_lv2_front.png` | 96×52 | 체크 식탁보 앞 |
+| lv3 뒷면 | `table_lv3_back.png` | 96×64 | 대리석 뒤 + 쿠션 의자 |
+| lv3 앞면 | `table_lv3_front.png` | 96×52 | 대리석 앞판 |
+| lv4 뒷면 | `table_lv4_back.png` | 96×64 | 크리스탈 뒤 + 벨벳 의자 |
+| lv4 앞면 | `table_lv4_front.png` | 96×52 | 크리스탈 앞판 + 금속 프레임 |
+
+#### 손님 독립 스프라이트 (10장)
+
+| 에셋 | 파일명 | 해상도 | 상태 |
+|------|--------|--------|------|
+| 일반 대기 | `customer_normal_waiting.png` | 48×64 | 입장/착석 대기 |
+| 일반 착석 | `customer_normal_seated.png` | 48×64 | 서빙 받은 후 |
+| VIP 대기 | `customer_vip_waiting.png` | 48×64 | 정장+왕관 |
+| VIP 착석 | `customer_vip_seated.png` | 48×64 | |
+| 미식가 대기 | `customer_gourmet_waiting.png` | 48×64 | 안경+양복 |
+| 미식가 착석 | `customer_gourmet_seated.png` | 48×64 | |
+| 급한 대기 | `customer_rushed_waiting.png` | 48×64 | 긴장 표정 |
+| 급한 착석 | `customer_rushed_seated.png` | 48×64 | |
+| 단체 대기 | `customer_group_waiting.png` | 64×64 | 가족 |
+| 단체 착석 | `customer_group_seated.png` | 64×64 | |
+
+#### 데코 (옵션, 우선순위 낮음)
+
+| 에셋 | 현재 파일 | 개선 방향 | 해상도 |
+|------|-----------|---------|--------|
+| 화분 데코 | `decor_plant.png` | 챕터별 변형 (화분/대나무/선인장) | 64×96 |
+| 입구 아치 | `entrance_arch.png` | 챕터별 문 디자인 변형 | 192×64 |
 
 ### 3-3. 3단계 에셋 (주방 구역 + 애니메이션, 별도 페이즈)
 
@@ -167,71 +241,73 @@
 
 ### 4-1. `ServiceScene.js` 수정 포인트
 
-#### 챕터별 바닥 로드 (1단계)
+#### 1단계 — 챕터별 바닥 (Phase 51-4 완료)
 
-현재 `_createTables()`에서 `'floor_hall'` 단일 키로 이미지를 로드한다. 챕터별 키를 반환하는 헬퍼 함수를 추가해야 한다.
+`_getHallFloorKey()`, `_getWallBackKey()` 헬퍼 추가, `add.tileSprite` 전환, 하단 바 색조 수정 완료.
+
+#### 2단계 — 테이블 앞/뒤 분리 렌더링 (핵심 변경)
+
+`_createTables()` 내 테이블 렌더 로직을 아래와 같이 교체한다.
 
 ```javascript
-// 변경 전
-if (SpriteLoader.hasTexture(this, 'floor_hall')) {
-  this.add.image(..., 'floor_hall')...
+// 변경 전 (컴포짓 방식)
+const occKey = `table_lv${grade}_occupied`;
+if (isOccupied && SpriteLoader.hasTexture(this, occKey)) {
+  this.add.image(x, y, occKey).setDepth(depth);
+} else {
+  this.add.image(x, y, `table_lv${grade}`).setDepth(depth);
 }
 
-// 변경 후
-const floorKey = this._getHallFloorKey();   // 예: 'floor_hall_izakaya'
-if (SpriteLoader.hasTexture(this, floorKey) || SpriteLoader.hasTexture(this, 'floor_hall')) {
-  this.add.image(..., SpriteLoader.hasTexture(this, floorKey) ? floorKey : 'floor_hall')...
+// 변경 후 (3레이어 분리 방식)
+const BASE = (col + row) * 100;
+const backKey  = `table_lv${grade}_back`;
+const frontKey = `table_lv${grade}_front`;
+const custKey  = isOccupied ? `customer_${custType}_seated` : null;
+
+// fallback: 기존 단일 에셋
+if (!SpriteLoader.hasTexture(this, backKey)) {
+  const legacyKey = isOccupied ? `table_lv${grade}_occupied` : `table_lv${grade}`;
+  this.add.image(x, y, legacyKey).setDepth(BASE);
+  return;
 }
+
+this.add.image(x, y, backKey).setDepth(BASE);          // 레이어 1: 테이블 뒷면
+if (custKey && SpriteLoader.hasTexture(this, custKey)) {
+  this.add.image(x, y - 8, custKey).setDepth(BASE + 50); // 레이어 2: 손님
+}
+this.add.image(x, y, frontKey).setDepth(BASE + 99);    // 레이어 3: 테이블 앞면
 ```
 
-헬퍼 함수 `_getHallFloorKey()`: `this.chapter` 값으로 챕터 그룹을 판별하고 해당 에셋 키를 반환한다.
-
+**depth 계산 기준**:
 ```
-chapter 1~6   → 'floor_hall_g1'
-chapter 7~9   → 'floor_hall_izakaya'
-chapter 10~12 → 'floor_hall_dragon'
-chapter 13~15 → 'floor_hall_bistro'
-chapter 16~18 → 'floor_hall_spice'
-chapter 19~21 → 'floor_hall_cantina'
-chapter 22~24 → 'floor_hall_dream'
-isEndless     → 'floor_hall_endless'
+(col + row) * 100       → 테이블 뒷면 (배경에 가까운 쪽)
+(col + row) * 100 + 50  → 손님 스프라이트
+(col + row) * 100 + 99  → 테이블 앞면 (플레이어에 가까운 쪽)
 ```
 
-뒷벽 키도 동일한 패턴으로 `_getWallBackKey()` 헬퍼를 추가한다.
+#### SpriteLoader 수정 포인트
 
-#### 에셋 Preload 연동
-
-`PreloadScene.js` (또는 해당 씬의 preload 단계)에서 챕터별 에셋을 모두 로드하거나, 현재 챕터에 해당하는 에셋만 동적으로 로드하는 전략을 선택해야 한다. 바닥 이미지 8종 × 약 20~60 KB = 최대 480 KB 추가이므로 전부 미리 로드해도 허용 범위다.
-
-#### 손님 크기 변경 (2단계)
-
-`_createTables()`에서 `custIconImg.setDisplaySize(32, 32)` → `setDisplaySize(48, 48)` (64×64 원본 기준 스케일링). `table_lv{n}_occupied.png` 컴포짓의 높이 계산도 변경 필요:
 ```javascript
-// 현행: occH = Math.round(SISO_TABLE_H * 1.2) = 67
-// 변경: 손님 크기가 커지면 컴포짓 높이 조정 필요 (재생성 에셋 치수에 맞게)
-```
+// _loadServiceAssets() 에 추가
+const TABLE_GRADES = [0, 1, 2, 3, 4];
+const CUST_TYPES   = ['normal', 'vip', 'gourmet', 'rushed', 'group'];
+const CUST_STATES  = ['waiting', 'seated'];
 
-#### 하단 바 색조 통일 (즉시, 코드만)
-
-`_createBottomBar()`에서:
-```javascript
-// 변경 전
-0x0d0d1a
-// 변경 후
-0x1c0e00
+for (const g of TABLE_GRADES) {
+  scene.load.image(`table_lv${g}_back`,  `${SERVICE_ROOT}/table_lv${g}_back.png`);
+  scene.load.image(`table_lv${g}_front`, `${SERVICE_ROOT}/table_lv${g}_front.png`);
+}
+for (const t of CUST_TYPES) {
+  for (const s of CUST_STATES) {
+    scene.load.image(`customer_${t}_${s}`, `${SERVICE_ROOT}/customer_${t}_${s}.png`);
+  }
+}
 ```
 
 ### 4-2. `PreloadScene.js` (또는 동등 씬) 수정 포인트
 
-챕터별 홀 바닥 에셋 키-경로 매핑을 추가한다.
-
-```javascript
-this.load.image('floor_hall_g1',      'assets/service/floor_hall_g1.png');
-this.load.image('floor_hall_izakaya', 'assets/service/floor_hall_izakaya.png');
-// ... (각 챕터 그룹별 8개 키)
-this.load.image('wall_back_g1',       'assets/service/wall_back_g1.png');
-// ...
-```
+챕터별 홀 바닥 에셋은 Phase 51-4에서 SpriteLoader에 이미 추가됨.
+2단계에서 테이블 앞/뒤 + 손님 스프라이트 경로 추가 (SpriteLoader 방식으로 통일).
 
 ---
 
@@ -252,18 +328,23 @@ this.load.image('wall_back_g1',       'assets/service/wall_back_g1.png');
 
 **구현 상세**: 바닥 해상도를 기획서 360x240에서 128x128 tileable로 변경하여 `add.tileSprite`로 반복 렌더링. QA 25/25 PASS.
 
-### 2단계 — 손님 캐릭터 + 데코 (Phase 51 이후, 별도 페이즈)
+### 2단계 — 렌더링 재구성 (테이블 분리 + 손님 독립화, 별도 페이즈)
 
-**목표**: 손님 5종 64×64 재생성. 화분/아치 챕터별 변형.
+**목표**: 컴포짓 occupied 방식 폐기. 테이블 앞/뒤 분리 에셋 + 손님 독립 스프라이트 도입.
 
 | 작업 | 내용 |
 |------|------|
-| 에셋 생성 | 손님 5종 × 64×64 (PixelLab) |
-| 에셋 생성 | occupied 컴포짓 5등급 재생성 (새 손님 크기 반영) |
-| ServiceScene.js | `custIconImg.setDisplaySize` 수치 조정 |
-| ServiceScene.js | occupied 컴포짓 높이 비율 재조정 |
+| 에셋 생성 | 테이블 lv0~lv4 앞면 5장 + 뒷면 5장 = 10장 (PixelLab) |
+| 에셋 생성 | 손님 5종 × 2상태(waiting/seated) = 10장 (PixelLab, 48×64) |
+| SpriteLoader.js | 테이블 front/back + 손님 waiting/seated 로드 추가 |
+| ServiceScene.js | `_createTables()` 3레이어 분리 렌더링으로 교체 |
+| ServiceScene.js | depth 계산 공식 `(col+row)*100 + {0,50,99}` 적용 |
+| 바닥 타일 재생성 | `isometric` 타입 128×128 타일로 교체 (square_topdown 대체) |
 
-**기대 효과**: 손님 캐릭터 존재감 강화, VIP/미식가 시각적 구분 명확화.
+**기대 효과**:
+- 손님 착석 시 테이블 앞면에 자연스럽게 가려지는 입체감
+- 새 손님 종류 추가 = 에셋 2장만 추가 (기존 방식 대비 1/5 이하)
+- 바닥 타일이 아이소메트릭 테이블과 원근감 통일
 
 ### 3단계 — 주방 구역 + 애니메이션 (장기, 별도 페이즈)
 
@@ -292,15 +373,17 @@ Phase 51은 "Phase 48~50 기획 구현"을 목표로 한다. 영업씬 재구성
 | 하단 바 색조 통일 (`0x0d0d1a` → `0x1c0e00`) | 1줄 코드 수정 |
 | PreloadScene 에셋 경로 추가 | 16줄 추가 |
 
-### Phase 51 이후 별도 처리 항목
+### Phase 51 이후 별도 처리 항목 (2단계로 이동)
 
-| 항목 | 이유 |
+| 항목 | 내용 |
 |------|------|
-| 손님 64×64 재생성 | occupied 컴포짓 5등급 전체 재생성 필요, 작업량 큼 |
-| 화분/아치 챕터별 변형 | 우선순위 낮음, 1단계 효과 확인 후 결정 |
-| 카운터 배경 텍스처 | SD Forge 생성, 코드 연동 복잡도 있음 |
-| 손님 애니메이션 | SpriteLoader 구조 변경 필요, 별도 설계 필요 |
-| 테이블 lv0~lv4 형태 차별화 | 재생성 10종 (empty + occupied), 2단계 에셋 작업 병행 |
+| 테이블 앞/뒤 분리 에셋 10장 | lv0~lv4 × front/back, PixelLab 생성 |
+| 손님 독립 스프라이트 10장 | 5종 × waiting/seated, 48×64 |
+| ServiceScene 3레이어 렌더링 | `_createTables()` 재작성 |
+| 바닥 타일 isometric 재생성 | square_topdown → isometric 타입 교체 |
+| 화분/아치 챕터별 변형 | 우선순위 낮음, 2단계 이후 |
+| 손님 eating 애니메이션 | 3단계 (SpriteLoader anim 구조 변경 필요) |
+| 카운터 배경 텍스처 | 3단계 (SD Forge 생성) |
 
 ---
 
@@ -339,4 +422,5 @@ Phase 51은 "Phase 48~50 기획 구현"을 목표로 한다. 영업씬 재구성
 - 엔드리스 모드는 `isEndless === true` 플래그로 판별한다 (`this.isEndless` 참조, `init()` 메서드).
 - `chapter` 값은 `parseInt(stageId.split('-')[0])` 로 파싱된다 (ServiceScene.js `init()` 참조).
 - 에셋 preload는 현재 `PreloadScene.js` 또는 동등 씬에서 처리한다. 해당 씬 구조 확인 후 경로 추가.
-- 손님 스프라이트 변경 시 `table_lv{n}_occupied.png` 컴포짓도 반드시 세트로 재생성해야 한다. 손님 이미지만 교체하면 컴포짓 에셋과 크기 불일치가 발생한다.
+- **[2단계 이후]** `table_lv{n}_occupied.png` 컴포짓은 레거시 fallback으로만 남긴다. 분리 렌더링 전환 후에는 `_back`/`_front` 미로드 시에만 컴포짓을 사용하는 fallback 경로를 유지한다.
+- **[확정]** 손님 스프라이트는 테이블 등급과 독립이므로, 새 손님 추가 시 `customer_{type}_waiting.png` + `customer_{type}_seated.png` 2장만 생성하면 모든 테이블 등급에서 동작한다.
