@@ -51,6 +51,19 @@ export default class InventoryManager {
   }
 
   /**
+   * 레시피 재료 요구사항을 일괄 추가(반환)한다.
+   * 조리 실패 시 재료 회수 등에 사용된다.
+   * @param {{ [type: string]: number }} ingredients - 재료 맵 (예: { carrot: 2, meat: 1 })
+   */
+  addIngredients(ingredients) {
+    for (const [type, amount] of Object.entries(ingredients)) {
+      if (amount > 0) {
+        this.inventory[type] = (this.inventory[type] || 0) + amount;
+      }
+    }
+  }
+
+  /**
    * 전체 재고를 복사본으로 반환한다.
    * @returns {Object<string, number>}
    */

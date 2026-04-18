@@ -421,9 +421,16 @@ export class ServiceScene extends Phaser.Scene {
     this._buffVipRewardMult = 0;
     /** VIP 서빙 완료 시 food_review 이벤트 확률 추가 (로살리오 3단계) */
     this._buffVipFoodReviewBonus = 0;
-    // TODO: 요코 연쇄 퇴장 방지 (chain_serve) -- Optional 미구현
-    // this._buffChainServeThreshold = 0;
-    // this._buffChainServeReward = 0;
+    /** 요코 연쇄 서빙 달성 기준 수 (0이면 비활성) */
+    this._yokoChainThreshold = 0;
+    /** 요코 퇴장 방지 발동 시 골드 보너스 (0.50 = +50%) */
+    this._yokoChainReward = 0;
+    /** 현재 연속 서빙 카운터 */
+    this._yokoChainCount = 0;
+    /** 다음 손님 퇴장 방지 플래그 */
+    this._yokoProtectNext = false;
+    /** 퇴장 방지 발동 중 플래그 (다음 서빙 시 보너스 참조용) */
+    this._yokoProtectActive = false;
 
     if (hired.length === 0) return;
 
@@ -475,9 +482,8 @@ export class ServiceScene extends Phaser.Scene {
           break;
 
         case 'chain_serve':
-          // TODO: 요코 연쇄 퇴장 방지 -- Optional 미구현
-          // this._buffChainServeThreshold = v;
-          // this._buffChainServeReward = v2;
+          this._yokoChainThreshold = v;   // 단계별 기준 수 (3/2/2)
+          this._yokoChainReward = v2;     // 단계별 보상 (0/0/0.50)
           break;
       }
     }
@@ -1917,6 +1923,23 @@ export class ServiceScene extends Phaser.Scene {
       this._updateTableUI(i);
 
       if (cust.patience <= 0) {
+        // ── Phase 51-3: 요코 연쇄 퇴장 방지 ──
+        if (this._yokoProtectNext) {
+          // 인내심을 최솟값(500ms)으로 고정하여 퇴장 지연
+          cust.patience = 500;
+          if (cust.customerType === 'group' && cust.sharedPatience) {
+            cust.sharedPatience.value = 500;
+          }
+          this._yokoProtectNext = false;
+          this._yokoProtectActive = true;
+          // VFX: 퇴장 방지 알림
+          if (this.tableContainers[i] && this.vfx) {
+            this.vfx.floatingText(this.tableContainers[i].x, this.tableContainers[i].y - 30, '\u26A1 \uC5F0\uC1C4 \uD1F4\uC7A5 \uBC29\uC9C0!', '#ffaa00', 16);
+          }
+          this._updateTableUI(i);
+          continue; // 이 손님은 퇴장하지 않고 다음 테이블로 진행
+        }
+
         // 기본 만족도 감소
         let satPenalty = 15;
 
@@ -1938,6 +1961,12 @@ export class ServiceScene extends Phaser.Scene {
         this.tables[i] = null;
         this.satisfaction = Math.max(0, this.satisfaction - satPenalty);
         this.comboCount = 0;
+
+        // Phase 51-3: 손님 자연 퇴장 시 요코 카운터 리셋
+        this._yokoChainCount = 0;
+        this._yokoProtectNext = false;
+        this._yokoProtectActive = false;
+
         this._updateTableUI(i);
         SoundManager.playSFX('sfx_customer_out');
 
@@ -2038,7 +2067,8 @@ export class ServiceScene extends Phaser.Scene {
   // ── 조리 슬롯 버리기 ──────────────────────────────────────────────
 
   /**
-   * 조리 중이거나 완료된 요리를 슬롯에서 버린다. 재료는 반환하지 않는다.
+   * 조리 중이거나 완료된 요리를 슬롯에서 버린다.
+   * Phase 51-3: 아이다 버프 활성 시 확률로 재료를 회수한다.
    * @param {number} idx 슬롯 인덱스
    * @private
    */
@@ -2048,10 +2078,29 @@ export class ServiceScene extends Phaser.Scene {
     if (!slot.recipe) return;
 
     const name = slot.recipe?.nameKo || '요리';
+
+    // ── Phase 51-3: 아이다 재료 회수 — 조리 중(미완성) 슬롯 버릴 때 확률로 재료 반환 ──
+    if (this._buffIngredientRefund > 0 && slot.recipe && !slot.ready) {
+      const refundRoll = Math.random();
+      if (refundRoll < this._buffIngredientRefund) {
+        this.inventoryManager.addIngredients(slot.recipe.ingredients);
+        this._updateInventoryPanel();
+        this._updateRecipeQuickSlots();
+        this._showMessage('재료 회수됨!');
+      }
+    }
+
     slot.recipe = null;
     slot.timeLeft = 0;
     slot.totalTime = 0;
     slot.ready = false;
+
+    // Phase 51-3: 아이다 3단계 — 버린 슬롯 즉시 재사용 가능 (세척 생략)
+    if (this._buffNoFailDelay) {
+      slot.washing = false;
+      slot.washTimeLeft = 0;
+    }
+
     this._updateCookSlotUI(idx);
     this._showMessage(`${name} 버림`);
   }
@@ -2205,9 +2254,62 @@ export class ServiceScene extends Phaser.Scene {
     // yuki_chef 패시브: tier 3 이상 레시피 보상 +15%
     const highStarBonus = (recipe.tier >= 3) ? ChefManager.getHighStarRewardBonus() : 1.0;
 
-    // 골드 = 기본보상 * 테이블팁배율 * (1 + 조명팁보너스) * 서빙등급 * 콤보 * 유형배율 * 그릴 * 스페셜 * 고급레시피
+    // ── Phase 51-3: 유랑 미력사 버프 배율 계산 (독립 계수 곱셈) ──
+
+    // 시엔 세션 초반 보너스 — 경과 시간이 _buffEarlyDuration 이내이면 추가 배율
+    const elapsedSec = this.serviceConfig.duration - this.serviceTimeLeft;
+    const earlyMult = (this._buffEarlyBonus > 0 && elapsedSec <= this._buffEarlyDuration)
+      ? (1 + this._buffEarlyBonus)
+      : 1.0;
+
+    // 로살리오 VIP 보너스 — VIP 손님 서빙 시 추가 배율
+    const vipBonus = (cust.customerType === 'vip' && this._buffVipRewardMult > 0)
+      ? (1 + this._buffVipRewardMult)
+      : 1.0;
+
+    // 레이라 미식가 보너스 — 미식가 손님 서빙 시 추가 배율
+    const gourmetBonus = (cust.customerType === 'gourmet' && this._buffGourmetRewardMult > 0)
+      ? (1 + this._buffGourmetRewardMult)
+      : 1.0;
+
+    // 요코 퇴장 방지 발동 시 골드 보너스
+    const yokoProtectBonus = (this._yokoProtectActive && this._yokoChainReward > 0)
+      ? (1 + this._yokoChainReward)
+      : 1.0;
+
+    // 골드 = 기본보상 * 테이블팁 * 인테리어팁 * 서빙등급 * 콤보 * 유형배율
+    //       * 그릴 * 스페셜 * 고급레시피 (← 스토리 셰프/인테리어 버프)
+    //       * earlyMult * vipBonus * gourmetBonus * yokoProtectBonus (← 유랑 미력사 버프, 독립 계수 곱셈)
+    // 스토리 셰프 버프(ChefManager)와 미력사 버프는 독립 슬롯으로 분리되어 중첩 적용된다.
+    // 참고: docs/CHEF_SKILL_REDESIGN.md 2-4절
     const baseGold = cust.baseReward;
-    const totalGold = Math.floor(baseGold * tableTipMult * (1 + interiorTipBonus) * tipGrade * comboMult * typeMult * grillBonus * specialMultiplier * highStarBonus);
+    const totalGold = Math.floor(
+      baseGold
+      * tableTipMult
+      * (1 + interiorTipBonus)
+      * tipGrade
+      * comboMult
+      * typeMult
+      * grillBonus
+      * specialMultiplier
+      * highStarBonus
+      * earlyMult        // [Phase 51-3] 시엔 세션 초반 보너스
+      * vipBonus         // [Phase 51-3] 로살리오 VIP 보너스
+      * gourmetBonus     // [Phase 51-3] 레이라 미식가 보너스
+      * yokoProtectBonus // [Phase 51-3] 요코 퇴장 방지 보너스
+    );
+
+    // 요코 연쇄 서빙 카운터 처리
+    if (this._yokoChainThreshold > 0) {
+      this._yokoChainCount++;
+      if (this._yokoChainCount >= this._yokoChainThreshold) {
+        this._yokoProtectNext = true;
+        this._yokoChainCount = 0; // 카운터 리셋
+      }
+    }
+
+    // 서빙 완료 후 요코 퇴장 방지 상태 리셋
+    this._yokoProtectActive = false;
 
     this.totalGold += totalGold;
     this.servedCount++;
@@ -2540,11 +2642,12 @@ export class ServiceScene extends Phaser.Scene {
       return;
     }
 
-    // 딜레이 카운트다운
+    // 딜레이 카운트다운 — Phase 51-3: 무오 서빙 속도 버프 적용 (최대 80% 단축, 딜레이 최소 20% 보장)
+    const effectiveServeDelay = AUTO_SERVE_DELAY_MS * (1 - Math.min(this._buffServeSpeed || 0, 0.80));
     this.autoServeTimer += delta;
-    if (this.autoServeTimer < AUTO_SERVE_DELAY_MS) return;
+    if (this.autoServeTimer < effectiveServeDelay) return;
 
-    // 3초 경과 — 자동 서빙 실행
+    // 딜레이 경과 — 자동 서빙 실행
     this.autoServeTimer = 0;
 
     // 가장 오래 기다린 손님 (인내심이 가장 많이 소진된 = maxPatience - patience가 가장 큰) 우선
@@ -2625,7 +2728,14 @@ export class ServiceScene extends Phaser.Scene {
    */
   _triggerRandomEvent() {
     const types = Object.keys(SERVICE_EVENT_TYPES);
-    const chosen = types[Math.floor(Math.random() * types.length)];
+    let chosen;
+
+    // Phase 51-3: 로살리오 3단계 — food_review 이벤트 확률 증가
+    if (this._buffVipFoodReviewBonus > 0 && Math.random() < this._buffVipFoodReviewBonus) {
+      chosen = 'food_review';
+    } else {
+      chosen = types[Math.floor(Math.random() * types.length)];
+    }
     const evtDef = SERVICE_EVENT_TYPES[chosen];
 
     this.eventCount++;
