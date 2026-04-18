@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-17
-> 기준: Phase 47-1 완료 / Phase 47-2~3 walk+death 애니메이션 진행 중
+> 최종 업데이트: 2026-04-18
+> 기준: Phase 51-4 완료 / Phase 52 영업씬 렌더링 재구성 설계 확정
 
 ---
 
@@ -218,6 +218,47 @@ Phase 48-3: [기획] 셰프 스킬 재설계
               - 현재 5종 전투 스킬 → 영업 전용 스킬로 교체
               - 신규 고용 셰프 풀 스킬 설계 (영업 특화)
               - 스토리 동료(유키/라오/아르준 등)와 역할 분리 원칙 확립
+              ↓
+Phase 49: [기획] 유랑 미력사 시스템 전체 설계 ✅ 완료
+              - 고용 가능 미력사 40인 캐릭터 설계 (이름/세계관/스킬/등급)
+              - 고용/해고/강화/파견 UI 흐름 기획
+              - 미력의 정수 획득 경로 및 소비 경제 설계
+              - 상세: WANDERING_CHEFS_SYSTEM.md, WANDERING_CHEFS_EXTENDED.md
+              ↓
+Phase 50: [기획] 영업씬 재구성 설계 ✅ 완료
+              - 현황 분석 (8개 한계점 도출)
+              - 뷰 방식 확정: 아이소메트릭 유지 (사이드뷰 검토 후 기각)
+              - 3단계 구현 로드맵 설계 (배경 교체 → 렌더링 재구성 → 애니메이션)
+              - 렌더링 아키텍처 전환 결정: 컴포짓 occupied 폐기 → 3레이어 분리
+              - 상세: SERVICE_SCENE_REDESIGN.md
+              ↓
+Phase 51: Phase 48~50 기획 구현 (일부 완료)
+              Phase 51-4: 영업씬 배경 교체 ✅ 완료 (2026-04-18)
+                - 챕터별 홀 바닥 타일 8종 생성 (128×128 isometric, PixelLab)
+                - ServiceScene: _getHallFloorKey() / _getWallBackKey() 헬퍼
+                - add.image → add.tileSprite 전환
+                - 하단 바 색조 0x0d0d1a → 0x1c0e00
+                - QA 25/25 PASS
+              Phase 51-1~3: 미착수 (미력의 정수 구현, 유랑 미력사 시스템, 셰프 스킬)
+              ↓
+Phase 52: 영업씬 렌더링 재구성 — 테이블 분리 + 손님 독립화 ⬅ 다음 목표
+              [에셋 생성]
+              - 테이블 lv0~lv4 앞면(_front) 5장 + 뒷면(_back) 5장 = 10장
+                lv0: 낡은 나무+플라스틱 의자 / lv1: 원목+나무 의자
+                lv2: 체크 식탁보+패딩 / lv3: 대리석+쿠션 / lv4: 크리스탈+벨벳
+                해상도: front 96×52, back 96×64 (의자 포함)
+              - 손님 5종 × 2상태(waiting/seated) = 10장 (48×64)
+                normal / vip / gourmet / rushed / group
+              - 바닥 타일 isometric 타입 재생성 (square_topdown 대체)
+              [코드 변경]
+              - SpriteLoader: table_lv{n}_back/front + customer_{t}_{s} 로드
+              - ServiceScene._createTables(): 3레이어 분리 렌더링
+                depth = (col+row)*100 | +50(손님) | +99(앞면)
+              - fallback: _back 미로드 시 기존 _occupied 컴포짓 사용
+              [기대 효과]
+              - 손님 착석 시 테이블 앞면에 자연스럽게 가려지는 입체감
+              - 새 손님 추가 비용: 기존 5장 → 2장으로 감소
+              - 바닥/테이블/손님 원근감 통일
 ```
 
 ---
