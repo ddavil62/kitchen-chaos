@@ -10,6 +10,7 @@
  * Phase 19-5: 홀 영역 테이블 배치를 flat top-down → 아이소메트릭 다이아몬드 격자로 전환.
  *             _cellToWorld(), _drawIsoFloor() 추가. depth sorting y좌표 기반 적용.
  * Phase 51-4: 챕터별 홀 바닥·뒷벽 키 헬퍼 추가, tileSprite 전환, 하단 바 색조 통일.
+ * Phase 51-1: mireuk_traveler 특수 손님 타입 추가, 미력의 정수 드롭 로직, HUD 보유량 표시.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -114,6 +115,7 @@ const CUSTOMER_TYPE_ICONS = {
   gourmet: '\uD83E\uDDD0',  // 🧐
   rushed: '\uD83D\uDE30',   // 😰
   group: '\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67\u200D\uD83D\uDC66', // 👨‍👩‍👧‍👦
+  mireuk_traveler: '\uD83D\uDCAE', // 💠 (이모지 폴백)
 };
 
 /** 손님 유형별 인내심 배율 */
@@ -123,6 +125,7 @@ const CUSTOMER_PATIENCE_MULT = {
   gourmet: 1.0,
   rushed: 0.4,
   group: 1.2,
+  mireuk_traveler: 1.5,   // 여유로운 여행자. 급하지 않음.
 };
 
 /** 손님 유형별 보상 배율 */
@@ -132,6 +135,7 @@ const CUSTOMER_REWARD_MULT = {
   gourmet: 1.8,
   rushed: 2.5,
   group: 2.0,
+  mireuk_traveler: 0.8,   // 여행자는 돈이 없다. 골드 보상 낮음, 대신 정수 드롭.
 };
 
 /**
@@ -362,8 +366,90 @@ export class ServiceScene extends Phaser.Scene {
     this._tutAdvanced2 = false;
     this._tutAdvanced3 = false;
 
+    // ── Phase 51-1: 미력 나그네 등장 예약 ──
+    this._mireukSpawned = false;  // 세션당 1회 중복 방지 플래그
+    this._scheduleMireukTraveler();
+
     // 씬 종료 시 정리
     this.events.once('shutdown', this._shutdown, this);
+  }
+
+  // ── Phase 51-1: 미력 나그네 등장 예약 ──────────────────────────────
+
+  /**
+   * 미력 나그네 등장 예약.
+   * 7-1 이후 스테이지이고 season2Unlocked 상태일 때 16% 확률로 세션 내 1회 등장을 예약한다.
+   * 등장 시각: 세션 시작 후 60~90초 사이 무작위.
+   * TODO: chapter 16~24 → 20%, 엔드리스 → 12% 확률 보정 (현재 16% 단일 적용)
+   * @private
+   */
+  _scheduleMireukTraveler() {
+    // 잠금 해제 조건: 7-1 이후 (season2Unlocked) + 엔드리스 아님
+    const saveData = SaveManager.load();
+    const isSeason2 = !!saveData.season2Unlocked;
+    if (!isSeason2 && this.chapter < 7) return;
+    if (this.isEndless) return; // 엔드리스는 현재 미지원 (TODO)
+
+    // 16% 확률로 등장 예약
+    if (Math.random() >= 0.16) return;
+
+    // 60~90초 사이 무작위 시각에 등장
+    const delayMs = Phaser.Math.Between(60000, 90000);
+    this.time.delayedCall(delayMs, () => {
+      if (this.isServiceOver || this.isPaused || this._mireukSpawned) return;
+      this._spawnMireukTraveler();
+    });
+  }
+
+  /**
+   * 미력 나그네를 홀에 스폰한다.
+   * 빈 테이블이 없으면 스폰하지 않고 예약을 소비(1회 시도)한다.
+   * @private
+   */
+  _spawnMireukTraveler() {
+    const emptyIndices = [];
+    for (let i = 0; i < this.tableCount; i++) {
+      if (this.tables[i] === null) emptyIndices.push(i);
+    }
+    if (emptyIndices.length === 0) return; // 만석이면 이번 기회는 소진
+
+    this._mireukSpawned = true;
+
+    // 레시피 선택: 상위 30% 등급 (tier >= 3) 우선, 없으면 전체 풀
+    const recipe = this._pickRecipeForType('mireuk_traveler');
+    if (!recipe) return;
+
+    // 인내심 계산 (기존 공식 동일, typeMult = 1.5 적용)
+    const chefPatienceBonus = ChefManager.getPatienceBonus();
+    const tableIdx = emptyIndices[0];
+    const tableGrade = this.tableUpgrades[tableIdx] || 0;
+    const tablePatienceBonus = TABLE_PATIENCE_BONUS[tableGrade];
+    const interiorPatienceBonus = FLOWER_PATIENCE_BONUS[this.interiorFlower] || 0;
+    const basePat = this.serviceConfig.customerPatience * 1000;
+    const typeMult = CUSTOMER_PATIENCE_MULT.mireuk_traveler;
+    const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
+    const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * typeMult * eventPatienceMult;
+
+    const customer = {
+      dish: recipe.id,
+      recipe: recipe,
+      patience: totalPatience,
+      maxPatience: totalPatience,
+      baseReward: recipe.baseReward,
+      tipMultiplier: 1.5,
+      vip: false,
+      customerType: 'mireuk_traveler',
+      tableIdx: tableIdx,
+      groupPairIdx: -1,
+    };
+
+    this.tables[tableIdx] = customer;
+    this.customersSpawned++;
+    this.totalCustomers++;
+
+    this._updateTableUI(tableIdx);
+    this._playEntranceEffect(tableIdx);
+    SoundManager.playSFX('sfx_customer_in');
   }
 
   // ── HUD (상단 40px) ──────────────────────────────────────────────
@@ -399,6 +485,13 @@ export class ServiceScene extends Phaser.Scene {
     this.eventHudText = this.add.text(GAME_WIDTH - 10, 26, '', {
       fontSize: '10px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(1, 0).setDepth(101);
+
+    // ── Phase 51-1: 미력의 정수 보유량 (chapter >= 7 또는 보유량 > 0 시 표시) ──
+    this._mireukEssenceVal = SaveManager.getMireukEssence();
+    this.mireukEssenceText = this.add.text(10, 26, '', {
+      fontSize: '11px', color: '#b266ff', fontStyle: 'bold',
+    }).setDepth(101);
+    this._updateMireukHUD();
   }
 
   /** @private */
@@ -425,6 +518,24 @@ export class ServiceScene extends Phaser.Scene {
       }
     } else {
       this.eventHudText.setText('');
+    }
+
+    // Phase 51-1: 미력의 정수 HUD 갱신
+    this._updateMireukHUD();
+  }
+
+  /**
+   * 미력의 정수 HUD 텍스트를 갱신한다.
+   * chapter >= 7이거나 보유량 > 0일 때만 표시한다.
+   * @private
+   */
+  _updateMireukHUD() {
+    if (!this.mireukEssenceText) return;
+    const essence = SaveManager.getMireukEssence();
+    if (this.chapter >= 7 || essence > 0) {
+      this.mireukEssenceText.setText(`\uD83D\uDCAE ${essence}`);
+    } else {
+      this.mireukEssenceText.setText('');
     }
   }
 
@@ -1604,6 +1715,13 @@ export class ServiceScene extends Phaser.Scene {
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
+    // Phase 51-1: 미력 나그네 — 상위 30% 등급(tier >= 3) 우선
+    if (customerType === 'mireuk_traveler') {
+      const highTier = craftable.filter(r => r.tier >= 3);
+      const pool = highTier.length > 0 ? highTier : craftable;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
     // 일반/VIP/급한/단체: 만들 수 있는 레시피에서 랜덤 선택
     return craftable[Math.floor(Math.random() * craftable.length)];
   }
@@ -1997,6 +2115,22 @@ export class ServiceScene extends Phaser.Scene {
       // 일반/VIP/미식가/급한: 테이블 즉시 비우기
       this.tables[tableIdx] = null;
       this._updateTableUI(tableIdx);
+    }
+
+    // ── Phase 51-1: 미력 나그네 서빙 완료 — 정수 드롭 ──
+    if (cust.customerType === 'mireuk_traveler') {
+      const essenceDrop = patienceRatio >= 0.8 ? 3 : patienceRatio >= 0.4 ? 2 : 1;
+      SaveManager.addMireukEssence(essenceDrop);
+      SaveManager.incrementMireukTravelerCount();
+
+      // HUD 정수 보유량 갱신
+      this._updateMireukHUD();
+
+      // VFX: 보라색 플로팅 텍스트
+      const tblCont = this.tableContainers[tableIdx];
+      if (tblCont && this.vfx) {
+        this.vfx.floatingText(tblCont.x, tblCont.y - 30, `\uD83D\uDCAE +${essenceDrop} \uC815\uC218!`, '#b266ff', 16);
+      }
     }
 
     // 서빙 이펙트
@@ -2554,6 +2688,8 @@ export class ServiceScene extends Phaser.Scene {
     this.activeEvent = null;
     this.accidentSlotIdx = -1;
     this.foodReviewRemaining = 0;
+    // Phase 51-1: 미력 나그네 상태 정리
+    this._mireukSpawned = false;
     // Phase 8-6: 스킬 상태 정리
     this.skillCooldownLeft = 0;
     this.skillCooldownMax = 0;

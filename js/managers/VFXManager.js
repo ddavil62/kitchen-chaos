@@ -380,6 +380,30 @@ export class VFXManager {
   }
 
   /**
+   * 범용 플로팅 텍스트 — 지정 텍스트/색상/크기로 위로 떠오르며 페이드 아웃.
+   * 정수 드롭("💠 +N 정수!"), 스페셜 보너스 등 다목적으로 사용한다.
+   * @param {number} x
+   * @param {number} y
+   * @param {string} text - 표시할 텍스트
+   * @param {string} [color='#ffffff'] - CSS 색상 문자열
+   * @param {number} [fontSize=14] - 폰트 크기 (px)
+   */
+  floatingText(x, y, text, color = '#ffffff', fontSize = 14) {
+    const t = this.scene.add.text(x, y, text, {
+      fontSize: `${fontSize}px`, fontStyle: 'bold', color,
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(VFX_DEPTH_TEXT);
+    this.scene.tweens.add({
+      targets: t,
+      y: y - 35,
+      alpha: 0,
+      duration: 1100,
+      ease: 'Quad.easeOut',
+      onComplete: () => t.destroy(),
+    });
+  }
+
+  /**
    * 콤보 텍스트 (xN COMBO!) -- 화면 중앙 확대/축소 연출.
    * @param {number} count - 콤보 수
    */

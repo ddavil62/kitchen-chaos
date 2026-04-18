@@ -14,12 +14,14 @@
  * Phase 19-1: v12 마이그레이션 — 신규 도구 2종(wasabi_cannon, spice_grinder) + season2Unlocked 추가.
  * Phase 19-3: v13 마이그레이션 — storyFlags 배열→객체 변환 (프로퍼티 접근 지원).
  * Phase 26-2: v16 마이그레이션 — chapter12 진행 플래그 + sake_master 스테이지 교체 관련 플래그 추가.
+ * Phase 51-1: v18 마이그레이션 — mireukEssence, mireukEssenceTotal, mireukTravelerCount,
+ *             mireukBossRewards, hiredMireukChefs 추가. 미력의 정수 헬퍼 메서드 4개 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 17;
+const SAVE_VERSION = 18;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -100,6 +102,12 @@ function createDefault() {
         total_gold_earned: 0,
       },
     },
+    // ── Phase 51-1 추가 ──
+    mireukEssence: 0,          // 보유 미력의 정수 (소비 시 감소)
+    mireukEssenceTotal: 0,     // 누적 획득 미력의 정수 (소비해도 감소 안 함, 업적용)
+    mireukTravelerCount: 0,    // 미력 나그네 서빙 누적 횟수 (대화 트리거용)
+    mireukBossRewards: {},     // { [stageId]: true } 보스 정화 정수 수령 기록
+    hiredMireukChefs: [],      // 고용 중인 유랑 미력사 목록 (Phase 51-2 이후 사용)
     // ── Phase 11-1 추가 ──
     endless: {
       unlocked: false,            // 6-3 클리어 시 true
@@ -500,6 +508,49 @@ export class SaveManager {
     }
   }
 
+  // ── 미력의 정수 (Phase 51-1) ──
+
+  /**
+   * 현재 보유 미력의 정수 조회.
+   * @returns {number}
+   */
+  static getMireukEssence() {
+    return SaveManager.load().mireukEssence ?? 0;
+  }
+
+  /**
+   * 미력의 정수 가산. mireukEssenceTotal도 함께 증가.
+   * 최대 999 캡 적용.
+   * @param {number} amount - 가산할 정수 수
+   * @returns {number} 가산 후 보유량
+   */
+  static addMireukEssence(amount) {
+    const data = SaveManager.load();
+    data.mireukEssence      = Math.min(999, (data.mireukEssence ?? 0) + amount);
+    data.mireukEssenceTotal = (data.mireukEssenceTotal ?? 0) + amount;
+    SaveManager.save(data);
+    return data.mireukEssence;
+  }
+
+  /**
+   * 미력 나그네 서빙 누적 횟수 조회.
+   * @returns {number}
+   */
+  static getMireukTravelerCount() {
+    return SaveManager.load().mireukTravelerCount ?? 0;
+  }
+
+  /**
+   * 미력 나그네 서빙 누적 횟수 +1 증가.
+   * @returns {number} 증가 후 횟수
+   */
+  static incrementMireukTravelerCount() {
+    const data = SaveManager.load();
+    data.mireukTravelerCount = (data.mireukTravelerCount ?? 0) + 1;
+    SaveManager.save(data);
+    return data.mireukTravelerCount;
+  }
+
   // ── 업적 시스템 (Phase 42) ──
 
   /**
@@ -833,6 +884,16 @@ export class SaveManager {
         },
       };
       data.version = 17;
+    }
+
+    // v17 → v18: 미력의 정수 시스템 추가 (Phase 51-1)
+    if (data.version < 18) {
+      data.mireukEssence      = data.mireukEssence      ?? 0;
+      data.mireukEssenceTotal = data.mireukEssenceTotal ?? 0;
+      data.mireukTravelerCount= data.mireukTravelerCount?? 0;
+      data.mireukBossRewards  = data.mireukBossRewards  || {};
+      data.hiredMireukChefs   = data.hiredMireukChefs   || [];
+      data.version = 18;
     }
 
     return data;
