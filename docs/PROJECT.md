@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-18 (Phase 51-1 완료)
+> 최종 업데이트: 2026-04-19 (Phase 51-3 완료)
 
 ## 프로젝트 개요
 
@@ -34,7 +34,7 @@
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 ~106종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), ~111항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v18, season3Unlocked, getTotalStars(group), achievements, mireukEssence 헬퍼 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v19, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs 헬퍼 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
@@ -76,8 +76,9 @@
 | 업적 시스템 | 30개 업적 (5카테고리), 조건 판정+보상, 토스트 알림, 전용 AchievementScene UI | 완료 |
 | 아트 리워크 | 레거시 스프라이트 64px 재생성. Phase 44(적/보스 전종) + Phase 45(셰프 5종) 완료. Phase 46에서 metadata.json 일괄 갱신 + cardamom.png 교체 + 렌더링 검증까지 완결 | 완료 |
 | 애니메이션 시스템 | walk+death 프레임 시퀀스 아키텍처 (SpriteLoader death 로딩/등록, Enemy _animState 상태 머신, 비동기 death anim). 보스 13종+일반 적 42종 전종 death anim 완료 | 완료 |
-| 미력의 정수 코어 | mireukEssence 화폐 세이브 v18, mireuk_traveler 특수 손님 (정수 드롭 1~3), HUD 보유량 표시, VFX 플로팅 텍스트 | 완료 |
-| 유랑 미력사 고용 | 8명 미력사 데이터, WanderingChefModal 고용/강화/해고 UI, ServiceScene 패시브 스킬 적용, 세이브 v19 | 완료 |
+| 미력의 정수 코어 | mireukEssence 화폐 세이브 v18, mireuk_traveler 특수 손님 (정수 드롭 1~3), HUD 보유량 표시, VFX 플로팅 텍스트, spendMireukEssence 소비 메서드 | 완료 |
+| 유랑 미력사 고용 | 8명 미력사(4등급) 고용/강화(3단계)/해고 시스템, WanderingChefModal(스크롤, 등급 뱃지), ServiceScene 패시브 스킬 적용(인내심/조리시간/특수손님), 세이브 v19 | 완료 |
+| 셰프 스킬 재설계 | passiveDesc 3건 교정, 미력사 버프 5종 ServiceScene 실제 로직 연결, 요코 chain_serve 구현, 독립 계수 곱셈 원칙 코드 반영 | 완료 |
 
 ## 콘텐츠 규모
 

@@ -1,5 +1,118 @@
 # Changelog
 
+## [Phase 51-3] 2026-04-19 -- 셰프 스킬 재설계
+
+### Changed
+
+- **`js/data/chefData.js`**: passiveDesc 문자열 3건 교정 (로직 변경 없음)
+  - petit_chef: "재료 수거 범위 +30%" -> "재료 수거 범위 +30%, 조리시간 −15%"
+  - flame_chef: "화염 타워 피해 +20%" -> "화염 타워 피해 +20%, 그릴 요리 수익 +25%"
+  - ice_chef: "CC(둔화/빙결) 지속 +25%" -> "CC(둔화/빙결) 지속 +25%, 손님 인내심 +20%"
+
+### Added
+
+- **`js/managers/InventoryManager.js`**: `addIngredients(ingredients)` 메서드 추가
+  - 재료 배열을 받아 인벤토리에 일괄 반환. 음수 수량 방어(`if (amount > 0)` 필터링)
+- **`js/scenes/ServiceScene.js`**: 미력사 버프 5종 실제 로직 연결
+  - `_updateAutoServe()`: effectiveServeDelay 계산 (`_buffServeSpeed` 반영, 최대 80% 캡). 무오 1단계: 3000ms->2250ms(-25%), 2/3단계: 3000ms->1800ms(-40%)
+  - `_serveToCustomer()`: earlyMult(시엔), vipBonus(로살리오), gourmetBonus(레이라), yokoProtectBonus(요코) 4개 배율 변수 추가. totalGold 계산식 확장
+  - `_serveToCustomer()`: 독립 계수 곱셈 원칙 주석 추가 (CHEF_SKILL_REDESIGN.md 2-4절 참조)
+  - `_discardDish()`: 아이다 재료 회수 로직 (`_buffIngredientRefund` 확률 판정 + `addIngredients` 호출), `_buffNoFailDelay` 시 세척 생략
+  - `_triggerRandomEvent()`: 로살리오 3단계 `_buffVipFoodReviewBonus` 반영 (food_review 이벤트 확률 +30%)
+- **`js/scenes/ServiceScene.js`**: 요코(wanderer_yoko) chain_serve 구현
+  - `_applyWanderingChefSkills()`: chain_serve case 구현 + 요코 변수 5개 초기화 (`_yokoChainThreshold`, `_yokoChainReward`, `_yokoChainCount`, `_yokoProtectNext`, `_yokoProtectActive`)
+  - `_serveToCustomer()`: 서빙 성공 후 체인 카운터 증가, threshold 달성 시 `_yokoProtectNext=true`, 카운터 리셋
+  - `_updateCustomerPatience()`: 인내심 0 도달 시 요코 퇴장 방지 분기 (500ms 고정 + VFX "연쇄 퇴장 방지!"), 자연 퇴장 시 카운터 리셋
+
+### Notes
+
+- 무오 3단계 `_buffMuoFirstServeGuarantee` (첫 서빙 인내심 80% 보장) 미구현. wanderingChefData.js에 serve_speed skillValues2가 정의되지 않아 후속 페이즈에서 데이터 추가 후 구현 필요
+- 요코 퇴장 방지 시 인내심 500ms 고정. 극히 짧아 실질적으로 즉시 서빙 필요 (밸런스 확인 기획 판단 사항)
+- `_buffNoFailDelay` 시 `washing=false` 설정은 사실상 무의미 (discard는 washing을 트리거하지 않음). 기능 이슈는 아님
+- visual_change: ui
+- QA: PASS (39/39, 수용 기준 10개 전항목 통과, 예외 시나리오 8개 통과)
+- 스펙: `.claude/specs/2026-04-19-kc-phase51-3-spec.md`
+- 리포트: `.claude/specs/2026-04-19-kc-phase51-3-report.md`
+- QA: `.claude/specs/2026-04-19-kc-phase51-3-qa.md`
+
+## [Phase 51-2] 2026-04-19 -- 유랑 미력사 고용 시스템
+
+### Added
+
+- **`js/data/wanderingChefData.js`** (신규): 8명 유랑 미력사 전체 데이터 정의
+  - 등급: 초급(하루카, 보태) / 중급(레이라, 무오, 시엔) / 고급(아이다, 로살리오) / 전설(요코)
+  - 스킬 유형 7종: patience_pct, cook_time_reduce, gourmet_rate, serve_speed, early_session_bonus, ingredient_refund, vip_rate (+ chain_serve TODO)
+  - 단계별 수치 배열 (skillValues, skillValues2), 등급별 비용 테이블 (GRADE_COSTS), 등급명/색상 매핑
+  - GRADE_COLORS: 초급=0x4daa4d(초록), 중급=0x4488cc(파랑), 고급=0xaa6622(황금), 전설=0x9933cc(보라)
+- **`js/scenes/WanderingChefModal.js`** (신규): 고용/강화/해고 모달 씬
+  - ShopScene에서 `scene.launch('WanderingChefModal')` + `scene.pause()` 패턴으로 진입
+  - 8명 카드 목록 (Phaser Graphics 마스크 y=68~640 + 포인터 드래그 스크롤, maxScroll=260px)
+  - 등급 뱃지 (center_x=308, 카드 우측 내부 배치)
+  - 해금 전 잠금 표시 ("X-X 클리어 필요"), hireLimit=0 시 "(7-1 클리어 후 해금)" 안내
+  - 고용/재고용 버튼 (정수 부족 시 "N 부족", 슬롯 초과 시 "슬롯 부족")
+  - 강화 버튼 (1->2->3단계, 만강화 시 "만강화 ★★★")
+  - 해고 버튼 (window.confirm 임시 구현, 환급 없음)
+  - 닫기 버튼 44x44px, 정수 텍스트 x=GAME_WIDTH-72 (겹침 방지)
+- **SaveManager `spendMireukEssence(amount)`** (`js/managers/SaveManager.js`): 정수 소비 메서드. `amount <= 0` 방어, 잔액 부족 시 false 반환 (Phase 51-1 QA 지적 해결)
+- **SaveManager 유랑 미력사 헬퍼 6개** (`js/managers/SaveManager.js`): `getWanderingChefs()`, `hireWanderingChef(chefId, cost)`, `fireWanderingChef(chefId)`, `upgradeWanderingChef(chefId, cost)`, `isWanderingChefHired(chefId)`, `getHireLimit()`
+- **ShopScene 직원 탭 변경** (`js/scenes/ShopScene.js`): "향후 추가 직원 예정" placeholder 제거, "유랑 미력사 고용" 섹션 추가 (구분선, 섹션 헤더 💠, 고용수/상한 표시, 보유 정수 잔액, WanderingChefModal 진입 버튼)
+- **ServiceScene `_applyWanderingChefSkills()`** (`js/scenes/ServiceScene.js`): 세션 시작 시 고용 중인 미력사 패시브 스킬 일괄 적용
+  - 실제 적용: `_patienceMults`(인내심 배율, CUSTOMER_PATIENCE_MULT 참조 3곳 교체), `_buffCookTimeReduce`(조리 시간 감소), `specialRates`(미식가/VIP 등장 확률 수정)
+  - 변수 초기화만: `_buffServeSpeed`, `_buffEarlyBonus`/`_buffEarlyDuration`, `_buffIngredientRefund`/`_buffNoFailDelay`, `_buffVipRewardMult`, `_buffGourmetRewardMult`, `_buffVipFoodReviewBonus` (후속 페이즈에서 적용 위치 연동 예정)
+- **main.js**: WanderingChefModal import + scene 배열 등록
+
+### Changed
+
+- **SaveManager SAVE_VERSION**: 18 -> 19
+- **SaveManager `createDefault()`**: `hiredMireukChefs: []` 제거, `wanderingChefs: { hired: [], unlocked: [], enhancements: {} }` 구조체 추가
+- **SaveManager `_migrate()`**: v18 -> v19 케이스 추가. `hiredMireukChefs` 배열 -> `wanderingChefs.hired` 이관, `unlocked` 소급 등록, `hiredMireukChefs` 키 삭제
+
+### Notes
+
+- 동시 고용 상한: chapter 7~12=1명, 13~18=2명, 19+=3명. chapter < 7이면 0명 (고용 불가)
+- 비용 체계 (등급별): 초급 고용4/재고용2/강화1-2:3/강화2-3:6, 중급 12/6/10/20, 고급 35/18/30/60, 전설 80/40/70/140
+- wanderer_yoko(전설) chain_serve 스킬: TODO 주석 처리, 실제 퇴장 방지 로직 미구현
+- window.confirm() 해고 확인: 임시 구현, 추후 인게임 모달로 교체 예정
+- hireWanderingChef 중복 호출 시 hired 중복 추가 안 되지만 정수 차감됨 (UI에서 방어, 코드 레벨 방어 미완)
+- console.log 1건 잔류 (ServiceScene.js:511, 디버그용)
+- visual_change: ui
+- AD 모드 3: 최초 REVISE (6건: 스크롤 미구현, 등급 뱃지 잘림, hireLimit=0 안내 없음, X 버튼 소형, 초급 색상 가독성, 정수 잔액 미표시) -> 전건 수정 후 APPROVED
+- QA: PASS (25/25, 수용 기준 14개 전항목 통과)
+- 스펙: `.claude/specs/2026-04-18-kc-phase51-2-spec.md`
+- 리포트: `.claude/specs/2026-04-18-kc-phase51-2-report.md`
+- AD3 REVISE 리포트: `.claude/specs/2026-04-18-kc-phase51-2-ad3-revise-report.md`
+- QA: `.claude/specs/2026-04-18-kc-phase51-2-qa.md`
+
+## [Phase 51-1] 2026-04-18 -- 미력의 정수 화폐 시스템 코어 레이어
+
+### Added
+
+- **SaveManager v17->v18 마이그레이션** (`js/managers/SaveManager.js`)
+  - 신규 필드 5개: `mireukEssence`(보유량), `mireukEssenceTotal`(누적 획득, 소비 시 불변), `mireukTravelerCount`(서빙 누적 횟수), `mireukBossRewards`(보스 정화 수령 기록), `hiredMireukChefs`(고용 미력사 목록, Phase 51-2 이후 사용)
+  - 헬퍼 메서드 4개: `getMireukEssence()`, `addMireukEssence(amount)` (999 캡 적용, total도 증가), `getMireukTravelerCount()`, `incrementMireukTravelerCount()`
+- **VFXManager.floatingText()** (`js/managers/VFXManager.js`): 범용 플로팅 텍스트 메서드 (x, y, text, color, fontSize). goldPopup과 동일 패턴 (y-35px, 1100ms fadeOut, Quad.easeOut)
+- **mireuk_traveler 특수 손님 타입** (`js/scenes/ServiceScene.js`)
+  - 상수 등록: `CUSTOMER_TYPE_ICONS`(💠), `CUSTOMER_PATIENCE_MULT`(1.5), `CUSTOMER_REWARD_MULT`(0.8)
+  - `_scheduleMireukTraveler()`: 7-1 이후 16% 확률로 세션당 1회 등장 예약. 60~90초 사이 delayedCall. `_mireukSpawned` 중복 방지 플래그
+  - `_spawnMireukTraveler()`: 빈 테이블에 스폰, 상위 30% 등급(tier >= 3) 레시피 우선 선택
+  - `_pickRecipeForType('mireuk_traveler')`: gourmet과 동일 로직 (highTier 우선)
+  - 정수 드롭 로직 (`_serveToCustomer()`): patienceRatio >= 80% -> 3정수, 40~79% -> 2정수, <= 39% -> 1정수
+- **HUD mireukEssenceText** (`js/scenes/ServiceScene.js`): x=10, y=26, 11px, #b266ff. chapter >= 7 또는 보유량 > 0 시 표시
+- **정수 드롭 VFX**: 보라색(#b266ff) 플로팅 텍스트 "💠 +N 정수!" (16px), 테이블 위에서 위로 떠오르며 페이드 아웃
+
+### Notes
+
+- 스펙에서 `_scheduleMireukTraveler` 조건이 "7-1 이후이고 season2Unlocked" AND 조건이었으나, 구현은 OR 형태 (`!isSeason2 && this.chapter < 7`). season2Unlocked=true이면 이전 챕터 리플레이에서도 등장 가능. QA에서 게임 경험상 자연스러운 동작으로 판단하여 PASS
+- `addMireukEssence`에 음수 방어 미구현. 현재 Phase에서는 양수(1~3)만 전달하므로 문제 없음. Phase 51-2 소비 기능 구현 시 별도 `spendMireukEssence` 메서드 추가 권장
+- 챕터별 등장 확률 보정(16~24장: 20%, 엔드리스: 12%)은 미구현 (TODO 주석). 현재 16% 단일 적용
+- 기존 ServiceScene 라인 2014의 `this.vfx.floatingText(...)` 호출이 VFXManager 메서드 추가로 정상 동작하게 됨 (기존 런타임 오류 해소)
+- visual_change: ui
+- QA: PASS (25/25, 수용 기준 13개 전항목 통과, 시각 검증 3건 통과)
+- AD 모드 3: UI 레이아웃 검수 완료 (HUD 2행 좌측 배치, 기존 요소와 충돌 없음)
+- 스펙: `.claude/specs/2026-04-18-kc-phase51-1-spec.md`
+- 리포트: `.claude/specs/2026-04-18-kc-phase51-1-report.md`
+- QA: `.claude/specs/2026-04-18-kc-phase51-1-qa.md`
+
 ## [Phase 51-4] 2026-04-18 -- 영업씬 챕터별 배경 교체
 
 ### Added

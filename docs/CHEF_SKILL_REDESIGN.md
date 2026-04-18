@@ -219,7 +219,44 @@ getSynergyBonus(chefId, mireukId)
 
 ---
 
-## 8. 결정 사항 요약
+## 8. 구현 현황
+
+> Phase 51-3 (2026-04-19) 완료
+
+### passiveDesc 교정
+
+- [x] petit_chef: "재료 수거 범위 +30%, 조리시간 −15%" (chefData.js)
+- [x] flame_chef: "화염 타워 피해 +20%, 그릴 요리 수익 +25%" (chefData.js)
+- [x] ice_chef: "CC(둔화/빙결) 지속 +25%, 손님 인내심 +20%" (chefData.js)
+
+### 독립 계수 곱셈 원칙
+
+- [x] ServiceScene `_serveToCustomer()` totalGold 계산식에 독립 계수 원칙 주석 추가
+- [x] 스토리 셰프 버프(ChefManager)와 유랑 미력사 버프가 독립 슬롯으로 곱셈 적용됨을 코드에 반영
+- [x] earlyMult(시엔) / vipBonus(로살리오) / gourmetBonus(레이라) / yokoProtectBonus(요코) 4개 배율 변수를 독립 계수로 추가
+
+### 미력사 버프 5종 연결
+
+- [x] _buffServeSpeed (무오): effectiveServeDelay로 자동 서빙 딜레이 단축, 80% 상한 캡
+- [x] _buffEarlyBonus / _buffEarlyDuration (시엔): 세션 초반 N초간 골드 배율 적용
+- [x] _buffIngredientRefund / _buffNoFailDelay (아이다): 조리 실패(discard) 시 확률적 재료 회수
+- [x] _buffVipRewardMult (로살리오): VIP 손님 서빙 시 골드 추가 배율
+- [x] _buffGourmetRewardMult (레이라): 미식가 손님 서빙 시 골드 추가 배율
+- [x] _buffVipFoodReviewBonus (로살리오 3단계): food_review 이벤트 확률 +30%
+
+### 요코 chain_serve
+
+- [x] _yokoChainThreshold / _yokoChainReward / _yokoChainCount / _yokoProtectNext / _yokoProtectActive 변수 구현
+- [x] 연속 서빙 카운터 + 퇴장 방지(500ms 고정) + VFX + 골드 보너스(3단계 +50%)
+- [x] 서빙 실패(자연 퇴장) 시 카운터 리셋
+
+### 미구현 (후속 과제)
+
+- [ ] 무오 3단계 _buffMuoFirstServeGuarantee (첫 서빙 인내심 80% 보장) -- wanderingChefData.js에 serve_speed skillValues2 데이터 추가 필요
+
+---
+
+## 9. 결정 사항 요약
 
 1. **스토리 셰프는 GatheringScene 주 전문**으로, ServiceScene에서는 지원 역할(쿨다운 지원 스킬 + 소수 패시브)만 수행한다.
 2. **유랑 미력사는 ServiceScene 전담**으로, GatheringScene 효과는 없다.
