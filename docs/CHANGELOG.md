@@ -1,5 +1,36 @@
 # Changelog
 
+## [Phase 51-4] 2026-04-18 -- 영업씬 챕터별 배경 교체
+
+### Added
+
+- **챕터별 홀 바닥 에셋 8종** (`assets/service/floor_hall_*.png`, 128x128 tileable)
+  - `floor_hall_g1` (ch1~6 할머니 식당), `floor_hall_izakaya` (ch7~9 이자카야), `floor_hall_dragon` (ch10~12 드래곤 팰리스), `floor_hall_bistro` (ch13~15 파리 비스트로), `floor_hall_spice` (ch16~18 스파이스 팰리스), `floor_hall_cantina` (ch19~21 칸티나), `floor_hall_dream` (ch22~24 드림 디저트), `floor_hall_endless` (엔드리스)
+- **`_getHallFloorKey()` 헬퍼** (`js/scenes/ServiceScene.js`): `this.chapter` / `this.isEndless` 기반 바닥 에셋 키 반환
+- **`_getWallBackKey()` 헬퍼** (`js/scenes/ServiceScene.js`): 동일 로직으로 뒷벽 에셋 키 반환
+- **SpriteLoader 에셋 로드 16건** (`js/managers/SpriteLoader.js`): `_loadServiceAssets()`에 바닥 8종 + 뒷벽 8종 로드 루프 추가
+
+### Changed
+
+- **바닥 렌더링 방식 전환** (`js/scenes/ServiceScene.js` `_createTables()`): `add.image` → `add.tileSprite` (128x128 tileable 에셋 반복 채움)
+- **뒷벽 렌더링 fallback 추가** (`js/scenes/ServiceScene.js` `_createHallDecor()`): 챕터별 키 우선 → 기존 `wall_back` fallback
+- **하단 바 색조** (`js/scenes/ServiceScene.js` `_createBottomBar()`): `0x0d0d1a` → `0x1c0e00` (웜 다크 통합 팔레트 통일)
+
+### Notes
+
+- 스펙에서 뒷벽 에셋 8종도 생성 예정이었으나, PixelLab create_map_object API가 360x64 해상도를 지원하지 않아 미생성. 기존 `wall_back.png` fallback으로 정상 동작. 뒷벽 챕터별 변형은 후속 페이즈 처리 예정
+- 기존 `floor_hall.png` (360x240)는 fallback용으로 유지
+- SERVICE_SCENE_REDESIGN.md 기획서 기준 1단계 작업 완료 (바닥+뒷벽+하단바 색조)
+- visual_change: art
+- QA: PASS (25/25, 챕터별 tileSprite 렌더링, fallback, 엣지케이스 전항목 통과)
+- AD Mode 1: APPROVED (에셋 컨셉 8종 승인)
+- AD Mode 2: APPROVED (바닥 8종 전 테마 검증, 뒷벽 미생성 → fallback 확인)
+- 스펙: `.claude/specs/2026-04-18-kc-phase51-4-spec.md`
+- 리포트: `.claude/specs/2026-04-18-kc-phase51-4-report.md`
+- QA: `.claude/specs/2026-04-18-kc-phase51-4-qa.md`
+- AD Mode 1: `.claude/specs/2026-04-18-kc-phase51-4-ad1.md`
+- AD Mode 2: `.claude/specs/2026-04-18-kc-phase51-4-ad2.md`
+
 ## [Phase 47-3] 2026-04-18 -- 일반 적 41종 death 애니메이션 완료
 
 ### Added

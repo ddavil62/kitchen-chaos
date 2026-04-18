@@ -1,7 +1,7 @@
 # Kitchen Chaos — 영업씬(ServiceScene) 비주얼 재구성 기획서
 
 > 작성일: 2026-04-18 (Phase 50 산출물)
-> 상태: 기획 완료, Phase 51 구현 대기
+> 상태: 1단계 완료 (Phase 51-4, 2026-04-18), 2~3단계 미착수
 
 ---
 
@@ -237,19 +237,20 @@ this.load.image('wall_back_g1',       'assets/service/wall_back_g1.png');
 
 ## 5. 단계적 구현 계획
 
-### 1단계 — 배경 교체 (최우선, Phase 51 포함 권장)
+### 1단계 — 배경 교체 (Phase 51-4 완료, 2026-04-18)
 
 **목표**: 챕터별 홀 바닥 + 뒷벽 이미지 8세트 교체. 코드 변경 최소화.
 
-| 작업 | 내용 |
-|------|------|
-| 에셋 생성 | floor_hall 8종 + wall_back 8종 = 16개 PNG (PixelLab) |
-| ServiceScene.js | `_getHallFloorKey()`, `_getWallBackKey()` 헬퍼 추가 (약 30줄) |
-| ServiceScene.js | `_createTables()`, `_createHallDecor()` 키 참조 방식 변경 |
-| PreloadScene.js | 신규 에셋 16개 로드 경로 추가 |
-| 하단 바 색조 | `0x0d0d1a` → `0x1c0e00` 1줄 변경 |
+| 작업 | 내용 | 상태 |
+|------|------|------|
+| 에셋 생성 | floor_hall 8종 (128x128 tileable, PixelLab) | 완료 |
+| 에셋 생성 | wall_back 8종 (360x64) | 미생성 (PixelLab API 한계, 기존 wall_back.png fallback) |
+| ServiceScene.js | `_getHallFloorKey()`, `_getWallBackKey()` 헬퍼 추가 | 완료 |
+| ServiceScene.js | `_createTables()` tileSprite 전환, `_createHallDecor()` fallback 방식 | 완료 |
+| SpriteLoader.js | 신규 에셋 16개 로드 경로 추가 | 완료 |
+| 하단 바 색조 | `0x0d0d1a` → `0x1c0e00` | 완료 |
 
-**기대 효과**: 챕터 진행마다 홀 분위기가 달라져 스토리 몰입감 대폭 향상. 코드 변경이 적어 버그 리스크 낮음.
+**구현 상세**: 바닥 해상도를 기획서 360x240에서 128x128 tileable로 변경하여 `add.tileSprite`로 반복 렌더링. QA 25/25 PASS.
 
 ### 2단계 — 손님 캐릭터 + 데코 (Phase 51 이후, 별도 페이즈)
 

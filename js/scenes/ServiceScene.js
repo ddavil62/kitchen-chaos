@@ -9,6 +9,7 @@
  * Phase 11-3c: 비활성 테이블 렌더 최적화, 씬 Tween/Timer 정리.
  * Phase 19-5: 홀 영역 테이블 배치를 flat top-down → 아이소메트릭 다이아몬드 격자로 전환.
  *             _cellToWorld(), _drawIsoFloor() 추가. depth sorting y좌표 기반 적용.
+ * Phase 51-4: 챕터별 홀 바닥·뒷벽 키 헬퍼 추가, tileSprite 전환, 하단 바 색조 통일.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -477,14 +478,50 @@ export class ServiceScene extends Phaser.Scene {
   }
 
   /**
+   * 현재 챕터에 맞는 홀 바닥 에셋 키를 반환한다.
+   * @returns {string}
+   * @private
+   */
+  _getHallFloorKey() {
+    if (this.isEndless)      return 'floor_hall_endless';
+    if (this.chapter <= 6)   return 'floor_hall_g1';
+    if (this.chapter <= 9)   return 'floor_hall_izakaya';
+    if (this.chapter <= 12)  return 'floor_hall_dragon';
+    if (this.chapter <= 15)  return 'floor_hall_bistro';
+    if (this.chapter <= 18)  return 'floor_hall_spice';
+    if (this.chapter <= 21)  return 'floor_hall_cantina';
+    return 'floor_hall_dream';
+  }
+
+  /**
+   * 현재 챕터에 맞는 뒷벽 에셋 키를 반환한다.
+   * @returns {string}
+   * @private
+   */
+  _getWallBackKey() {
+    if (this.isEndless)      return 'wall_back_endless';
+    if (this.chapter <= 6)   return 'wall_back_g1';
+    if (this.chapter <= 9)   return 'wall_back_izakaya';
+    if (this.chapter <= 12)  return 'wall_back_dragon';
+    if (this.chapter <= 15)  return 'wall_back_bistro';
+    if (this.chapter <= 18)  return 'wall_back_spice';
+    if (this.chapter <= 21)  return 'wall_back_cantina';
+    return 'wall_back_dream';
+  }
+
+  /**
    * 홀 배경 데코 오브젝트 — 뒷벽, 화분, 입구를 배치한다.
    * 에셋 미로드 시 해당 오브젝트를 생략하고 에러를 발생시키지 않는다.
    * @private
    */
   _createHallDecor() {
-    // 뒷벽 — 홀 상단 가로 전체 배치
-    if (SpriteLoader.hasTexture(this, 'wall_back')) {
-      this.add.image(GAME_WIDTH / 2, HALL_Y + 26, 'wall_back')
+    // Phase 51-4: 챕터별 뒷벽 키 우선, fallback: 기존 wall_back
+    const wallKey = this._getWallBackKey();
+    const activeWallKey = SpriteLoader.hasTexture(this, wallKey) ? wallKey
+                        : SpriteLoader.hasTexture(this, 'wall_back') ? 'wall_back'
+                        : null;
+    if (activeWallKey) {
+      this.add.image(GAME_WIDTH / 2, HALL_Y + 26, activeWallKey)
         .setDisplaySize(GAME_WIDTH, 52)
         .setDepth(3);
     }
@@ -512,10 +549,13 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createTables() {
-    // 홀 배경 — Phase 19-5: 아이소메트릭 헤링본 파케 바닥 텍스처 + fallback: 웜 브라운
-    if (SpriteLoader.hasTexture(this, 'floor_hall')) {
-      this.add.image(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, 'floor_hall')
-        .setDisplaySize(GAME_WIDTH, HALL_H)
+    // Phase 51-4: 챕터별 128×128 tileable 바닥 → tileSprite. fallback: 단일 이미지 → 단색
+    const floorKey = this._getHallFloorKey();
+    const activeFloorKey = SpriteLoader.hasTexture(this, floorKey) ? floorKey
+                         : SpriteLoader.hasTexture(this, 'floor_hall') ? 'floor_hall'
+                         : null;
+    if (activeFloorKey) {
+      this.add.tileSprite(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, activeFloorKey)
         .setDepth(0);
     } else {
       this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0x5C3A1E)
@@ -975,7 +1015,7 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createBottomBar() {
-    this.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_H / 2, GAME_WIDTH, BOTTOM_H, 0x0d0d1a)
+    this.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_H / 2, GAME_WIDTH, BOTTOM_H, 0x1c0e00)
       .setDepth(100);
 
     // ── Phase 8-6: 셰프 영업 액티브 스킬 버튼 ──

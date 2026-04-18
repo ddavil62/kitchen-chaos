@@ -23,6 +23,7 @@
  * Phase 38-1: 24장 보스 1종(queen_of_taste, 3페이즈) 추가. BOSS_WALK_HASHES에 queen_of_taste 3종 등록.
  * Phase 47-1: death 애니메이션 프레임 로드 + Phaser anim 등록 시스템 추가.
  * Phase 47-2: 보스 13종 death 애니메이션 프레임 로드 + Phaser anim 등록 시스템 추가.
+ * Phase 51-4: 챕터별 홀 바닥 타일 8종 + 뒷벽 8종 추가 로드 (SERVICE_ROOT/floor_hall_*.png, wall_back_*.png).
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -674,6 +675,12 @@ export class SpriteLoader {
     scene.load.image('wall_back',     `${SERVICE_ROOT}/wall_back.png`);
     scene.load.image('decor_plant',   `${SERVICE_ROOT}/decor_plant.png`);
     scene.load.image('entrance_arch', `${SERVICE_ROOT}/entrance_arch.png`);
+    // Phase 51-4: 챕터별 홀 바닥 타일 (128×128 seamless, tileSprite용) + 뒷벽
+    const FLOOR_VARIANTS = ['g1','izakaya','dragon','bistro','spice','cantina','dream','endless'];
+    for (const v of FLOOR_VARIANTS) {
+      scene.load.image(`floor_hall_${v}`, `${SERVICE_ROOT}/floor_hall_${v}.png`);
+      scene.load.image(`wall_back_${v}`,  `${SERVICE_ROOT}/wall_back_${v}.png`);
+    }
   }
 
   /**
