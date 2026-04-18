@@ -16,12 +16,14 @@
  * Phase 26-2: v16 마이그레이션 — chapter12 진행 플래그 + sake_master 스테이지 교체 관련 플래그 추가.
  * Phase 51-1: v18 마이그레이션 — mireukEssence, mireukEssenceTotal, mireukTravelerCount,
  *             mireukBossRewards, hiredMireukChefs 추가. 미력의 정수 헬퍼 메서드 4개 추가.
+ * Phase 51-2: v19 마이그레이션 — hiredMireukChefs → wanderingChefs 구조체 이관.
+ *             spendMireukEssence + 유랑 미력사 헬퍼 메서드 7개 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 18;
+const SAVE_VERSION = 19;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -107,7 +109,12 @@ function createDefault() {
     mireukEssenceTotal: 0,     // 누적 획득 미력의 정수 (소비해도 감소 안 함, 업적용)
     mireukTravelerCount: 0,    // 미력 나그네 서빙 누적 횟수 (대화 트리거용)
     mireukBossRewards: {},     // { [stageId]: true } 보스 정화 정수 수령 기록
-    hiredMireukChefs: [],      // 고용 중인 유랑 미력사 목록 (Phase 51-2 이후 사용)
+    // ── Phase 51-2 추가: 유랑 미력사 고용 시스템 ──
+    wanderingChefs: {
+      hired: [],           // 현재 고용 중인 미력사 ID 목록 (예: ['wanderer_haruka'])
+      unlocked: [],        // 도감 해금 목록 (고용 이력)
+      enhancements: {},    // { [chefId]: 1|2|3 } -- 강화 단계. 미기재 시 1로 간주
+    },
     // ── Phase 11-1 추가 ──
     endless: {
       unlocked: false,            // 6-3 클리어 시 true
@@ -551,6 +558,111 @@ export class SaveManager {
     return data.mireukTravelerCount;
   }
 
+  /**
+   * 미력의 정수 소비. 잔액이 amount보다 적으면 false 반환 (음수 방어 포함).
+   * @param {number} amount - 소비할 정수 수
+   * @returns {boolean} 성공 여부
+   */
+  static spendMireukEssence(amount) {
+    if (amount <= 0) return false;
+    const data = SaveManager.load();
+    if ((data.mireukEssence ?? 0) < amount) return false;
+    data.mireukEssence -= amount;
+    SaveManager.save(data);
+    return true;
+  }
+
+  // ── 유랑 미력사 (Phase 51-2) ──
+
+  /**
+   * wanderingChefs 구조체 전체 반환.
+   * @returns {{ hired: string[], unlocked: string[], enhancements: object }}
+   */
+  static getWanderingChefs() {
+    const data = SaveManager.load();
+    return data.wanderingChefs || { hired: [], unlocked: [], enhancements: {} };
+  }
+
+  /**
+   * 유랑 미력사 고용 처리. hired 추가 + unlocked에 신규 등록 + 정수 소비.
+   * @param {string} chefId
+   * @param {number} cost - 고용(또는 재고용) 비용
+   * @returns {boolean} 성공 여부
+   */
+  static hireWanderingChef(chefId, cost) {
+    const data = SaveManager.load();
+    if (!data.wanderingChefs) data.wanderingChefs = { hired: [], unlocked: [], enhancements: {} };
+    if ((data.mireukEssence ?? 0) < cost) return false;
+    data.mireukEssence -= cost;
+    if (!data.wanderingChefs.hired.includes(chefId)) {
+      data.wanderingChefs.hired.push(chefId);
+    }
+    if (!data.wanderingChefs.unlocked.includes(chefId)) {
+      data.wanderingChefs.unlocked.push(chefId);
+    }
+    if (!data.wanderingChefs.enhancements[chefId]) {
+      data.wanderingChefs.enhancements[chefId] = 1;
+    }
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
+   * 유랑 미력사 해고 처리. hired에서 제거. 환급 없음.
+   * @param {string} chefId
+   */
+  static fireWanderingChef(chefId) {
+    const data = SaveManager.load();
+    if (!data.wanderingChefs) return;
+    data.wanderingChefs.hired = data.wanderingChefs.hired.filter(id => id !== chefId);
+    SaveManager.save(data);
+  }
+
+  /**
+   * 유랑 미력사 강화. 최대 3단계. 비용 소비 후 단계 +1.
+   * @param {string} chefId
+   * @param {number} cost - 강화 비용
+   * @returns {boolean} 성공 여부
+   */
+  static upgradeWanderingChef(chefId, cost) {
+    const data = SaveManager.load();
+    if (!data.wanderingChefs) return false;
+    const curLevel = data.wanderingChefs.enhancements[chefId] || 1;
+    if (curLevel >= 3) return false;
+    if ((data.mireukEssence ?? 0) < cost) return false;
+    data.mireukEssence -= cost;
+    data.wanderingChefs.enhancements[chefId] = curLevel + 1;
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
+   * 유랑 미력사 고용 여부 확인.
+   * @param {string} chefId
+   * @returns {boolean}
+   */
+  static isWanderingChefHired(chefId) {
+    const data = SaveManager.load();
+    return !!(data.wanderingChefs?.hired?.includes(chefId));
+  }
+
+  /**
+   * 현재 동시 고용 상한 반환. storyProgress.currentChapter 기반.
+   * - chapter 7~12 -> 1명
+   * - chapter 13~18 -> 2명
+   * - chapter 19+ -> 3명
+   * - 7 미만 -> 0 (고용 불가)
+   * @returns {number}
+   */
+  static getHireLimit() {
+    const data = SaveManager.load();
+    const ch = data.storyProgress?.currentChapter || 1;
+    if (ch < 7) return 0;
+    if (ch <= 12) return 1;
+    if (ch <= 18) return 2;
+    return 3;
+  }
+
   // ── 업적 시스템 (Phase 42) ──
 
   /**
@@ -894,6 +1006,18 @@ export class SaveManager {
       data.mireukBossRewards  = data.mireukBossRewards  || {};
       data.hiredMireukChefs   = data.hiredMireukChefs   || [];
       data.version = 18;
+    }
+
+    // v18 → v19: hiredMireukChefs 배열 → wanderingChefs 구조체로 이관 (Phase 51-2)
+    if (data.version < 19) {
+      const legacyHired = Array.isArray(data.hiredMireukChefs) ? data.hiredMireukChefs : [];
+      data.wanderingChefs = {
+        hired:        legacyHired,
+        unlocked:     legacyHired.slice(),   // 이전 고용 이력을 unlocked로 소급 등록
+        enhancements: {},
+      };
+      delete data.hiredMireukChefs;
+      data.version = 19;
     }
 
     return data;

@@ -14,6 +14,7 @@ import { UpgradeManager } from '../managers/UpgradeManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { STAFF_TYPES } from '../data/staffData.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
+import { WANDERING_CHEFS, GRADE_NAMES, GRADE_COLORS } from '../data/wanderingChefData.js';
 
 // ── Phase 8-3: 테이블/인테리어 상수 ──
 
@@ -816,23 +817,68 @@ export class ShopScene extends Phaser.Scene {
       }
     });
 
-    // ── 빈 슬롯: 향후 추가 직원 예정 ──
-    const emptyY = startY + 28 + staffIds.length * cardH;
-    const emptyBg = this.add.rectangle(GAME_WIDTH / 2, emptyY + 30, 340, 48, 0x1a1a1a)
-      .setStrokeStyle(1, 0x333333);
-    this._contentContainer.add(emptyBg);
+    // ── 유랑 미력사 고용 섹션 ──
+    const wandererSectionY = startY + 28 + staffIds.length * cardH + 10;
+
+    // 구분선
+    const divLine = this.add.rectangle(GAME_WIDTH / 2, wandererSectionY, GAME_WIDTH - 20, 1, 0x444444);
+    this._contentContainer.add(divLine);
+
+    // 섹션 헤더
+    this._contentContainer.add(
+      this.add.text(20, wandererSectionY + 8, '\uD83D\uDCA0 \uC720\uB791 \uBBF8\uB825\uC0AC \uACE0\uC6A9', {
+        fontSize: '14px', fontStyle: 'bold', color: '#b266ff',
+      })
+    );
+
+    // 현재 고용 수 / 상한 표시
+    const hireLimit = SaveManager.getHireLimit();
+    const hiredCount = SaveManager.getWanderingChefs().hired.length;
+    const limitText = hireLimit === 0
+      ? '(7-1 \uD074\uB9AC\uC5B4 \uD6C4 \uD574\uAE08)'
+      : `\uACE0\uC6A9 \uC911: ${hiredCount}/${hireLimit}\uBA85`;
+    this._contentContainer.add(
+      this.add.text(GAME_WIDTH - 20, wandererSectionY + 10, limitText, {
+        fontSize: '11px', color: '#888888',
+      }).setOrigin(1, 0)
+    );
+
+    // "고용 화면 열기" 버튼 카드
+    const wBtnY = wandererSectionY + 44;
+    const wCardBg = this.add.rectangle(GAME_WIDTH / 2, wBtnY, 340, 52, 0x1a1020)
+      .setStrokeStyle(1, 0x7722aa)
+      .setInteractive({ useHandCursor: true });
+    this._contentContainer.add(wCardBg);
 
     this._contentContainer.add(
-      this.add.text(GAME_WIDTH / 2, emptyY + 22, '\uD5A5\uD6C4 \uCD94\uAC00 \uC9C1\uC6D0 \uC608\uC815', {
-        fontSize: '12px', color: '#555555',
+      this.add.text(GAME_WIDTH / 2, wBtnY - 8, '\uC720\uB791 \uBBF8\uB825\uC0AC\uB97C \uACE0\uC6A9\uD558\uC5EC \uC601\uC5C5 \uB2A5\uB825\uC744 \uAC15\uD654\uD558\uC138\uC694', {
+        fontSize: '10px', color: '#aa88cc',
       }).setOrigin(0.5)
     );
 
+    const openBtnX = GAME_WIDTH / 2;
+    const openBtnY2 = wBtnY + 12;
+    const openBtn = this.add.rectangle(openBtnX, openBtnY2, 160, 24, 0x552288)
+      .setInteractive({ useHandCursor: true });
+    this._contentContainer.add(openBtn);
     this._contentContainer.add(
-      this.add.text(GAME_WIDTH / 2, emptyY + 38, '\uB2E4\uC74C \uC5C5\uB370\uC774\uD2B8\uC5D0\uC11C \uB9CC\uB098\uBCF4\uC138\uC694!', {
-        fontSize: '10px', color: '#444444',
+      this.add.text(openBtnX, openBtnY2, '\uACE0\uC6A9 \uD654\uBA74 \uC5F4\uAE30', {
+        fontSize: '12px', fontStyle: 'bold', color: '#e0aaff',
       }).setOrigin(0.5)
     );
+
+    wCardBg.on('pointerdown', () => {
+      this.scene.launch('WanderingChefModal');
+      this.scene.pause();
+    });
+    openBtn.on('pointerdown', () => {
+      this.scene.launch('WanderingChefModal');
+      this.scene.pause();
+    });
+    wCardBg.on('pointerover', () => wCardBg.setFillStyle(0x2a1030));
+    wCardBg.on('pointerout', () => wCardBg.setFillStyle(0x1a1020));
+    openBtn.on('pointerover', () => openBtn.setFillStyle(0x6633aa));
+    openBtn.on('pointerout', () => openBtn.setFillStyle(0x552288));
   }
 
   /**

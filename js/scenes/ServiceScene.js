@@ -11,6 +11,7 @@
  *             _cellToWorld(), _drawIsoFloor() 추가. depth sorting y좌표 기반 적용.
  * Phase 51-4: 챕터별 홀 바닥·뒷벽 키 헬퍼 추가, tileSprite 전환, 하단 바 색조 통일.
  * Phase 51-1: mireuk_traveler 특수 손님 타입 추가, 미력의 정수 드롭 로직, HUD 보유량 표시.
+ * Phase 51-2: 유랑 미력사 패시브 스킬 적용 (_applyWanderingChefSkills), 인내심/조리시간 버프.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -39,6 +40,7 @@ import { ToolManager } from '../managers/ToolManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
+import { WANDERING_CHEFS, getWanderingChefById } from '../data/wanderingChefData.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -370,8 +372,143 @@ export class ServiceScene extends Phaser.Scene {
     this._mireukSpawned = false;  // 세션당 1회 중복 방지 플래그
     this._scheduleMireukTraveler();
 
+    // ── Phase 51-2: 유랑 미력사 패시브 스킬 적용 ──
+    this._applyWanderingChefSkills();
+
     // 씬 종료 시 정리
     this.events.once('shutdown', this._shutdown, this);
+  }
+
+  // ── Phase 51-2: 유랑 미력사 패시브 스킬 적용 ──────────────────────────────
+
+  /**
+   * 고용 중인 유랑 미력사의 패시브 스킬을 세션 시작 시 일괄 적용한다.
+   * 스킬 효과는 내부 버프 변수에 덧셈 합산 방식으로 적용한다.
+   * @private
+   */
+  _applyWanderingChefSkills() {
+    const wc = SaveManager.getWanderingChefs();
+    const hired = wc.hired || [];
+
+    // ── 버프 변수 초기화 ──
+    /** 인내심 배율 누적 증가 (0.2 = +20%) */
+    this._buffPatienceMult = 0;
+    /** 급한 손님(rushed) 전용 인내심 추가 증가 */
+    this._buffRushedPatienceMult = 0;
+    /** 조리 시간 감소율 누적 (0.10 = -10%) */
+    this._buffCookTimeReduce = 0;
+    /** 조리 시간 콤보 보너스 (2연속 서빙 후 추가 감소율) */
+    this._buffCookComboReduce = 0;
+    /** 미식가 등장 확률 증가 (절대값) */
+    this._buffGourmetRateAdd = 0;
+    /** 미식가 보상 배율 증가 */
+    this._buffGourmetRewardMult = 0;
+    /** 서빙 처리 속도 증가율 */
+    this._buffServeSpeed = 0;
+    /** 세션 초반 보상 증가율 */
+    this._buffEarlyBonus = 0;
+    /** 세션 초반 효과 지속 시간 (초) */
+    this._buffEarlyDuration = 0;
+    /** 세션 초반 보상 적용 시작 시각 (create 완료 기준 0초) */
+    this._buffEarlyStartTime = 0;
+    /** 조리 실패 시 재료 회수율 */
+    this._buffIngredientRefund = 0;
+    /** 조리 실패 후 즉시 재조리 가능 플래그 */
+    this._buffNoFailDelay = false;
+    /** VIP 등장 확률 배율 */
+    this._buffVipRateMult = 1;
+    /** VIP 보상 배율 증가 */
+    this._buffVipRewardMult = 0;
+    /** VIP 서빙 완료 시 food_review 이벤트 확률 추가 (로살리오 3단계) */
+    this._buffVipFoodReviewBonus = 0;
+    // TODO: 요코 연쇄 퇴장 방지 (chain_serve) -- Optional 미구현
+    // this._buffChainServeThreshold = 0;
+    // this._buffChainServeReward = 0;
+
+    if (hired.length === 0) return;
+
+    for (const chefId of hired) {
+      const def = getWanderingChefById(chefId);
+      if (!def) continue;
+      const level = wc.enhancements[chefId] || 1;
+      const idx = level - 1;
+      const v  = def.skillValues[idx];
+      const v2 = def.skillValues2 ? def.skillValues2[idx] : 0;
+
+      switch (def.skillType) {
+        case 'patience_pct':
+          this._buffPatienceMult += v;
+          this._buffRushedPatienceMult += v2;
+          break;
+
+        case 'cook_time_reduce':
+          this._buffCookTimeReduce += v;
+          // 3단계 콤보 보너스는 comboCount 체크 시 _buffCookComboReduce 사용
+          this._buffCookComboReduce = Math.max(this._buffCookComboReduce, v2);
+          break;
+
+        case 'gourmet_rate':
+          this._buffGourmetRateAdd += v;
+          this._buffGourmetRewardMult += v2;
+          break;
+
+        case 'serve_speed':
+          this._buffServeSpeed += v;
+          break;
+
+        case 'early_session_bonus':
+          // 여러 시엔 동시 고용 불가이나, 혹시 중복 방지 위해 최댓값 적용
+          this._buffEarlyBonus    = Math.max(this._buffEarlyBonus, v);
+          this._buffEarlyDuration = Math.max(this._buffEarlyDuration, v2);
+          break;
+
+        case 'ingredient_refund':
+          this._buffIngredientRefund = Math.max(this._buffIngredientRefund, v);
+          this._buffNoFailDelay = this._buffNoFailDelay || (v2 > 0);
+          break;
+
+        case 'vip_rate':
+          this._buffVipRateMult *= v;   // 배율이므로 곱셈
+          this._buffVipRewardMult += v2;
+          // 로살리오 3단계: food_review 이벤트 확률 +30%
+          if (level === 3) this._buffVipFoodReviewBonus += 0.30;
+          break;
+
+        case 'chain_serve':
+          // TODO: 요코 연쇄 퇴장 방지 -- Optional 미구현
+          // this._buffChainServeThreshold = v;
+          // this._buffChainServeReward = v2;
+          break;
+      }
+    }
+
+    // ── 적용: 인내심 배율 (CUSTOMER_PATIENCE_MULT 복사본 생성 후 수정) ──
+    // 씬 인스턴스 변수로 덮어쓰기. 원본 상수 객체를 보호하기 위해 얕은 복사본 사용.
+    if (this._buffPatienceMult > 0 || this._buffRushedPatienceMult > 0) {
+      this._patienceMults = { ...CUSTOMER_PATIENCE_MULT };
+      for (const type of Object.keys(this._patienceMults)) {
+        this._patienceMults[type] *= (1 + this._buffPatienceMult);
+      }
+      if (this._buffRushedPatienceMult > 0) {
+        this._patienceMults.rushed *= (1 + this._buffRushedPatienceMult);
+      }
+    } else {
+      this._patienceMults = CUSTOMER_PATIENCE_MULT;
+    }
+
+    // ── 적용: 특수 손님 확률 (specialRates 복사본 생성) ──
+    if (this._buffGourmetRateAdd > 0 || this._buffVipRateMult !== 1) {
+      const base = this.specialRates || SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[1];
+      this.specialRates = { ...base };
+      if (this._buffGourmetRateAdd > 0) {
+        this.specialRates.gourmet = Math.min(0.50, (base.gourmet || 0) + this._buffGourmetRateAdd);
+      }
+      if (this._buffVipRateMult !== 1) {
+        this.specialRates.vip = Math.min(0.50, (base.vip || 0) * this._buffVipRateMult);
+      }
+    }
+
+    console.log('[ServiceScene] 유랑 미력사 스킬 적용:', hired.length, '명');
   }
 
   // ── Phase 51-1: 미력 나그네 등장 예약 ──────────────────────────────
@@ -426,7 +563,7 @@ export class ServiceScene extends Phaser.Scene {
     const tablePatienceBonus = TABLE_PATIENCE_BONUS[tableGrade];
     const interiorPatienceBonus = FLOWER_PATIENCE_BONUS[this.interiorFlower] || 0;
     const basePat = this.serviceConfig.customerPatience * 1000;
-    const typeMult = CUSTOMER_PATIENCE_MULT.mireuk_traveler;
+    const typeMult = (this._patienceMults || CUSTOMER_PATIENCE_MULT).mireuk_traveler;
     const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
     const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * typeMult * eventPatienceMult;
 
@@ -1575,7 +1712,9 @@ export class ServiceScene extends Phaser.Scene {
     const tablePatienceBonus = TABLE_PATIENCE_BONUS[tableGrade];
     const interiorPatienceBonus = FLOWER_PATIENCE_BONUS[this.interiorFlower] || 0;
     const basePat = this.serviceConfig.customerPatience * 1000; // ms
-    const typeMult = CUSTOMER_PATIENCE_MULT[customerType] || 1.0;
+    // Phase 51-2: 유랑 미력사 인내심 버프 반영 (this._patienceMults 사용)
+    const patienceTable = this._patienceMults || CUSTOMER_PATIENCE_MULT;
+    const typeMult = patienceTable[customerType] || 1.0;
 
     // 비 오는 날 이벤트: 인내심 +50%
     const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
@@ -1644,7 +1783,7 @@ export class ServiceScene extends Phaser.Scene {
     const tablePatienceBonus = TABLE_PATIENCE_BONUS[minGrade];
     const interiorPatienceBonus = FLOWER_PATIENCE_BONUS[this.interiorFlower] || 0;
     const basePat = this.serviceConfig.customerPatience * 1000;
-    const typeMult = CUSTOMER_PATIENCE_MULT.group;
+    const typeMult = (this._patienceMults || CUSTOMER_PATIENCE_MULT).group;
     const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
 
     const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * typeMult * eventPatienceMult;
@@ -1948,8 +2087,10 @@ export class ServiceScene extends Phaser.Scene {
     // 조리 시작 — Phase 8-3: 인테리어 오픈키친 보너스 적용
     const cookTimeBonus = ChefManager.getCookTimeBonus();
     const kitchenBonus = KITCHEN_COOK_BONUS[this.interiorKitchen] || 0;
+    // Phase 51-2: 유랑 미력사 조리 시간 감소 버프 반영
+    const wanderingCookReduce = this._buffCookTimeReduce || 0;
     // precision_cut(유키 serviceSkill): 남은 카운트가 있으면 즉시 조리
-    let totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus);
+    let totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus) * (1 - wanderingCookReduce);
     if (this._precisionCutRemaining > 0) {
       totalTime = 0;
       this._precisionCutRemaining--;
