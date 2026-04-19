@@ -462,8 +462,39 @@ export class MenuScene extends Phaser.Scene {
     };
     hiddenInput.addEventListener('input', onInput);
 
+    // ── 결과 메시지 텍스트 ──
+    const resultText = this.add.text(cx, cy + 15, '', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      wordWrap: { width: 220 },
+      align: 'center',
+    }).setOrigin(0.5, 0);
+    container.add(resultText);
+
+    // ── 제출 함수 ──
+    const submit = () => {
+      const code = hiddenInput.value;
+      if (!code || !code.trim()) return;
+
+      const result = redeemCoupon(code);
+      if (result.ok) {
+        resultText.setColor('#44ff44');
+        resultText.setText(`\u2705 ${result.msg}`);
+        SoundManager.playSFX('sfx_coin');
+        // 성공 시 입력창 초기화
+        hiddenInput.value = '';
+        displayText.setText('\uCF54\uB4DC\uB97C \uC785\uB825\uD558\uC138\uC694');
+        displayText.setColor('#666666');
+      } else {
+        resultText.setColor('#ff6666');
+        resultText.setText(`\u274C ${result.msg}`);
+        SoundManager.playSFX('sfx_ui_tap');
+      }
+    };
+
     // ── DEV 치트 자동완성 드롭다운 ──
-    // 입력란 포커스 시 치트 코드 목록을 표시한다. 프로덕션 빌드에서는 트리쉐이킹된다.
+    // submit 정의 이후에 위치해야 항목 클릭 즉시 효과를 적용할 수 있다.
+    // 프로덕션 빌드에서는 트리쉐이킹된다.
     if (import.meta.env.DEV) {
       const hints = getCheatCodeHints();
       if (hints.length > 0) {
@@ -503,11 +534,11 @@ export class MenuScene extends Phaser.Scene {
           itemBg.on('pointerover', () => itemBg.setFillStyle(0x1a1a44));
           itemBg.on('pointerout',  () => itemBg.setFillStyle(0x0e0e28));
           itemBg.on('pointerdown', () => {
-            // 선택된 코드를 입력란에 채운다
+            // 코드를 채운 뒤 즉시 제출 — 확인 버튼 없이 바로 효과 적용
             hiddenInput.value = hint.code;
             onInput();
             sugContainer.setVisible(false);
-            hiddenInput.focus();
+            submit();
           });
 
           sugContainer.add([itemBg, codeText, descText]);
@@ -526,36 +557,6 @@ export class MenuScene extends Phaser.Scene {
         this._couponBlurListener  = onBlur;
       }
     }
-
-    // ── 결과 메시지 텍스트 ──
-    const resultText = this.add.text(cx, cy + 15, '', {
-      fontSize: '12px',
-      color: '#aaaaaa',
-      wordWrap: { width: 220 },
-      align: 'center',
-    }).setOrigin(0.5, 0);
-    container.add(resultText);
-
-    // ── 제출 함수 ──
-    const submit = () => {
-      const code = hiddenInput.value;
-      if (!code || !code.trim()) return;
-
-      const result = redeemCoupon(code);
-      if (result.ok) {
-        resultText.setColor('#44ff44');
-        resultText.setText(`\u2705 ${result.msg}`);
-        SoundManager.playSFX('sfx_coin');
-        // 성공 시 입력창 초기화
-        hiddenInput.value = '';
-        displayText.setText('\uCF54\uB4DC\uB97C \uC785\uB825\uD558\uC138\uC694');
-        displayText.setColor('#666666');
-      } else {
-        resultText.setColor('#ff6666');
-        resultText.setText(`\u274C ${result.msg}`);
-        SoundManager.playSFX('sfx_ui_tap');
-      }
-    };
 
     // Enter 키로 제출
     const onKeydown = (e) => {
