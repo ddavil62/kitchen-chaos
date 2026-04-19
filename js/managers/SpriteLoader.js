@@ -141,8 +141,8 @@ const ENEMY_WALK_HASHES = {
   shrimp_samurai: 'walking-52be561d',
   sugar_fairy: 'walking-83b51e9e',
   tomato_bomber: 'walking-0dd2efa9',
-  sushi_ninja: null,    // PixelLab 생성 후 hash 기입
-  tempura_monk: null,   // PixelLab 생성 후 hash 기입
+  sushi_ninja:          'walking-73e8aef5',   // Phase 47-3
+  tempura_monk:         'walking-aaf52389',   // Phase 47-3
   dumpling_warrior: 'animating-1e8cfa3d',  // Phase 21
   mini_dumpling: 'animating-8123f320',     // Phase 21
   wok_phantom: 'animating-4a4ef775',       // Phase 21
@@ -165,8 +165,8 @@ const ENEMY_WALK_HASHES = {
   luchador_ghost: 'animating-0469ac97',  // Phase 34-2 (252px, pro)
   candy_soldier: 'walking-4afaa9df',     // Phase 36-2 (22장 슈가 드림랜드)
   cake_witch: 'walking-076ead3d',        // Phase 36-2 (22장 슈가 드림랜드)
-  macaron_knight: 'animating-de406b54',  // Phase 37-1 (23장 드림랜드 심층부, 64px standard)
-  sugar_specter: 'animating-7f31cfcf',   // Phase 37-1 (23장 드림랜드 심층부, 64px standard)
+  macaron_knight: 'walking-532f38a1',    // Phase 47-3
+  sugar_specter:  'walking-2cf239b9',    // Phase 47-3
 };
 
 // ── 보스 death 애니메이션 폴더 해시 맵 (Phase 47-2) ──
@@ -189,22 +189,23 @@ const BOSS_DEATH_HASHES = {
 };
 
 const BOSS_WALK_HASHES = {
-  cuisine_god: 'walking-84e4ae22',
+  cuisine_god: 'walking-a3de1caf',  // Phase 47-3: 8방향 완성 (84e4ae22의 north + a3de1caf의 7방향 합산)
   dragon_ramen: 'walking-dcd66668',
   lava_dessert_golem: 'walking-5514895b',
   master_patissier: 'walking-b21b062a',
   pasta_boss: 'walking-49c92768',
   seafood_kraken: 'walking-f85ec5ca',
-  sake_oni: 'walking-9fa1ac06',  // Phase 23-1
+  sake_oni: 'walking-910cce10',  // Phase 47-3
   dragon_wok: 'animating-30e6c64f',     // Phase 26-1 신규 스프라이트 (기존 animating-8efd2218 교체)
   sake_master: 'animating-8d3d020e',   // Phase 26-1 신규
   chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
   maharaja: 'animating-2c666ada',     // Phase 32-5 (pro 모드, 212px canvas)
   el_diablo_pepper: 'walking-acae25f3', // Phase 35-2 (pro 모드, 116px canvas)
   // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (116/112/TBD px canvas)
-  queen_of_taste:   'animating-9259ac21',   // 페이즈1 기본형 (116px)
-  queen_of_taste_2: 'animating-96f74fd3',   // 페이즈2 변신형 (112px, 페이즈 전환 시 교체)
-  queen_of_taste_3: 'animating-d170c7e2',   // 페이즈3 분노형 (112px)
+  // Phase 47-4: queen_of_taste_2/3 별도 PixelLab 캐릭터 생성 필요
+  queen_of_taste:   'walking-d0fa0cc7',  // Phase 47-3
+  queen_of_taste_2: null,   // 페이즈2 — Phase 47-4 미착수
+  queen_of_taste_3: null,   // 페이즈3 — Phase 47-4 미착수
 };
 
 /** 걷기 애니메이션 방향 목록 */
