@@ -273,7 +273,31 @@ Phase 54: 쿠폰 코드 시스템 (프로덕션 + DEV 치트 분리) ✅ 완료 
 - 인도(16~18장), 멕시칸(19~21장), 디저트·최종(22~24장)
 - 54슬롯(전 스테이지 구현), 레시피 98종, 재료 9종, 적 14종+보스 3종
 
-### 엔드리스 확장 (미착수)
+### 엔드리스 확장
 
 - 영구 식란 지대(미력 폭풍의 눈), 끝없는 정화 임무
 - 그룹별 엔드리스 테마 추가
+- 상세 기획: `docs/ENDLESS_EXPANSION.md`
+
+```
+Phase 55-1: [기획] 엔드리스 모드 확장 기획서 작성 ✅ 완료 (2026-04-19)
+              - ENDLESS_EXPANSION.md 작성 (Phase 55-2~55-4 스펙 포함)
+              - 그룹3 적 12종 + 보스 3종 POOL_TIER_6 편입 목록 확정
+              - 미력 폭풍의 눈 이벤트 수치 정의 (웨이브 15 배수, HP×0.7, 속도×0.8, 정수 20~50)
+              - 끝없는 정화 임무 4종 조건/보상 정의
+              ↓
+Phase 55-2: 그룹3 적/보스 통합 (quick, none)
+              - EndlessWaveGenerator.js: POOL_TIER_6 12종 추가 (웨이브 31+)
+              - BOSS_POOL: maharaja / el_diablo_pepper / queen_of_taste 추가 (9→12종)
+              - _getEnemyPool()에 waveNumber >= 31 분기 1행 추가
+              ↓
+Phase 55-3: 미력 폭풍 + 유랑 미력사 + 정화 임무 (full, ui)
+              - ServiceScene: isEndless 차단 제거, 미력사 등장 확률 8% 적용
+              - EndlessScene: 미력 폭풍의 눈 이벤트 (웨이브 15 배수, VFX, 정수 보상)
+              - EndlessMissionManager.js 신규: 임무 4종 (신속처단/완벽방어/연속처치/호위섬멸)
+              ↓
+Phase 55-4: 테마 전환 + 업적 확장 (full, none)
+              - ServiceScene: 웨이브 구간별 배경 테마 전환 (기존 에셋 재활용)
+              - achievementData.js: 엔드리스 업적 4개 추가 (총 6개)
+              - SaveManager: v21 마이그레이션 (stormCount/missionSuccessCount/noLeakStreak)
+```
