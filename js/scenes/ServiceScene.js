@@ -809,11 +809,14 @@ export class ServiceScene extends Phaser.Scene {
     const activeFloorKey = SpriteLoader.hasTexture(this, floorKey) ? floorKey
                          : SpriteLoader.hasTexture(this, 'floor_hall') ? 'floor_hall'
                          : null;
+    // Phase 52+: 홀 배경을 밝은 베이지 계열로 변경하여 테이블과의 대비 확보
+    this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0xC8A07A)
+      .setDepth(0);
     if (activeFloorKey) {
       this.add.tileSprite(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, activeFloorKey)
-        .setDepth(0);
+        .setDepth(1).setAlpha(0.35);
     } else {
-      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0x5C3A1E)
+      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0xC8A07A)
         .setDepth(0);
     }
     // 아이소메트릭 격자 경계선 오버레이
@@ -971,11 +974,21 @@ export class ServiceScene extends Phaser.Scene {
       container.setData('_isEmpty', true);
 
       if (useLayered) {
-        // 3레이어 모드 — compositeImg·customerImg 숨김, back/front 복원
-        container.getData('compositeImg')?.setVisible(false);
+        // Phase 52+: 빈 테이블은 원본 table_lv0.png(밝은 갈색)를 compositeImg로 표시.
+        // back/front(어두운 갈색)는 밝은 바닥 배경과 대비가 낮아 가시성 불량.
+        const emptyGrade = this.tableUpgrades[idx] || 0;
+        const emptyKey = `table_lv${emptyGrade}`;
+        const compositeImg = container.getData('compositeImg');
+        if (compositeImg && SpriteLoader.hasTexture(this, emptyKey)) {
+          compositeImg.setTexture(emptyKey).setDisplaySize(90, 70).setVisible(true);
+          container.getData('tableBackImg')?.setVisible(false);
+          container.getData('tableFrontImg')?.setVisible(false);
+        } else {
+          compositeImg?.setVisible(false);
+          container.getData('tableBackImg')?.setVisible(true);
+          container.getData('tableFrontImg')?.setVisible(true);
+        }
         container.getData('customerImg')?.setVisible(false);
-        container.getData('tableBackImg')?.setVisible(true);
-        container.getData('tableFrontImg')?.setVisible(true);
       } else {
         // 빈 테이블 — 컴포짓 해제 후 empty 텍스처로 복원
         const tImgEmpty = container.getData('tableImg');
@@ -1016,22 +1029,23 @@ export class ServiceScene extends Phaser.Scene {
         container.getData('tableBackImg')?.setVisible(false);
         container.getData('tableFrontImg')?.setVisible(false);
         customerImg?.setVisible(false);
-        compositeImg?.setTexture(compositeKey).setDisplaySize(72, 72).setVisible(true);
+        // Phase 52+: 90×68 (비율 유지) — 사람이 더 크게 보임
+        compositeImg?.setTexture(compositeKey).setDisplaySize(90, 68).setVisible(true);
         custIconText.setVisible(false);
       } else {
-        // ── 3레이어 폴백: 기존 손님 스프라이트 ──
+        // ── 3레이어 폴백: 기존 손님 스프라이트 (크기 확대) ──
         container.getData('tableBackImg')?.setVisible(true);
         container.getData('tableFrontImg')?.setVisible(true);
         compositeImg?.setVisible(false);
         const custSpriteKey = `customer_${custType}_${state}`;
         const fallbackKey   = `customer_${custType}`;
         if (SpriteLoader.hasTexture(this, custSpriteKey)) {
-          const w = (custType === 'group') ? 40 : 32;
-          const h = (custType === 'group') ? 54 : 43;
+          const w = (custType === 'group') ? 52 : 40;
+          const h = (custType === 'group') ? 70 : 56;
           customerImg.setTexture(custSpriteKey).setDisplaySize(w, h).setVisible(true);
           custIconText.setVisible(false);
         } else if (SpriteLoader.hasTexture(this, fallbackKey)) {
-          customerImg.setTexture(fallbackKey).setDisplaySize(24, 24).setVisible(true);
+          customerImg.setTexture(fallbackKey).setDisplaySize(40, 40).setVisible(true);
           custIconText.setVisible(false);
         } else {
           customerImg.setVisible(false);
