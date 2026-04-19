@@ -1,5 +1,50 @@
 # Changelog
 
+## [Phase 52] 2026-04-19 -- 영업씬 렌더링 재구성 (테이블 앞/뒤 분리 + 손님 독립 스프라이트)
+
+### Added
+
+- **에셋 `assets/service/table_lv{0~4}_back.png`** (5장, 96x64): 테이블 뒷면+의자 (lv0 낡은 원목~lv4 크리스탈+벨벳)
+- **에셋 `assets/service/table_lv{0~4}_front.png`** (5장, 96x52): 테이블 앞면 (등급별 형태 차별화)
+- **에셋 `assets/service/customer_{normal,vip,gourmet,rushed,group}_{waiting,seated}.png`** (10장): 손님 5종 x 2상태 독립 스프라이트
+  - 해상도: 48x64 (group만 64x64)
+  - waiting: 입장/착석 대기 포즈, seated: 서빙 후 착석 포즈
+- **`js/managers/SpriteLoader.js`**: `_loadServiceAssets()`에 table_lv{0~4}_back/front 10종 + customer_{type}_{waiting,seated} 10종 로드 코드 추가
+- **`js/scenes/ServiceScene.js`**: `_createTables()` 3레이어 분리 렌더링 구현
+  - 독립 Image 3개: tableBackImg(depth=BASE), customerImg(depth=BASE+50), tableFrontImg(depth=BASE+99)
+  - Container는 UI 요소(statusText, bubble, pBar, hitArea) 전용으로 축소
+  - `useLayered` 데이터 플래그로 3레이어/레거시 구분
+  - depth 공식: `BASE = 10 + (col+row)*100` (col=0,row=0: 10 ~ col=3,row=1: 410)
+- **`js/scenes/ServiceScene.js`**: `_updateTableUI()` 3레이어 업데이트 분기
+  - customerImg 텍스처 교체: `customer_{type}_{state}` -> `customer_{type}` -> 이모지 텍스트 3단계 fallback
+  - mireuk_traveler: CUSTOMER_TYPE_IDS 미포함 -> 이모지 '💠' 폴백 정상 동작
+  - group 손님 displaySize 40x40, 나머지 24x32
+- **`js/scenes/ServiceScene.js`**: `_shutdown()` 독립 이미지 해제 코드 추가 (tableBackImg/tableFrontImg/customerImg destroy)
+
+### Changed
+
+- **`js/scenes/ServiceScene.js`**: HUD/UI depth 체계 전면 상향
+  - HUD 배경/구분선: 100 -> 600, HUD 텍스트: 101 -> 601
+  - 하단 바 배경: 100 -> 600, 스킬 버튼 배경: 101 -> 601, 스킬 텍스트: 102 -> 602
+  - 직원 아이콘: 101 -> 601
+  - 이벤트 배너: 250~251 -> 700~701
+  - 플로팅 텍스트: 200 -> 750
+  - 토스트(_showMessage): 300 -> 800
+  - 일시정지 패널: 2000 (변경 없음)
+
+### Notes
+
+- 바닥 타일 isometric 128x128 재생성(floor_hall_* 8종 교체)은 에셋 생성 미완료. 코드 경로는 Phase 51-4에서 이미 구현 완료, 에셋 교체 시 자동 반영
+- 스펙의 `_showToast()`는 실제 코드에서 `_showMessage()`로 구현. depth 상향은 동일 적용
+- 기존 컴포짓 에셋(`table_lv{n}_occupied.png`, `table_lv{n}.png`) 파일 보존 (fallback 경로 유지)
+- AD2 초기 REVISE (배경 투명화 20장, group_waiting 천막 제거, lv0/lv1 합성 정렬 보정) -> 전건 수정 후 APPROVED
+- AD3: depth 계층, fallback 경로, customerImg 제어, 씬 클린업, 화면 경계 16항목 전체 APPROVED
+- visual_change: both
+- QA: PASS (67/67, 수용 기준 9/9 PASS + 1 N/A)
+- 스펙: `.claude/specs/2026-04-19-kc-phase52-spec.md`
+- 리포트: `.claude/specs/2026-04-19-kc-phase52-report.md`
+- QA: `.claude/specs/2026-04-19-kc-phase52-qa.md`
+
 ## [Phase 51-3] 2026-04-19 -- 셰프 스킬 재설계
 
 ### Changed

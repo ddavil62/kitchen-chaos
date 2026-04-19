@@ -2,7 +2,7 @@
 
 > 작성일: 2026-04-18 (Phase 50 산출물)
 > 최종 수정: 2026-04-18 — 렌더링 아키텍처 전환 결정 (테이블 앞/뒷면 분리 + 손님 독립 스프라이트)
-> 상태: 1단계 완료 (Phase 51-4), 2단계(렌더링 재구성) 설계 확정, 3단계 미착수
+> 상태: 1단계 완료 (Phase 51-4), 2단계 완료 (Phase 52), 3단계 미착수
 
 ---
 
@@ -328,23 +328,27 @@ for (const t of CUST_TYPES) {
 
 **구현 상세**: 바닥 해상도를 기획서 360x240에서 128x128 tileable로 변경하여 `add.tileSprite`로 반복 렌더링. QA 25/25 PASS.
 
-### 2단계 — 렌더링 재구성 (테이블 분리 + 손님 독립화, 별도 페이즈)
+### 2단계 — 렌더링 재구성 (Phase 52 완료, 2026-04-19)
 
 **목표**: 컴포짓 occupied 방식 폐기. 테이블 앞/뒤 분리 에셋 + 손님 독립 스프라이트 도입.
 
-| 작업 | 내용 |
-|------|------|
-| 에셋 생성 | 테이블 lv0~lv4 앞면 5장 + 뒷면 5장 = 10장 (PixelLab) |
-| 에셋 생성 | 손님 5종 × 2상태(waiting/seated) = 10장 (PixelLab, 48×64) |
-| SpriteLoader.js | 테이블 front/back + 손님 waiting/seated 로드 추가 |
-| ServiceScene.js | `_createTables()` 3레이어 분리 렌더링으로 교체 |
-| ServiceScene.js | depth 계산 공식 `(col+row)*100 + {0,50,99}` 적용 |
-| 바닥 타일 재생성 | `isometric` 타입 128×128 타일로 교체 (square_topdown 대체) |
+| 작업 | 내용 | 상태 |
+|------|------|------|
+| 에셋 생성 | 테이블 lv0~lv4 뒷면 5장 (96x64) + 앞면 5장 (96x52) = 10장 (PixelLab) | 완료 |
+| 에셋 생성 | 손님 5종 x 2상태(waiting/seated) = 10장 (48x64, group 64x64) | 완료 |
+| SpriteLoader.js | table_lv{0~4}_back/front + customer_{type}_{state} 로드 추가 | 완료 |
+| ServiceScene.js | `_createTables()` 3레이어 분리 렌더링 (tableBackImg/customerImg/tableFrontImg 독립 Image) | 완료 |
+| ServiceScene.js | `_updateTableUI()` waiting/seated 상태 전환, 3단계 fallback 체인 | 완료 |
+| ServiceScene.js | depth 공식 `BASE = 10 + (col+row)*100` + HUD 600+ 상향 | 완료 |
+| ServiceScene.js | `_shutdown()` 독립 이미지 오브젝트 해제 추가 | 완료 |
+| 바닥 타일 재생성 | `isometric` 타입 128x128 타일로 교체 (square_topdown 대체) | 미완료 (에셋 미생성, 코드 경로는 Phase 51-4에서 구현 완료) |
 
-**기대 효과**:
-- 손님 착석 시 테이블 앞면에 자연스럽게 가려지는 입체감
-- 새 손님 종류 추가 = 에셋 2장만 추가 (기존 방식 대비 1/5 이하)
-- 바닥 타일이 아이소메트릭 테이블과 원근감 통일
+**구현 상세**:
+- depth 체계: back=BASE, customer=BASE+50, front=BASE+99, HUD=600+, 배너=700+, 플로팅=750, 토스트=800
+- Container는 UI 요소(statusText, bubble, pBar) 전용으로 축소, 3레이어 이미지는 씬에 직접 추가
+- `useLayered` 데이터 플래그로 3레이어/레거시 자동 분기
+- fallback: `_back` 미로드 시 기존 `_occupied` 컴포짓 방식 유지, 그마저 없으면 다이아몬드 폴리곤
+- QA 67/67 PASS, AD2 APPROVED, AD3 APPROVED
 
 ### 3단계 — 주방 구역 + 애니메이션 (장기, 별도 페이즈)
 
