@@ -845,7 +845,7 @@ export class ServiceScene extends Phaser.Scene {
 
         if (SpriteLoader.hasTexture(this, backKey)) {
           // ── 3레이어 분리 렌더링 ──
-          const tableBackImg = this.add.image(cx, cy, backKey)
+          const tableBackImg = this.add.image(cx, cy - 4, backKey)
             .setDisplaySize(SISO_TABLE_W, Math.round(SISO_TABLE_W * 64 / 96))
             .setDepth(BASE);
           const tableFrontImg = this.add.image(cx, cy, frontKey)
