@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
 > 최종 업데이트: 2026-04-19
-> 기준: Phase 54 완료
+> 기준: Phase 55-3 완료
 
 ---
 
@@ -58,8 +58,10 @@
 | Phase 47-1 | 애니메이션 엔진 구축 + carrot_goblin 파일럿 (SpriteLoader death 로딩/등록, Enemy _animState 상태 머신, _executeDeath 분리, carrot_goblin death 4방향 7프레임) | ✅ 완료 |
 | Phase 53 | 챕터별 홀 뒷벽 에셋 8종 + oni_herald 미니보스 에셋 (코드 변경 없이 에셋 배치) | ✅ 완료 |
 | Phase 54 | 쿠폰 코드 시스템 (CouponRegistry, 일반 쿠폰 3종+DEV 치트 5종, 설정 메뉴 모달 UI, giftIngredients 세이브 v20) | ✅ 완료 |
+| Phase 55-1 | 엔드리스 모드 확장 기획서 (ENDLESS_EXPANSION.md, Phase 55-2~55-4 스펙) | ✅ 완료 |
+| Phase 55-3 | 미력 폭풍 + 유랑 미력사 엔드리스 지원 + 정화 임무 4종 (EndlessMissionManager 신규) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 54 완료 (2026-04-19) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). oni_herald 미니보스 에셋 완료(도형 폴백 해소). 쿠폰 코드 시스템(일반+DEV 치트, 프로덕션 트리쉐이킹).
+**현재 구현 완성도**: Phase 55-3 완료 (2026-04-19) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장.
 
 ### 현재 콘텐츠 규모
 
@@ -291,7 +293,7 @@ Phase 55-2: 그룹3 적/보스 통합 (quick, none)
               - BOSS_POOL: maharaja / el_diablo_pepper / queen_of_taste 추가 (9→12종)
               - _getEnemyPool()에 waveNumber >= 31 분기 1행 추가
               ↓
-Phase 55-3: 미력 폭풍 + 유랑 미력사 + 정화 임무 (full, ui)
+Phase 55-3: 미력 폭풍 + 유랑 미력사 + 정화 임무 (full, ui) ✅ 완료 (2026-04-19)
               - ServiceScene: isEndless 차단 제거, 미력사 등장 확률 8% 적용
               - EndlessScene: 미력 폭풍의 눈 이벤트 (웨이브 15 배수, VFX, 정수 보상)
               - EndlessMissionManager.js 신규: 임무 4종 (신속처단/완벽방어/연속처치/호위섬멸)

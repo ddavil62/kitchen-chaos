@@ -1,5 +1,44 @@
 # Changelog
 
+## [Phase 55-3] 2026-04-19 -- 미력 폭풍 + 유랑 미력사 엔드리스 지원 + 정화 임무
+
+### Added
+
+- **`js/managers/EndlessMissionManager.js`** (신규): 엔드리스 정화 임무 매니저
+  - 임무 4종: `mission_speed_kill` (30초 내 보스 처치, 재료 3종 지급), `mission_no_leak` (라이프 손실 0, 정수 +15), `mission_combo` (10연속 처치, 골드 +500), `mission_boss_escort` (호위대 전멸 후 보스 처치, 정수 +30)
+  - 비보스 웨이브: no_leak / combo 중 랜덤 선택
+  - 보스 웨이브: speed_kill / no_leak / combo / boss_escort 중 랜덤 선택
+  - 폭풍 웨이브: 임무 비활성화
+  - API: startMission / onEnemyKilled / onLifeLost / markBossSpawned / evaluateAndReward / getStatusText / reset
+- **`js/scenes/EndlessScene.js`**: 미력 폭풍의 눈 이벤트 + EndlessMissionManager 연동
+  - 폭풍 발동 조건: `waveNumber % 15 === 0`
+  - 폭풍 효과: 적 HP x0.7, 속도 x0.8
+  - 폭풍 VFX: 보라색 screenFlash + 오버레이(depth 999)
+  - 폭풍 클리어 보상: `Math.min(50, 10 + Math.floor(wave/15)*10)` 미력의 정수 (wave15=20, 30=30, 45=40, 60+=50)
+  - 보스 스폰 시 `_mission.markBossSpawned()` 호출 (_spawnEnemy 패치 내부)
+  - shutdown 시 _mission + _stormOverlay 정리
+
+### Changed
+
+- **`js/scenes/ServiceScene.js`**: `_scheduleMireukTraveler()` 엔드리스 지원
+  - `if (this.isEndless) return;` 차단 제거
+  - 엔드리스 등장 확률 8% (캠페인 16%의 절반): `this.isEndless ? 0.08 : 0.16`
+  - isEndless 모드에서 season2/chapter 조건 면제 (`if (!this.isEndless) { ... }` 블록으로 감싸기)
+
+### Fixed
+
+- **Bug #1 (HIGH)**: `markBossSpawned()` 미호출 -- 보스 스폰 시점 기록이 누락되어 speed_kill 임무 판정이 부정확했음. `_spawnEnemy` 패치에서 `baseData.isBoss` 확인 후 호출 추가
+- **Bug #2 (MEDIUM)**: 폭풍 보상 수식 기준값 오류 -- `20 + Math.floor(wave/15)*10`이 wave15=30을 반환(스펙은 20). `10 + Math.floor(wave/15)*10`으로 수정
+
+### Notes
+
+- 스펙의 "미력의 정수 드롭 배율 x2 (적 처치 시)"는 적 처치 시 정수 드롭 로직이 존재하지 않으므로 구현하지 않음. 폭풍 보상으로만 처리
+- `mission_combo`는 maxCombo 추적 방식: 웨이브 중 한 번이라도 10연속을 달성하면 이후 리셋되어도 성공 판정 (스펙 "연속 10처치 달성"과 일치)
+- wave 30/60/90 등 보스+폭풍 겹침 시 폭풍이 우선하여 임무 비활성화. 보스 HP x0.7 보정도 적용
+- 스펙: `.claude/specs/2026-04-19-kc-phase55-3-report.md`
+- Bugfix: `.claude/specs/2026-04-19-kc-phase55-3-bugfix-report.md`
+- QA: `.claude/specs/2026-04-19-kc-phase55-3-qa.md`
+
 ## [Phase 54] 2026-04-19 -- 쿠폰 코드 시스템 (프로덕션 + DEV 치트 분리)
 
 ### Added
