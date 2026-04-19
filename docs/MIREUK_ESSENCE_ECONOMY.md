@@ -264,7 +264,41 @@
 
 ---
 
-## 7. 연계 문서 및 다음 단계
+## 7. 구현 현황
+
+> 최종 업데이트: 2026-04-18 (Phase 51-1)
+
+### Phase 51-1 (완료)
+
+- [x] SaveManager v17->v18 마이그레이션: 5개 필드 추가
+- [x] SaveManager 헬퍼 메서드 4개 (getMireukEssence, addMireukEssence, getMireukTravelerCount, incrementMireukTravelerCount)
+- [x] ServiceScene: mireuk_traveler 손님 타입 상수 등록 (patience_mult 1.5, reward_mult 0.8)
+- [x] ServiceScene: 세션당 1회 등장 예약 (16% 확률, 60~90초 delayedCall)
+- [x] ServiceScene: 인내심 비율 기반 정수 드롭 (3/2/1)
+- [x] HUD: mireukEssenceText (x=10, y=26, 11px, #b266ff)
+- [x] VFXManager: floatingText 범용 메서드
+- [x] VFX: 정수 드롭 시 보라색 플로팅 텍스트
+
+구현 시 변경사항:
+- 등장 조건이 스펙의 AND에서 OR로 변경 (season2Unlocked=true면 이전 챕터에서도 등장 가능)
+- 챕터별 확률 보정(16~24장: 20%, 엔드리스: 12%)은 미구현 (TODO), 16% 단일 적용
+
+### 미구현 (Phase 51-2 이후)
+
+- [ ] 유랑 미력사 고용 UI 및 고용 로직
+- [ ] 미력 나그네 전용 픽셀아트 스프라이트 (현재 이모지 💠 폴백)
+- [ ] 보스 클리어 정수 보상 (ResultScene 연동)
+- [ ] 스토리 이정표 정수 보상 (StoryManager 연동)
+- [ ] 엔드리스 웨이브 이정표 보상
+- [ ] 대화 훅 (DialogueManager) 연동
+- [ ] mireukEssence 소비 처리 (spendMireukEssence 메서드)
+- [ ] 챕터별 등장 확률 보정 (16~24장: 20%, 엔드리스: 12%)
+- [ ] 미력의 정수 전용 아이콘 (16x16px 픽셀아트)
+- [ ] addMireukEssence 음수 방어 로직
+
+---
+
+## 8. 연계 문서 및 다음 단계
 
 | 문서/Phase | 내용 |
 |-----------|------|

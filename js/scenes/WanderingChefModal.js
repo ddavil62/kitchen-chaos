@@ -32,7 +32,7 @@ export class WanderingChefModal extends Phaser.Scene {
       stroke: '#330066', strokeThickness: 3,
     }).setOrigin(0.5);
 
-    this._essenceText = this.add.text(GAME_WIDTH - 22, 52, '', {
+    this._essenceText = this.add.text(GAME_WIDTH - 72, 52, '', {
       fontSize: '13px', color: '#b266ff',
     }).setOrigin(1, 0.5);
 
@@ -40,10 +40,10 @@ export class WanderingChefModal extends Phaser.Scene {
       fontSize: '11px', color: '#888888',
     }).setOrigin(0, 0.5);
 
-    // ── 닫기 버튼 ──
-    const closeBtn = this.add.rectangle(GAME_WIDTH - 22, 32, 36, 24, 0x443344)
+    // ── 닫기 버튼 (44x44 터치 타겟) ──
+    const closeBtn = this.add.rectangle(338, 30, 44, 44, 0x443344)
       .setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH - 22, 32, '\u2715', {
+    this.add.text(338, 30, '\u2715', {
       fontSize: '14px', color: '#ccaadd',
     }).setOrigin(0.5);
     closeBtn.on('pointerdown', () => this._close());
@@ -52,6 +52,39 @@ export class WanderingChefModal extends Phaser.Scene {
 
     // ── 카드 목록 ──
     this._listContainer = this.add.container(0, 0);
+
+    // 스크롤 마스크 (헤더 아래부터 화면 하단까지)
+    const maskShape = this.make.graphics({ add: false });
+    maskShape.fillStyle(0xffffff);
+    maskShape.fillRect(0, 68, GAME_WIDTH, 572);
+    const mask = maskShape.createGeometryMask();
+    this._listContainer.setMask(mask);
+
+    // 스크롤 상태
+    this._scrollY = 0;
+    this._dragStartY = 0;
+    this._isDragging = false;
+
+    // 스크롤 가능 총 높이
+    const contentH = 80 + 8 * (88 + 6); // listStartY + 8 x (cardH + gap)
+    const viewH = 572;
+    this._maxScroll = Math.max(0, contentH - viewH);
+
+    // 포인터 이벤트 (드래그 스크롤)
+    this.input.on('pointerdown', (p) => {
+      if (p.y > 68) { // 헤더 아래에서만 드래그
+        this._isDragging = true;
+        this._dragStartY = p.y - this._scrollY;
+      }
+    });
+    this.input.on('pointermove', (p) => {
+      if (!this._isDragging) return;
+      const newScroll = Phaser.Math.Clamp(p.y - this._dragStartY, -this._maxScroll, 0);
+      this._scrollY = newScroll;
+      this._listContainer.y = newScroll;
+    });
+    this.input.on('pointerup', () => { this._isDragging = false; });
+    this.input.on('pointerupoutside', () => { this._isDragging = false; });
 
     this._render();
   }
@@ -70,7 +103,10 @@ export class WanderingChefModal extends Phaser.Scene {
     const hiredCount = wc.hired.length;
 
     this._essenceText.setText(`\uD83D\uDCA0 ${essence} \uC815\uC218`);
-    this._limitText.setText(`\uACE0\uC6A9: ${hiredCount}/${hireLimit}\uBA85`);
+    const limitLabel = hireLimit === 0
+      ? '(7-1 \uD074\uB9AC\uC5B4 \uD6C4 \uD574\uAE08)'
+      : `\uACE0\uC6A9: ${hiredCount}/${hireLimit}\uBA85`;
+    this._limitText.setText(limitLabel);
 
     // 해금 조건 충족 여부 판별
     const saveData = SaveManager.load();
@@ -111,12 +147,12 @@ export class WanderingChefModal extends Phaser.Scene {
         })
       );
 
-      // 등급 뱃지
+      // 등급 뱃지 (카드 우측 안쪽에 완전 수용)
       const gradeColor = GRADE_COLORS[chef.grade];
-      const gradeBadge = this.add.rectangle(GAME_WIDTH - 18, y + 10, 60, 18, gradeColor, 0.8);
+      const gradeBadge = this.add.rectangle(GAME_WIDTH - 52, y + 10, 60, 18, gradeColor, 0.8);
       this._listContainer.add(gradeBadge);
       this._listContainer.add(
-        this.add.text(GAME_WIDTH - 18, y + 10, GRADE_NAMES[chef.grade], {
+        this.add.text(GAME_WIDTH - 52, y + 10, GRADE_NAMES[chef.grade], {
           fontSize: '9px', color: '#ffffff',
         }).setOrigin(0.5)
       );

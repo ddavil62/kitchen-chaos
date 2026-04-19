@@ -600,40 +600,41 @@ export class ServiceScene extends Phaser.Scene {
   /** @private */
   _createHUD() {
     // Phase 19-6: HUD 배경 웜 다크 (#1c0e00)로 통일
+    // Phase 52: depth 100→600 상향 (테이블 3레이어 depth 범위 10~509와 분리)
     this.add.rectangle(GAME_WIDTH / 2, HUD_H / 2, GAME_WIDTH, HUD_H, 0x1c0e00)
-      .setDepth(100);
+      .setDepth(600);
     // HUD 하단 골드 구분선 (1px, 반투명)
     this.add.rectangle(GAME_WIDTH / 2, HUD_H, GAME_WIDTH, 1, 0xffd700)
       .setAlpha(0.4)
-      .setDepth(100);
+      .setDepth(600);
 
     this.goldText = this.add.text(10, 10, `\uD83E\uDE99 ${this.totalGold}`, {
       fontSize: '14px', color: '#ffd700', fontStyle: 'bold',
-    }).setDepth(101);
+    }).setDepth(601);
 
     this.timeText = this.add.text(GAME_WIDTH / 2, 10, this._formatTime(this.serviceTimeLeft), {
       fontSize: '14px', color: '#ffffff', fontStyle: 'bold',
-    }).setOrigin(0.5, 0).setDepth(101);
+    }).setOrigin(0.5, 0).setDepth(601);
 
     // Phase 19-6: satText 색상 웜 앰버로 통일
     this.satText = this.add.text(GAME_WIDTH - 10, 10, `\u2B50 ${this.satisfaction}%`, {
       fontSize: '14px', color: '#e8c87a', fontStyle: 'bold',
-    }).setOrigin(1, 0).setDepth(101);
+    }).setOrigin(1, 0).setDepth(601);
 
     this.comboText = this.add.text(GAME_WIDTH / 2, 26, '', {
       fontSize: '11px', color: '#ffcc00', fontStyle: 'bold',
-    }).setOrigin(0.5, 0).setDepth(101);
+    }).setOrigin(0.5, 0).setDepth(601);
 
     // Phase 8-5: 활성 이벤트 아이콘 + 남은 시간 표시
     this.eventHudText = this.add.text(GAME_WIDTH - 10, 26, '', {
       fontSize: '10px', color: '#ffffff', fontStyle: 'bold',
-    }).setOrigin(1, 0).setDepth(101);
+    }).setOrigin(1, 0).setDepth(601);
 
     // ── Phase 51-1: 미력의 정수 보유량 (chapter >= 7 또는 보유량 > 0 시 표시) ──
     this._mireukEssenceVal = SaveManager.getMireukEssence();
     this.mireukEssenceText = this.add.text(10, 26, '', {
       fontSize: '11px', color: '#b266ff', fontStyle: 'bold',
-    }).setDepth(101);
+    }).setDepth(601);
     this._updateMireukHUD();
   }
 
@@ -832,34 +833,61 @@ export class ServiceScene extends Phaser.Scene {
         const { x: cx, y: cy } = this._cellToWorld(col, row);
         const grade = this.tableUpgrades[idx] || 0;
 
-        // depth = y좌표 기반 동적 할당 (앞행이 뒷행 위에 렌더링)
-        const container = this.add.container(cx, cy).setDepth(10 + cy);
+        // Phase 52: depth 공식 — 아이소메트릭 셀별 100단위 분리
+        const BASE = 10 + (col + row) * 100;
 
-        // 테이블 스프라이트 — Phase 19-4 아이소메트릭 에셋 재활용
-        const tableKey = `table_lv${grade}`;
-        if (SpriteLoader.hasTexture(this, tableKey)) {
-          const tableImg = this.add.image(0, 0, tableKey)
-            .setDisplaySize(SISO_TABLE_W, SISO_TABLE_H);
-          container.add(tableImg);
-          container.setData('tableImg', tableImg);
+        // UI 컨테이너: statusText, bubble, pBar, hitArea 전용
+        const container = this.add.container(cx, cy).setDepth(BASE);
+
+        // Phase 52: 3레이어 분리 렌더링 (back → customer → front)
+        const backKey  = `table_lv${grade}_back`;
+        const frontKey = `table_lv${grade}_front`;
+
+        if (SpriteLoader.hasTexture(this, backKey)) {
+          // ── 3레이어 분리 렌더링 ──
+          const tableBackImg = this.add.image(cx, cy, backKey)
+            .setDisplaySize(SISO_TABLE_W, Math.round(SISO_TABLE_W * 64 / 96))
+            .setDepth(BASE);
+          const tableFrontImg = this.add.image(cx, cy, frontKey)
+            .setDisplaySize(SISO_TABLE_W, Math.round(SISO_TABLE_W * 52 / 96))
+            .setDepth(BASE + 99);
+
+          // customerImg — _updateTableUI에서 텍스처 교체 및 표시/비표시 제어
+          const customerImg = this.add.image(cx, cy - 8, '__MISSING')
+            .setDisplaySize(32, 48).setVisible(false).setDepth(BASE + 50);
+
+          container.setData('tableBackImg', tableBackImg);
+          container.setData('tableFrontImg', tableFrontImg);
+          container.setData('customerImg', customerImg);
+          container.setData('useLayered', true);
         } else {
-          // fallback: 다이아몬드 폴리곤
-          const gfx = this.add.graphics();
-          gfx.fillStyle(TABLE_COLORS[grade], 0.7);
-          gfx.fillPoints([
-            { x: 0,              y: -SISO_HALF_H },
-            { x: SISO_HALF_W,    y: 0            },
-            { x: 0,              y: SISO_HALF_H  },
-            { x: -SISO_HALF_W,   y: 0            },
-          ], true);
-          gfx.lineStyle(TABLE_STROKE_WIDTH[grade], TABLE_STROKE_COLOR[grade]);
-          gfx.strokePoints([
-            { x: 0,              y: -SISO_HALF_H },
-            { x: SISO_HALF_W,    y: 0            },
-            { x: 0,              y: SISO_HALF_H  },
-            { x: -SISO_HALF_W,   y: 0            },
-          ], true);
-          container.add(gfx);
+          // ── fallback: 기존 단일 tableImg + custIconImg 방식 ──
+          const tableKey = `table_lv${grade}`;
+          if (SpriteLoader.hasTexture(this, tableKey)) {
+            const tableImg = this.add.image(0, 0, tableKey)
+              .setDisplaySize(SISO_TABLE_W, SISO_TABLE_H);
+            container.add(tableImg);
+            container.setData('tableImg', tableImg);
+          } else {
+            // fallback: 다이아몬드 폴리곤
+            const gfx = this.add.graphics();
+            gfx.fillStyle(TABLE_COLORS[grade], 0.7);
+            gfx.fillPoints([
+              { x: 0,              y: -SISO_HALF_H },
+              { x: SISO_HALF_W,    y: 0            },
+              { x: 0,              y: SISO_HALF_H  },
+              { x: -SISO_HALF_W,   y: 0            },
+            ], true);
+            gfx.lineStyle(TABLE_STROKE_WIDTH[grade], TABLE_STROKE_COLOR[grade]);
+            gfx.strokePoints([
+              { x: 0,              y: -SISO_HALF_H },
+              { x: SISO_HALF_W,    y: 0            },
+              { x: 0,              y: SISO_HALF_H  },
+              { x: -SISO_HALF_W,   y: 0            },
+            ], true);
+            container.add(gfx);
+          }
+          container.setData('useLayered', false);
         }
 
         // "빈 테이블" 텍스트
@@ -885,6 +913,7 @@ export class ServiceScene extends Phaser.Scene {
         container.add(pBarFill);
 
         // 손님 아이콘 — Phase 19-4: 스프라이트 Image + fallback Text 이중 생성
+        // Phase 52: useLayered=true일 때 custIconImg는 미사용, custIconText는 이모지 폴백용 유지
         const custIconImg = this.add.image(0, -5, '__MISSING')
           .setDisplaySize(32, 32).setVisible(false);
         container.add(custIconImg);
@@ -928,18 +957,25 @@ export class ServiceScene extends Phaser.Scene {
     const pBarFill = container.getData('pBarFill');
     const custIconImg = container.getData('custIconImg');
     const custIconText = container.getData('custIconText');
+    const useLayered = container.getData('useLayered');
 
     if (!cust) {
       // Phase 11-3c: 빈 테이블이 이미 빈 상태면 렌더 상태 변경 생략
       if (container.getData('_isEmpty')) return;
       container.setData('_isEmpty', true);
-      // 빈 테이블 — 컴포짓 해제 후 empty 텍스처로 복원
-      const tImgEmpty = container.getData('tableImg');
-      if (tImgEmpty) {
-        const emptyGrade = this.tableUpgrades[idx] || 0;
-        tImgEmpty.setTexture(`table_lv${emptyGrade}`)
-          .setDisplaySize(SISO_TABLE_W, SISO_TABLE_H)
-          .setY(0);
+
+      if (useLayered) {
+        // Phase 52: 3레이어 모드 — customerImg 숨김, back/front는 항상 표시
+        container.getData('customerImg')?.setVisible(false);
+      } else {
+        // 빈 테이블 — 컴포짓 해제 후 empty 텍스처로 복원
+        const tImgEmpty = container.getData('tableImg');
+        if (tImgEmpty) {
+          const emptyGrade = this.tableUpgrades[idx] || 0;
+          tImgEmpty.setTexture(`table_lv${emptyGrade}`)
+            .setDisplaySize(SISO_TABLE_W, SISO_TABLE_H)
+            .setY(0);
+        }
       }
       statusText.setText('\uBE48 \uD14C\uC774\uBE14').setVisible(true);
       bubble.setVisible(false);
@@ -956,32 +992,61 @@ export class ServiceScene extends Phaser.Scene {
 
     statusText.setVisible(false);
 
-    // 컴포짓 스프라이트 처리 — 테이블+손님이 하나의 PNG에 합성된 occupied 에셋 사용
-    const grade = this.tableUpgrades[idx] || 0;
-    const occupiedKey = `table_lv${grade}_occupied`;
-    const tImg = container.getData('tableImg');
-    const useComposite = tImg && SpriteLoader.hasTexture(this, occupiedKey);
-
-    if (useComposite) {
-      // occupied 컴포짓: 높이 비율 96/80 = 1.2배, Y=-6으로 바닥 정렬 유지
-      const occH = Math.round(SISO_TABLE_H * 1.2); // 67
-      tImg.setTexture(occupiedKey).setDisplaySize(SISO_TABLE_W, occH).setY(-6);
-      custIconImg.setVisible(false);
-      custIconText.setVisible(false);
-    } else {
-      // fallback: 기존 손님 아이콘 방식 (컴포짓 없는 경우)
+    // Phase 52: 3레이어 분리 렌더링 업데이트
+    if (useLayered) {
       const custType = cust.customerType || 'normal';
-      const custSpriteKey = `customer_${custType}`;
-      const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
-      // 단체 손님 부분 서빙 완료 시 체크마크 표시
-      const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
+      const isServed = cust.served || (custType === 'group' && cust.groupServed);
+      const state = isServed ? 'seated' : 'waiting';
+      const customerImg = container.getData('customerImg');
+      const custSpriteKey = `customer_${custType}_${state}`;
+      const fallbackKey   = `customer_${custType}`;
 
-      if (!servedMark && SpriteLoader.hasTexture(this, custSpriteKey)) {
-        custIconImg.setTexture(custSpriteKey).setDisplaySize(32, 32).setVisible(true);
+      if (SpriteLoader.hasTexture(this, custSpriteKey)) {
+        // 신규 분리 스프라이트 (waiting/seated)
+        const w = (custType === 'group') ? 40 : 24;
+        const h = (custType === 'group') ? 40 : 32;
+        customerImg.setTexture(custSpriteKey).setDisplaySize(w, h).setVisible(true);
+        custIconText.setVisible(false);
+      } else if (SpriteLoader.hasTexture(this, fallbackKey)) {
+        // 레거시 단일 스프라이트 fallback
+        customerImg.setTexture(fallbackKey).setDisplaySize(24, 24).setVisible(true);
         custIconText.setVisible(false);
       } else {
-        custIconImg.setVisible(false);
+        // 이모지 텍스트 fallback (mireuk_traveler 포함)
+        customerImg.setVisible(false);
+        const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
+        const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
         custIconText.setText(servedMark || typeIcon).setVisible(true);
+      }
+      custIconImg.setVisible(false);
+    } else {
+      // 기존 컴포짓(_occupied) + 아이콘 방식 유지
+      const grade = this.tableUpgrades[idx] || 0;
+      const occupiedKey = `table_lv${grade}_occupied`;
+      const tImg = container.getData('tableImg');
+      const useComposite = tImg && SpriteLoader.hasTexture(this, occupiedKey);
+
+      if (useComposite) {
+        // occupied 컴포짓: 높이 비율 96/80 = 1.2배, Y=-6으로 바닥 정렬 유지
+        const occH = Math.round(SISO_TABLE_H * 1.2); // 67
+        tImg.setTexture(occupiedKey).setDisplaySize(SISO_TABLE_W, occH).setY(-6);
+        custIconImg.setVisible(false);
+        custIconText.setVisible(false);
+      } else {
+        // fallback: 기존 손님 아이콘 방식 (컴포짓 없는 경우)
+        const custType = cust.customerType || 'normal';
+        const custSpriteKey = `customer_${custType}`;
+        const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
+        // 단체 손님 부분 서빙 완료 시 체크마크 표시
+        const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
+
+        if (!servedMark && SpriteLoader.hasTexture(this, custSpriteKey)) {
+          custIconImg.setTexture(custSpriteKey).setDisplaySize(32, 32).setVisible(true);
+          custIconText.setVisible(false);
+        } else {
+          custIconImg.setVisible(false);
+          custIconText.setText(servedMark || typeIcon).setVisible(true);
+        }
       }
     }
 
@@ -1269,8 +1334,9 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createBottomBar() {
+    // Phase 52: depth 100→600 상향 (테이블 3레이어 depth 범위와 분리)
     this.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_H / 2, GAME_WIDTH, BOTTOM_H, 0x1c0e00)
-      .setDepth(100);
+      .setDepth(600);
 
     // ── Phase 8-6: 셰프 영업 액티브 스킬 버튼 ──
     const chefData = ChefManager.getChefData();
@@ -1281,11 +1347,11 @@ export class ServiceScene extends Phaser.Scene {
       this.skillBtnBg = this.add.rectangle(70, BOTTOM_Y + 14, 120, 36, 0x446688, 0.9)
         .setStrokeStyle(1, 0x6688aa)
         .setInteractive({ useHandCursor: true })
-        .setDepth(101);
+        .setDepth(601);
       // 스킬 버튼 텍스트
       this.skillBtnText = this.add.text(70, BOTTOM_Y + 14, `${chefData.icon} ${skill.name}`, {
         fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
-      }).setOrigin(0.5).setDepth(102);
+      }).setOrigin(0.5).setDepth(602);
 
       this.skillBtnBg.on('pointerdown', () => this._onSkillTap());
     } else {
@@ -1294,7 +1360,7 @@ export class ServiceScene extends Phaser.Scene {
       this.skillBtnText = null;
       this.add.text(20, BOTTOM_Y + 14, '\uC158\uD504 \uC5C6\uC74C', {
         fontSize: '11px', color: '#aaddff',
-      }).setOrigin(0, 0.5).setDepth(101);
+      }).setOrigin(0, 0.5).setDepth(601);
     }
 
     // ── Phase 8-4: 직원 아이콘 표시 ──
@@ -1304,10 +1370,10 @@ export class ServiceScene extends Phaser.Scene {
     const pauseBtn = this.add.rectangle(GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, 80, 36, 0x444466)
       .setStrokeStyle(1, 0x6666aa)
       .setInteractive({ useHandCursor: true })
-      .setDepth(101);
+      .setDepth(601);
     this.pauseLabel = this.add.text(GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, '\u23F8 \uC77C\uC2DC\uC815\uC9C0', {
       fontSize: '11px', color: '#ffffff',
-    }).setOrigin(0.5).setDepth(102);
+    }).setOrigin(0.5).setDepth(602);
 
     pauseBtn.on('pointerdown', () => this._togglePause());
 
@@ -1315,11 +1381,11 @@ export class ServiceScene extends Phaser.Scene {
     this.closingBtn = this.add.rectangle(GAME_WIDTH - 145, BOTTOM_Y + BOTTOM_H / 2, 80, 36, 0x662222)
       .setStrokeStyle(1, 0xaa4444)
       .setInteractive({ useHandCursor: true })
-      .setDepth(101)
+      .setDepth(601)
       .setVisible(false);
     this.closingLabel = this.add.text(GAME_WIDTH - 145, BOTTOM_Y + BOTTOM_H / 2, '🔒 마감', {
       fontSize: '11px', color: '#ffaaaa',
-    }).setOrigin(0.5).setDepth(102).setVisible(false);
+    }).setOrigin(0.5).setDepth(602).setVisible(false);
 
     this.closingBtn.on('pointerdown', () => {
       if (this.isPaused && !this.isServiceOver) {
@@ -1348,9 +1414,10 @@ export class ServiceScene extends Phaser.Scene {
       const displayIcon = hired ? s.icon : s.lockIcon;
       const color = hired ? '#ffffff' : '#555555';
 
+      // Phase 52: depth 101→601 상향
       const iconText = this.add.text(x, iconY, displayIcon, {
         fontSize: '18px', color: color,
-      }).setOrigin(0, 0.5).setDepth(101);
+      }).setOrigin(0, 0.5).setDepth(601);
 
       // 참조 저장 (자동 서빙 애니메이션용)
       if (s.id === 'waiter') {
@@ -2808,16 +2875,16 @@ export class ServiceScene extends Phaser.Scene {
     const bannerX = GAME_WIDTH / 2;
     const bannerY = HUD_H + 30;
 
-    // 배너 배경
+    // 배너 배경 (Phase 52: depth 250→700 상향)
     const bg = this.add.rectangle(bannerX, bannerY, bannerW, bannerH, evtDef.bannerColor, 0.9)
       .setStrokeStyle(1, 0xffffff)
-      .setDepth(250);
+      .setDepth(700);
 
-    // 배너 텍스트
+    // 배너 텍스트 (Phase 52: depth 251→701 상향)
     const text = this.add.text(bannerX, bannerY, evtDef.messageKo, {
       fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000000', strokeThickness: 2,
-    }).setOrigin(0.5).setDepth(251);
+    }).setOrigin(0.5).setDepth(701);
 
     // 3초 후 페이드아웃
     this.time.delayedCall(EVENT_BANNER_DURATION * 1000, () => {
@@ -2888,10 +2955,11 @@ export class ServiceScene extends Phaser.Scene {
    * @private
    */
   _showFloatingText(target, text, color) {
+    // Phase 52: depth 200→750 상향
     const fx = this.add.text(target.x, target.y - 20, text, {
       fontSize: '14px', fontStyle: 'bold', color: color,
       stroke: '#000000', strokeThickness: 3,
-    }).setOrigin(0.5).setDepth(200);
+    }).setOrigin(0.5).setDepth(750);
 
     this.tweens.add({
       targets: fx,
@@ -2916,7 +2984,7 @@ export class ServiceScene extends Phaser.Scene {
       backgroundColor: '#000000aa',
       padding: { x: 16, y: 8 },
       align: 'center',
-    }).setOrigin(0.5).setDepth(300);
+    }).setOrigin(0.5).setDepth(800);
 
     this.time.delayedCall(duration, () => {
       this.tweens.add({
@@ -2933,6 +3001,12 @@ export class ServiceScene extends Phaser.Scene {
     this.tables = [];
     this.cookingSlots = [];
     this.recipeButtons = [];
+    // Phase 52: 3레이어 독립 이미지 오브젝트 해제 (메모리 누수 방지)
+    for (const cont of this.tableContainers) {
+      cont.getData('tableBackImg')?.destroy();
+      cont.getData('tableFrontImg')?.destroy();
+      cont.getData('customerImg')?.destroy();
+    }
     this.tableContainers = [];
     this.cookSlotContainers = [];
     // Phase 8-5: 이벤트 정리

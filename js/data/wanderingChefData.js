@@ -29,7 +29,7 @@ export const GRADE_NAMES = {
  * 등급 코드 -> 카드 강조 색상 (hex).
  */
 export const GRADE_COLORS = {
-  1: 0x888888,   // 회색 -- 초급
+  1: 0x4daa4d,   // 초록 -- 초급
   2: 0x4488cc,   // 파랑 -- 중급
   3: 0xaa6622,   // 황금 -- 고급
   4: 0x9933cc,   // 보라 -- 전설

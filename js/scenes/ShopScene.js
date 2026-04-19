@@ -831,6 +831,13 @@ export class ShopScene extends Phaser.Scene {
       })
     );
 
+    // 섹션 헤더 우측에 보유 정수 표시
+    this._contentContainer.add(
+      this.add.text(GAME_WIDTH - 20, wandererSectionY + 14, `\uD83D\uDCA0 ${SaveManager.getMireukEssence()} \uC815\uC218`, {
+        fontSize: '11px', color: '#b266ff',
+      }).setOrigin(1, 0.5)
+    );
+
     // 현재 고용 수 / 상한 표시
     const hireLimit = SaveManager.getHireLimit();
     const hiredCount = SaveManager.getWanderingChefs().hired.length;

@@ -664,9 +664,21 @@ export class SpriteLoader {
       scene.load.image(`table_lv${lv}`, `${SERVICE_ROOT}/table_lv${lv}.png`);
       scene.load.image(`table_lv${lv}_occupied`, `${SERVICE_ROOT}/table_lv${lv}_occupied.png`);
     }
+    // Phase 52: 테이블 앞/뒤 분리 에셋 (3레이어 렌더링)
+    for (let lv = 0; lv < TABLE_GRADE_COUNT; lv++) {
+      scene.load.image(`table_lv${lv}_back`,  `${SERVICE_ROOT}/table_lv${lv}_back.png`);
+      scene.load.image(`table_lv${lv}_front`, `${SERVICE_ROOT}/table_lv${lv}_front.png`);
+    }
     // 손님 유형별
     for (const type of CUSTOMER_TYPE_IDS) {
       scene.load.image(`customer_${type}`, `${SERVICE_ROOT}/customer_${type}.png`);
+    }
+    // Phase 52: 손님 독립 스프라이트 (waiting/seated 2상태)
+    const CUST_STATES = ['waiting', 'seated'];
+    for (const type of CUSTOMER_TYPE_IDS) {
+      for (const state of CUST_STATES) {
+        scene.load.image(`customer_${type}_${state}`, `${SERVICE_ROOT}/customer_${type}_${state}.png`);
+      }
     }
     // 홀 바닥 + 카운터
     scene.load.image('floor_hall', `${SERVICE_ROOT}/floor_hall.png`);
