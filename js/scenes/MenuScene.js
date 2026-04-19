@@ -12,7 +12,7 @@ import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
-import { redeemCoupon } from '../managers/CouponRegistry.js';
+import { redeemCoupon, getCheatCodeHints } from '../managers/CouponRegistry.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -462,6 +462,71 @@ export class MenuScene extends Phaser.Scene {
     };
     hiddenInput.addEventListener('input', onInput);
 
+    // ── DEV 치트 자동완성 드롭다운 ──
+    // 입력란 포커스 시 치트 코드 목록을 표시한다. 프로덕션 빌드에서는 트리쉐이킹된다.
+    if (import.meta.env.DEV) {
+      const hints = getCheatCodeHints();
+      if (hints.length > 0) {
+        const sugW = 220;
+        const sugItemH = 26;
+        // input 하단(cy-35+18=cy-17)에서 2px 아래부터 시작
+        const sugStartY = cy - 17 + 2;
+
+        const sugContainer = this.add.container(0, 0).setDepth(1200).setVisible(false);
+        this._couponSuggestGroup = sugContainer;
+
+        // 드롭다운 전체 배경
+        const totalH = hints.length * sugItemH;
+        const bgCenterY = sugStartY + totalH / 2;
+        const sugBg = this.add.rectangle(cx, bgCenterY, sugW + 2, totalH + 2, 0x060614, 0.97)
+          .setStrokeStyle(1, 0x3355aa);
+        sugContainer.add(sugBg);
+
+        hints.forEach((hint, i) => {
+          const itemY = sugStartY + i * sugItemH + sugItemH / 2;
+
+          // 아이템 배경 (인터랙티브)
+          const itemBg = this.add.rectangle(cx, itemY, sugW, sugItemH - 1, 0x0e0e28)
+            .setInteractive({ useHandCursor: true });
+          // 코드 텍스트 (왼쪽 정렬, 모노스페이스)
+          const codeText = this.add.text(cx - sugW / 2 + 10, itemY, hint.code, {
+            fontSize: '11px',
+            fontFamily: 'monospace',
+            color: '#88ccff',
+          }).setOrigin(0, 0.5);
+          // 설명 텍스트 (오른쪽 정렬, 흐린 색)
+          const descText = this.add.text(cx + sugW / 2 - 8, itemY, hint.desc, {
+            fontSize: '10px',
+            color: '#886644',
+          }).setOrigin(1, 0.5);
+
+          itemBg.on('pointerover', () => itemBg.setFillStyle(0x1a1a44));
+          itemBg.on('pointerout',  () => itemBg.setFillStyle(0x0e0e28));
+          itemBg.on('pointerdown', () => {
+            // 선택된 코드를 입력란에 채운다
+            hiddenInput.value = hint.code;
+            onInput();
+            sugContainer.setVisible(false);
+            hiddenInput.focus();
+          });
+
+          sugContainer.add([itemBg, codeText, descText]);
+        });
+
+        // 포커스 시 드롭다운 표시
+        const onFocus = () => sugContainer.setVisible(true);
+        // blur 시 200ms 딜레이 후 숨김 — Phaser pointerdown 이벤트가 먼저 처리되도록
+        const onBlur = () => setTimeout(() => {
+          if (this._couponSuggestGroup) this._couponSuggestGroup.setVisible(false);
+        }, 200);
+
+        hiddenInput.addEventListener('focus', onFocus);
+        hiddenInput.addEventListener('blur', onBlur);
+        this._couponFocusListener = onFocus;
+        this._couponBlurListener  = onBlur;
+      }
+    }
+
     // ── 결과 메시지 텍스트 ──
     const resultText = this.add.text(cx, cy + 15, '', {
       fontSize: '12px',
@@ -548,10 +613,24 @@ export class MenuScene extends Phaser.Scene {
     if (this._couponHiddenInput) {
       this._couponHiddenInput.removeEventListener('input', this._couponInputListener);
       this._couponHiddenInput.removeEventListener('keydown', this._couponKeydownListener);
+      // DEV 포커스/블러 리스너 정리
+      if (this._couponFocusListener) {
+        this._couponHiddenInput.removeEventListener('focus', this._couponFocusListener);
+        this._couponFocusListener = null;
+      }
+      if (this._couponBlurListener) {
+        this._couponHiddenInput.removeEventListener('blur', this._couponBlurListener);
+        this._couponBlurListener = null;
+      }
       this._couponHiddenInput.remove();
       this._couponHiddenInput = null;
       this._couponInputListener = null;
       this._couponKeydownListener = null;
+    }
+    // DEV 자동완성 컨테이너 정리
+    if (this._couponSuggestGroup) {
+      this._couponSuggestGroup.destroy();
+      this._couponSuggestGroup = null;
     }
     if (this._couponContainer) {
       this._couponContainer.destroy();

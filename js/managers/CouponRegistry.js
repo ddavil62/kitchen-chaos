@@ -20,13 +20,14 @@ const PROD_COUPONS = [
 ];
 
 // ── DEV 전용 치트 코드 (빌드 시 트리쉐이킹) ──
-/** @type {Array<{code: string, type: string, handler: () => {ok: boolean, msg: string}}>} */
+/** @type {Array<{code: string, desc: string, type: string, handler: () => {ok: boolean, msg: string}}>} */
 let DEV_COUPONS = [];
 
 if (import.meta.env.DEV) {
   DEV_COUPONS = [
     {
       code: 'CHEAT_GOLD',
+      desc: '골드 99,999',
       type: 'cheat',
       handler: () => {
         ToolManager.addGold(99999);
@@ -35,6 +36,7 @@ if (import.meta.env.DEV) {
     },
     {
       code: 'CHEAT_ITEMS',
+      desc: '전 재료 x20',
       type: 'cheat',
       handler: () => {
         const allIngredients = {};
@@ -47,6 +49,7 @@ if (import.meta.env.DEV) {
     },
     {
       code: 'CHEAT_STAGE_SKIP',
+      desc: '스테이지 스킵',
       type: 'cheat',
       handler: () => {
         const data = SaveManager.load();
@@ -86,6 +89,7 @@ if (import.meta.env.DEV) {
     },
     {
       code: 'CHEAT_BOSS_KILL',
+      desc: '보스 즉사 (전투씬)',
       type: 'cheat',
       handler: () => {
         if (window.__kcCheat?.bossDie) {
@@ -97,6 +101,7 @@ if (import.meta.env.DEV) {
     },
     {
       code: 'CHEAT_WAVE_END',
+      desc: '웨이브 종료 (전투씬)',
       type: 'cheat',
       handler: () => {
         if (window.__kcCheat?.waveEnd) {
@@ -142,6 +147,18 @@ function _markUsed(code) {
 }
 
 // ── 공개 API ──
+
+/**
+ * DEV 환경에서 사용 가능한 치트 코드 힌트 목록을 반환한다.
+ * 프로덕션 빌드에서는 빈 배열을 반환하며, 해당 분기 코드는 트리쉐이킹된다.
+ * @returns {Array<{code: string, desc: string}>}
+ */
+export function getCheatCodeHints() {
+  if (import.meta.env.DEV) {
+    return DEV_COUPONS.map(c => ({ code: c.code, desc: c.desc }));
+  }
+  return [];
+}
 
 /**
  * 쿠폰 코드를 사용(리딤)한다.
