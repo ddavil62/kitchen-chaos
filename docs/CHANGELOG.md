@@ -39,6 +39,34 @@
 - 리포트: `.claude/specs/2026-04-19-kc-phase54-report.md`
 - QA: `.claude/specs/2026-04-19-kc-phase54-qa.md`
 
+## [Phase 53] 2026-04-19 -- 챕터별 홀 뒷벽 에셋 8종 + oni_herald 미니보스 에셋
+
+### Added
+
+- **에셋 `assets/service/wall_back_g1.png`** (512x80px): 한식/시장 테마 뒷벽 — 한옥 목재 기둥, 창호지, 전통 문양, 갈색-황토색 팔레트
+- **에셋 `assets/service/wall_back_izakaya.png`** (512x80px): 일식 이자카야 테마 뒷벽 — 나무 격자 벽, 등롱, 노렌, 인디고-감색 팔레트
+- **에셋 `assets/service/wall_back_dragon.png`** (512x80px): 중식 용의 주방 테마 뒷벽 — 붉은 용 조각, 금빛 격자문, 적금색 팔레트
+- **에셋 `assets/service/wall_back_bistro.png`** (512x80px): 서양 비스트로 테마 뒷벽 — 파리풍 벽돌, 칠판, 크림-와인 팔레트
+- **에셋 `assets/service/wall_back_spice.png`** (512x80px): 인도 향신료 궁전 테마 뒷벽 — 대리석 아치, 공작 타일, 사프란-딥 퍼플 팔레트
+- **에셋 `assets/service/wall_back_cantina.png`** (512x80px): 멕시코 칸티나 테마 뒷벽 — 테라코타 벽, 선인장 벽화, 오렌지-터콰이즈 팔레트
+- **에셋 `assets/service/wall_back_dream.png`** (512x80px): 슈가 드림랜드 테마 뒷벽 — 파스텔 캔디, 마카롱 창틀, 라벤더-민트-핑크 팔레트
+- **에셋 `assets/service/wall_back_endless.png`** (512x80px): 영원한 식란 지대 테마 뒷벽 — 우주적 배경, 별자리 문양, 딥 퍼플-시안 팔레트
+- **에셋 `assets/bosses/oni_herald/rotations/*.png`** (8방향, 92x92px): 보라-핑크 오니 전령 미니보스 정지 이미지
+- **에셋 `assets/bosses/oni_herald/animations/walking-7ae1e13e/`** (8방향 x 6프레임, 92x92px): oni_herald walk 스프라이트시트
+- **에셋 `assets/bosses/oni_herald/animations/falling_backward-8387b83c/`** (8방향 x 7프레임, 92x92px): oni_herald death 스프라이트시트
+
+### Notes
+
+- 코드 변경 없음. SpriteLoader의 `FLOOR_VARIANTS` 루프(Phase 51-4)와 `BOSS_IDS`/`BOSS_WALK_HASHES`/`BOSS_DEATH_HASHES` 등록(Phase 47-2)이 사전 완성되어 있어 에셋 파일 배치만으로 자동 로드/렌더링 동작
+- wall_back 8종: SD Forge로 생성, 파일 크기 40KB~74KB
+- oni_herald: PixelLab pro 모드로 생성, chibi 체형, 기존 보스 에셋(sake_oni, oni_minion)과 동일 세계관
+- `_getWallBackKey()` 챕터 매핑: ch1~6=g1, 7~9=izakaya, 10~12=dragon, 13~15=bistro, 16~18=spice, 19~21=cantina, 22+=dream, isEndless=endless
+- oni_herald death 에셋은 8방향 존재하나 코드(DEATH_DIRS)에서 4방향만 로드 — 대각선은 DEATH_DIR_FALLBACK 매핑으로 처리 (기존 설계, 에셋 용량 절약)
+- AD 모드2 WARN: bistro 매우 밝음, cantina 고채도 — 기능에는 무영향, 캐릭터 가독성 실 영업 시 추가 확인 권장
+- QA: 22/22 PASS (Playwright 테스트, 11개 시각적 스크린샷 검증 포함)
+- 스펙: `.claude/specs/2026-04-19-kc-phase53-spec.md`
+- QA: `.claude/specs/2026-04-19-kc-phase53-qa.md`
+
 ## [Phase 52] 2026-04-19 -- 영업씬 렌더링 재구성 (테이블 앞/뒤 분리 + 손님 독립 스프라이트)
 
 ### Added

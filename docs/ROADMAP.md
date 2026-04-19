@@ -56,9 +56,10 @@
 | Phase 45 | 셰프 5종 92x92px 업그레이드 (재생성 3종 + 신규 2종, 전 캐릭터 아트 통일 완결) | ✅ 완료 |
 | Phase 46 | 통합 검증 및 잔여 버그 수정 (metadata.json 50건 갱신, enemy_charge_impact 구현, cardamom.png 교체, 전 캐릭터 렌더링 검증) | ✅ 완료 |
 | Phase 47-1 | 애니메이션 엔진 구축 + carrot_goblin 파일럿 (SpriteLoader death 로딩/등록, Enemy _animState 상태 머신, _executeDeath 분리, carrot_goblin death 4방향 7프레임) | ✅ 완료 |
+| Phase 53 | 챕터별 홀 뒷벽 에셋 8종 + oni_herald 미니보스 에셋 (코드 변경 없이 에셋 배치) | ✅ 완료 |
 | Phase 54 | 쿠폰 코드 시스템 (CouponRegistry, 일반 쿠폰 3종+DEV 치트 5종, 설정 메뉴 모달 UI, giftIngredients 세이브 v20) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 54 완료 (2026-04-19) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 8종 완성. 쿠폰 코드 시스템(일반+DEV 치트, 프로덕션 트리쉐이킹).
+**현재 구현 완성도**: Phase 54 완료 (2026-04-19) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). oni_herald 미니보스 에셋 완료(도형 폴백 해소). 쿠폰 코드 시스템(일반+DEV 치트, 프로덕션 트리쉐이킹).
 
 ### 현재 콘텐츠 규모
 
@@ -235,17 +236,16 @@ Phase 52: 영업씬 렌더링 재구성 — 테이블 분리 + 손님 독립화 
               - ServiceScene._createTables(): 3레이어 분리 렌더링
               - depth = (col+row)*100 | +50(손님) | +99(앞면)
               ↓
-Phase 53: 챕터별 홀 뒷벽 에셋 생성 + oni_herald 미니보스 에셋 ⬅ 다음 목표
-              [wall_back 8종 에셋 생성]
-              - wall_back_g1 / wall_back_bistro / wall_back_cantina / wall_back_dragon
-              - wall_back_dream / wall_back_endless / wall_back_izakaya / wall_back_spice
-              - 해상도: 512×80, PixelLab (또는 SD Forge), 챕터 테마별 배경 스타일
-              - ServiceScene: _getWallBackKey() fallback 대신 챕터별 에셋 로드
+Phase 53: 챕터별 홀 뒷벽 에셋 8종 + oni_herald 미니보스 에셋 ✅ 완료 (2026-04-19)
+              [wall_back 8종 에셋]
+              - wall_back_g1 / wall_back_izakaya / wall_back_dragon / wall_back_bistro
+              - wall_back_spice / wall_back_cantina / wall_back_dream / wall_back_endless
+              - 해상도: 512×80px, SD Forge 생성, 챕터 테마별 배경 스타일
+              - 코드 변경 없이 에셋 배치만으로 자동 로드 (SpriteLoader Phase 51-4 완성)
               [oni_herald 미니보스 에셋]
-              - 현황: isMidBoss=true, bodyColor 도형 폴백으로 렌더링 중 (에셋 없음)
-              - PixelLab pro 64px chibi, 8방향, 보라-핑크 오니 전령 스타일
-              - BOSS_IDS에 oni_herald 추가 + BOSS_WALK_HASHES 등록
-              - assets/bosses/oni_herald/ 폴더 생성
+              - rotations 8방향 (92×92px) + walk 8방향×6프레임 + death 8방향×7프레임
+              - PixelLab pro 모드, 보라-핑크 오니 전령 chibi 스타일
+              - 코드 변경 없이 에셋 배치만으로 자동 로드 (BOSS_IDS/HASHES 사전 등록)
               ↓
 Phase 54: 쿠폰 코드 시스템 (프로덕션 + DEV 치트 분리) ✅ 완료 (2026-04-19)
               - CouponRegistry.js: 일반 쿠폰 3종 + DEV 치트 5종
