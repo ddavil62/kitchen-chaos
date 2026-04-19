@@ -4,6 +4,7 @@
  * WaveManager에 options.waves로 주입하여 사용한다.
  * Phase 11-1: 엔드리스 모드 도입.
  * Phase 30: 그룹2 적 10종(POOL_TIER_5, 웨이브 21+) + 보스 3종(sake_oni, sake_master, dragon_wok) 통합.
+ * Phase 55-2: 그룹3 적 12종(POOL_TIER_6, 웨이브 31+) + 보스 3종(maharaja, el_diablo_pepper, queen_of_taste) 통합.
  */
 
 import { ENEMY_TYPES } from '../data/gameData.js';
@@ -29,11 +30,22 @@ const POOL_TIER_5 = [
   'wine_specter', 'foie_gras_knight',
 ];
 
+/** 31+ 웨이브 추가 적 (그룹3: 인도·멕시칸·디저트 적) */
+const POOL_TIER_6 = [
+  'curry_djinn', 'naan_golem', 'incense_specter', 'spice_elemental', 'masala_guide',
+  'taco_bandit', 'burrito_juggernaut', 'cactus_wraith', 'luchador_ghost',
+  'candy_soldier', 'cake_witch', 'macaron_knight',
+];
+
 /** 보스 풀 (전 구간 공통) */
 const BOSS_POOL = [
+  // 그룹1
   'pasta_boss', 'dragon_ramen', 'seafood_kraken',
   'lava_dessert_golem', 'master_patissier', 'cuisine_god',
+  // 그룹2
   'sake_oni', 'sake_master', 'dragon_wok',
+  // 그룹3 (신규)
+  'maharaja', 'el_diablo_pepper', 'queen_of_taste',
 ];
 
 // ── 기본 적 수 (비보스 웨이브에서 랜덤 구성용) ──
@@ -144,6 +156,7 @@ export class EndlessWaveGenerator {
     if (waveNumber >= 11) pool = pool.concat(POOL_TIER_3);
     if (waveNumber >= 16) pool = pool.concat(POOL_TIER_4);
     if (waveNumber >= 21) pool = pool.concat(POOL_TIER_5);
+    if (waveNumber >= 31) pool = pool.concat(POOL_TIER_6);
     return pool;
   }
 
