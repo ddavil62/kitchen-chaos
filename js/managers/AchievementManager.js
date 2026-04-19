@@ -1,6 +1,7 @@
 /**
  * @fileoverview 업적 매니저.
  * Phase 42: 업적 해금 조건 판정, 진행도 추적, 토스트 알림 발행. 보상은 AchievementScene에서 수령 시 지급.
+ * Phase 55-4: endless_storm_cleared, endless_mission_success, endless_no_leak_streak 조건 추가.
  *
  * StoryManager 패턴을 답습한 정적 클래스.
  * 씬 생명주기와 독립적으로 동작하며 SaveManager만 참조한다.
@@ -148,6 +149,15 @@ export class AchievementManager {
 
       case 'endless_score':
         return data.endless?.bestScore || 0;
+
+      case 'endless_storm_cleared':
+        return data.endless?.stormCount || 0;
+
+      case 'endless_mission_success':
+        return data.endless?.missionSuccessCount || 0;
+
+      case 'endless_no_leak_streak':
+        return data.endless?.noLeakStreak || 0;
 
       default:
         return 0;

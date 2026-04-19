@@ -298,6 +298,9 @@ export class AchievementScene extends Phaser.Scene {
       data.kitchenCoins = (data.kitchenCoins || 0) + item.reward.coin;
       SaveManager.save(data);
     }
+    if (item.reward.mireukEssence) {
+      SaveManager.addMireukEssence(item.reward.mireukEssence);
+    }
 
     // 잔액 갱신
     this._updateBalanceDisplay();

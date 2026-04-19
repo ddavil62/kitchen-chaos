@@ -1,6 +1,7 @@
 /**
  * @fileoverview 업적 데이터 정의.
  * Phase 42: 30개 업적 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 2).
+ * Phase 55-4: 엔드리스 업적 4개 추가 (총 34개).
  *
  * 각 업적은 고유 ID, 한국어 이름/설명, 카테고리, 아이콘, 조건, 보상으로 구성된다.
  */
@@ -18,7 +19,7 @@ export const ACHIEVEMENT_CATEGORIES = [
 ];
 
 /**
- * 전체 업적 목록 (30개).
+ * 전체 업적 목록 (34개).
  * @type {Array<{
  *   id: string,
  *   nameKo: string,
@@ -290,7 +291,7 @@ export const ACHIEVEMENTS = [
     reward: { gold: 600 },
   },
 
-  // ── 엔드리스 (2개) ──
+  // ── 엔드리스 (6개) ──
   {
     id: 'endless_wave20',
     nameKo: '생존자',
@@ -308,6 +309,42 @@ export const ACHIEVEMENTS = [
     icon: '\u221E',
     condition: { type: 'endless_wave', threshold: 50 },
     reward: { gold: 1000 },
+  },
+  {
+    id: 'endless_wave100',
+    nameKo: '식란 정복자',
+    descKo: '엔드리스 모드에서 100웨이브에 도달한다',
+    category: 'endless',
+    icon: '\uD83D\uDC51',
+    condition: { type: 'endless_wave', threshold: 100 },
+    reward: { gold: 3000 },
+  },
+  {
+    id: 'endless_storm10',
+    nameKo: '폭풍의 화신',
+    descKo: '미력 폭풍의 눈을 10회 클리어한다',
+    category: 'endless',
+    icon: '\uD83C\uDF00',
+    condition: { type: 'endless_storm_cleared', threshold: 10 },
+    reward: { coin: 30 },
+  },
+  {
+    id: 'endless_mission30',
+    nameKo: '임무의 달인',
+    descKo: '끝없는 정화 임무를 30회 성공한다',
+    category: 'endless',
+    icon: '\uD83D\uDCCB',
+    condition: { type: 'endless_mission_success', threshold: 30 },
+    reward: { mireukEssence: 50 },
+  },
+  {
+    id: 'endless_no_leak10',
+    nameKo: '무결 방어',
+    descKo: '라이프 손실 없이 10웨이브를 연속으로 클리어한다',
+    category: 'endless',
+    icon: '\uD83D\uDEE1\uFE0F',
+    condition: { type: 'endless_no_leak_streak', threshold: 10 },
+    reward: { gold: 2000 },
   },
 ];
 

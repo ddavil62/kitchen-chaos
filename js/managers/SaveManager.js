@@ -20,12 +20,14 @@
  *             spendMireukEssence + 유랑 미력사 헬퍼 메서드 7개 추가.
  * Phase 54: v20 마이그레이션 — giftIngredients 추가.
  *           addGiftIngredients, consumeGiftIngredients 헬퍼 추가.
+ * Phase 55-4: v21 마이그레이션 — endless.stormCount, missionSuccessCount, noLeakStreak 추가.
+ *             incrementEndlessStormCount, incrementEndlessMissionSuccess, updateEndlessNoLeakStreak 헬퍼 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 20;
+const SAVE_VERSION = 21;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -126,6 +128,10 @@ function createDefault() {
       bestScore: 0,               // 최고 누적 골드
       bestCombo: 0,               // 최고 연속 콤보
       lastDailySeed: 0,           // 마지막 플레이한 데일리 시드
+      // ── Phase 55-4 추가 ──
+      stormCount: 0,              // 누적 미력 폭풍의 눈 클리어 횟수
+      missionSuccessCount: 0,     // 누적 정화 임무 성공 횟수
+      noLeakStreak: 0,            // 현재 라이프 손실 없이 연속 클리어 중인 웨이브 수
     },
   };
 }
@@ -607,6 +613,49 @@ export class SaveManager {
     return true;
   }
 
+  // ── 엔드리스 확장 통계 (Phase 55-4) ──
+
+  /**
+   * 폭풍 클리어 횟수 +1 증가 후 저장.
+   * @returns {number} 증가 후 횟수
+   */
+  static incrementEndlessStormCount() {
+    const data = SaveManager.load();
+    if (!data.endless) data.endless = { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
+    data.endless.stormCount = (data.endless.stormCount ?? 0) + 1;
+    SaveManager.save(data);
+    return data.endless.stormCount;
+  }
+
+  /**
+   * 임무 성공 횟수 +1 증가 후 저장.
+   * @returns {number} 증가 후 횟수
+   */
+  static incrementEndlessMissionSuccess() {
+    const data = SaveManager.load();
+    if (!data.endless) data.endless = { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
+    data.endless.missionSuccessCount = (data.endless.missionSuccessCount ?? 0) + 1;
+    SaveManager.save(data);
+    return data.endless.missionSuccessCount;
+  }
+
+  /**
+   * noLeakStreak 갱신. noLeak=true이면 ++, false이면 0으로 리셋 후 저장.
+   * @param {boolean} noLeak - 해당 웨이브에서 라이프 손실 없이 클리어했는지 여부
+   * @returns {number} 갱신 후 streak 값
+   */
+  static updateEndlessNoLeakStreak(noLeak) {
+    const data = SaveManager.load();
+    if (!data.endless) data.endless = { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
+    if (noLeak) {
+      data.endless.noLeakStreak = (data.endless.noLeakStreak ?? 0) + 1;
+    } else {
+      data.endless.noLeakStreak = 0;
+    }
+    SaveManager.save(data);
+    return data.endless.noLeakStreak;
+  }
+
   // ── 유랑 미력사 (Phase 51-2) ──
 
   /**
@@ -1059,6 +1108,17 @@ export class SaveManager {
     if (data.version < 20) {
       data.giftIngredients = data.giftIngredients || {};
       data.version = 20;
+    }
+
+    // v20 → v21: 엔드리스 확장 통계 필드 추가 (Phase 55-4)
+    if (data.version < 21) {
+      if (!data.endless) {
+        data.endless = { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
+      }
+      data.endless.stormCount          = data.endless.stormCount          ?? 0;
+      data.endless.missionSuccessCount = data.endless.missionSuccessCount ?? 0;
+      data.endless.noLeakStreak        = data.endless.noLeakStreak        ?? 0;
+      data.version = 21;
     }
 
     return data;

@@ -740,7 +740,7 @@ export class ServiceScene extends Phaser.Scene {
    * @private
    */
   _getHallFloorKey() {
-    if (this.isEndless)      return 'floor_hall_endless';
+    if (this.isEndless)      return ServiceScene._endlessFloorKey(this.endlessWave);
     if (this.chapter <= 6)   return 'floor_hall_g1';
     if (this.chapter <= 9)   return 'floor_hall_izakaya';
     if (this.chapter <= 12)  return 'floor_hall_dragon';
@@ -756,7 +756,7 @@ export class ServiceScene extends Phaser.Scene {
    * @private
    */
   _getWallBackKey() {
-    if (this.isEndless)      return 'wall_back_endless';
+    if (this.isEndless)      return ServiceScene._endlessWallKey(this.endlessWave);
     if (this.chapter <= 6)   return 'wall_back_g1';
     if (this.chapter <= 9)   return 'wall_back_izakaya';
     if (this.chapter <= 12)  return 'wall_back_dragon';
@@ -764,6 +764,34 @@ export class ServiceScene extends Phaser.Scene {
     if (this.chapter <= 18)  return 'wall_back_spice';
     if (this.chapter <= 21)  return 'wall_back_cantina';
     return 'wall_back_dream';
+  }
+
+  /**
+   * 엔드리스 웨이브 구간에 따른 홀 바닥 타일 키 반환.
+   * @param {number} wave
+   * @returns {string}
+   * @private
+   */
+  static _endlessFloorKey(wave) {
+    if (wave <= 20) return 'floor_hall_endless';
+    if (wave <= 30) return 'floor_hall_izakaya';
+    if (wave <= 40) return 'floor_hall_bistro';
+    const cycle = Math.floor((wave - 41) / 10) % 3;
+    return ['floor_hall_spice', 'floor_hall_cantina', 'floor_hall_dream'][cycle];
+  }
+
+  /**
+   * 엔드리스 웨이브 구간에 따른 홀 뒷벽 키 반환.
+   * @param {number} wave
+   * @returns {string}
+   * @private
+   */
+  static _endlessWallKey(wave) {
+    if (wave <= 20) return 'wall_back_endless';
+    if (wave <= 30) return 'wall_back_izakaya';
+    if (wave <= 40) return 'wall_back_bistro';
+    const cycle = Math.floor((wave - 41) / 10) % 3;
+    return ['wall_back_spice', 'wall_back_cantina', 'wall_back_dream'][cycle];
   }
 
   /**

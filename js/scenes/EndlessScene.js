@@ -6,11 +6,13 @@
  * 라이프 0 시 엔드리스 결과 화면으로 전환.
  * Phase 11-3b: 보스 웨이브(10의 배수) BGM 전환 추가.
  * Phase 55-3: 미력 폭풍의 눈 이벤트 + EndlessMissionManager 연동.
+ * Phase 55-4: 폭풍/임무/noLeak 통계 SaveManager 연동.
  */
 
 import { GatheringScene } from './GatheringScene.js';
 import { EndlessWaveGenerator } from '../managers/EndlessWaveGenerator.js';
 import { EndlessMissionManager } from '../managers/EndlessMissionManager.js';
+import { AchievementManager } from '../managers/AchievementManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { ENEMY_TYPES } from '../data/gameData.js';
@@ -64,6 +66,7 @@ export class EndlessScene extends GatheringScene {
     this._mission = new EndlessMissionManager(this);
     this._isStormWave = false;
     this._stormOverlay = null;
+    this._waveLifeLeaked = false; // Phase 55-4: 웨이브 단위 라이프 손실 추적
 
     // ── Phase 11-3a: 엔드리스 튜토리얼 ──
     // super.create()가 생성한 _tutorial(battle)을 엔드리스 전용으로 덮어쓴다
@@ -209,6 +212,7 @@ export class EndlessScene extends GatheringScene {
    */
   _prepareEndlessWave(waveNumber) {
     this.endlessWave = waveNumber;
+    this._waveLifeLeaked = false; // Phase 55-4: 웨이브 시작 시 초기화
     const waveDef = EndlessWaveGenerator.generateWave(waveNumber)[0];
 
     // Phase 55-3: 미력 폭풍의 눈 판정 (15의 배수)
@@ -261,10 +265,15 @@ export class EndlessScene extends GatheringScene {
   _onEndlessWaveCleared() {
     this._updateHUD();
 
+    // ── Phase 55-4: noLeak streak 갱신 (임무 reset 전에 판정) ──
+    const waveNoLeak = !this._waveLifeLeaked;
+    SaveManager.updateEndlessNoLeakStreak(waveNoLeak);
+
     // ── Phase 55-3: 미력 폭풍 보상 ──
     if (this._isStormWave) {
       const bonus = Math.min(50, 10 + Math.floor(this.endlessWave / 15) * 10);
       SaveManager.addMireukEssence(bonus);
+      SaveManager.incrementEndlessStormCount(); // Phase 55-4: 폭풍 클리어 통계
       this._showMessage(`\uD3ED\uD48D \uC815\uD654 \uC644\uB8CC!\n\uBBF8\uB825\uC758 \uC815\uC218 +${bonus}`, 2500);
       if (this.vfx) this.vfx.screenFlash(0xffd700, 0.4, 400);
       if (this._stormOverlay) { this._stormOverlay.destroy(); this._stormOverlay = null; }
@@ -274,6 +283,7 @@ export class EndlessScene extends GatheringScene {
     if (this._mission) {
       const missionResult = this._mission.evaluateAndReward();
       if (missionResult && missionResult.success) {
+        SaveManager.incrementEndlessMissionSuccess(); // Phase 55-4: 임무 성공 통계
         // 폭풍 메시지와 겹치지 않도록 약간의 딜레이 후 표시
         const delay = this._isStormWave ? 2600 : 0;
         this.time.delayedCall(delay, () => {
@@ -282,6 +292,13 @@ export class EndlessScene extends GatheringScene {
       }
       this._mission.reset();
     }
+
+    // ── Phase 55-4: 업적 체크 (통계 갱신 후) ──
+    AchievementManager.check(this, 'endless_no_leak_streak', 0);
+    if (this._isStormWave) {
+      AchievementManager.check(this, 'endless_storm_cleared', 0);
+    }
+    AchievementManager.check(this, 'endless_mission_success', 0);
 
     // 5웨이브마다 ServiceScene으로 전환
     if (this.endlessWave % 5 === 0) {
@@ -357,6 +374,8 @@ export class EndlessScene extends GatheringScene {
    */
   _onEnemyReachedBase(enemy) {
     super._onEnemyReachedBase(enemy);
+    // Phase 55-4: 웨이브 단위 라이프 손실 플래그
+    this._waveLifeLeaked = true;
     // Phase 55-3: 정화 임무 — 라이프 손실 이벤트 전달
     if (this._mission) {
       this._mission.onLifeLost();

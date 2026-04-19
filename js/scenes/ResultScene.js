@@ -77,9 +77,12 @@ export class ResultScene extends Phaser.Scene {
   _createEndlessResultView() {
     const bestRecord = SaveManager.getEndlessRecord();
 
-    // ── 업적: 엔드리스 체크 (Phase 42) ──
+    // ── 업적: 엔드리스 체크 (Phase 42 + Phase 55-4) ──
     AchievementManager.check(this, 'endless_wave', 0);
     AchievementManager.check(this, 'endless_score', 0);
+    AchievementManager.check(this, 'endless_storm_cleared', 0);
+    AchievementManager.check(this, 'endless_mission_success', 0);
+    AchievementManager.check(this, 'endless_no_leak_streak', 0);
 
     // 타이틀
     this.add.text(GAME_WIDTH / 2, 40, '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uAC8C\uC784\uC624\uBC84', {
