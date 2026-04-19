@@ -176,6 +176,11 @@ export class EndlessScene extends GatheringScene {
 
       const enemy = new Enemy(scene, enemyData, waypoints);
       enemyGroup.add(enemy);
+
+      // Phase 55-3: 보스 스폰 시 정화 임무에 알림 (speed_kill 시간 측정 기준)
+      if (baseData.isBoss && scene._mission) {
+        scene._mission.markBossSpawned();
+      }
     };
 
     // update 패치: spawnQueue에서 hp/speed를 읽어 _spawnEnemy에 전달
@@ -258,7 +263,7 @@ export class EndlessScene extends GatheringScene {
 
     // ── Phase 55-3: 미력 폭풍 보상 ──
     if (this._isStormWave) {
-      const bonus = Math.min(50, 20 + Math.floor(this.endlessWave / 15) * 10);
+      const bonus = Math.min(50, 10 + Math.floor(this.endlessWave / 15) * 10);
       SaveManager.addMireukEssence(bonus);
       this._showMessage(`\uD3ED\uD48D \uC815\uD654 \uC644\uB8CC!\n\uBBF8\uB825\uC758 \uC815\uC218 +${bonus}`, 2500);
       if (this.vfx) this.vfx.screenFlash(0xffd700, 0.4, 400);
