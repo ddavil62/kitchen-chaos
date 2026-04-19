@@ -18,12 +18,14 @@
  *             mireukBossRewards, hiredMireukChefs 추가. 미력의 정수 헬퍼 메서드 4개 추가.
  * Phase 51-2: v19 마이그레이션 — hiredMireukChefs → wanderingChefs 구조체 이관.
  *             spendMireukEssence + 유랑 미력사 헬퍼 메서드 7개 추가.
+ * Phase 54: v20 마이그레이션 — giftIngredients 추가.
+ *           addGiftIngredients, consumeGiftIngredients 헬퍼 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 19;
+const SAVE_VERSION = 20;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -115,6 +117,8 @@ function createDefault() {
       unlocked: [],        // 도감 해금 목록 (고용 이력)
       enhancements: {},    // { [chefId]: 1|2|3 } -- 강화 단계. 미기재 시 1로 간주
     },
+    // ── Phase 54 추가 ──
+    giftIngredients: {},     // 쿠폰으로 지급된 재료 (GatheringScene 진입 시 소비)
     // ── Phase 11-1 추가 ──
     endless: {
       unlocked: false,            // 6-3 클리어 시 true
@@ -406,6 +410,37 @@ export class SaveManager {
       data.soundSettings.muted = settings.muted;
     }
     SaveManager.save(data);
+  }
+
+  // ── 쿠폰 선물 재료 (Phase 54) ──
+
+  /**
+   * 쿠폰으로 지급된 재료를 기존 giftIngredients에 누적 저장한다.
+   * @param {{ [ingredientId: string]: number }} ingredients - 재료 맵 (예: { carrot: 5, meat: 3 })
+   */
+  static addGiftIngredients(ingredients) {
+    const data = SaveManager.load();
+    if (!data.giftIngredients) data.giftIngredients = {};
+    for (const [id, amount] of Object.entries(ingredients)) {
+      if (amount > 0) {
+        data.giftIngredients[id] = (data.giftIngredients[id] || 0) + amount;
+      }
+    }
+    SaveManager.save(data);
+  }
+
+  /**
+   * giftIngredients를 전체 소진 후 반환한다.
+   * GatheringScene 시작 시 호출하여 InventoryManager에 합산한다.
+   * @returns {{ [ingredientId: string]: number }} 소진된 재료 맵 (빈 경우 빈 객체)
+   */
+  static consumeGiftIngredients() {
+    const data = SaveManager.load();
+    const gifts = data.giftIngredients || {};
+    if (Object.keys(gifts).length === 0) return {};
+    data.giftIngredients = {};
+    SaveManager.save(data);
+    return gifts;
   }
 
   // ── 영구 골드 (Phase 13) ──
@@ -1018,6 +1053,12 @@ export class SaveManager {
       };
       delete data.hiredMireukChefs;
       data.version = 19;
+    }
+
+    // v19 → v20: 쿠폰 선물 재료 필드 추가 (Phase 54)
+    if (data.version < 20) {
+      data.giftIngredients = data.giftIngredients || {};
+      data.version = 20;
     }
 
     return data;

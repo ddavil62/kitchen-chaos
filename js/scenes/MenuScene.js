@@ -12,6 +12,7 @@ import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
+import { redeemCoupon } from '../managers/CouponRegistry.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -248,9 +249,9 @@ export class MenuScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;   // 180
     const cy = GAME_HEIGHT / 2;  // 320
 
-    // 패널 크기/위치
+    // 패널 크기/위치 (Phase 54: panelH 300 → 340, 쿠폰 버튼 추가)
     const panelW = 280;
-    const panelH = 300;
+    const panelH = 340;
     const panelX = cx - panelW / 2;  // 40
     const panelY = 170;
 
@@ -323,19 +324,239 @@ export class MenuScene extends Phaser.Scene {
 
     // ── 음소거 토글 (y=360) ──
     this._createMuteToggle(container, 360, settings.muted);
+
+    // ── 쿠폰 입력 버튼 (y=408, Phase 54) ──
+    const couponBg = this.add.rectangle(cx, 408, 240, 36, 0x1a3366)
+      .setStrokeStyle(1, 0x666666)
+      .setInteractive({ useHandCursor: true });
+    container.add(couponBg);
+
+    const couponLabel = this.add.text(cx, 408, '\uD83C\uDF9F \uCFE0\uD3F0 \uC785\uB825', {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      color: '#88ccff',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(couponLabel);
+
+    couponBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._openCouponModal();
+    });
+    couponBg.on('pointerover', () => couponBg.setFillStyle(0x264d99));
+    couponBg.on('pointerout', () => couponBg.setFillStyle(0x1a3366));
   }
 
   /**
    * 설정 패널을 닫는다 (컨테이너 파괴).
+   * Phase 54: 쿠폰 모달이 열려있으면 함께 닫는다.
    * @private
    */
   _closeSettingsPanel() {
+    // 쿠폰 모달이 열려있으면 먼저 닫기
+    this._closeCouponModal();
     if (this._settingsContainer) {
       this._settingsContainer.destroy();
       this._settingsContainer = null;
     }
     // 드래그 상태 정리
     this._activeDrag = null;
+  }
+
+  // ── 쿠폰 모달 (Phase 54) ──────────────────────────────────────
+
+  /**
+   * 쿠폰 코드 입력 모달을 생성한다.
+   * Hidden DOM input으로 모바일 키보드를 활성화하고,
+   * Phaser 텍스트로 입력값을 표시한다.
+   * @private
+   */
+  _openCouponModal() {
+    // 이미 열려있으면 무시
+    if (this._couponContainer) return;
+
+    const cx = GAME_WIDTH / 2;   // 180
+    const cy = GAME_HEIGHT / 2;  // 320
+
+    const modalW = 260;
+    const modalH = 220;
+
+    const container = this.add.container(0, 0).setDepth(1100);
+    this._couponContainer = container;
+
+    // ── 반투명 오버레이 ──
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+      .setInteractive();
+    container.add(overlay);
+
+    // ── 모달 배경 ──
+    const modalBg = this.add.rectangle(cx, cy, modalW, modalH, 0x1a1a2e)
+      .setStrokeStyle(2, 0x88ccff);
+    container.add(modalBg);
+
+    // ── 타이틀 ──
+    const title = this.add.text(cx, cy - 85, '\uD83C\uDF9F \uCFE0\uD3F0 \uCF54\uB4DC \uC785\uB825', {
+      fontSize: '16px',
+      fontStyle: 'bold',
+      color: '#88ccff',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(title);
+
+    // ── 닫기 버튼 ──
+    const closeBtn = this.add.text(cx + modalW / 2 - 15, cy - modalH / 2 + 15, '\u2715', {
+      fontSize: '18px',
+      fontStyle: 'bold',
+      color: '#ff6666',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    closeBtn.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._closeCouponModal();
+    });
+    closeBtn.on('pointerover', () => closeBtn.setColor('#ff0000'));
+    closeBtn.on('pointerout', () => closeBtn.setColor('#ff6666'));
+    container.add(closeBtn);
+
+    // ── 입력 영역 배경 ──
+    const inputBg = this.add.rectangle(cx, cy - 35, 220, 36, 0x2a2a4a)
+      .setStrokeStyle(1, 0x555555)
+      .setInteractive({ useHandCursor: true });
+    container.add(inputBg);
+
+    // ── 입력 텍스트 표시 ──
+    const displayText = this.add.text(cx, cy - 35, '\uCF54\uB4DC\uB97C \uC785\uB825\uD558\uC138\uC694', {
+      fontSize: '14px',
+      color: '#666666',
+    }).setOrigin(0.5);
+    container.add(displayText);
+
+    // ── Hidden DOM input (모바일 키보드 활성화) ──
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'text';
+    hiddenInput.autocomplete = 'off';
+    hiddenInput.autocapitalize = 'characters';
+    hiddenInput.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;';
+    document.body.appendChild(hiddenInput);
+    this._couponHiddenInput = hiddenInput;
+
+    // 입력 영역 클릭 시 포커스
+    inputBg.on('pointerdown', () => {
+      hiddenInput.focus();
+    });
+
+    // input 이벤트로 표시 텍스트 동기화
+    const onInput = () => {
+      const val = hiddenInput.value.toUpperCase();
+      hiddenInput.value = val;
+      if (val) {
+        displayText.setText(val);
+        displayText.setColor('#ffffff');
+      } else {
+        displayText.setText('\uCF54\uB4DC\uB97C \uC785\uB825\uD558\uC138\uC694');
+        displayText.setColor('#666666');
+      }
+    };
+    hiddenInput.addEventListener('input', onInput);
+
+    // ── 결과 메시지 텍스트 ──
+    const resultText = this.add.text(cx, cy + 15, '', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      wordWrap: { width: 220 },
+      align: 'center',
+    }).setOrigin(0.5, 0);
+    container.add(resultText);
+
+    // ── 제출 함수 ──
+    const submit = () => {
+      const code = hiddenInput.value;
+      if (!code || !code.trim()) return;
+
+      const result = redeemCoupon(code);
+      if (result.ok) {
+        resultText.setColor('#44ff44');
+        resultText.setText(`\u2705 ${result.msg}`);
+        SoundManager.playSFX('sfx_coin');
+        // 성공 시 입력창 초기화
+        hiddenInput.value = '';
+        displayText.setText('\uCF54\uB4DC\uB97C \uC785\uB825\uD558\uC138\uC694');
+        displayText.setColor('#666666');
+      } else {
+        resultText.setColor('#ff6666');
+        resultText.setText(`\u274C ${result.msg}`);
+        SoundManager.playSFX('sfx_ui_tap');
+      }
+    };
+
+    // Enter 키로 제출
+    const onKeydown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submit();
+      }
+    };
+    hiddenInput.addEventListener('keydown', onKeydown);
+
+    // ── 제출 버튼 ──
+    const submitBg = this.add.rectangle(cx, cy + 65, 160, 36, 0x335533)
+      .setStrokeStyle(1, 0x666666)
+      .setInteractive({ useHandCursor: true });
+    container.add(submitBg);
+
+    const submitLabel = this.add.text(cx, cy + 65, '\uD655\uC778', {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      color: '#88ff88',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(submitLabel);
+
+    submitBg.on('pointerdown', () => {
+      submit();
+    });
+    submitBg.on('pointerover', () => submitBg.setFillStyle(0x447744));
+    submitBg.on('pointerout', () => submitBg.setFillStyle(0x335533));
+
+    // 오버레이 클릭 시 닫기 (모달 영역 외부)
+    overlay.on('pointerdown', (pointer) => {
+      const mx = cx - modalW / 2;
+      const my = cy - modalH / 2;
+      if (pointer.x >= mx && pointer.x <= mx + modalW &&
+          pointer.y >= my && pointer.y <= my + modalH) return;
+      SoundManager.playSFX('sfx_ui_tap');
+      this._closeCouponModal();
+    });
+
+    // 포커스 활성화
+    this.time.delayedCall(100, () => hiddenInput.focus());
+
+    // 이벤트 리스너 참조 저장 (정리용)
+    this._couponInputListener = onInput;
+    this._couponKeydownListener = onKeydown;
+  }
+
+  /**
+   * 쿠폰 모달을 닫는다 (DOM input 제거, 컨테이너 파괴).
+   * @private
+   */
+  _closeCouponModal() {
+    if (this._couponHiddenInput) {
+      this._couponHiddenInput.removeEventListener('input', this._couponInputListener);
+      this._couponHiddenInput.removeEventListener('keydown', this._couponKeydownListener);
+      this._couponHiddenInput.remove();
+      this._couponHiddenInput = null;
+      this._couponInputListener = null;
+      this._couponKeydownListener = null;
+    }
+    if (this._couponContainer) {
+      this._couponContainer.destroy();
+      this._couponContainer = null;
+    }
   }
 
   /**

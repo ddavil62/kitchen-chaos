@@ -97,6 +97,13 @@ export class GatheringScene extends Phaser.Scene {
     // ── 매니저 ──
     this.ingredientManager = new IngredientManager(this);
     this.inventoryManager = new InventoryManager();
+
+    // ── 쿠폰 선물 재료 소비 (Phase 54) ──
+    const giftIngredients = SaveManager.consumeGiftIngredients();
+    if (Object.keys(giftIngredients).length > 0) {
+      this.inventoryManager.addIngredients(giftIngredients);
+    }
+
     // 스토리 스테이지는 모든 웨이브를 단일 연속 웨이브로 병합한다
     const storyWaves = this.stageData?.waves;
     this.waveManager = new WaveManager(this, this.enemies, {
@@ -179,6 +186,37 @@ export class GatheringScene extends Phaser.Scene {
 
     // ── 대화 트리거 (Phase 14-3: StoryManager 중앙화) ──
     StoryManager.checkTriggers(this, 'gathering_enter', { stageId: this.stageId });
+
+    // ── DEV 전용 치트 핸들러 등록 (Phase 54) ──
+    if (import.meta.env.DEV) {
+      const scene = this;
+      window.__kcCheat = {
+        /** 모든 적 즉사 처리 */
+        bossDie: () => {
+          const enemies = scene.enemies.getChildren().filter(e => e.active);
+          enemies.forEach(enemy => {
+            if (enemy.takeDamage) {
+              enemy.takeDamage(enemy.hp + 9999);
+            }
+          });
+        },
+        /** 웨이브 강제 완료 처리 */
+        waveEnd: () => {
+          if (scene.waveManager) {
+            // 모든 적 제거
+            const enemies = scene.enemies.getChildren().filter(e => e.active);
+            enemies.forEach(enemy => {
+              if (enemy.takeDamage) {
+                enemy.takeDamage(enemy.hp + 9999);
+              }
+            });
+            // 웨이브 완료 플래그
+            scene.waveManager.isAllWavesComplete = true;
+            scene._checkWaveProgress();
+          }
+        },
+      };
+    }
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this.shutdown, this);
@@ -2164,6 +2202,11 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   shutdown() {
+    // ── Phase 54: DEV 치트 핸들러 해제 ──
+    if (import.meta.env.DEV && window.__kcCheat) {
+      delete window.__kcCheat;
+    }
+
     this.events.off('enemy_died', this._onEnemyDied, this);
     this.events.off('enemy_reached_base', this._onEnemyReachedBase, this);
     this.events.off('boss_summon', this._onBossSummon, this);
