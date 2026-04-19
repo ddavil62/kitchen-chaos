@@ -853,8 +853,9 @@ export class ServiceScene extends Phaser.Scene {
             .setDepth(BASE + 99);
 
           // customerImg — _updateTableUI에서 텍스처 교체 및 표시/비표시 제어
-          const customerImg = this.add.image(cx, cy - 8, '__MISSING')
-            .setDisplaySize(32, 48).setVisible(false).setDepth(BASE + 50);
+          // cy-18: 테이블 앞면(cy-19.5) 기준으로 상반신 ~20px가 노출되는 위치
+          const customerImg = this.add.image(cx, cy - 18, '__MISSING')
+            .setDisplaySize(32, 43).setVisible(false).setDepth(BASE + 50);
 
           container.setData('tableBackImg', tableBackImg);
           container.setData('tableFrontImg', tableFrontImg);
@@ -1003,8 +1004,9 @@ export class ServiceScene extends Phaser.Scene {
 
       if (SpriteLoader.hasTexture(this, custSpriteKey)) {
         // 신규 분리 스프라이트 (waiting/seated)
-        const w = (custType === 'group') ? 40 : 24;
-        const h = (custType === 'group') ? 40 : 32;
+        // 48×64 원본 → 3:4 비율 유지. normal=32×43, group=40×54
+        const w = (custType === 'group') ? 40 : 32;
+        const h = (custType === 'group') ? 54 : 43;
         customerImg.setTexture(custSpriteKey).setDisplaySize(w, h).setVisible(true);
         custIconText.setVisible(false);
       } else if (SpriteLoader.hasTexture(this, fallbackKey)) {
