@@ -852,14 +852,19 @@ export class ServiceScene extends Phaser.Scene {
             .setDisplaySize(SISO_TABLE_W, Math.round(SISO_TABLE_W * 52 / 96))
             .setDepth(BASE + 99);
 
-          // customerImg — _updateTableUI에서 텍스처 교체 및 표시/비표시 제어
-          // cy-18: 테이블 앞면(cy-19.5) 기준으로 상반신 ~20px가 노출되는 위치
+          // customerImg — 3레이어 폴백용 (compositeImg 없을 때)
           const customerImg = this.add.image(cx, cy - 18, '__MISSING')
             .setDisplaySize(32, 43).setVisible(false).setDepth(BASE + 50);
+
+          // compositeImg — 테이블+손님 통합 이미지 (waiting/seated). 있으면 3레이어 대체
+          // cy-20: 64px 타일 기준으로 테이블 상단(~픽셀45) 이 cy-4에 맞는 오프셋
+          const compositeImg = this.add.image(cx, cy - 10, '__MISSING')
+            .setDisplaySize(72, 72).setVisible(false).setDepth(BASE + 2);
 
           container.setData('tableBackImg', tableBackImg);
           container.setData('tableFrontImg', tableFrontImg);
           container.setData('customerImg', customerImg);
+          container.setData('compositeImg', compositeImg);
           container.setData('useLayered', true);
         } else {
           // ── fallback: 기존 단일 tableImg + custIconImg 방식 ──
@@ -966,8 +971,11 @@ export class ServiceScene extends Phaser.Scene {
       container.setData('_isEmpty', true);
 
       if (useLayered) {
-        // Phase 52: 3레이어 모드 — customerImg 숨김, back/front는 항상 표시
+        // 3레이어 모드 — compositeImg·customerImg 숨김, back/front 복원
+        container.getData('compositeImg')?.setVisible(false);
         container.getData('customerImg')?.setVisible(false);
+        container.getData('tableBackImg')?.setVisible(true);
+        container.getData('tableFrontImg')?.setVisible(true);
       } else {
         // 빈 테이블 — 컴포짓 해제 후 empty 텍스처로 복원
         const tImgEmpty = container.getData('tableImg');
@@ -993,32 +1001,44 @@ export class ServiceScene extends Phaser.Scene {
 
     statusText.setVisible(false);
 
-    // Phase 52: 3레이어 분리 렌더링 업데이트
+    // Phase 52+: 테이블 렌더링 업데이트 (복합 이미지 우선, 3레이어 폴백)
     if (useLayered) {
       const custType = cust.customerType || 'normal';
       const isServed = cust.served || (custType === 'group' && cust.groupServed);
       const state = isServed ? 'seated' : 'waiting';
-      const customerImg = container.getData('customerImg');
-      const custSpriteKey = `customer_${custType}_${state}`;
-      const fallbackKey   = `customer_${custType}`;
+      const grade = this.tableUpgrades[idx] || 0;
+      const compositeKey = `table_lv${grade}_${state}`;
+      const compositeImg = container.getData('compositeImg');
+      const customerImg  = container.getData('customerImg');
 
-      if (SpriteLoader.hasTexture(this, custSpriteKey)) {
-        // 신규 분리 스프라이트 (waiting/seated)
-        // 48×64 원본 → 3:4 비율 유지. normal=32×43, group=40×54
-        const w = (custType === 'group') ? 40 : 32;
-        const h = (custType === 'group') ? 54 : 43;
-        customerImg.setTexture(custSpriteKey).setDisplaySize(w, h).setVisible(true);
-        custIconText.setVisible(false);
-      } else if (SpriteLoader.hasTexture(this, fallbackKey)) {
-        // 레거시 단일 스프라이트 fallback
-        customerImg.setTexture(fallbackKey).setDisplaySize(24, 24).setVisible(true);
+      if (SpriteLoader.hasTexture(this, compositeKey)) {
+        // ── 복합 이미지 모드: 테이블+손님 통합 에셋으로 3레이어 대체 ──
+        container.getData('tableBackImg')?.setVisible(false);
+        container.getData('tableFrontImg')?.setVisible(false);
+        customerImg?.setVisible(false);
+        compositeImg?.setTexture(compositeKey).setDisplaySize(72, 72).setVisible(true);
         custIconText.setVisible(false);
       } else {
-        // 이모지 텍스트 fallback (mireuk_traveler 포함)
-        customerImg.setVisible(false);
-        const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
-        const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
-        custIconText.setText(servedMark || typeIcon).setVisible(true);
+        // ── 3레이어 폴백: 기존 손님 스프라이트 ──
+        container.getData('tableBackImg')?.setVisible(true);
+        container.getData('tableFrontImg')?.setVisible(true);
+        compositeImg?.setVisible(false);
+        const custSpriteKey = `customer_${custType}_${state}`;
+        const fallbackKey   = `customer_${custType}`;
+        if (SpriteLoader.hasTexture(this, custSpriteKey)) {
+          const w = (custType === 'group') ? 40 : 32;
+          const h = (custType === 'group') ? 54 : 43;
+          customerImg.setTexture(custSpriteKey).setDisplaySize(w, h).setVisible(true);
+          custIconText.setVisible(false);
+        } else if (SpriteLoader.hasTexture(this, fallbackKey)) {
+          customerImg.setTexture(fallbackKey).setDisplaySize(24, 24).setVisible(true);
+          custIconText.setVisible(false);
+        } else {
+          customerImg.setVisible(false);
+          const typeIcon = CUSTOMER_TYPE_ICONS[custType] || CUSTOMER_TYPE_ICONS.normal;
+          const servedMark = (custType === 'group' && cust.groupServed) ? '\u2705' : '';
+          custIconText.setText(servedMark || typeIcon).setVisible(true);
+        }
       }
       custIconImg.setVisible(false);
     } else {

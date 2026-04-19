@@ -669,6 +669,11 @@ export class SpriteLoader {
       scene.load.image(`table_lv${lv}_back`,  `${SERVICE_ROOT}/table_lv${lv}_back.png`);
       scene.load.image(`table_lv${lv}_front`, `${SERVICE_ROOT}/table_lv${lv}_front.png`);
     }
+    // Phase 52+: 테이블+손님 통합 복합 이미지 (waiting/seated 상태별)
+    for (let lv = 0; lv < TABLE_GRADE_COUNT; lv++) {
+      scene.load.image(`table_lv${lv}_waiting`, `${SERVICE_ROOT}/table_lv${lv}_waiting.png`);
+      scene.load.image(`table_lv${lv}_seated`,  `${SERVICE_ROOT}/table_lv${lv}_seated.png`);
+    }
     // 손님 유형별
     for (const type of CUSTOMER_TYPE_IDS) {
       scene.load.image(`customer_${type}`, `${SERVICE_ROOT}/customer_${type}.png`);
