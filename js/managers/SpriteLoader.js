@@ -75,6 +75,7 @@ const BOSS_IDS = [
   'maharaja',     // Phase 32-5
   'el_diablo_pepper', // Phase 35-2
   'queen_of_taste',   // Phase 38-1
+  'oni_herald',       // Phase 53: 미니보스 (isMidBoss=true), boss prefix 경로 사용
 ];
 
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
@@ -186,6 +187,7 @@ const BOSS_DEATH_HASHES = {
   maharaja:            'falling_backward-7da945c4',
   el_diablo_pepper:    'falling_backward-7f8bea1c',
   queen_of_taste:      'falling_backward-7bf0791d',
+  oni_herald:          'falling_backward-8387b83c',  // Phase 53: 미니보스 death
 };
 
 const BOSS_WALK_HASHES = {
@@ -203,6 +205,7 @@ const BOSS_WALK_HASHES = {
   el_diablo_pepper: 'walking-acae25f3', // Phase 35-2 (pro 모드, 116px canvas)
   // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (136px/116px/112px canvas)
   queen_of_taste:   'walking-d0fa0cc7',  // Phase 47-3
+  oni_herald:       'walking-7ae1e13e',   // Phase 53: 미니보스 walk (92x92px)
   queen_of_taste_2: 'walking-131877f4',  // Phase 47-4 (116x116px canvas)
   queen_of_taste_3: 'walking-30ddc8c8',  // Phase 47-4 (112x112px canvas)
 };
