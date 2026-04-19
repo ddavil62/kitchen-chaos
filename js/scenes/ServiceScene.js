@@ -521,20 +521,22 @@ export class ServiceScene extends Phaser.Scene {
 
   /**
    * 미력 나그네 등장 예약.
-   * 7-1 이후 스테이지이고 season2Unlocked 상태일 때 16% 확률로 세션 내 1회 등장을 예약한다.
+   * 캠페인: 7-1 이후 + season2Unlocked 시 16% 확률.
+   * 엔드리스: 무조건 8% 확률 (시즌/챕터 조건 면제).
    * 등장 시각: 세션 시작 후 60~90초 사이 무작위.
-   * TODO: chapter 16~24 → 20%, 엔드리스 → 12% 확률 보정 (현재 16% 단일 적용)
    * @private
    */
   _scheduleMireukTraveler() {
-    // 잠금 해제 조건: 7-1 이후 (season2Unlocked) + 엔드리스 아님
-    const saveData = SaveManager.load();
-    const isSeason2 = !!saveData.season2Unlocked;
-    if (!isSeason2 && this.chapter < 7) return;
-    if (this.isEndless) return; // 엔드리스는 현재 미지원 (TODO)
+    // 잠금 해제 조건: 엔드리스가 아니면 season2Unlocked + 7-1 이후
+    if (!this.isEndless) {
+      const saveData = SaveManager.load();
+      const isSeason2 = !!saveData.season2Unlocked;
+      if (!isSeason2 && this.chapter < 7) return;
+    }
 
-    // 16% 확률로 등장 예약
-    if (Math.random() >= 0.16) return;
+    // 엔드리스 모드에서는 낮은 확률(8%)로 등장 허용
+    const spawnChance = this.isEndless ? 0.08 : 0.16;
+    if (Math.random() >= spawnChance) return;
 
     // 60~90초 사이 무작위 시각에 등장
     const delayMs = Phaser.Math.Between(60000, 90000);

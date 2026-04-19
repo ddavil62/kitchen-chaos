@@ -5,10 +5,12 @@
  * 5웨이브마다 ServiceScene → MerchantScene → EndlessScene 복귀 루프.
  * 라이프 0 시 엔드리스 결과 화면으로 전환.
  * Phase 11-3b: 보스 웨이브(10의 배수) BGM 전환 추가.
+ * Phase 55-3: 미력 폭풍의 눈 이벤트 + EndlessMissionManager 연동.
  */
 
 import { GatheringScene } from './GatheringScene.js';
 import { EndlessWaveGenerator } from '../managers/EndlessWaveGenerator.js';
+import { EndlessMissionManager } from '../managers/EndlessMissionManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { ENEMY_TYPES } from '../data/gameData.js';
@@ -57,6 +59,11 @@ export class EndlessScene extends GatheringScene {
     // 4. super.create가 설정한 waveManager를 엔드리스 웨이브로 교체
     this._patchWaveManagerForEndless();
     this._prepareEndlessWave(this.endlessWave + 1);
+
+    // 5. Phase 55-3: 정화 임무 매니저 초기화
+    this._mission = new EndlessMissionManager(this);
+    this._isStormWave = false;
+    this._stormOverlay = null;
 
     // ── Phase 11-3a: 엔드리스 튜토리얼 ──
     // super.create()가 생성한 _tutorial(battle)을 엔드리스 전용으로 덮어쓴다
@@ -199,6 +206,17 @@ export class EndlessScene extends GatheringScene {
     this.endlessWave = waveNumber;
     const waveDef = EndlessWaveGenerator.generateWave(waveNumber)[0];
 
+    // Phase 55-3: 미력 폭풍의 눈 판정 (15의 배수)
+    this._isStormWave = (waveNumber % 15 === 0);
+
+    // 폭풍 웨이브면 적 HP ×0.7, 속도 ×0.8 보정
+    if (this._isStormWave) {
+      waveDef.enemies.forEach(group => {
+        group.hp = Math.round(group.hp * 0.7);
+        group.speed = Math.round(group.speed * 0.8);
+      });
+    }
+
     // WaveManager 상태 리셋 후 새 웨이브 주입
     this.waveManager._waves = [waveDef];
     this.waveManager.totalWaves = 1;
@@ -238,17 +256,44 @@ export class EndlessScene extends GatheringScene {
   _onEndlessWaveCleared() {
     this._updateHUD();
 
+    // ── Phase 55-3: 미력 폭풍 보상 ──
+    if (this._isStormWave) {
+      const bonus = Math.min(50, 20 + Math.floor(this.endlessWave / 15) * 10);
+      SaveManager.addMireukEssence(bonus);
+      this._showMessage(`\uD3ED\uD48D \uC815\uD654 \uC644\uB8CC!\n\uBBF8\uB825\uC758 \uC815\uC218 +${bonus}`, 2500);
+      if (this.vfx) this.vfx.screenFlash(0xffd700, 0.4, 400);
+      if (this._stormOverlay) { this._stormOverlay.destroy(); this._stormOverlay = null; }
+    }
+
+    // ── Phase 55-3: 정화 임무 평가 ──
+    if (this._mission) {
+      const missionResult = this._mission.evaluateAndReward();
+      if (missionResult && missionResult.success) {
+        // 폭풍 메시지와 겹치지 않도록 약간의 딜레이 후 표시
+        const delay = this._isStormWave ? 2600 : 0;
+        this.time.delayedCall(delay, () => {
+          this._showMessage(`\uC784\uBB34 \uC131\uACF5!\n\uBCF4\uC0C1 \uD68D\uB4DD!`, 2000);
+        });
+      }
+      this._mission.reset();
+    }
+
     // 5웨이브마다 ServiceScene으로 전환
     if (this.endlessWave % 5 === 0) {
       this._endlessServicePending = true;
-      this._showMessage(`\uC6E8\uC774\uBE0C ${this.endlessWave} \uD074\uB9AC\uC5B4!\n\uC601\uC5C5 \uC2DC\uAC04\uC785\uB2C8\uB2E4!`, 2500);
-      this.time.delayedCall(2800, () => this._transitionToService());
+      const transDelay = this._isStormWave ? 5500 : 2800;
+      if (!this._isStormWave) {
+        this._showMessage(`\uC6E8\uC774\uBE0C ${this.endlessWave} \uD074\uB9AC\uC5B4!\n\uC601\uC5C5 \uC2DC\uAC04\uC785\uB2C8\uB2E4!`, 2500);
+      }
+      this.time.delayedCall(transDelay, () => this._transitionToService());
       return;
     }
 
     // 그 외: 다음 웨이브 준비
     this.waitingForNextWave = true;
-    this._showMessage(`\uC6E8\uC774\uBE0C ${this.endlessWave} \uD074\uB9AC\uC5B4!`, 2000);
+    if (!this._isStormWave) {
+      this._showMessage(`\uC6E8\uC774\uBE0C ${this.endlessWave} \uD074\uB9AC\uC5B4!`, 2000);
+    }
     this.time.delayedCall(1500, () => {
       this._setWaveButtonEnabled(true);
       this._prepareEndlessWave(this.endlessWave + 1);
@@ -296,6 +341,21 @@ export class EndlessScene extends GatheringScene {
   _triggerVictory() {
     // 엔드리스에서는 승리 없음 — _onEndlessWaveCleared로 처리됨
     this._onEndlessWaveCleared();
+  }
+
+  // ── _onEnemyReachedBase override (Phase 55-3) ──────────────────
+
+  /**
+   * 적이 기지에 도달 시 부모 로직 호출 후 정화 임무에 라이프 손실 알림.
+   * @param {Enemy} enemy
+   * @override
+   */
+  _onEnemyReachedBase(enemy) {
+    super._onEnemyReachedBase(enemy);
+    // Phase 55-3: 정화 임무 — 라이프 손실 이벤트 전달
+    if (this._mission) {
+      this._mission.onLifeLost();
+    }
   }
 
   // ── _triggerGameOver override ───────────────────────────────────
@@ -373,6 +433,24 @@ export class EndlessScene extends GatheringScene {
       SoundManager.playBGM('bgm_battle');
     }
 
+    // ── Phase 55-3: 미력 폭풍의 눈 이펙트 ──
+    if (this._isStormWave) {
+      this._showMessage('\uBBF8\uB825 \uD3ED\uD48D\uC758 \uB208!\n\uC801\uC774 \uC57D\uD574\uC9C0\uACE0, \uC815\uC218\uAC00 2\uBC30 \uB4DC\uB78D\uB429\uB2C8\uB2E4!', 3000);
+      if (this.vfx) this.vfx.screenFlash(0x9900ff, 0.6, 500);
+      this._stormOverlay = this.add.rectangle(
+        GAME_WIDTH / 2, 320, GAME_WIDTH, 640, 0x9900ff, 0.12
+      ).setDepth(999);
+    }
+
+    // ── Phase 55-3: 정화 임무 시작 ──
+    if (this._mission) {
+      this._mission.startMission(
+        this.endlessWave,
+        EndlessWaveGenerator.isBossWave(this.endlessWave),
+        this._isStormWave
+      );
+    }
+
     // 엔드리스에서는 오더 생성 안 함
   }
 
@@ -402,6 +480,11 @@ export class EndlessScene extends GatheringScene {
       this.vfx.enemyDeath(enemy.x, enemy.y, color, isBoss);
     }
 
+    // Phase 55-3: 정화 임무 — 적 처치 이벤트 전달
+    if (this._mission) {
+      this._mission.onEnemyKilled(enemy);
+    }
+
     this._checkWaveProgress();
   }
 
@@ -418,5 +501,10 @@ export class EndlessScene extends GatheringScene {
     this.endlessMaxCombo = 0;
     this.dailySpecials = [];
     this._endlessServicePending = false;
+
+    // Phase 55-3: 정화 임무 및 폭풍 오버레이 정리
+    if (this._mission) { this._mission.reset(); this._mission = null; }
+    if (this._stormOverlay) { this._stormOverlay.destroy(); this._stormOverlay = null; }
+    this._isStormWave = false;
   }
 }
