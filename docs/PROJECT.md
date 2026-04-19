@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-19 (Phase 52 완료)
+> 최종 업데이트: 2026-04-19 (Phase 54 완료)
 
 ## 프로젝트 개요
 
@@ -34,7 +34,8 @@
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 ~106종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), ~111항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v19, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs 헬퍼 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v20, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients 헬퍼 |
+| 쿠폰 | CouponRegistry.js | 쿠폰 레지스트리, redeemCoupon() API, 일반 3종+DEV 치트 5종, 사용 이력 localStorage 관리 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
@@ -80,6 +81,7 @@
 | 유랑 미력사 고용 | 8명 미력사(4등급) 고용/강화(3단계)/해고 시스템, WanderingChefModal(스크롤, 등급 뱃지), ServiceScene 패시브 스킬 적용(인내심/조리시간/특수손님), 세이브 v19 | 완료 |
 | 셰프 스킬 재설계 | passiveDesc 3건 교정, 미력사 버프 5종 ServiceScene 실제 로직 연결, 요코 chain_serve 구현, 독립 계수 곱셈 원칙 코드 반영 | 완료 |
 | 영업씬 렌더링 재구성 | 테이블 3레이어 분리 렌더링(back/customer/front), 손님 독립 스프라이트(5종x2상태), HUD depth 600+ 상향 | 완료 |
+| 쿠폰 코드 시스템 | 설정 메뉴 쿠폰 입력 UI, 일반 쿠폰 3종(프로덕션), DEV 치트 5종(트리쉐이킹), giftIngredients 세이브 v20 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -92,7 +94,7 @@
 | 스테이지 | 143슬롯 (1~24장 전체 구현, placeholder 0개) |
 | 셰프 | 5종 (꼬마/불꽃/얼음/유키/라오, 전원 패시브+액티브 스킬 구현 완료) |
 | 업적 | 30개 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 2) |
-| 세이브 버전 | v19 |
+| 세이브 버전 | v20 |
 
 ## 알려진 제약사항
 

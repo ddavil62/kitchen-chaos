@@ -249,9 +249,9 @@ export class MenuScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;   // 180
     const cy = GAME_HEIGHT / 2;  // 320
 
-    // 패널 크기/위치 (Phase 54: panelH 300 → 340, 쿠폰 버튼 추가)
+    // 패널 크기/위치 (Phase 54: panelH 268, 쿠폰 버튼 추가, AD3 여백 보정)
     const panelW = 280;
-    const panelH = 340;
+    const panelH = 268;
     const panelX = cx - panelW / 2;  // 40
     const panelY = 170;
 

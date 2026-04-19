@@ -1,5 +1,44 @@
 # Changelog
 
+## [Phase 54] 2026-04-19 -- 쿠폰 코드 시스템 (프로덕션 + DEV 치트 분리)
+
+### Added
+
+- **`js/managers/CouponRegistry.js`** (신규): 쿠폰 레지스트리 모듈
+  - 일반 쿠폰 3종: `LAZYSLIME2026` (골드 +5,000), `KITCHENLOVE` (골드 +3,000 + 재료 carrot/meat/egg x5), `GRANDOPENING` (골드 +2,000 + 재료 flour/rice x10)
+  - DEV 치트 5종: `CHEAT_GOLD` (골드 +99,999), `CHEAT_ITEMS` (전 재료 31종 x20), `CHEAT_STAGE_SKIP` (다음 스테이지 3성 클리어+리로드), `CHEAT_BOSS_KILL` (모든 적 즉사), `CHEAT_WAVE_END` (웨이브 강제 완료)
+  - `redeemCoupon(rawCode)` API: 코드 정규화(trim+toUpperCase), 사용 이력 검증, 보상 지급
+  - 사용 이력: `kitchenChaosTycoon_usedCoupons` localStorage 키 (세이브 초기화와 독립)
+  - 치트 코드는 사용 이력 미저장 (무제한 재사용)
+- **`js/scenes/MenuScene.js`**: 설정 패널 쿠폰 입력 UI
+  - `_openCouponModal()`: hidden DOM input + Phaser 텍스트 가상 입력창, depth 1100
+  - `_closeCouponModal()`: input 이벤트 리스너 해제 + DOM 요소 제거
+  - 쿠폰 버튼: 배경 `0x1a3366`, 텍스트 `#88ccff`, y=408
+  - 설정 패널 닫기 시 쿠폰 모달도 함께 정리
+- **`js/managers/SaveManager.js`**: giftIngredients 필드 및 헬퍼
+  - `addGiftIngredients(ingredients)`: 기존값에 누적 저장
+  - `consumeGiftIngredients()`: 전체 소진 후 반환, 빈 객체로 초기화
+- **`js/scenes/GatheringScene.js`**: DEV 전용 `window.__kcCheat` 등록
+  - `create()` 말미에 `bossDie()` / `waveEnd()` 함수 등록 (DEV only)
+  - `shutdown()` 시 `delete window.__kcCheat`
+  - `create()` 초기화 시 `consumeGiftIngredients()` 호출하여 InventoryManager에 합산
+
+### Changed
+
+- **`js/managers/SaveManager.js`**: SAVE_VERSION 19 -> 20
+  - `createDefault()`에 `giftIngredients: {}` 추가
+  - v19 -> v20 마이그레이션: `data.giftIngredients = data.giftIngredients || {}`
+- **`js/scenes/MenuScene.js`**: 설정 패널 panelH 확장 (쿠폰 버튼 수용)
+
+### Notes
+
+- 스펙의 쿠폰 코드 표에 `GRAND OPENING` (공백 포함)으로 표기되었으나, 구현은 `GRANDOPENING` (공백 없음). 스펙 내 코드 블록이 `GRANDOPENING`이므로 구현이 올바름
+- panelH: 스펙 340 vs 구현 268 (AD 모드3 여백 보정 결과, 시각적으로 적절)
+- 프로덕션 빌드 번들에서 `CHEAT_GOLD`, `CHEAT_BOSS_KILL`, `__kcCheat` 등 치트 관련 문자열 0건 확인 (트리쉐이킹 정상)
+- 스펙: `.claude/specs/2026-04-19-kc-phase54-spec.md`
+- 리포트: `.claude/specs/2026-04-19-kc-phase54-report.md`
+- QA: `.claude/specs/2026-04-19-kc-phase54-qa.md`
+
 ## [Phase 52] 2026-04-19 -- 영업씬 렌더링 재구성 (테이블 앞/뒤 분리 + 손님 독립 스프라이트)
 
 ### Added
