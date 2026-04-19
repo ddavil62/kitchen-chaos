@@ -201,11 +201,10 @@ const BOSS_WALK_HASHES = {
   chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
   maharaja: 'animating-2c666ada',     // Phase 32-5 (pro 모드, 212px canvas)
   el_diablo_pepper: 'walking-acae25f3', // Phase 35-2 (pro 모드, 116px canvas)
-  // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (116/112/TBD px canvas)
-  // Phase 47-4: queen_of_taste_2/3 별도 PixelLab 캐릭터 생성 필요
+  // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (136px/116px/112px canvas)
   queen_of_taste:   'walking-d0fa0cc7',  // Phase 47-3
-  queen_of_taste_2: null,   // 페이즈2 — Phase 47-4 미착수
-  queen_of_taste_3: null,   // 페이즈3 — Phase 47-4 미착수
+  queen_of_taste_2: 'walking-131877f4',  // Phase 47-4 (116x116px canvas)
+  queen_of_taste_3: 'walking-30ddc8c8',  // Phase 47-4 (112x112px canvas)
 };
 
 /** 걷기 애니메이션 방향 목록 */
