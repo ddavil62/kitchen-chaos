@@ -57,7 +57,7 @@
 | Phase 46 | 통합 검증 및 잔여 버그 수정 (metadata.json 50건 갱신, enemy_charge_impact 구현, cardamom.png 교체, 전 캐릭터 렌더링 검증) | ✅ 완료 |
 | Phase 47-1 | 애니메이션 엔진 구축 + carrot_goblin 파일럿 (SpriteLoader death 로딩/등록, Enemy _animState 상태 머신, _executeDeath 분리, carrot_goblin death 4방향 7프레임) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 47-1 완료 — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템 아키텍처 구축, carrot_goblin death 파일럿 완료(4방향 7프레임).
+**현재 구현 완성도**: Phase 52 완료 (2026-04-19) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 30개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 8종 완성.
 
 ### 현재 콘텐츠 규모
 
@@ -191,33 +191,21 @@ Phase 47-1: 애니메이션 엔진 구축 + carrot_goblin 파일럿 ✅ 완료
               - carrot_goblin death: falling_backward-10a27983, 4방향 7프레임, AD Mode 2 APPROVED
               - QA PASS (15/15 수용 기준, 8/8 예외, Playwright 7/7)
               ↓
-Phase 47-2: 보스 13종 walk + death 에셋 생성 및 적용
-              - PixelLab animate_character (보스 13종 × walk + death = 26 호출)
-              - 에셋 배치 + SpriteLoader 등록
-              - QA: 보스 전종 인게임 애니메이션 확인
+Phase 47-2: 보스 13종 walk + death 에셋 생성 및 적용 ✅ 완료
+              - 보스 13종 walk 에셋 생성, BOSS_WALK_HASHES 등록
+              - 보스 13종 death 에셋 생성, BOSS_DEATH_HASHES 등록
+              - cuisine_god walking-a3de1caf (8방향 완성: 84e4ae22 north + a3de1caf 7방향 합산)
               ↓
-Phase 47-3: 일반 적 전종 walk + death 에셋 생성 및 적용
-              - PixelLab animate_character (일반 적 43종 × walk + death = ~86 호출)
-              - 에셋 배치 + 등록
-              - QA + 최종 통합 검증
+Phase 47-3: 일반 적 전종 walk + death 에셋 생성 및 적용 ✅ 완료
+              - ENEMY_IDS 42종 walk/death 에셋 생성 및 등록
+              - queen_of_taste_2/3 신규 PixelLab pro 캐릭터 생성 + walk 에셋 (Phase 47-4)
+              - sugar_specter_mini (소형 분열 적, isMini): 의도적 제외
               ↓
-Phase 48-1: [기획] 미력의 정수 — 희귀 화폐 시스템 설계
-              - 화폐 정의 및 획득 경로 (스토리 보상 + 특수 손님 NPC)
-              - 특수 손님 NPC 설계 (등장 조건, 연출, 대화)
-              - 소비처 및 고용 비용 테이블
-              - 경제 밸런스
+Phase 48-1: [기획] 미력의 정수 — 희귀 화폐 시스템 설계 ✅ 완료
               ↓
-Phase 48-2: [기획] 유랑 미력사 시스템 — 고용 셰프 전체 설계
-              - 유랑 미력사 세계관 정의 및 개연성 스크립트
-              - 고용/해고 UI 흐름
-              - 셰프 등급/희귀도 체계
-              - 셰프 강화 방식 (훈련/합성 등)
-              - 도감 연동
+Phase 48-2: [기획] 유랑 미력사 시스템 — 고용 셰프 전체 설계 ✅ 완료
               ↓
-Phase 48-3: [기획] 셰프 스킬 재설계
-              - 현재 5종 전투 스킬 → 영업 전용 스킬로 교체
-              - 신규 고용 셰프 풀 스킬 설계 (영업 특화)
-              - 스토리 동료(유키/라오/아르준 등)와 역할 분리 원칙 확립
+Phase 48-3: [기획] 셰프 스킬 재설계 ✅ 완료
               ↓
 Phase 49: [기획] 유랑 미력사 시스템 전체 설계 ✅ 완료
               - 고용 가능 미력사 40인 캐릭터 설계 (이름/세계관/스킬/등급)
@@ -232,33 +220,38 @@ Phase 50: [기획] 영업씬 재구성 설계 ✅ 완료
               - 렌더링 아키텍처 전환 결정: 컴포짓 occupied 폐기 → 3레이어 분리
               - 상세: SERVICE_SCENE_REDESIGN.md
               ↓
-Phase 51: Phase 48~50 기획 구현 (일부 완료)
-              Phase 51-4: 영업씬 배경 교체 ✅ 완료 (2026-04-18)
-                - 챕터별 홀 바닥 타일 8종 생성 (128×128 isometric, PixelLab)
-                - ServiceScene: _getHallFloorKey() / _getWallBackKey() 헬퍼
-                - add.image → add.tileSprite 전환
-                - 하단 바 색조 0x0d0d1a → 0x1c0e00
-                - QA 25/25 PASS
-              Phase 51-1~3: 미착수 (미력의 정수 구현, 유랑 미력사 시스템, 셰프 스킬)
+Phase 51: Phase 48~50 기획 구현 ✅ 완료 (2026-04-18)
+              Phase 51-1: 미력의 정수 코어 구현 (mireukEssence 화폐, mireuk_traveler NPC, HUD, 세이브 v18)
+              Phase 51-2: 유랑 미력사 고용 시스템 (8명 4등급, WanderingChefModal, 서비스씬 패시브 적용, 세이브 v19)
+              Phase 51-3: 셰프 스킬 재설계 (passiveDesc 교정, 미력사 버프 5종 실 연결, 요코 chain_serve)
+              Phase 51-4: 영업씬 배경 교체 (챕터별 홀 바닥 타일 8종, tileSprite 전환, QA 25/25 PASS)
               ↓
-Phase 52: 영업씬 렌더링 재구성 — 테이블 분리 + 손님 독립화 ⬅ 다음 목표
-              [에셋 생성]
-              - 테이블 lv0~lv4 앞면(_front) 5장 + 뒷면(_back) 5장 = 10장
-                lv0: 낡은 나무+플라스틱 의자 / lv1: 원목+나무 의자
-                lv2: 체크 식탁보+패딩 / lv3: 대리석+쿠션 / lv4: 크리스탈+벨벳
-                해상도: front 96×52, back 96×64 (의자 포함)
-              - 손님 5종 × 2상태(waiting/seated) = 10장 (48×64)
-                normal / vip / gourmet / rushed / group
-              - 바닥 타일 isometric 타입 재생성 (square_topdown 대체)
-              [코드 변경]
+Phase 52: 영업씬 렌더링 재구성 — 테이블 분리 + 손님 독립화 ✅ 완료 (2026-04-19)
+              - 테이블 lv0~lv4 앞면(_front) + 뒷면(_back) 10장 생성
+              - 손님 5종 × 2상태(waiting/seated) 10장 생성
+              - 바닥 타일 isometric 타입 재생성 (square_topdown → isometric)
               - SpriteLoader: table_lv{n}_back/front + customer_{t}_{s} 로드
               - ServiceScene._createTables(): 3레이어 분리 렌더링
-                depth = (col+row)*100 | +50(손님) | +99(앞면)
-              - fallback: _back 미로드 시 기존 _occupied 컴포짓 사용
-              [기대 효과]
-              - 손님 착석 시 테이블 앞면에 자연스럽게 가려지는 입체감
-              - 새 손님 추가 비용: 기존 5장 → 2장으로 감소
-              - 바닥/테이블/손님 원근감 통일
+              - depth = (col+row)*100 | +50(손님) | +99(앞면)
+              ↓
+Phase 53: 챕터별 홀 뒷벽 에셋 생성 + oni_herald 미니보스 에셋 ⬅ 다음 목표
+              [wall_back 8종 에셋 생성]
+              - wall_back_g1 / wall_back_bistro / wall_back_cantina / wall_back_dragon
+              - wall_back_dream / wall_back_endless / wall_back_izakaya / wall_back_spice
+              - 해상도: 512×80, PixelLab (또는 SD Forge), 챕터 테마별 배경 스타일
+              - ServiceScene: _getWallBackKey() fallback 대신 챕터별 에셋 로드
+              [oni_herald 미니보스 에셋]
+              - 현황: isMidBoss=true, bodyColor 도형 폴백으로 렌더링 중 (에셋 없음)
+              - PixelLab pro 64px chibi, 8방향, 보라-핑크 오니 전령 스타일
+              - BOSS_IDS에 oni_herald 추가 + BOSS_WALK_HASHES 등록
+              - assets/bosses/oni_herald/ 폴더 생성
+              ↓
+Phase 54: 치트 기능 구현 (개발자/테스트 전용)
+              - 치트 메뉴 UI (DevTools 또는 숨겨진 콘솔 패널)
+              - 골드/재료 즉시 지급, 스테이지 스킵, 세이브 조작
+              - 보스 즉사, 적 등장 제어, 웨이브 강제 완료
+              - 영업씬: 손님 즉시 서빙 완료, 메뉴 강제 주문
+              - 개발/QA 전용 플래그로 프로덕션 빌드에서 비활성화
 ```
 
 ---
