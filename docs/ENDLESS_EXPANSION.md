@@ -370,7 +370,7 @@ if (this._mission) { this._mission.reset(); this._mission = null; }
 
 ---
 
-## Phase 55-4: 테마 전환 + 업적 확장
+## Phase 55-4: 테마 전환 + 업적 확장 ✅ 완료 (2026-04-19)
 
 ### 개요
 
@@ -614,15 +614,15 @@ static updateEndlessNoLeakStreak(noLeak) { ... }
 - [x] 각 임무 보상이 올바르게 지급된다 (재료/정수/골드)
 - [x] 임무 미성공 시 아무 보상도 지급되지 않는다
 
-### Phase 55-4
-- [ ] 웨이브 21~30 ServiceScene에서 이자카야 배경이 표시된다
-- [ ] 웨이브 31~40에서 비스트로 배경이 표시된다
-- [ ] 웨이브 41+에서 spice→cantina→dream 3종이 10웨이브 단위로 순환한다
-- [ ] SaveManager SAVE_VERSION이 21이다
-- [ ] 기존 세이브(v20)가 v21로 정상 마이그레이션된다
-- [ ] 엔드리스 업적이 achievementData.js에 6개 존재한다
-- [ ] endless_wave100 조건이 bestWave 100 달성 시 해금된다
-- [ ] `reward: { mireukEssence: 50 }` 형식을 AchievementManager가 처리한다
+### Phase 55-4 ✅ PASS (QA 31/31)
+- [x] 웨이브 21~30 ServiceScene에서 이자카야 배경이 표시된다
+- [x] 웨이브 31~40에서 비스트로 배경이 표시된다
+- [x] 웨이브 41+에서 spice→cantina→dream 3종이 10웨이브 단위로 순환한다
+- [x] SaveManager SAVE_VERSION이 21이다
+- [x] 기존 세이브(v20)가 v21로 정상 마이그레이션된다
+- [x] 엔드리스 업적이 achievementData.js에 6개 존재한다
+- [x] endless_wave100 조건이 bestWave 100 달성 시 해금된다
+- [x] `reward: { mireukEssence: 50 }` 형식을 AchievementManager가 처리한다
 
 ---
 

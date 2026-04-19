@@ -1,5 +1,41 @@
 # Changelog
 
+## [Phase 55-4] 2026-04-19 -- 엔드리스 테마 전환 + 업적 확장 + SaveManager v21
+
+### Added
+
+- **`js/scenes/ServiceScene.js`**: 엔드리스 웨이브 구간별 배경 테마 전환
+  - `_endlessFloorKey(wave)` / `_endlessWallKey(wave)` static 헬퍼 2개 추가
+  - 1~20: endless, 21~30: izakaya, 31~40: bistro, 41+: spice/cantina/dream 10웨이브 단위 순환
+  - 신규 에셋 없이 기존 Phase 51-4/53 에셋 재활용
+- **`js/data/achievementData.js`**: 엔드리스 업적 4개 추가 (기존 2개 → 총 6개, 전체 34개)
+  - `endless_wave100`: 식란 정복자 (100웨이브 도달, 골드 3000)
+  - `endless_storm10`: 폭풍의 화신 (폭풍 10회 클리어, 코인 30)
+  - `endless_mission30`: 임무의 달인 (임무 30회 성공, 정수 50)
+  - `endless_no_leak10`: 무결 방어 (연속 10웨이브 무손실, 골드 2000)
+- **`js/managers/SaveManager.js`**: v21 마이그레이션
+  - SAVE_VERSION 20 → 21
+  - endless 객체에 `stormCount` / `missionSuccessCount` / `noLeakStreak` 필드 추가
+  - 헬퍼 3개: `incrementEndlessStormCount()`, `incrementEndlessMissionSuccess()`, `updateEndlessNoLeakStreak(noLeak)`
+- **`js/managers/AchievementManager.js`**: 신규 조건 타입 3개 처리
+  - `endless_storm_cleared`: stormCount와 threshold 비교
+  - `endless_mission_success`: missionSuccessCount와 threshold 비교
+  - `endless_no_leak_streak`: noLeakStreak와 threshold 비교
+- **`js/scenes/AchievementScene.js`**: `_claimReward`에 `reward.mireukEssence` 보상 타입 처리 추가
+
+### Changed
+
+- **`js/scenes/EndlessScene.js`**: `_waveLifeLeaked` 플래그 추가, `_onEndlessWaveCleared`에서 SaveManager 통계 헬퍼 호출 + AchievementManager.check 호출
+- **`js/scenes/ResultScene.js`**: 게임오버 시 신규 업적 3종(wave100/storm10/mission30) 체크 추가
+
+### Notes
+
+- `_endlessFloorKey`/`_endlessWallKey`에 NaN/undefined 입력 시 array[NaN]=undefined 반환 가능하나, ServiceScene `create()`에서 `data.endlessWave || 0` 방어 처리로 실 발생 불가 (QA LOW-ISSUE)
+- `endless_no_leak10` 업적은 매 웨이브 끝에 streak 갱신 후 즉시 체크되므로 연속 10웨이브 달성 시 즉시 해금
+- ResultScene에서도 업적 체크를 추가한 것은 게임오버 시점에 bestWave가 갱신되기 때문 (스펙 미명시, coder 판단으로 추가)
+- 스펙: `.claude/specs/2026-04-19-kc-phase55-4-report.md`
+- QA: `.claude/specs/2026-04-19-kc-phase55-4-qa.md`
+
 ## [Phase 55-3] 2026-04-19 -- 미력 폭풍 + 유랑 미력사 엔드리스 지원 + 정화 임무
 
 ### Added
