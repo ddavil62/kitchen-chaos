@@ -1,5 +1,49 @@
 # Changelog
 
+## [Phase 57] 2026-04-20 -- ChefSelectScene 가로 캐러셀 UI 개편
+
+### Added
+
+- **`assets/portraits/portrait_arjun.png`**: arjun_chef 전용 portrait 신규 생성 (SD Forge, 512x512, 투명 배경)
+  - 스펙은 픽셀아트 스타일을 요구했으나 애니메/일러스트 스타일로 생성됨 (기존 portrait과 스타일 불일치, 텍스처 로딩 이슈 해결 시 시각적 불일치 노출 예상)
+- **`js/scenes/ChefSelectScene.js`**: 가로 캐러셀 전면 재작성
+  - 신규 메서드: `_buildCarouselCards()`, `_buildCard()`, `_goToIndex()`, `_setupSwipe()`, `_updateSelectButton()`, `_buildArrowButtons()`, `_buildSelectButton()`, `_buildBottomControls()`
+  - `CHEF_PORTRAIT_MAP` 상수: 7종 셰프 ID -> portrait 텍스처 키 매핑
+  - 카드 크기: 260x380px, 중심 x=180, y=270 (스펙 y=287에서 17px 상향 튜닝)
+  - 좌우 peek 카드: 간격 280px (카드 260 + gap 20), alpha 0.45
+  - 화살표 버튼: x=22/338, y=270, 36x60px
+  - 스와이프: 임계값 50px, tween 220ms (Power2.easeOut)
+  - 순환(wrap): index < 0 -> 6, index > 6 -> 0
+  - 잠금 오버레이: alpha 0.75 검은 rect + 자물쇠 48px + unlockHint 텍스트
+  - 선택 버튼: 잠금 시 회색 비활성화, 해금 시 셰프 색상
+  - 초기 인덱스: 이전 선택 셰프 유지, 없으면 0
+
+### Changed
+
+- **`js/scenes/ChefSelectScene.js`**: 세로 목록 (cardHeight=76px, 7장 수직 배치) -> 가로 캐러셀 (260x380px 카드 1장 중앙 + 좌우 peek)
+- **`js/managers/SpriteLoader.js`**: PORTRAIT_IDS에 'arjun' 추가 (masala_guide는 DialogueScene 참조로 유지)
+  - 변경 전: `['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'masala_guide']`
+  - 변경 후: `['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'masala_guide', 'arjun']`
+- 하단 버튼 위치 미세 조정: "셰프 없이 시작" x=245 (스펙 240), "< 뒤로" x=62 (스펙 55)
+
+### Fixed
+
+- **`js/scenes/ChefSelectScene.js`**: `_startGame()` / `_onBack()` 씬 전환 중복 호출 방지 가드 추가 (`_transitioning` 플래그)
+
+### Known Issues
+
+- portrait/스프라이트 텍스처 Phaser 미로드로 전체 셰프 이모지 fallback 동작 중 (Phase 56부터 지속, Phase 57 코드 원인 아님)
+- portrait_arjun 스타일 불일치: 스펙은 픽셀아트 portrait 요구, 실제 생성은 애니메/일러스트 스타일
+- `pointerupoutside` 미처리: 캔버스 밖 pointer 해제 시 `_swiping` 상태 잔존 가능 (LOW)
+
+### Notes
+
+- QA 판정: PARTIAL (10개 수용 기준 중 7 PASS, 3 FAIL -- FAIL 3건 모두 Phase 56 이전부터 존재하는 텍스처 로딩 기존 이슈)
+- 카드 중심 y좌표: 스펙 287 -> 구현 270 (17px 상향, 360x640 화면 내 밸런스 튜닝)
+- 스펙: `.claude/specs/2026-04-20-kc-phase57-chef-carousel-spec.md`
+- 구현 리포트: `.claude/specs/2026-04-20-kc-phase57-coder-report.md`
+- QA: `.claude/specs/2026-04-20-kc-phase57-qa.md`
+
 ## [Phase 56] 2026-04-20 -- TD 셰프 시스템 Named 캐릭터 개편
 
 ### Added

@@ -138,6 +138,8 @@ export class ChefSelectScene extends Phaser.Scene {
    * 엔드리스 모드에서는 메뉴로, 일반 모드에서는 월드맵으로 복귀한다.
    */
   _onBack() {
+    if (this._transitioning) return;
+    this._transitioning = true;
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start(this._isEndless ? 'MenuScene' : 'WorldMapScene');
@@ -543,6 +545,10 @@ export class ChefSelectScene extends Phaser.Scene {
    * @private
    */
   _startGame(chefId) {
+    // 중복 호출 방지 (더블클릭, 연타 등)
+    if (this._transitioning) return;
+    this._transitioning = true;
+
     if (chefId) {
       ChefManager.selectChef(chefId);
     } else {
