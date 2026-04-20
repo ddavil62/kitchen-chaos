@@ -68,16 +68,16 @@ export class IngredientManager {
     const spriteKey = `ingredient_${type}`;
     if (SpriteLoader.hasTexture(this.scene, spriteKey)) {
       const icon = this.scene.add.image(0, 0, spriteKey);
-      // 32x32 → 20px 표시 크기
-      icon.setScale(20 / icon.width);
+      // 32x32 → 40px 표시 크기 (2x 확대)
+      icon.setScale(40 / icon.width);
       container.add(icon);
     } else {
-      const icon = this.scene.add.circle(0, 0, 10, data.color);
+      const icon = this.scene.add.circle(0, 0, 20, data.color);
       container.add(icon);
     }
 
-    const label = this.scene.add.text(0, 14, `×${count}`, {
-      fontSize: '10px', color: '#ffffff',
+    const label = this.scene.add.text(0, 24, `×${count}`, {
+      fontSize: '14px', color: '#ffffff',
       stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5, 0);
     container.add(label);

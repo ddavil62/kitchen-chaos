@@ -59,8 +59,8 @@ export class Tower extends Phaser.GameObjects.Container {
     if (hasSprite) {
       // ── 스프라이트 이미지 사용 ──
       const sprite = this.scene.add.image(0, 0, spriteKey);
-      // 타워: 68x68 → 32px
-      const targetSize = 32;
+      // 타워: 68x68 → 64px (2x 확대)
+      const targetSize = 64;
       const scale = targetSize / sprite.width;
       sprite.setScale(scale);
       this.add(sprite);
