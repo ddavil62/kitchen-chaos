@@ -57,7 +57,11 @@ export class WaveManager {
     this._totalToSpawn = 0;
 
     waveDef.enemies.forEach(group => {
-      for (let i = 0; i < group.count; i++) {
+      // Phase 58: 적 수 0.6배 압축 (최소 1마리, __pause__ 제외)
+      const count = group.type === '__pause__'
+        ? group.count
+        : Math.max(1, Math.round(group.count * 0.6));
+      for (let i = 0; i < count; i++) {
         const entry = { type: group.type, delay: group.interval };
         // Phase 26-1: hpOverride 스폰 파라미터 전달
         if (group.hpOverride) entry.hpOverride = group.hpOverride;
@@ -100,7 +104,7 @@ export class WaveManager {
    * @param {number} [gapMs=5000] - 웨이브 간 갭 (ms)
    * @returns {object[]} 단일 요소 배열 (WaveManager 생성자 형식)
    */
-  static mergeWaves(waves, gapMs = 5000) {
+  static mergeWaves(waves, gapMs = 2000) {
     const mergedEnemies = [];
     waves.forEach((wave, idx) => {
       // 두 번째 웨이브부터 갭 삽입
