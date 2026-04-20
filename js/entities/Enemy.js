@@ -227,8 +227,8 @@ export class Enemy extends Phaser.GameObjects.Container {
     // Phase 47-1: 초기 animState 설정
     this._animState = hasWalkAnim ? 'WALKING' : 'IDLE';
 
-    // Phase 12: 크기 25% 증가 (적: 28→35, 미니보스: 42, 보스: 40→50) → 2x 확대
-    const targetSize = isBoss ? 100 : (isMidBoss ? 84 : 70);
+    // Phase 12: 크기 25% 증가 (적: 28→35, 미니보스: 42, 보스: 40→50) → 3x 확대 (타일 채움)
+    const targetSize = isBoss ? 150 : (isMidBoss ? 126 : 105);
     // death 애니메이션 스케일 재조정에 사용 (프레임 크기 불일치 방어)
     this._targetSize = targetSize;
 
