@@ -450,12 +450,17 @@ export class WorldMapScene extends Phaser.Scene {
         .setStrokeStyle(borderWidth, borderColor);
       this._mapContainer.add(bgCircle);
 
-      // 3. 챕터 아이콘
+      // 3. 챕터 아이콘 (PNG 우선, 없으면 이모지 폴백)
       const iconAlpha = state.unlocked ? 1.0 : 0.4;
-      const iconText = this.add.text(x, y - 6, chapter.icon, {
-        fontSize: '26px',
-      }).setOrigin(0.5).setAlpha(iconAlpha);
-      this._mapContainer.add(iconText);
+      const iconKey = `chapter_icon_${chapter.id}`;
+      let iconObj;
+      if (this.textures.exists(iconKey)) {
+        iconObj = this.add.image(x, y - 6, iconKey).setDisplaySize(24, 24);
+      } else {
+        iconObj = this.add.text(x, y - 6, chapter.icon, { fontSize: '26px' }).setOrigin(0.5);
+      }
+      iconObj.setAlpha(iconAlpha);
+      this._mapContainer.add(iconObj);
 
       // 4. 챕터 번호 라벨
       const labelColor = state.unlocked ? chapter.themeColor : '#555555';

@@ -48,8 +48,9 @@ export class GameUI {
     s.add.rectangle(GAME_WIDTH / 2, 50, GAME_WIDTH, 2, 0xffa500).setDepth(20);
 
     // 골드
-    this.goldText = s.add.text(10, 10, '🪙 150', {
-      fontSize: '16px', color: '#ffd700', stroke: '#000', strokeThickness: 2,
+    s.add.image(18, 18, 'icon_gold').setDisplaySize(20, 20).setDepth(21);
+    this.goldText = s.add.text(32, 10, '150', {
+      fontSize: FONT_SIZE.ui, color: '#ffd700', stroke: '#000', strokeThickness: 2,
     }).setDepth(21);
 
     // 웨이브
@@ -58,8 +59,9 @@ export class GameUI {
     }).setOrigin(0.5, 0).setDepth(21);
 
     // 목숨
-    this.livesText = s.add.text(GAME_WIDTH - 10, 10, '❤️ 10', {
-      fontSize: '16px', color: '#ff4444', stroke: '#000', strokeThickness: 2,
+    s.add.image(GAME_WIDTH - 26, 18, 'icon_heart').setDisplaySize(20, 20).setDepth(21);
+    this.livesText = s.add.text(GAME_WIDTH - 10, 10, '10', {
+      fontSize: FONT_SIZE.ui, color: '#ff4444', stroke: '#000', strokeThickness: 2,
     }).setOrigin(1, 0).setDepth(21);
   }
 
@@ -218,8 +220,7 @@ export class GameUI {
    * @param {number} gold
    */
   setGold(gold) {
-    this.goldText.setText(`🪙 ${gold}`);
-    // 레시피 버튼 활성화 상태는 인벤토리 변경 시 갱신
+    this.goldText.setText(`${gold}`);
   }
 
   /**
@@ -227,7 +228,7 @@ export class GameUI {
    * @param {number} lives
    */
   setLives(lives) {
-    this.livesText.setText(`❤️ ${lives}`);
+    this.livesText.setText(`${lives}`);
   }
 
   /**

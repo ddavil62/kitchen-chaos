@@ -322,6 +322,7 @@ export class SpriteLoader {
     SpriteLoader._loadPortraits(scene);
     SpriteLoader._loadServiceAssets(scene);
     SpriteLoader._loadUIIcons(scene);           // Phase 57-2
+    SpriteLoader._loadChapterIcons(scene);      // Phase 57-4
   }
 
   /**
@@ -332,6 +333,19 @@ export class SpriteLoader {
   static _loadUIIcons(scene) {
     scene.load.image('icon_gold',  'assets/ui/icon_gold.png');
     scene.load.image('icon_heart', 'assets/ui/icon_heart.png');
+  }
+
+  /**
+   * 월드맵 챕터 노드 아이콘 13종 (Phase 57-4).
+   * ch1~ch12, ch14 (ch13/ch15+ 플레이스홀더는 제외).
+   * @param {Phaser.Scene} scene
+   * @private
+   */
+  static _loadChapterIcons(scene) {
+    const ids = ['ch1','ch2','ch3','ch4','ch5','ch6','ch7','ch8','ch9','ch10','ch11','ch12','ch14'];
+    for (const id of ids) {
+      scene.load.image(`chapter_icon_${id}`, `assets/ui/chapter-icons/chapter_icon_${id}.png`);
+    }
   }
 
   /**
