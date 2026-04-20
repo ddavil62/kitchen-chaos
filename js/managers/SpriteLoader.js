@@ -321,6 +321,17 @@ export class SpriteLoader {
     SpriteLoader._loadTilesets(scene);
     SpriteLoader._loadPortraits(scene);
     SpriteLoader._loadServiceAssets(scene);
+    SpriteLoader._loadUIIcons(scene);           // Phase 57-2
+  }
+
+  /**
+   * HUD·UI 아이콘 (Phase 57-2).
+   * @param {Phaser.Scene} scene
+   * @private
+   */
+  static _loadUIIcons(scene) {
+    scene.load.image('icon_gold',  'assets/ui/icon_gold.png');
+    scene.load.image('icon_heart', 'assets/ui/icon_heart.png');
   }
 
   /**

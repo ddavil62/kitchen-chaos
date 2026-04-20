@@ -389,10 +389,39 @@ export class WorldMapScene extends Phaser.Scene {
     // 그룹1=0, 그룹2=6, 그룹3=15 기준 절대 챕터 번호 계산
     const groupBaseChapter = this._currentGroup === 1 ? 1 : (this._currentGroup === 2 ? 7 : 16);
 
+    // 그룹 전체가 placeholder이면 단일 "?" 노드 1개만 표시
+    const allPlaceholder = chapters.every(ch => ch.theme === 'placeholder');
+    if (allPlaceholder) {
+      const cx = GAME_WIDTH / 2;
+      const cy = 297;
+      const circle = this.add.circle(cx, cy, 50, 0x1a1a1a).setStrokeStyle(2, 0x333333);
+      this._mapContainer.add(circle);
+      const qText = this.add.text(cx, cy - 10, '?', {
+        fontSize: '34px', color: '#444444', fontStyle: 'bold',
+      }).setOrigin(0.5);
+      this._mapContainer.add(qText);
+      const comingText = this.add.text(cx, cy + 26, '\ub354 \ub9ce\uc740 \uc774\uc57c\uae30\uac00\n\ucc3e\uc544\uc635\ub2c8\ub2e4', {
+        fontSize: '11px', color: '#444444', align: 'center',
+      }).setOrigin(0.5);
+      this._mapContainer.add(comingText);
+      return;
+    }
+
     chapters.forEach((chapter, idx) => {
       const pos = positions[idx];
       const state = chapterStates[idx];
       const { x, y } = pos;
+
+      // placeholder 챕터는 최소 "?" 노드만 표시
+      if (state.placeholder) {
+        const pCircle = this.add.circle(x, y, 28, 0x1a1a1a).setStrokeStyle(1, 0x333333);
+        this._mapContainer.add(pCircle);
+        const pText = this.add.text(x, y, '?', {
+          fontSize: '20px', color: '#3a3a3a', fontStyle: 'bold',
+        }).setOrigin(0.5);
+        this._mapContainer.add(pText);
+        return;
+      }
 
       // 1. 글로우 원 (진행중 전용)
       if (state.inProgress) {

@@ -3,7 +3,7 @@
  * 상단 HUD, 하단 타워 선택 패널, 재료 인벤토리, 조리소 패널을 관리한다.
  */
 
-import { GAME_WIDTH, GAME_HEIGHT, BOTTOM_UI_HEIGHT } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, BOTTOM_UI_HEIGHT, COLORS, FONT_SIZE } from '../config.js';
 import { TOWER_TYPES, RECIPES } from '../data/gameData.js';
 
 const BOTTOM_Y = GAME_HEIGHT - BOTTOM_UI_HEIGHT;
@@ -54,7 +54,7 @@ export class GameUI {
 
     // 웨이브
     this.waveText = s.add.text(GAME_WIDTH / 2, 10, '웨이브 0/5', {
-      fontSize: '14px', color: '#ffffff', stroke: '#000', strokeThickness: 2,
+      fontSize: FONT_SIZE.ui, color: '#ffffff', stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5, 0).setDepth(21);
 
     // 목숨
@@ -79,8 +79,8 @@ export class GameUI {
       .setDepth(20);
 
     // 구분선
-    s.add.rectangle(120, BOTTOM_Y + BOTTOM_UI_HEIGHT / 2, 2, BOTTOM_UI_HEIGHT - 10, 0x555555).setDepth(20);
-    s.add.rectangle(240, BOTTOM_Y + BOTTOM_UI_HEIGHT / 2, 2, BOTTOM_UI_HEIGHT - 10, 0x555555).setDepth(20);
+    s.add.rectangle(120, BOTTOM_Y + BOTTOM_UI_HEIGHT / 2, 2, BOTTOM_UI_HEIGHT - 10, COLORS.divider).setDepth(20);
+    s.add.rectangle(240, BOTTOM_Y + BOTTOM_UI_HEIGHT / 2, 2, BOTTOM_UI_HEIGHT - 10, COLORS.divider).setDepth(20);
 
     this._buildTowerPanel();
     this._buildInventoryPanel();
@@ -94,7 +94,8 @@ export class GameUI {
   _buildTowerPanel() {
     const s = this.scene;
     const towerIds = Object.keys(TOWER_TYPES);
-    const btnW = 36, btnH = 36;
+    const iconSize = 36; // 시각적 아이콘 크기
+    const hitSize  = 44; // WCAG 2.5.5 권장 터치 타겟
     const startX = 12;
     const y = BOTTOM_Y + 14;
 
@@ -104,24 +105,27 @@ export class GameUI {
 
     towerIds.forEach((id, i) => {
       const data = TOWER_TYPES[id];
-      const x = startX + i * (btnW + 4);
+      const cx = startX + hitSize / 2 + i * (hitSize + 4);
+      const cy = y + hitSize / 2;
 
-      // 버튼 배경
-      const bg = s.add.rectangle(x + btnW / 2, y + btnH / 2, btnW, btnH, 0x333333)
-        .setDepth(21).setInteractive({ useHandCursor: true });
+      // 시각적 배경 (36×36)
+      const bg = s.add.rectangle(cx, cy, iconSize, iconSize, 0x333333).setDepth(21);
 
       // 타워 색상 사각형
-      s.add.rectangle(x + btnW / 2, y + btnH / 2 - 4, 20, 20, data.color)
-        .setDepth(22);
+      s.add.rectangle(cx, cy - 4, 20, 20, data.color).setDepth(22);
 
       // 가격 텍스트
-      s.add.text(x + btnW / 2, y + btnH - 4, `${data.cost}g`, {
+      s.add.text(cx, cy + iconSize / 2 - 4, `${data.cost}g`, {
         fontSize: '9px', color: '#ffd700',
       }).setOrigin(0.5, 1).setDepth(22);
 
-      bg.on('pointerdown', () => this._selectTower(id));
-      bg.on('pointerover', () => bg.setFillStyle(0x555555));
-      bg.on('pointerout', () => {
+      // 히트박스 (44×44, 투명) — 터치 타겟 확장
+      const hit = s.add.rectangle(cx, cy, hitSize, hitSize, 0x000000, 0)
+        .setDepth(23).setInteractive({ useHandCursor: true });
+
+      hit.on('pointerdown', () => this._selectTower(id));
+      hit.on('pointerover', () => bg.setFillStyle(0x555555));
+      hit.on('pointerout', () => {
         bg.setFillStyle(this.selectedTowerType === id ? 0x885500 : 0x333333);
       });
 

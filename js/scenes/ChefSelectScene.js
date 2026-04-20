@@ -5,7 +5,7 @@
  * Phase 11-1: stageId='endless' 시 EndlessScene으로 전환.
  * Phase 11-3b: fadeIn 300ms 통일, 버튼 Disabled 팔레트 적용.
  * Phase 19-2: 5종 카드 리레이아웃 + 시즌2 셰프 잠금 표시.
- * Phase 56: 7종 Named 셰프 카드, 압축 레이아웃 (cardHeight 80, cardGap 5),
+ * Phase 56: 7종 Named 셰프 카드, 압축 레이아웃 (cardHeight 76, cardGap 4),
  *           잠금 조건 7종 분기, unlockHint 사용.
  * 360x640 레이아웃: 7장의 세로 배치 카드 + "셰프 없이 시작" 버튼.
  */
@@ -76,8 +76,8 @@ export class ChefSelectScene extends Phaser.Scene {
     // ── 셰프 카드 7장 (세로 압축 배치, Phase 56) ──
     const previousChef = ChefManager.getSelectedChef();
     const cardStartY = 45;
-    const cardHeight = 80;
-    const cardGap = 5;
+    const cardHeight = 76;
+    const cardGap = 4;
 
     /** @type {Phaser.GameObjects.Rectangle[]} */
     this._cardBgs = [];
@@ -94,8 +94,8 @@ export class ChefSelectScene extends Phaser.Scene {
       this._createChefCard(chef, cy, isSelected, locked);
     });
 
-    // ── 하단: "셰프 없이 시작" 버튼 (Phase 56: y → 630) ──
-    const skipY = 630;
+    // ── 하단: "셰프 없이 시작" 버튼 (Phase 56: y → 625) ──
+    const skipY = 625;
     // Phase 11-3b: Disabled 팔레트 적용
     const skipBtn = this.add.rectangle(GAME_WIDTH / 2, skipY, 200, 30, 0x444444)
       .setInteractive({ useHandCursor: true });
@@ -110,10 +110,10 @@ export class ChefSelectScene extends Phaser.Scene {
     skipBtn.on('pointerover', () => skipBtn.setFillStyle(0x666666));
     skipBtn.on('pointerout', () => skipBtn.setFillStyle(0x444444));
 
-    // ── 뒤로 가기 버튼 (Phase 56: y → 630) ──
-    const backBtn = this.add.rectangle(40, 630, 60, 28, 0x444444)
+    // ── 뒤로 가기 버튼 (Phase 56: y → 625) ──
+    const backBtn = this.add.rectangle(40, 625, 60, 28, 0x444444)
       .setInteractive({ useHandCursor: true });
-    this.add.text(40, 630, '< \uB4A4\uB85C', {
+    this.add.text(40, 625, '< \uB4A4\uB85C', {
       fontSize: '10px', color: '#cccccc',
     }).setOrigin(0.5);
 
@@ -143,7 +143,7 @@ export class ChefSelectScene extends Phaser.Scene {
 
   /**
    * 셰프 카드 생성.
-   * Phase 56: 카드 높이 80px, 폰트 축소, 잠금 로직 7종 분기, unlockHint 사용.
+   * Phase 56: 카드 높이 76px, 폰트 축소, 잠금 로직 7종 분기, unlockHint 사용.
    * @param {object} chef - CHEF_TYPES 항목
    * @param {number} cy - 카드 세로 중심
    * @param {boolean} isSelected - 이전 선택 셰프 여부
@@ -153,7 +153,7 @@ export class ChefSelectScene extends Phaser.Scene {
   _createChefCard(chef, cy, isSelected, isLocked) {
     const cx = GAME_WIDTH / 2;
     const cardW = 320;
-    const cardH = 80;
+    const cardH = 76;
 
     // ── 잠금 상태: 어두운 배경 + 회색 테두리 ──
     let bgColor, borderColor;

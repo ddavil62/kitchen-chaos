@@ -35,29 +35,20 @@ export class MenuScene extends Phaser.Scene {
       this.add.circle(o.x, o.y, o.r, o.c, o.a);
     });
 
-    // 타이틀
-    this.add.text(GAME_WIDTH / 2, 160, 'Kitchen', {
-      fontSize: '48px',
-      fontStyle: 'bold',
-      color: '#ffd700',
-      stroke: '#8b4500',
-      strokeThickness: 6,
-    }).setOrigin(0.5);
-
-    this.add.text(GAME_WIDTH / 2, 220, 'Chaos', {
-      fontSize: '48px',
-      fontStyle: 'bold',
-      color: '#ff6b35',
-      stroke: '#8b0000',
-      strokeThickness: 6,
-    }).setOrigin(0.5);
-
-    this.add.text(GAME_WIDTH / 2, 275, 'Tycoon', {
+    // 타이틀 블록 (Container로 단일 관리)
+    const titleBlock = this.add.container(GAME_WIDTH / 2, 220);
+    titleBlock.add(this.add.text(0, -60, 'Kitchen', {
+      fontSize: '48px', fontStyle: 'bold',
+      color: '#ffd700', stroke: '#8b4500', strokeThickness: 6,
+    }).setOrigin(0.5));
+    titleBlock.add(this.add.text(0, 0, 'Chaos', {
+      fontSize: '48px', fontStyle: 'bold',
+      color: '#ff6b35', stroke: '#8b0000', strokeThickness: 6,
+    }).setOrigin(0.5));
+    titleBlock.add(this.add.text(0, 55, 'Tycoon', {
       fontSize: '28px',
-      color: '#ffffff',
-      stroke: '#333333',
-      strokeThickness: 4,
-    }).setOrigin(0.5);
+      color: '#ffffff', stroke: '#333333', strokeThickness: 4,
+    }).setOrigin(0.5));
 
     // 부제목
     this.add.text(GAME_WIDTH / 2, 320, '주방을 지켜라!', {

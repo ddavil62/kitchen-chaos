@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-19
-> 기준: Phase 55-4 완료
+> 최종 업데이트: 2026-04-20
+> 기준: Phase 56 완료
 
 ---
 
@@ -61,6 +61,7 @@
 | Phase 55-1 | 엔드리스 모드 확장 기획서 (ENDLESS_EXPANSION.md, Phase 55-2~55-4 스펙) | ✅ 완료 |
 | Phase 55-3 | 미력 폭풍 + 유랑 미력사 엔드리스 지원 + 정화 임무 4종 (EndlessMissionManager 신규) | ✅ 완료 |
 | Phase 55-4 | 엔드리스 웨이브 구간별 배경 테마 전환 + 업적 4개 추가(총 34개) + SaveManager v21 | ✅ 완료 |
+| Phase 56 | TD 셰프 Named Character 개편 (7종) | ✅ 완료 |
 
 **현재 구현 완성도**: Phase 55-4 완료 (2026-04-19) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21).
 
@@ -305,4 +306,36 @@ Phase 55-4: 테마 전환 + 업적 확장 (full, none) ✅ 완료 (2026-04-19)
               - SaveManager: v21 마이그레이션 (stormCount/missionSuccessCount/noLeakStreak)
               - AchievementManager: 신규 조건 타입 3개 + mireukEssence 보상 처리
               - EndlessScene + ResultScene: 통계 헬퍼 호출 연동
+              ↓
+Phase 56: TD 셰프 Named Character 개편 (7종) ✅ 완료 (2026-04-20)
+              ↓
+Phase 57: UI Refactoring — 모바일 UX 개선 (2026-04-20~)
+              상세 기준: docs/UI-REFACTORING.md (Design Critique 기반 10개 항목)
+              ↓
+Phase 57-1: 색상·타입 토큰 정비 + 터치·가독성 Quick 수정 (quick, none)
+              - config.js: COLORS / FONT_SIZE 상수 추가 (#7)
+              - GameUI.js: 구분선 0x555555 → COLORS.divider (#9)
+              - GameUI.js: 타워 버튼 btnW/H 36 → 44px, 아이콘 내부 20px 분리 (#1)
+              - GameUI.js: 웨이브 텍스트 14px → 16px (#4)
+              - GameUI.js: 한국어 폰트 베이스라인 +4px workaround → lineHeight 공식화 (#10)
+              ↓
+Phase 57-2: HUD 이모지 → PNG 아이콘 (full, art+ui)
+              - assets/ui/icon_gold.png + icon_heart.png 생성 (PixelLab, 20×20)
+              - GameUI.js: 🪙/❤️ 이모지 text → image + 숫자 text 분리 (#2)
+              - setGold() / setLives(): 숫자 텍스트만 갱신하도록 수정
+              ↓
+Phase 57-3: 월드맵 미구현 챕터 정리 (quick, ui)
+              - WorldMapScene.js: theme:'placeholder' 챕터 → 그룹별 "?" 노드 1개로 통합 (#3)
+              - 그룹2: ch13·ch15 → 노드 1개 / 그룹3: ch16~ch24 → 노드 1개
+              ↓
+Phase 57-4: 챕터 아이콘 PNG화 (full, art+ui)
+              - assets/ui/chapter-icons/: 구현 챕터 12종 + "?" 1종 = 13장, 24×24px (PixelLab) (#6)
+              - WorldMapScene.js: icon 이모지 문자열 → add.image PNG 교체
+              ↓
+Phase 57-5: 하단 3패널 슬라이드업 분리 (full, ui)
+              - GameUI.js: _buildCookingPanel() → 슬라이드업 Container 분리 (#5)
+              - 재료 아이콘 터치 시 tweens.add로 조리소 오버레이 노출/숨김
+              ↓
+Phase 57-6: 타이틀 텍스트 통합 (quick, ui)
+              - MenuScene.js: Kitchen/Chaos/Tycoon 텍스트 3개 → TextStyle 단일 블록 (#8)
 ```

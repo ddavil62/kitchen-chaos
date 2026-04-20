@@ -210,6 +210,25 @@ export function buildWaypointsFromSegments(segments) {
 // ── 앱 버전 (Phase 11-3d) ──
 export const APP_VERSION = '1.0.0';
 
+// ── 색상 토큰 (Phase 57-1) ──
+export const COLORS = {
+  bg:        0x1a0a00,
+  primary:   0xff6b35,
+  accent:    0xffd700,
+  danger:    0xff4444,
+  divider:   0xffa500,
+  textMuted: 0xcccccc,
+};
+
+// ── 타입 스케일 (Phase 57-1) ──
+export const FONT_SIZE = {
+  display: '48px',
+  title:   '28px',
+  body:    '18px',
+  ui:      '16px',
+  caption: '14px',
+};
+
 // ── 게임 규칙 상수 ──
 export const STARTING_LIVES = 15;       // 라운드 시작 생명 수 (GatheringScene, EndlessScene)
 export const FRESHNESS_WINDOW_MS = 5000; // 재료 신선도 유지 시간 (ms) (Enemy, IngredientManager)
