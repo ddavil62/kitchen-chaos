@@ -12,15 +12,11 @@ import { ChefManager } from './ChefManager.js';
 import { UpgradeManager } from './UpgradeManager.js';
 import { SpriteLoader } from './SpriteLoader.js';
 
-// 드롭 아이템 자동 수거 대기 시간 (ms)
-const AUTO_COLLECT_DELAY = 8000;
-
 /**
  * @typedef {object} IngredientDrop
  * @property {Phaser.GameObjects.Container} container - 화면 표시 오브젝트
  * @property {string} type - 재료 타입 ID
  * @property {number} count - 수량 (신선 보너스 시 2)
- * @property {number} autoTimer - 자동 수거 타이머 (ms)
  */
 
 export class IngredientManager {
@@ -107,7 +103,7 @@ export class IngredientManager {
       this._collectDrop(drop);
     });
 
-    const drop = { container, type, count, autoTimer: AUTO_COLLECT_DELAY };
+    const drop = { container, type, count };
     this.drops.push(drop);
   }
 
@@ -157,20 +153,6 @@ export class IngredientManager {
       type: drop.type,
       count: drop.count,
     });
-  }
-
-  /**
-   * 매 프레임 업데이트 - 자동 수거 타이머.
-   * @param {number} delta - ms
-   */
-  update(delta) {
-    for (let i = this.drops.length - 1; i >= 0; i--) {
-      const drop = this.drops[i];
-      drop.autoTimer -= delta;
-      if (drop.autoTimer <= 0) {
-        this._collectDrop(drop);
-      }
-    }
   }
 
   /**

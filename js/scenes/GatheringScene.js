@@ -2131,8 +2131,6 @@ export class GatheringScene extends Phaser.Scene {
       if (proj.active) proj.update(delta);
     });
 
-    this.ingredientManager.update(delta);
-
     // 배달 도구 자동 수거
     this._updateDeliveryTowers(delta);
 
