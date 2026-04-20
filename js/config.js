@@ -210,6 +210,10 @@ export function buildWaypointsFromSegments(segments) {
 // ── 앱 버전 (Phase 11-3d) ──
 export const APP_VERSION = '1.0.0';
 
+// ── GameUI 하단 패널 (Phase 57-5) ──
+export const BOTTOM_UI_HEIGHT = 120;   // 하단 고정 패널 높이 (조리소 제외)
+export const COOK_PANEL_H    = 130;    // 슬라이드업 조리소 오버레이 높이
+
 // ── 색상 토큰 (Phase 57-1) ──
 export const COLORS = {
   bg:        0x1a0a00,

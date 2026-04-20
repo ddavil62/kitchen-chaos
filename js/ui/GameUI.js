@@ -3,7 +3,7 @@
  * 상단 HUD, 하단 타워 선택 패널, 재료 인벤토리, 조리소 패널을 관리한다.
  */
 
-import { GAME_WIDTH, GAME_HEIGHT, BOTTOM_UI_HEIGHT, COLORS, FONT_SIZE } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, BOTTOM_UI_HEIGHT, COOK_PANEL_H, COLORS, FONT_SIZE } from '../config.js';
 import { TOWER_TYPES, RECIPES } from '../data/gameData.js';
 
 const BOTTOM_Y = GAME_HEIGHT - BOTTOM_UI_HEIGHT;
@@ -24,6 +24,7 @@ export class GameUI {
     this._towerButtons = {};
     this._inventory = {};
     this._buffInfo = null;
+    this._cookPanelVisible = false;
 
     this._buildHUD();
     this._buildBottomPanel();
@@ -80,9 +81,8 @@ export class GameUI {
     s.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y, GAME_WIDTH, 2, 0xffa500)
       .setDepth(20);
 
-    // 구분선
+    // 구분선: 타워↔인벤토리 사이 (조리소는 슬라이드업 오버레이로 분리)
     s.add.rectangle(120, BOTTOM_Y + BOTTOM_UI_HEIGHT / 2, 2, BOTTOM_UI_HEIGHT - 10, COLORS.divider).setDepth(20);
-    s.add.rectangle(240, BOTTOM_Y + BOTTOM_UI_HEIGHT / 2, 2, BOTTOM_UI_HEIGHT - 10, COLORS.divider).setDepth(20);
 
     this._buildTowerPanel();
     this._buildInventoryPanel();
@@ -136,7 +136,8 @@ export class GameUI {
   }
 
   /**
-   * 재료 인벤토리 패널 (하단 중앙, 120~239px).
+   * 재료 인벤토리 패널 (하단 중앙~우측, 120~360px).
+   * 우측에 요리 트리거 버튼 포함 (Phase 57-5).
    * @private
    */
   _buildInventoryPanel() {
@@ -163,47 +164,132 @@ export class GameUI {
     s.add.text(panelX + 4, BOTTOM_Y + 84, '★ 빠른 처치 → 2배 드롭', {
       fontSize: '8px', color: '#aaaaaa',
     }).setDepth(21);
+
+    // ── 요리 트리거 버튼 (우측 고정) ──
+    const btnX = GAME_WIDTH - 28;
+    const btnY = BOTTOM_Y + BOTTOM_UI_HEIGHT / 2;
+
+    const cookBg = s.add.rectangle(btnX, btnY, 48, BOTTOM_UI_HEIGHT - 8, 0x2a1500)
+      .setStrokeStyle(2, COLORS.divider)
+      .setDepth(21)
+      .setInteractive({ useHandCursor: true });
+
+    s.add.text(btnX, btnY - 14, '요리', {
+      fontSize: '10px', color: '#ffaa00',
+    }).setOrigin(0.5).setDepth(22);
+
+    this._cookArrow = s.add.text(btnX, btnY + 10, '▲', {
+      fontSize: '14px', color: '#ffd700',
+    }).setOrigin(0.5).setDepth(22);
+
+    cookBg.on('pointerover', () => cookBg.setFillStyle(0x3a2500));
+    cookBg.on('pointerout',  () => cookBg.setFillStyle(0x2a1500));
+    cookBg.on('pointerdown', () => {
+      if (this._cookPanelVisible) {
+        this.hideCookingPanel();
+      } else {
+        this.showCookingPanel();
+      }
+    });
   }
 
   /**
-   * 조리소 패널 (하단 오른쪽, 240~360px).
+   * 조리소 슬라이드업 오버레이 생성 (Phase 57-5).
+   * 평상시 화면 아래에 숨겨두고, 요리 버튼 탭 시 BOTTOM_Y 바로 위로 슬라이드인.
    * @private
    */
   _buildCookingPanel() {
     const s = this.scene;
-    const panelX = 244;
 
-    s.add.text(panelX + 4, BOTTOM_Y + 4, '조리소', {
-      fontSize: '10px', color: '#ffaa00',
-    }).setDepth(21);
+    // 컨테이너 초기 위치: 화면 아래 (숨김)
+    this._cookOverlay = s.add.container(0, GAME_HEIGHT).setDepth(50);
 
+    // 배경
+    const bg = s.add.rectangle(
+      GAME_WIDTH / 2, COOK_PANEL_H / 2, GAME_WIDTH, COOK_PANEL_H, 0x1a0a00
+    ).setStrokeStyle(2, COLORS.divider);
+    this._cookOverlay.add(bg);
+
+    // 상단 경계선
+    this._cookOverlay.add(
+      s.add.rectangle(GAME_WIDTH / 2, 1, GAME_WIDTH, 2, COLORS.divider)
+    );
+
+    // 타이틀
+    this._cookOverlay.add(
+      s.add.text(8, 6, '조리소', { fontSize: '10px', color: '#ffaa00' })
+    );
+
+    // 닫기 버튼
+    const closeBtn = s.add.text(GAME_WIDTH - 16, 12, '✕', {
+      fontSize: '16px', color: '#888888',
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    closeBtn.on('pointerover', () => closeBtn.setColor('#ffffff'));
+    closeBtn.on('pointerout',  () => closeBtn.setColor('#888888'));
+    closeBtn.on('pointerdown', () => this.hideCookingPanel());
+    this._cookOverlay.add(closeBtn);
+
+    // 레시피 버튼
     this._recipeButtons = [];
-
     RECIPES.forEach((recipe, i) => {
-      const y = BOTTOM_Y + 18 + i * 32;
-
-      // 재료 표시 텍스트
+      const y = 24 + i * 32;
       const ingText = Object.entries(recipe.ingredients)
         .map(([id, cnt]) => `${id === 'carrot' ? '🥕' : '🥩'}×${cnt}`)
         .join(' ');
 
-      const btn = s.add.text(panelX + 4, y, `${ingText} → ${recipe.nameKo}`, {
-        fontSize: '9px', color: '#cccccc', stroke: '#000', strokeThickness: 1,
+      const btn = s.add.text(8, y, `${ingText} → ${recipe.nameKo}`, {
+        fontSize: '9px', color: '#666666', stroke: '#000', strokeThickness: 1,
         backgroundColor: '#333333',
         padding: { x: 3, y: 2 },
-      }).setDepth(22).setInteractive({ useHandCursor: true });
+      }).setInteractive({ useHandCursor: true });
 
       btn.on('pointerdown', () => this.onCook(recipe.id));
       btn.on('pointerover', () => btn.setColor('#ffffff'));
-      btn.on('pointerout', () => btn.setColor('#cccccc'));
+      btn.on('pointerout', () => {
+        btn.setColor(this._checkCanCook(recipe) ? '#ffff88' : '#666666');
+      });
 
+      this._cookOverlay.add(btn);
       this._recipeButtons.push({ btn, recipeId: recipe.id });
     });
 
     // 버프 상태 표시
-    this.buffText = s.add.text(panelX + 4, BOTTOM_Y + 100, '', {
+    this.buffText = s.add.text(8, 24 + RECIPES.length * 32 + 4, '', {
       fontSize: '8px', color: '#00ff88',
-    }).setDepth(22);
+    });
+    this._cookOverlay.add(this.buffText);
+  }
+
+  // ── 슬라이드업 패널 제어 ────────────────────────────────────
+
+  /**
+   * 조리소 오버레이를 BOTTOM_Y 바로 위로 슬라이드인.
+   */
+  showCookingPanel() {
+    if (this._cookPanelVisible) return;
+    this._cookPanelVisible = true;
+    if (this._cookArrow) this._cookArrow.setText('▼');
+    this.scene.tweens.add({
+      targets: this._cookOverlay,
+      y: BOTTOM_Y - COOK_PANEL_H,
+      duration: 250,
+      ease: 'Back.easeOut',
+    });
+  }
+
+  /**
+   * 조리소 오버레이를 화면 아래로 슬라이드아웃.
+   */
+  hideCookingPanel() {
+    if (!this._cookPanelVisible) return;
+    this._cookPanelVisible = false;
+    if (this._cookArrow) this._cookArrow.setText('▲');
+    this.scene.tweens.add({
+      targets: this._cookOverlay,
+      y: GAME_HEIGHT,
+      duration: 200,
+      ease: 'Cubic.easeIn',
+    });
   }
 
   // ── 업데이트 ────────────────────────────────────────────
@@ -264,7 +350,7 @@ export class GameUI {
   }
 
   /**
-   * 인벤토리 변경 시 재료 표시 갱신.
+   * 인벤토리 변경 시 재료 표시 + 레시피 버튼 색상 갱신.
    * @private
    */
   _onInventoryChanged(inventory) {
@@ -272,14 +358,22 @@ export class GameUI {
     this.carrotText.setText(`×${inventory.carrot || 0}`);
     this.meatText.setText(`×${inventory.meat || 0}`);
 
-    // 레시피 버튼 색상: 재료 충족 시 밝게
     this._recipeButtons.forEach(({ btn, recipeId }) => {
       const recipe = RECIPES.find(r => r.id === recipeId);
-      const canCook = Object.entries(recipe.ingredients).every(
-        ([id, cnt]) => (inventory[id] || 0) >= cnt
-      );
-      btn.setColor(canCook ? '#ffff88' : '#666666');
+      btn.setColor(this._checkCanCook(recipe) ? '#ffff88' : '#666666');
     });
+  }
+
+  /**
+   * 레시피 조리 가능 여부 확인.
+   * @private
+   * @param {object} recipe
+   * @returns {boolean}
+   */
+  _checkCanCook(recipe) {
+    return Object.entries(recipe.ingredients).every(
+      ([id, cnt]) => (this._inventory[id] || 0) >= cnt
+    );
   }
 
   /**
