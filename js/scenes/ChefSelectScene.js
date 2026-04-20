@@ -196,9 +196,9 @@ export class ChefSelectScene extends Phaser.Scene {
     const chefSpriteKey = `chef_${chef.id}`;
 
     if (portraitKey && SpriteLoader.hasTexture(this, portraitKey)) {
-      // portrait 이미지 100x100px 표시
+      // portrait 이미지 120x120px 표시
       const portrait = this.add.image(0, portraitY, portraitKey);
-      const targetSize = 100;
+      const targetSize = 120;
       const scaleX = targetSize / portrait.width;
       const scaleY = targetSize / portrait.height;
       const scale = Math.min(scaleX, scaleY);
