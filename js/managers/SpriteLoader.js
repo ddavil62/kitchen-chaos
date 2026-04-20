@@ -127,7 +127,7 @@ const INGREDIENT_IDS = Object.keys(INGREDIENT_FILE_MAP);
 // ── 걷기 애니메이션 폴더 해시 맵 (Phase 12) ──
 const ENEMY_WALK_HASHES = {
   butter_ghost: 'walking-166fb6f3',
-  carrot_goblin: 'walking-012372c9',
+  carrot_goblin: 'walking-6def8c8c',  // Phase 58: 92px 리뉴얼 (구: walking-012372c9 48px)
   cheese_golem: 'walking-e8ab7eac',
   cheese_rat: 'walking-15884a43',
   chili_demon: 'walking-98c5d521',
@@ -157,8 +157,8 @@ const ENEMY_WALK_HASHES = {
   sommelier_wraith: 'animating-7cb39ccd', // Phase 28-2 (92px, chibi)
   curry_djinn: 'animating-c40a2ab6',      // Phase 31-2 (164px, chibi)
   naan_golem: 'animating-33505870',       // Phase 31-2 (120px, chibi)
-  incense_specter: 'animating-7f60bab8',  // Phase 32-2 (176px, pro)
-  spice_elemental: 'animating-6e040724',  // Phase 32-2 (164px, pro)
+  incense_specter: 'walking-6d4f930d',    // Phase 58: 92px 리뉴얼 (구: animating-7f60bab8 176px)
+  spice_elemental: 'walking-201cc29e',    // Phase 58: 92px 리뉴얼 (구: animating-6e040724 164px)
   masala_guide: 'animating-3594d863',     // Phase 32-5 (108px, pro)
   taco_bandit: 'animating-a8a759af',      // Phase 33-2 (160px, pro)
   burrito_juggernaut: 'animating-ca0e68fa', // Phase 33-2 (172px, pro)

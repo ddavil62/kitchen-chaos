@@ -229,6 +229,8 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // Phase 12: 크기 25% 증가 (적: 28→35, 미니보스: 42, 보스: 40→50)
     const targetSize = isBoss ? 50 : (isMidBoss ? 42 : 35);
+    // death 애니메이션 스케일 재조정에 사용 (프레임 크기 불일치 방어)
+    this._targetSize = targetSize;
 
     if (hasWalkAnim) {
       // ── 걷기 애니메이션 스프라이트 사용 ──
@@ -1374,6 +1376,20 @@ export class Enemy extends Phaser.GameObjects.Container {
       // DYING 상태 전환: 이동/피격 차단
       this._animState = 'DYING';
       const deathAnimKey = `${deathPrefix}_${id}_death_${deathCheck.resolvedDir}`;
+
+      // walk 프레임과 death 프레임의 캔버스 크기가 다를 경우 스케일 재조정
+      // (예: carrot_goblin walk=48px, death=92px 불일치 방어)
+      const deathFrame0Key = `${deathPrefix}_${id}_death_${deathCheck.resolvedDir}_0`;
+      if (this.scene.textures.exists(deathFrame0Key)) {
+        const deathTex = this.scene.textures.get(deathFrame0Key);
+        const src = deathTex.source[0];
+        const deathW = src ? src.width : this._bodySprite.width;
+        if (deathW && deathW !== this._bodySprite.width) {
+          const tgt = this._targetSize ?? 35;
+          this._bodySprite.setScale(tgt / deathW);
+        }
+      }
+
       this._bodySprite.play(deathAnimKey, true);
 
       // 애니메이션 완료 후 실제 제거
