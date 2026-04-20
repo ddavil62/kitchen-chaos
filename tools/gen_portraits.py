@@ -71,8 +71,8 @@ CHARACTERS = [
     },
     {
         "id": "poco",
-        "prompt": f"(masterpiece, best quality, official art), cute chibi anime style, (upper body portrait:1.3), (pure white background:1.5), simple background, soft anime shading, clean lineart, 2d illustration, centered composition, (cat girl:1.3), nekomimi, (two pointy cat ears symmetrically on top of head:1.7), (ears not hidden by hair:1.5), short bob pink hair that does not cover ears, big expressive blue eyes, pink scarf, cute small vest, charming mischievous smile, waist up, directly facing viewer, front facing",
-        "negative": f"{BASE_NEG}, {NO_BG_DECO}, human only, no cat ears, full body, (one ear hidden:1.5), (ear covered by hair:1.5), side view, profile, asymmetrical, long hair covering ears",
+        "prompt": f"(masterpiece, best quality, official art), cute chibi anime style, (upper body portrait:1.3), (pure white background:1.5), simple background, soft anime shading, clean lineart, 2d illustration, centered composition, (cat girl:1.3), nekomimi, (two pink cat ears on top of head:1.5), (both ears visible:1.4), short pink hair, big blue eyes, blue scarf, small vest, cheerful smile, waist up, facing viewer",
+        "negative": f"nsfw, bad quality, worst quality, low quality, blurry, realistic, 3d, photo, dark background, complex background, lowres, bad anatomy, multiple views, full body, one ear hidden, asymmetrical ears, black ear, dark ear, green hair, blonde hair",
     },
 ]
 
@@ -87,11 +87,40 @@ def get_mimi_ref_b64():
     return base64.b64encode(buf.getvalue()).decode()
 
 
-def remove_bg(img_bytes):
+def remove_bg(img_bytes, model="u2net"):
     """rembg AI 배경 제거"""
-    from rembg import remove as rembg_remove
-    result = rembg_remove(img_bytes)
+    from rembg import remove as rembg_remove, new_session
+    session = new_session(model)
+    result = rembg_remove(img_bytes, session=session)
     return Image.open(io.BytesIO(result)).convert("RGBA")
+
+
+def remove_bg_floodfill(img_bytes, threshold=240):
+    """가장자리 flood-fill로 흰 배경만 제거 (연색 요소 보존)"""
+    from collections import deque
+    import numpy as np
+    img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
+    arr = np.array(img, dtype=np.uint8)
+    h, w = arr.shape[:2]
+    bg = np.zeros((h, w), dtype=bool)
+    q = deque()
+    for x in range(w):
+        for y in (0, h - 1):
+            if not bg[y, x] and arr[y, x, 0] > threshold and arr[y, x, 1] > threshold and arr[y, x, 2] > threshold:
+                bg[y, x] = True; q.append((y, x))
+    for y in range(h):
+        for x in (0, w - 1):
+            if not bg[y, x] and arr[y, x, 0] > threshold and arr[y, x, 1] > threshold and arr[y, x, 2] > threshold:
+                bg[y, x] = True; q.append((y, x))
+    while q:
+        cy, cx = q.popleft()
+        for dy, dx in ((-1,0),(1,0),(0,-1),(0,1)):
+            ny, nx = cy + dy, cx + dx
+            if 0 <= ny < h and 0 <= nx < w and not bg[ny, nx]:
+                if arr[ny, nx, 0] > threshold and arr[ny, nx, 1] > threshold and arr[ny, nx, 2] > threshold:
+                    bg[ny, nx] = True; q.append((ny, nx))
+    arr[bg, 3] = 0
+    return Image.fromarray(arr)
 
 
 def apply_bottom_fade(img_rgba, fade_start=0.83, fade_end=0.97):
@@ -137,7 +166,11 @@ def generate(char, mimi_ref_b64=None):
     img_bytes = base64.b64decode(resp.json()["images"][0])
 
     # 배경 제거 + 하단 페이드
-    result = remove_bg(img_bytes)
+    # poco는 flood-fill 방식 사용 (rembg가 밝은 귀를 배경으로 오인하는 문제 방지)
+    if cid == "poco":
+        result = remove_bg_floodfill(img_bytes, threshold=235)
+    else:
+        result = remove_bg(img_bytes)
     result = apply_bottom_fade(result)
 
     out_path = f"{OUT_DIR}/portrait_{cid}.png"
