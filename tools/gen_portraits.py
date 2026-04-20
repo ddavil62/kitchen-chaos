@@ -71,7 +71,7 @@ CHARACTERS = [
     },
     {
         "id": "poco",
-        "prompt": f"(masterpiece, best quality, official art), cute chibi anime style, (upper body portrait:1.3), white background, simple background, soft anime shading, clean lineart, 2d illustration, centered composition, (cat girl:1.3), nekomimi, white fluffy hair, cat ears, big expressive blue eyes, pink scarf, cute small vest, charming mischievous smile, waist up",
+        "prompt": f"(masterpiece, best quality, official art), cute chibi anime style, (upper body portrait:1.3), white background, simple background, soft anime shading, clean lineart, 2d illustration, centered composition, (cat girl:1.3), nekomimi, (two cat ears visible:1.5), both ears on top of head, white fluffy hair, big expressive blue eyes, pink scarf, cute small vest, charming mischievous smile, waist up, facing viewer",
         "negative": f"{BASE_NEG}, {NO_BG_DECO}, human only, no cat ears, full body",
     },
 ]
