@@ -126,29 +126,29 @@ const INGREDIENT_IDS = Object.keys(INGREDIENT_FILE_MAP);
 
 // ── 걷기 애니메이션 폴더 해시 맵 (Phase 12) ──
 const ENEMY_WALK_HASHES = {
-  butter_ghost: 'walking-166fb6f3',
+  butter_ghost: 'walking-26dbc106',     // Phase 58: 92px (구: walking-166fb6f3 48px)
   carrot_goblin: 'walking-6def8c8c',  // Phase 58: 92px 리뉴얼 (구: walking-012372c9 48px)
-  cheese_golem: 'walking-e8ab7eac',
-  cheese_rat: 'walking-15884a43',
-  chili_demon: 'walking-98c5d521',
-  egg_sprite: 'walking-53299222',
-  fish_knight: 'walking-32ddc272',
-  flour_ghost: 'walking-dafa8589',
-  meat_ogre: 'walking-dff9d5bc',
-  milk_phantom: 'walking-df77f532',
-  mushroom_scout: 'walking-5e4378eb',
-  octopus_mage: 'walking-c62120db',
-  rice_slime: 'walking-fe48e722',
-  shrimp_samurai: 'walking-52be561d',
-  sugar_fairy: 'walking-83b51e9e',
-  tomato_bomber: 'walking-0dd2efa9',
+  cheese_golem: 'walking-2047818a',  // Phase 58: 92px 리뉴얼 (구: walking-e8ab7eac 48px)
+  cheese_rat: 'walking-b6028e43',       // Phase 58: 92px (구: walking-15884a43 48px)
+  chili_demon: 'walking-a04147cb',  // Phase 58: 92px 리뉴얼 (구: walking-98c5d521 48px)
+  egg_sprite: 'walking-bc2a5aed',  // Phase 58: 92px 리뉴얼 (구: walking-53299222 48px)
+  fish_knight: 'walking-8f7c23b3',  // Phase 58: 92px 리뉴얼 (구: walking-32ddc272 48px)
+  flour_ghost: 'walking-79d3f8e7',  // Phase 58: 92px 리뉴얼 (구: walking-dafa8589 48px)
+  meat_ogre: 'walking-2bffc631',  // Phase 58: 92px 리뉴얼 (구: walking-dff9d5bc 48px)
+  milk_phantom: 'walking-126cf281',     // Phase 58: 92px (구: walking-df77f532 48px)
+  mushroom_scout: 'walking-c6b60e14',   // Phase 58: 92px (구: walking-5e4378eb 48px)
+  octopus_mage: 'walking-6fb8c0e7',  // Phase 58: 92px 리뉴얼 (구: walking-c62120db 48px)
+  rice_slime: 'walking-a2fc069d',  // Phase 58: 92px 리뉴얼 (구: walking-fe48e722 48px)
+  shrimp_samurai: 'walking-bfaf160f',   // Phase 58: 92px (구: walking-52be561d 48px)
+  sugar_fairy: 'walking-5af6b5c3',      // Phase 58: 92px (구: walking-83b51e9e 48px)
+  tomato_bomber: 'walking-55ce69da',    // Phase 58: 92px (구: walking-0dd2efa9 48px)
   sushi_ninja:          'walking-73e8aef5',   // Phase 47-3
   tempura_monk:         'walking-aaf52389',   // Phase 47-3
-  dumpling_warrior: 'animating-1e8cfa3d',  // Phase 21
+  dumpling_warrior: 'walking-13c0cc26',    // Phase 58: 92px (구: animating-1e8cfa3d 48px)
   mini_dumpling: 'animating-8123f320',     // Phase 21
-  wok_phantom: 'animating-4a4ef775',       // Phase 21
-  sake_specter: 'walking-e2f2a098',        // Phase 22-3
-  oni_minion:   'walking-3d25e8be',        // Phase 22-3
+  wok_phantom: 'walking-ca9d64ee',         // Phase 58: 92px (구: animating-4a4ef775 48px)
+  sake_specter: 'walking-61116124',        // Phase 58: 92px (구: walking-e2f2a098 68px)
+  oni_minion:   'walking-cedb398e',        // Phase 58: 92px (구: walking-3d25e8be 68px)
   shadow_dragon_spawn: 'walking-dde29672',  // Phase 25-2
   wok_guardian: 'walking-bc1aca17',         // Phase 25-2
   wine_specter: 'animating-aaf41951',      // Phase 27-2 (92px, chibi)
@@ -220,28 +220,28 @@ const WALK_FRAME_COUNT = 6;
 const ENEMY_DEATH_HASHES = {
   carrot_goblin:       'falling_backward-10a27983',  // Phase 47-1 파일럿
   // Phase 47-3: 일반 적 41종
-  meat_ogre:           'falling_backward-1dcb3925',
-  octopus_mage:        'falling_backward-a5626f46',
-  chili_demon:         'falling_backward-238579d1',
-  cheese_golem:        'falling_backward-f870b6a3',
-  flour_ghost:         'falling_backward-8e782eea',
-  egg_sprite:          'falling_backward-01e1a20f',
-  rice_slime:          'falling_backward-b01cd02f',
-  fish_knight:         'falling_backward-070b26eb',
-  mushroom_scout:      'falling_backward-3144afe7',
-  cheese_rat:          'falling_backward-ebbb6c57',
-  shrimp_samurai:      'falling_backward-bec5dc6a',
-  tomato_bomber:       'falling_backward-b04b417e',
-  butter_ghost:        'falling_backward-1199988e',
-  sugar_fairy:         'falling_backward-cd70b305',
-  milk_phantom:        'falling_backward-5cfc354e',
+  meat_ogre:           'falling_backward-3b46da94',  // Phase 58: 92px (구: falling_backward-1dcb3925 48px)
+  octopus_mage:        'falling_backward-75908049',  // Phase 58: 92px (구: falling_backward-a5626f46 48px)
+  chili_demon:         'falling_backward-e859c003',  // Phase 58: 92px (구: falling_backward-238579d1 48px)
+  cheese_golem:        'falling_backward-d87e9476',  // Phase 58: 92px (구: falling_backward-f870b6a3 48px)
+  flour_ghost:         'falling_backward-bb34e07c',  // Phase 58: 92px (구: falling_backward-8e782eea 48px)
+  egg_sprite:          'falling_backward-e832ce75',  // Phase 58: 92px (구: falling_backward-01e1a20f 48px)
+  rice_slime:          'falling_backward-61da2fd9',  // Phase 58: 92px (구: falling_backward-b01cd02f 48px)
+  fish_knight:         'falling_backward-fad77daa',  // Phase 58: 92px (구: falling_backward-070b26eb 48px)
+  mushroom_scout:      'falling_backward-eb8ca6ee',  // Phase 58: 92px (구: falling_backward-3144afe7 48px)
+  cheese_rat:          'falling_backward-866abb6f',  // Phase 58: 92px (구: falling_backward-ebbb6c57 48px)
+  shrimp_samurai:      'falling_backward-01bb1d13',  // Phase 58: 92px (구: falling_backward-bec5dc6a 48px)
+  tomato_bomber:       'falling_backward-f0d2aa6d',  // Phase 58: 92px (구: falling_backward-b04b417e 48px)
+  butter_ghost:        'falling_backward-19badcb6',  // Phase 58: 92px (구: falling_backward-1199988e 48px)
+  sugar_fairy:         'falling_backward-af88a469',  // Phase 58: 92px (구: falling_backward-cd70b305 48px)
+  milk_phantom:        'falling_backward-b5f212bc',  // Phase 58: 92px (구: falling_backward-5cfc354e 48px)
   sushi_ninja:         'falling_backward-036fb035',
   tempura_monk:        'falling_backward-ea0f855c',
-  dumpling_warrior:    'falling_backward-5adb5411',
+  dumpling_warrior:    'falling_backward-0344be11',  // Phase 58: 92px (구: falling_backward-5adb5411 48px)
   mini_dumpling:       'falling_backward-254f2d4c',
-  wok_phantom:         'falling_backward-fcb57ede',
-  sake_specter:        'falling_backward-5ec8cea7',
-  oni_minion:          'falling_backward-b07d776d',
+  wok_phantom:         'falling_backward-be00fd6f',  // Phase 58: 92px (구: falling_backward-fcb57ede 48px)
+  sake_specter:        'falling_backward-f030d5f0',  // Phase 58: 92px (구: falling_backward-5ec8cea7 68px)
+  oni_minion:          'falling_backward-91d3d636',  // Phase 58: 92px (구: falling_backward-b07d776d 68px)
   shadow_dragon_spawn: 'falling_backward-ba7cab6b',
   wok_guardian:        'falling_backward-b8766bba',
   wine_specter:        'falling_backward-01346db3',
