@@ -271,27 +271,27 @@ export class GatheringScene extends Phaser.Scene {
    */
   _createHUD() {
     const hudBg = this.add.rectangle(GAME_WIDTH / 2, HUD_HEIGHT / 2, GAME_WIDTH, HUD_HEIGHT, 0x1a1a2e);
-    hudBg.setDepth(100);
+    hudBg.setDepth(100).setScrollFactor(0);
 
     this.waveText = this.add.text(GAME_WIDTH / 2, 10, '\uC6E8\uC774\uBE0C 0/8', {
       fontSize: '13px', color: '#ffffff',
-    }).setOrigin(0.5, 0).setDepth(101);
+    }).setOrigin(0.5, 0).setDepth(101).setScrollFactor(0);
 
     this.livesText = this.add.text(GAME_WIDTH - 10, 10, `\u2764\uFE0F ${this.lives}`, {
       fontSize: '14px', color: '#ff4444',
-    }).setOrigin(1, 0).setDepth(101);
+    }).setOrigin(1, 0).setDepth(101).setScrollFactor(0);
 
     this.comboText = this.add.text(GAME_WIDTH / 2, 26, '', {
       fontSize: '11px', color: '#ffcc00', fontStyle: 'bold',
-    }).setOrigin(0.5, 0).setDepth(101);
+    }).setOrigin(0.5, 0).setDepth(101).setScrollFactor(0);
 
     // 메뉴(나가기) 버튼 — HUD 좌측 상단
     this._menuBtn = this.add.rectangle(18, HUD_HEIGHT / 2, 28, 26, 0x333355)
       .setDepth(101).setInteractive({ useHandCursor: true })
-      .setStrokeStyle(1, 0x6666aa);
+      .setStrokeStyle(1, 0x6666aa).setScrollFactor(0);
     this.add.text(18, HUD_HEIGHT / 2 - 2, '≡', {
       fontSize: '14px', color: '#ccccff',
-    }).setOrigin(0.5).setDepth(102);
+    }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
 
     this._menuBtn.on('pointerdown', () => this._showMenuPopup());
   }
@@ -320,22 +320,22 @@ export class GatheringScene extends Phaser.Scene {
     // 아이콘 배경 (둥근 사각형)
     this._skillBtnBg = this.add.rectangle(btnX, btnY + 10, 30, 30, 0x333355)
       .setDepth(101).setInteractive({ useHandCursor: true })
-      .setStrokeStyle(2, this._chefData.color);
+      .setStrokeStyle(2, this._chefData.color).setScrollFactor(0);
 
     // 셰프 아이콘
     this._skillBtnIcon = this.add.text(btnX, btnY + 6, this._chefData.icon, {
       fontSize: '14px',
-    }).setOrigin(0.5).setDepth(102);
+    }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
 
     // 쿨다운 오버레이 (어둡게)
     this._skillCooldownOverlay = this.add.rectangle(btnX, btnY + 10, 30, 30, 0x000000, 0.6)
-      .setDepth(103).setVisible(false);
+      .setDepth(103).setVisible(false).setScrollFactor(0);
 
     // 쿨다운 텍스트
     this._skillCooldownText = this.add.text(btnX, btnY + 14, '', {
       fontSize: '10px', color: '#ff8888', fontStyle: 'bold',
       stroke: '#000', strokeThickness: 2,
-    }).setOrigin(0.5).setDepth(104).setVisible(false);
+    }).setOrigin(0.5).setDepth(104).setVisible(false).setScrollFactor(0);
 
     // 클릭 이벤트 (pointerdown — 쿨다운 중엔 removeInteractive로 원천 차단)
     this._skillBtnBg.on('pointerdown', () => {
@@ -477,7 +477,7 @@ export class GatheringScene extends Phaser.Scene {
     this.add.rectangle(
       GAME_WIDTH / 2, TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2,
       GAME_WIDTH, TOWER_BAR_HEIGHT, 0x111122
-    ).setDepth(100);
+    ).setDepth(100).setScrollFactor(0);
   }
 
   /**
@@ -496,11 +496,11 @@ export class GatheringScene extends Phaser.Scene {
       const cx = 30 + i * 50;
       const bg = this.add.rectangle(cx, tabY, 46, 14,
         cat.id === this._activeTowerCategory ? 0x885500 : 0x333355
-      ).setDepth(101).setInteractive({ useHandCursor: true });
+      ).setDepth(101).setInteractive({ useHandCursor: true }).setScrollFactor(0);
 
       const label = this.add.text(cx, tabY, cat.label, {
         fontSize: '10px', color: '#ffffff',
-      }).setOrigin(0.5).setDepth(102);
+      }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
 
       bg.on('pointerdown', () => {
         if (this._activeTowerCategory === cat.id) return;
@@ -587,7 +587,7 @@ export class GatheringScene extends Phaser.Scene {
       });
 
       // 컨테이너로 묶어 한 번에 destroy 가능
-      const container = this.add.container(0, 0, [bg, name, countLabel]).setDepth(100);
+      const container = this.add.container(0, 0, [bg, name, countLabel]).setDepth(100).setScrollFactor(0, true);
       this._towerBarButtons.push({ container, bg, id });
     });
 
@@ -633,7 +633,7 @@ export class GatheringScene extends Phaser.Scene {
         this._activateBuffRecipe(recipe);
       });
 
-      const container = this.add.container(0, 0, [bg, name, ingLabel]).setDepth(100);
+      const container = this.add.container(0, 0, [bg, name, ingLabel]).setDepth(100).setScrollFactor(0, true);
       this._towerBarButtons.push({ container, bg, id: recipe.id });
     });
   }
@@ -719,12 +719,12 @@ export class GatheringScene extends Phaser.Scene {
     this.add.rectangle(
       GAME_WIDTH / 2, INGREDIENT_BAR_Y + INGREDIENT_BAR_HEIGHT / 2,
       GAME_WIDTH, INGREDIENT_BAR_HEIGHT, 0x0d0d1a
-    ).setDepth(100);
+    ).setDepth(100).setScrollFactor(0);
 
     // 타이틀
     this._ingredientBarTitle = this.add.text(10, INGREDIENT_BAR_Y + 4, '수집 현황:', {
       fontSize: '10px', color: '#aaaaaa',
-    }).setDepth(101);
+    }).setDepth(101).setScrollFactor(0);
 
     // 재료 아이콘+수량 텍스트 (동적 갱신)
     this._ingredientBarTexts = [];
@@ -740,7 +740,7 @@ export class GatheringScene extends Phaser.Scene {
 
       const text = this.add.text(x, y, `${INGREDIENT_TYPES[id].icon}0`, {
         fontSize: '11px', color: '#888888',
-      }).setDepth(101);
+      }).setDepth(101).setScrollFactor(0);
 
       this._ingredientBarTexts.push({ id, text });
     });
@@ -766,18 +766,60 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _setupInput() {
-    // 맵 영역 전체를 덮는 투명 히트 영역
+    // ── 카메라 경계 설정 (2x 타일: 맵이 화면보다 크므로 패닝 허용) ──
+    // 맵 범위: x [-300, 612], y [71, 755] (ORIGIN_X=180, ORIGIN_Y=107, HALF_W=48, HALF_H=36)
+    // scrollY 최대 = 755 - 480 = 275 → height = 275 + 640 = 915
+    this.cameras.main.setBounds(-300, 0, 916, 915);
+
+    // 맵 영역 전체를 덮는 투명 히트 영역 (화면 고정 — SF=0)
     const hitArea = this.add.rectangle(
       GAME_WIDTH / 2,
       GAME_AREA_Y + GAME_AREA_HEIGHT / 2,
       GAME_WIDTH,
       GAME_AREA_HEIGHT,
       0x000000, 0
-    ).setInteractive().setDepth(2);
+    ).setInteractive().setDepth(2).setScrollFactor(0);
+
+    // ── 드래그 vs 탭 감지 ──
+    let dragStartX = 0, dragStartY = 0;
+    let lastPointerX = 0, lastPointerY = 0;
+    const DRAG_THRESHOLD = 5;
+    this._mapDragActive = false;
+    this._mapIsDragging = false;
 
     hitArea.on('pointerdown', (pointer) => {
+      dragStartX = pointer.x;
+      dragStartY = pointer.y;
+      lastPointerX = pointer.x;
+      lastPointerY = pointer.y;
+      this._mapDragActive = true;
+      this._mapIsDragging = false;
+    });
+
+    this.input.on('pointermove', (pointer) => {
+      if (!pointer.isDown || !this._mapDragActive) return;
+      const dx = pointer.x - dragStartX;
+      const dy = pointer.y - dragStartY;
+      if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+        this._mapIsDragging = true;
+      }
+      if (this._mapIsDragging) {
+        this.cameras.main.scrollX -= (pointer.x - lastPointerX);
+        this.cameras.main.scrollY -= (pointer.y - lastPointerY);
+      }
+      lastPointerX = pointer.x;
+      lastPointerY = pointer.y;
+    });
+
+    hitArea.on('pointerup', (pointer) => {
+      this._mapDragActive = false;
+      if (this._mapIsDragging) {
+        this._mapIsDragging = false;
+        return;
+      }
       if (this.isGameOver || this.isVictory) return;
-      const { col, row } = worldToCell(pointer.x, pointer.y);
+      // worldX/worldY: 카메라 스크롤이 반영된 월드 좌표
+      const { col, row } = worldToCell(pointer.worldX, pointer.worldY);
       if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
         this._onCellTap(col, row);
       }
@@ -1851,14 +1893,14 @@ export class GatheringScene extends Phaser.Scene {
 
     // 웨이브 컨트롤 배경
     this.add.rectangle(cx, cy, GAME_WIDTH, WAVE_CONTROL_HEIGHT, 0x111122)
-      .setDepth(100);
+      .setDepth(100).setScrollFactor(0);
 
     this._waveBtnBg = this.add.rectangle(cx, cy, 160, 36, 0xff6b35)
-      .setDepth(115).setInteractive({ useHandCursor: true });
+      .setDepth(115).setInteractive({ useHandCursor: true }).setScrollFactor(0);
     this._waveBtnText = this.add.text(cx, cy, '\uC6E8\uC774\uBE0C \uC2DC\uC791 \u25B6', {
       fontSize: '15px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000000', strokeThickness: 3,
-    }).setOrigin(0.5).setDepth(116);
+    }).setOrigin(0.5).setDepth(116).setScrollFactor(0);
 
     this._waveBtnBg.on('pointerdown', () => {
       if (!this._waveBtnEnabled) return;
@@ -1935,7 +1977,7 @@ export class GatheringScene extends Phaser.Scene {
         stroke: '#000000', strokeThickness: 1,
       }).setOrigin(0.5).setDepth(102);
       this._orderContainer = this.add.container(0, 0, [this._orderBg, this._orderLabel])
-        .setDepth(101);
+        .setDepth(101).setScrollFactor(0, true);
     }
 
     this._orderContainer.setVisible(true);
@@ -2052,7 +2094,7 @@ export class GatheringScene extends Phaser.Scene {
 
     this._menuPopup = this.add.container(0, 0,
       [overlay, popBg, title, resumeBg, resumeLabel, exitBg, exitLabel],
-    ).setDepth(300);
+    ).setDepth(300).setScrollFactor(0, true);
 
     const close = () => {
       this._menuPopup?.destroy();
@@ -2089,7 +2131,7 @@ export class GatheringScene extends Phaser.Scene {
       stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(121);
 
-    this._messagePopup = this.add.container(0, 0, [bg, text]).setDepth(999);
+    this._messagePopup = this.add.container(0, 0, [bg, text]).setDepth(999).setScrollFactor(0, true);
 
     this.time.delayedCall(duration, () => {
       if (this._messagePopup) {

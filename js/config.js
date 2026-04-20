@@ -35,14 +35,14 @@ export const KITCHEN_PANEL_HEIGHT = 120;
 // ── 아이소메트릭 그리드 ──
 export const GRID_COLS = 9;
 export const GRID_ROWS = 10;        // Phase 7 확장: 8 → 10행 (타워 배치 공간 확대)
-export const CELL_W = 48;           // 셀 가로 (다이아몬드 대각선 가로 길이)
-export const CELL_H = 36;           // 셀 세로 (4:3 비율, 하이탑다운 시점)
-export const HALF_W = CELL_W / 2;   // 24
-export const HALF_H = CELL_H / 2;   // 18
+export const CELL_W = 96;           // 셀 가로 (2x 확대: 48→96)
+export const CELL_H = 72;           // 셀 세로 (2x 확대: 36→72)
+export const HALF_W = CELL_W / 2;   // 48
+export const HALF_H = CELL_H / 2;   // 36
 
 // 아이소메트릭 원점: 다이아몬드 그리드의 (0,0) 셀 중심
-// 9×10 그리드, CELL 48×36: 가로 408px(중앙 정렬, 모서리 약간 클리핑), 세로 ~342px
-// 맵 영역(40~480=440px) 내 세로 중앙 정렬
+// 9×10 그리드, CELL 96×72: 맵이 화면보다 커서 카메라 패닝 필요
+// ORIGIN_X=180: 초기 카메라(scrollX=0)가 맵 중앙을 보여준다
 export const ORIGIN_X = 180;
 export const ORIGIN_Y = 107;
 
