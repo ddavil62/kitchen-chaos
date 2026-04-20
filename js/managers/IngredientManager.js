@@ -121,7 +121,7 @@ export class IngredientManager {
    * @returns {number}
    */
   getMaxInventory() {
-    const base = 10;
+    const base = 50;
     return base + UpgradeManager.getFridgeBonus();
   }
 

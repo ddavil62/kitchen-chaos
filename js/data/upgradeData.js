@@ -11,10 +11,10 @@ export const UPGRADE_DEFS = {
   fridge: {
     id: 'fridge',
     nameKo: '냉장고 확장',
-    desc: '재료 최대 보유량 +2',
+    desc: '재료 최대 보유량 +20',
     maxLevel: 5,
-    costs: [15, 30, 50, 80, 120],
-    effectPerLevel: 2,          // +2 보유량/레벨
+    costs: [80, 160, 280, 420, 600],
+    effectPerLevel: 20,         // +20 보유량/레벨 (기본 50, 최대 150)
   },
   knife: {
     id: 'knife',
