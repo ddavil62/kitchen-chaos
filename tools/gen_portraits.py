@@ -13,16 +13,16 @@ OUT_DIR     = "C:/antigravity/kitchen-chaos/assets/portraits"
 # ── 공통 프롬프트 ──
 BASE_POS = (
     "(masterpiece, best quality, official art), cute chibi anime style, "
-    "(close-up bust portrait:1.2), white background, simple background, "
+    "(upper body portrait:1.3), white background, simple background, "
     "soft anime shading, big round eyes, detailed cute face, clean lineart, "
-    "2d illustration, smile, centered composition, face and shoulders in frame, "
-    "face occupies upper center of image, looking at viewer"
+    "2d illustration, smile, centered composition, "
+    "face and upper torso visible, waist up, looking at viewer"
 )
 BASE_NEG = (
     "nsfw, bad quality, worst quality, low quality, blurry, realistic, 3d, photo, "
-    "dark background, complex background, full body, chibi body, lowres, "
+    "dark background, complex background, chibi body, lowres, "
     "bad anatomy, bad hands, multiple views, "
-    "extreme close-up, zoomed in face only, face cropped, tilted portrait, off-center"
+    "extreme close-up, head only, face only, shoulders only, cropped at neck, off-center"
 )
 NO_BG_DECO = (
     "circular frame, circle background, ornamental background, decorative frame, "
@@ -35,9 +35,9 @@ NO_BG_DECO = (
 CHARACTERS = [
     {
         "id": "mimi",
-        "prompt": f"{BASE_POS}, 1girl, black short bob haircut, green chef apron over white dress shirt, small white chef hat, cheerful protagonist chef, green accent colors",
-        "negative": BASE_NEG,
-        "txt2img": True,   # 미미는 txt2img (레퍼런스 원본)
+        "prompt": f"{BASE_POS}, (pure white background:1.5), 1girl, (black hair:1.5), short bob haircut, green chef apron over white dress shirt, small white chef hat, cheerful protagonist chef",
+        "negative": f"{BASE_NEG}, {NO_BG_DECO}, green hair, colored hair",
+        "txt2img": True,
     },
     {
         "id": "rin",
@@ -61,8 +61,8 @@ CHARACTERS = [
     },
     {
         "id": "arjun",
-        "prompt": f"{BASE_POS}, (pure white background:1.5), 1boy, orange turban, short beard, warm dark skin, Indian spice chef, friendly confident smile, orange and saffron color scheme",
-        "negative": f"{BASE_NEG}, {NO_BG_DECO}",
+        "prompt": f"{BASE_POS}, (pure white background:1.5), 1boy, (orange dastar turban:1.4), short dark beard, warm dark skin, Indian spice chef, friendly confident smile, orange and saffron chef uniform",
+        "negative": f"{BASE_NEG}, {NO_BG_DECO}, no turban, bare head, headband only",
     },
     {
         "id": "mage",
@@ -71,7 +71,7 @@ CHARACTERS = [
     },
     {
         "id": "poco",
-        "prompt": f"(masterpiece, best quality, official art), cute chibi anime style, (close-up bust portrait:1.2), white background, simple background, soft anime shading, clean lineart, 2d illustration, centered composition, (cat girl:1.3), nekomimi, white fluffy hair, cat ears, big expressive blue eyes, pink scarf, cute small vest, charming mischievous smile, face fills upper frame",
+        "prompt": f"(masterpiece, best quality, official art), cute chibi anime style, (upper body portrait:1.3), white background, simple background, soft anime shading, clean lineart, 2d illustration, centered composition, (cat girl:1.3), nekomimi, white fluffy hair, cat ears, big expressive blue eyes, pink scarf, cute small vest, charming mischievous smile, waist up",
         "negative": f"{BASE_NEG}, {NO_BG_DECO}, human only, no cat ears, full body",
     },
 ]
