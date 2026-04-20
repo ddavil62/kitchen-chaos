@@ -46,7 +46,7 @@ export class GameUI {
 
     // 배경
     s.add.rectangle(GAME_WIDTH / 2, 25, GAME_WIDTH, 50, 0x1a0a00).setDepth(20);
-    s.add.rectangle(GAME_WIDTH / 2, 50, GAME_WIDTH, 2, 0xffa500).setDepth(20);
+    s.add.rectangle(GAME_WIDTH / 2, 50, GAME_WIDTH, 2, COLORS.divider).setDepth(20);
 
     // 골드
     s.add.image(18, 18, 'icon_gold').setDisplaySize(20, 20).setDepth(21);
@@ -78,7 +78,7 @@ export class GameUI {
     // 배경
     s.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_UI_HEIGHT / 2, GAME_WIDTH, BOTTOM_UI_HEIGHT, 0x2a1500)
       .setDepth(20);
-    s.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y, GAME_WIDTH, 2, 0xffa500)
+    s.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y, GAME_WIDTH, 2, COLORS.divider)
       .setDepth(20);
 
     // 구분선: 타워↔인벤토리 사이 (조리소는 슬라이드업 오버레이로 분리)

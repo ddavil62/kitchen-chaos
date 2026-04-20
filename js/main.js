@@ -5,13 +5,15 @@
  */
 
 import Phaser from 'phaser';
+import { FONT_PADDING_TOP } from './config.js';
 
 // ── 한글 폰트 윗줄 잘림 방지: 모든 Text에 기본 top padding 주입 ──
+// 보정값 근거: config.js FONT_PADDING_TOP 참조 (Phase 57-10)
 const _origTextFactory = Phaser.GameObjects.GameObjectFactory.prototype.text;
 Phaser.GameObjects.GameObjectFactory.prototype.text = function (x, y, text, style) {
   const s = style && typeof style === 'object' ? style : {};
   if (!s.padding) s.padding = {};
-  if (s.padding.top === undefined) s.padding.top = 4;
+  if (s.padding.top === undefined) s.padding.top = FONT_PADDING_TOP;
   return _origTextFactory.call(this, x, y, text, s);
 };
 

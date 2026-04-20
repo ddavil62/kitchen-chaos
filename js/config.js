@@ -210,6 +210,12 @@ export function buildWaypointsFromSegments(segments) {
 // ── 앱 버전 (Phase 11-3d) ──
 export const APP_VERSION = '1.0.0';
 
+// ── 한글 폰트 베이스라인 보정 (Phase 57-10) ──
+// Android Canvas2D에서 한글 ascender가 클리핑되는 현상 방지.
+// main.js의 전역 text 팩토리 패치에서 이 값을 padding.top으로 주입한다.
+// 측정 기준: Noto Sans KR 기준 ascender clip 최솟값 = 4px.
+export const FONT_PADDING_TOP = 4;
+
 // ── GameUI 하단 패널 (Phase 57-5) ──
 export const BOTTOM_UI_HEIGHT = 120;   // 하단 고정 패널 높이 (조리소 제외)
 export const COOK_PANEL_H    = 130;    // 슬라이드업 조리소 오버레이 높이
