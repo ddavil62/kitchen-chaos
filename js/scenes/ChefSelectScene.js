@@ -190,8 +190,8 @@ export class ChefSelectScene extends Phaser.Scene {
     bgGraphics.strokeRoundedRect(-CARD_W / 2, -CARD_H / 2, CARD_W, CARD_H, CARD_RADIUS);
     container.add(bgGraphics);
 
-    // ── Portrait / 스프라이트 / 이모지 (y = -130) ──
-    const portraitY = -130;
+    // ── Portrait / 스프라이트 / 이모지 (y = -95, 카드 상단 여백 확보) ──
+    const portraitY = -95;
     const portraitKey = CHEF_PORTRAIT_MAP[chef.id];
     const chefSpriteKey = `chef_${chef.id}`;
 
@@ -220,50 +220,50 @@ export class ChefSelectScene extends Phaser.Scene {
       container.add(iconText);
     }
 
-    // ── 셰프 이름 (y = -68) ──
-    const nameText = this.add.text(0, -68, chef.nameKo, {
+    // ── 셰프 이름 (y = -33) ──
+    const nameText = this.add.text(0, -33, chef.nameKo, {
       fontSize: '18px', fontStyle: 'bold',
       color: isLocked ? '#555555' : hexColor,
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     container.add(nameText);
 
-    // ── 구분선 (y = -50) ──
+    // ── 구분선 (y = -15) ──
     const divLine = this.add.graphics();
     divLine.fillStyle(chef.color, isLocked ? 0.2 : 0.4);
-    divLine.fillRect(-100, -50, 200, 1);
+    divLine.fillRect(-100, -15, 200, 1);
     container.add(divLine);
 
-    // ── 패시브 라벨 (y = -38) ──
-    const passiveLabel = this.add.text(0, -38, '\uD328\uC2DC\uBE0C:', {
+    // ── 패시브 라벨 (y = -3) ──
+    const passiveLabel = this.add.text(0, -3, '\uD328\uC2DC\uBE0C:', {
       fontSize: '11px', color: isLocked ? '#444444' : '#88cc88',
     }).setOrigin(0.5);
     container.add(passiveLabel);
 
-    // ── 패시브 설명 (y = -20) ──
-    const passiveDesc = this.add.text(0, -20, chef.passiveDesc, {
+    // ── 패시브 설명 (y = +15) ──
+    const passiveDesc = this.add.text(0, 15, chef.passiveDesc, {
       fontSize: '10px', color: isLocked ? '#444444' : '#aaaaaa',
       wordWrap: { width: 220 }, align: 'center',
     }).setOrigin(0.5, 0);
     container.add(passiveDesc);
 
-    // ── 스킬명 (y = +18) ──
-    const skillName = this.add.text(0, 18, chef.skillName, {
+    // ── 스킬명 (y = +53) ──
+    const skillName = this.add.text(0, 53, chef.skillName, {
       fontSize: '13px', fontStyle: 'bold',
       color: isLocked ? '#444444' : '#ffcc44',
     }).setOrigin(0.5);
     container.add(skillName);
 
-    // ── 스킬 설명 (y = +38) ──
-    const skillDesc = this.add.text(0, 38, chef.skillDesc, {
+    // ── 스킬 설명 (y = +73) ──
+    const skillDesc = this.add.text(0, 73, chef.skillDesc, {
       fontSize: '10px', color: isLocked ? '#444444' : '#cccccc',
       wordWrap: { width: 220 }, align: 'center',
     }).setOrigin(0.5, 0);
     container.add(skillDesc);
 
-    // ── 쿨다운 (y = +62) ──
+    // ── 쿨다운 (y = +97) ──
     const cooldownSec = chef.skillCooldown / 1000;
-    const cooldownText = this.add.text(0, 62, `\uCFE8\uB2E4\uC6B4: ${cooldownSec}\uCD08`, {
+    const cooldownText = this.add.text(0, 97, `\uCFE8\uB2E4\uC6B4: ${cooldownSec}\uCD08`, {
       fontSize: '10px', color: isLocked ? '#444444' : '#888888',
     }).setOrigin(0.5);
     container.add(cooldownText);
