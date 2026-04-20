@@ -123,7 +123,7 @@ function createDefault() {
     giftIngredients: {},     // 쿠폰으로 지급된 재료 (GatheringScene 진입 시 소비)
     // ── Phase 11-1 추가 ──
     endless: {
-      unlocked: false,            // 6-3 클리어 시 true
+      unlocked: false,            // 24-6 클리어 시 true
       bestWave: 0,                // 최고 도달 웨이브
       bestScore: 0,               // 최고 누적 골드
       bestCombo: 0,               // 최고 연속 콤보
@@ -195,8 +195,8 @@ export class SaveManager {
       coinsEarned = Math.max(1, Math.floor((coinByStars[stars] || 0) * 0.2));
     }
 
-    // ── Phase 11-1: 6-3 클리어 시 엔드리스 해금 ──
-    if (stageId === '6-3' && stars > 0) {
+    // ── Phase 11-1: 최종 스테이지(24-6) 클리어 시 엔드리스 해금 ──
+    if (stageId === '24-6' && stars > 0) {
       data.endless = data.endless || { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
       data.endless.unlocked = true;
     }
@@ -481,7 +481,7 @@ export class SaveManager {
   }
 
   /**
-   * 엔드리스 모드 해금 기록. 6-3 클리어 시 clearStage에서 자동 호출됨.
+   * 엔드리스 모드 해금 기록. 24-6 클리어 시 clearStage에서 자동 호출됨.
    */
   static unlockEndless() {
     const data = SaveManager.load();
@@ -1119,6 +1119,15 @@ export class SaveManager {
       data.endless.missionSuccessCount = data.endless.missionSuccessCount ?? 0;
       data.endless.noLeakStreak        = data.endless.noLeakStreak        ?? 0;
       data.version = 21;
+    }
+
+    // v21 → v22: 엔드리스 해금 조건 6-3 → 24-6 변경
+    if (data.version < 22) {
+      // 24-6을 클리어한 경우에만 해금 유지, 아니면 초기화
+      if (data.endless?.unlocked && !data.stages?.['24-6']?.cleared) {
+        data.endless.unlocked = false;
+      }
+      data.version = 22;
     }
 
     return data;

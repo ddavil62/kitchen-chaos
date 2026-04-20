@@ -588,7 +588,7 @@ export class WorldMapScene extends Phaser.Scene {
     } else {
       // 잠금된 경우
       this.add.rectangle(180, 575, 200, 36, 0x444444);
-      this.add.text(180, 575, '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (6-3 \uD074\uB9AC\uC5B4 \uD544\uC694)', {
+      this.add.text(180, 575, '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (24-6 \uD074\uB9AC\uC5B4 \uD544\uC694)', {
         fontSize: '12px',
         color: '#666666',
       }).setOrigin(0.5);
