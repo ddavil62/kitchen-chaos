@@ -210,9 +210,10 @@ export class ChefSelectScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0, 0.5);
 
-    // 패시브 설명 (Phase 56: 폰트 11->10)
+    // 패시브 설명 (Phase 56: 폰트 11->10, wordWrap으로 자물쇠 아이콘 겹침 방지)
     this.add.text(leftX + 10, cy - 10, `\uD328\uC2DC\uBE0C: ${chef.passiveDesc}`, {
       fontSize: '10px', color: textColor || '#88cc88',
+      wordWrap: { width: isLocked ? 238 : 260 },
     }).setOrigin(0, 0.5);
 
     // 스킬 이름 (Phase 56: 폰트 12->11)

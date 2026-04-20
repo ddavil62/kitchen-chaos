@@ -1503,9 +1503,17 @@ export class ServiceScene extends Phaser.Scene {
    */
   _getServicePassiveDesc(chefId) {
     switch (chefId) {
+      // Phase 56: Named 셰프 ID (구 ID도 하위 호환 유지)
+      case 'mimi_chef':
       case 'petit_chef': return '\uC870\uB9AC\uC2DC\uAC04 -15%';
+      case 'rin_chef':
       case 'flame_chef': return '\uAD6C\uC774 \uBCF4\uC0C1 +25%';
+      case 'mage_chef':
       case 'ice_chef': return '\uC778\uB0B4\uC2EC +20%';
+      case 'yuki_chef': return '\uC778\uB0B4\uC2EC +20%';
+      case 'lao_chef': return '\uB3C4\uAD6C \uACF5\uACA9\uB825 +15%';
+      case 'andre_chef': return '\uC591\uC2DD \uC694\uB9AC \uC218\uC775 +25%';
+      case 'arjun_chef': return '\uD5A5\uC2E0\uB8CC \uD0C0\uC6CC \uACF5\uACA9 \uC18D\uB3C4 +20%';
       default: return '';
     }
   }

@@ -1,5 +1,60 @@
 # Changelog
 
+## [Phase 56] 2026-04-20 -- TD 셰프 시스템 Named 캐릭터 개편
+
+### Added
+
+- **`js/data/chefData.js`**: 7종 Named 셰프로 전면 재정의
+  - `petit_chef` -> `mimi_chef` (미미): 재료 수거 범위 +30%, 조리시간 -15%, 스킬 "긴급 배달"
+  - `flame_chef` -> `rin_chef` (린): 화염 타워 피해 +20%, 그릴 수익 +25%, 스킬 "지옥 불꽃"
+  - `ice_chef` -> `mage_chef` (메이지): CC 지속 +25%, 디저트 수익 +20%, 스킬 "마법진 설탕"
+  - `andre_chef` (앙드레, 신규): 양식 수익 +25%, 팁 +15%, 스킬 "오마카세 코스"/"플랑베"
+  - `arjun_chef` (아르준, 신규): 향신료 타워 공속 +20%, 드롭률 +15%, 스킬 "마살라 폭풍"/"비밀 향신료"
+  - `CHEF_ORDER` 7종 갱신: mimi, rin, mage, yuki, lao, andre, arjun
+- **`js/managers/ChefManager.js`**: 신규 패시브 헬퍼 메서드 4개
+  - `getDessertRewardBonus()` (mage_chef: 1.20)
+  - `getTipBonus()` (andre_chef: 1.15)
+  - `getWesternRewardBonus()` (andre_chef: 1.25)
+  - `getSpiceAttackSpeedBonus()` (arjun_chef: 1.20)
+- **`js/managers/SaveManager.js`**: v23 마이그레이션
+  - `selectedChef` ID 매핑: petit_chef->mimi_chef, flame_chef->rin_chef, ice_chef->mage_chef
+  - SAVE_VERSION 21 -> 23
+- **`js/scenes/ServiceScene.js`**: `_getServicePassiveDesc()` 7종 분기 추가 (신규 ID 대응)
+- 에셋: 5종 셰프 TD 스프라이트 (8방향 픽셀아트)
+  - `assets/chefs/mimi_chef/`, `assets/chefs/rin_chef/`, `assets/chefs/mage_chef/` (v2), `assets/chefs/andre_chef/` (v2), `assets/chefs/arjun_chef/`
+
+### Changed
+
+- **`js/scenes/ChefSelectScene.js`**: 잠금 조건 7종 재작성
+  - mimi/rin/mage: 항상 해금
+  - yuki: season2Unlocked
+  - lao: season2Unlocked && chapter >= 10
+  - andre: season2Unlocked && chapter >= 13
+  - arjun: season3Unlocked && chapter >= 17
+  - 레이아웃 압축: cardHeight=76, cardGap=4, buttonY=625 (스펙 80/5/630에서 미세 조정)
+- **`js/managers/ChefManager.js`**: 기존 메서드 ID 교체
+  - getCollectRangeBonus: petit_chef -> mimi_chef
+  - getGrillDamageBonus: flame_chef -> rin_chef
+  - getCCDurationBonus: ice_chef -> mage_chef
+  - getCookTimeBonus: petit_chef -> mimi_chef
+  - getGrillRewardBonus: flame_chef -> rin_chef
+  - getPatienceBonus: ice_chef -> mage_chef
+  - getDropRateBonus: arjun_chef 드롭률 +15% 누적 추가
+- **`js/managers/SpriteLoader.js`**: CHEF_IDS 7종으로 갱신
+- **`js/devtools/DevHelper.js`**: selectedChef 기본값 `mimi_chef`로 변경
+
+### Notes
+
+- 스펙 대비 레이아웃 미세 조정: cardHeight 80->76, cardGap 5->4, buttonY 630->625 (360x640 화면 적합)
+- 이모지 아이콘 크기: 스펙 28px -> 구현 20px (이모지 폰트 기준, 스프라이트 스케일은 28px)
+- 수용 기준 #13 "손님 인내심 +20%"는 스펙 상세 설계 "디저트 요리 수익 +20%"로 구현 (상세 설계 기준이 정확)
+- 신규 패시브(dessertRewardBonus, tipBonus 등)는 ChefManager 헬퍼까지만 구현. ServiceScene/GatheringScene 실연동은 Phase 57 예정
+- 시각적 이슈 (LOW): mage_chef 패시브 텍스트 우측 잘림, arjun_chef 잠금 시 자물쇠 겹침
+- 스프라이트는 Phaser 텍스처 로드 경로 매핑 이슈로 이모지 fallback 동작 중 (기능에 영향 없음)
+- 기존 petit_chef/flame_chef/ice_chef 스프라이트 디렉토리는 레거시 보존
+- 스펙: `.claude/specs/2026-04-20-kc-phase56-scope.md`
+- QA: `.claude/specs/2026-04-20-kc-phase56-qa.md`
+
 ## [Phase 55-4] 2026-04-19 -- 엔드리스 테마 전환 + 업적 확장 + SaveManager v21
 
 ### Added

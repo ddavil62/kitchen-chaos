@@ -62,7 +62,7 @@ function buildDefault() {
     kitchenCoins: 0,
     upgrades: { fridge: 0, knife: 0, delivery_speed: 0, cook_training: 0 },
     unlockedRecipes: [],
-    selectedChef: 'petit_chef',
+    selectedChef: 'mimi_chef',
     cookingSlots: 2,
     tools: {
       pan: { count: 1, level: 1 },
