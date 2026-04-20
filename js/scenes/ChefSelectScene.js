@@ -1,13 +1,14 @@
 /**
- * @fileoverview 셰프 선택 씬.
+ * @fileoverview 셰프 선택 씬 — 가로 캐러셀 UI.
  * Phase 6: 스테이지 선택 후, 게임 시작 전에 셰프를 고르는 화면.
  * Phase 7: GameScene -> MarketScene 전환에 따라 씬 키 변경.
  * Phase 11-1: stageId='endless' 시 EndlessScene으로 전환.
  * Phase 11-3b: fadeIn 300ms 통일, 버튼 Disabled 팔레트 적용.
  * Phase 19-2: 5종 카드 리레이아웃 + 시즌2 셰프 잠금 표시.
- * Phase 56: 7종 Named 셰프 카드, 압축 레이아웃 (cardHeight 76, cardGap 4),
- *           잠금 조건 7종 분기, unlockHint 사용.
- * 360x640 레이아웃: 7장의 세로 배치 카드 + "셰프 없이 시작" 버튼.
+ * Phase 56: 7종 Named 셰프 카드, 압축 레이아웃, 잠금 조건 7종 분기, unlockHint 사용.
+ * Phase 57: 세로 목록 → 가로 캐러셀 전면 개편. 중앙 카드 260x380px,
+ *           좌우 스와이프 + 화살표 버튼, 순환(wrap) 탐색, portrait 통합.
+ * 360x640 레이아웃: 가로 캐러셀 카드 + "이 셰프로 시작" + "셰프 없이 시작" + 뒤로가기.
  */
 
 import Phaser from 'phaser';
@@ -17,6 +18,17 @@ import { ChefManager } from '../managers/ChefManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { STAGES } from '../data/stageData.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
+
+// ── 셰프 ID → portrait 텍스처 키 매핑 (Phase 57) ──
+const CHEF_PORTRAIT_MAP = {
+  mimi_chef:  'portrait_mimi',
+  rin_chef:   'portrait_rin',
+  mage_chef:  'portrait_mage',
+  yuki_chef:  'portrait_yuki',
+  lao_chef:   'portrait_lao',
+  andre_chef: 'portrait_andre',
+  arjun_chef: 'portrait_arjun',
+};
 
 /**
  * 셰프 잠금 여부 판별.
@@ -38,6 +50,17 @@ function isChefLocked(chefId, save) {
   }
 }
 
+// ── 레이아웃 상수 ──
+const CX = GAME_WIDTH / 2;        // 180
+const CARD_W = 260;
+const CARD_H = 380;
+const CARD_CY = 270;               // 캐러셀 카드 세로 중심
+const CARD_GAP = 280;              // 좌우 카드 간격 (카드폭 260 + 간격 20)
+const PEEK_ALPHA = 0.45;           // 비활성 카드 투명도
+const SWIPE_THRESHOLD = 50;        // 스와이프 임계값 (px)
+const TWEEN_DURATION = 220;        // 카드 전환 tween 시간 (ms)
+const CARD_RADIUS = 12;            // 카드 모서리 라운드
+
 export class ChefSelectScene extends Phaser.Scene {
   constructor() {
     super({ key: 'ChefSelectScene' });
@@ -48,87 +71,67 @@ export class ChefSelectScene extends Phaser.Scene {
    */
   create(data) {
     this.stageId = data?.stageId || '1-1';
-    // Phase 11-1: 엔드리스 모드 여부 판별
     this._isEndless = this.stageId === 'endless';
     const stageData = this._isEndless ? null : STAGES[this.stageId];
-    const stageName = this._isEndless ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC' : (stageData?.nameKo || this.stageId);
+    const stageName = this._isEndless
+      ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC'
+      : (stageData?.nameKo || this.stageId);
 
-    // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
+    // ── 씬 전환 fadeIn ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
-    // 배경
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0d0d1a);
+    // ── 배경 ──
+    this.add.rectangle(CX, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0d0d1a);
 
-    // ── 타이틀 (Phase 56: y 20→16) ──
-    this.add.text(GAME_WIDTH / 2, 16, '\uC170\uD504\uB97C \uC120\uD0DD\uD558\uC138\uC694', {
+    // ── 타이틀 ──
+    this.add.text(CX, 18, '\uC170\uD504\uB97C \uC120\uD0DD\uD558\uC138\uC694', {
       fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 3,
     }).setOrigin(0.5);
 
-    // ── 서브타이틀 (Phase 56: y 38→32) ──
+    // ── 서브타이틀 ──
     const subTitle = this._isEndless
       ? `${stageName}`
       : `\uC2A4\uD14C\uC774\uC9C0: ${this.stageId} ${stageName}`;
-    this.add.text(GAME_WIDTH / 2, 32, subTitle, {
+    this.add.text(CX, 37, subTitle, {
       fontSize: '11px', color: this._isEndless ? '#cc88ff' : '#aaaaaa',
     }).setOrigin(0.5);
 
-    // ── 셰프 카드 7장 (세로 압축 배치, Phase 56) ──
+    // ── 세이브 로드 & 셰프 데이터 준비 ──
+    this._save = SaveManager.load();
+    this._chefList = CHEF_ORDER.map(id => ({
+      chef: CHEF_TYPES[id],
+      locked: isChefLocked(id, this._save),
+    }));
+
+    // ── 초기 인덱스 결정 (이전 선택 셰프 → 0) ──
     const previousChef = ChefManager.getSelectedChef();
-    const cardStartY = 45;
-    const cardHeight = 76;
-    const cardGap = 4;
+    this._currentIndex = 0;
+    if (previousChef) {
+      const idx = CHEF_ORDER.indexOf(previousChef);
+      if (idx >= 0) this._currentIndex = idx;
+    }
 
-    /** @type {Phaser.GameObjects.Rectangle[]} */
-    this._cardBgs = [];
+    // ── 캐러셀 카드 구축 ──
+    this._buildCarouselCards();
 
-    // 잠금 판별용 세이브 로드
-    const save = SaveManager.load();
+    // ── 화살표 버튼 ──
+    this._buildArrowButtons();
 
-    CHEF_ORDER.forEach((chefId, i) => {
-      const chef = CHEF_TYPES[chefId];
-      const cy = cardStartY + i * (cardHeight + cardGap) + cardHeight / 2;
-      const isSelected = chefId === previousChef;
-      const locked = isChefLocked(chefId, save);
+    // ── 선택 버튼 ──
+    this._buildSelectButton();
 
-      this._createChefCard(chef, cy, isSelected, locked);
-    });
+    // ── 하단 컨트롤 ──
+    this._buildBottomControls();
 
-    // ── 하단: "셰프 없이 시작" 버튼 (Phase 56: y → 625) ──
-    const skipY = 625;
-    // Phase 11-3b: Disabled 팔레트 적용
-    const skipBtn = this.add.rectangle(GAME_WIDTH / 2, skipY, 200, 30, 0x444444)
-      .setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, skipY, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
-      fontSize: '12px', color: '#aaaaaa',
-      stroke: '#000', strokeThickness: 2,
-    }).setOrigin(0.5);
+    // ── 스와이프 이벤트 ──
+    this._setupSwipe();
 
-    skipBtn.on('pointerdown', () => {
-      this._startGame(null);
-    });
-    skipBtn.on('pointerover', () => skipBtn.setFillStyle(0x666666));
-    skipBtn.on('pointerout', () => skipBtn.setFillStyle(0x444444));
-
-    // ── 뒤로 가기 버튼 (Phase 56: y → 625) ──
-    const backBtn = this.add.rectangle(40, 625, 60, 28, 0x444444)
-      .setInteractive({ useHandCursor: true });
-    this.add.text(40, 625, '< \uB4A4\uB85C', {
-      fontSize: '10px', color: '#cccccc',
-    }).setOrigin(0.5);
-
-    backBtn.on('pointerdown', () => {
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
-        // Phase 11-1: 엔드리스에서 뒤로가기 시 메뉴로, 일반은 월드맵으로 복귀
-        this.scene.start(this._isEndless ? 'MenuScene' : 'WorldMapScene');
-      });
-    });
-    backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
-    backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
+    // ── 초기 위치 설정 (애니메이션 없이) ──
+    this._goToIndex(this._currentIndex, false);
   }
 
-  // ── 하드웨어 백버튼 (Phase 12) ──────────────────────────────────
+  // ── 하드웨어 백버튼 (Phase 12) ──
 
   /**
    * 하드웨어 뒤로가기 핸들러.
@@ -141,134 +144,398 @@ export class ChefSelectScene extends Phaser.Scene {
     });
   }
 
+  // ── 캐러셀 카드 빌드 ──
+
   /**
-   * 셰프 카드 생성.
-   * Phase 56: 카드 높이 76px, 폰트 축소, 잠금 로직 7종 분기, unlockHint 사용.
-   * @param {object} chef - CHEF_TYPES 항목
-   * @param {number} cy - 카드 세로 중심
-   * @param {boolean} isSelected - 이전 선택 셰프 여부
-   * @param {boolean} isLocked - 잠금 여부
+   * 7종 셰프 카드 Container 배열을 생성한다.
    * @private
    */
-  _createChefCard(chef, cy, isSelected, isLocked) {
-    const cx = GAME_WIDTH / 2;
-    const cardW = 320;
-    const cardH = 76;
+  _buildCarouselCards() {
+    /** @type {Phaser.GameObjects.Container[]} */
+    this._cards = [];
 
-    // ── 잠금 상태: 어두운 배경 + 회색 테두리 ──
-    let bgColor, borderColor;
-    if (isLocked) {
-      bgColor = 0x1a1a1a;
-      borderColor = 0x333333;
-    } else {
-      bgColor = isSelected ? 0x2a3a2a : 0x1a1a2a;
-      borderColor = isSelected ? chef.color : 0x444466;
+    for (let i = 0; i < this._chefList.length; i++) {
+      const { chef, locked } = this._chefList[i];
+      const card = this._buildCard(chef, locked);
+      // 카드는 중앙 기준으로 배치, _goToIndex에서 x 위치를 조정
+      card.setPosition(CX, CARD_CY);
+      this.add.existing(card);
+      this._cards.push(card);
     }
+  }
 
-    const bg = this.add.rectangle(cx, cy, cardW, cardH, bgColor)
-      .setStrokeStyle(2, borderColor);
+  /**
+   * 단일 셰프 카드 Container를 생성한다.
+   * @param {object} chef - CHEF_TYPES 항목
+   * @param {boolean} isLocked - 잠금 여부
+   * @returns {Phaser.GameObjects.Container}
+   * @private
+   */
+  _buildCard(chef, isLocked) {
+    const container = this.add.container(0, 0);
 
-    // 잠금 카드는 인터랙션 제거
-    if (!isLocked) {
-      bg.setInteractive({ useHandCursor: true });
-    }
-    this._cardBgs.push(bg);
+    // ── 셰프 색상 → CSS hex ──
+    const r = (chef.color >> 16) & 0xff;
+    const g = (chef.color >> 8) & 0xff;
+    const b = chef.color & 0xff;
+    const hexColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 
-    // 아이콘 + 이름
-    const leftX = cx - cardW / 2 + 20;
-    const textColor = isLocked ? '#555555' : null;  // 잠금 시 모든 텍스트 회색
+    // ── 카드 배경 (roundedRect) ──
+    const bgGraphics = this.add.graphics();
+    bgGraphics.fillStyle(0x1a1a2e, 1);
+    bgGraphics.fillRoundedRect(-CARD_W / 2, -CARD_H / 2, CARD_W, CARD_H, CARD_RADIUS);
+    bgGraphics.lineStyle(2, isLocked ? 0x333333 : chef.color, 1);
+    bgGraphics.strokeRoundedRect(-CARD_W / 2, -CARD_H / 2, CARD_W, CARD_H, CARD_RADIUS);
+    container.add(bgGraphics);
 
+    // ── Portrait / 스프라이트 / 이모지 (y = -130) ──
+    const portraitY = -130;
+    const portraitKey = CHEF_PORTRAIT_MAP[chef.id];
     const chefSpriteKey = `chef_${chef.id}`;
-    if (SpriteLoader.hasTexture(this, chefSpriteKey)) {
-      // 스프라이트 이미지 (Phase 56: 스케일 32->28)
-      const chefImg = this.add.image(leftX + 14, cy - 24, chefSpriteKey);
-      chefImg.setScale(28 / chefImg.width);
-      if (isLocked) chefImg.setAlpha(0.3);
+
+    if (portraitKey && SpriteLoader.hasTexture(this, portraitKey)) {
+      // portrait 이미지 100x100px 표시
+      const portrait = this.add.image(0, portraitY, portraitKey);
+      const targetSize = 100;
+      const scaleX = targetSize / portrait.width;
+      const scaleY = targetSize / portrait.height;
+      const scale = Math.min(scaleX, scaleY);
+      portrait.setScale(scale);
+      if (isLocked) portrait.setAlpha(0.3);
+      container.add(portrait);
+    } else if (SpriteLoader.hasTexture(this, chefSpriteKey)) {
+      // 스프라이트 fallback — 80px 고정 폭
+      const sprite = this.add.image(0, portraitY, chefSpriteKey);
+      sprite.setScale(80 / sprite.width);
+      if (isLocked) sprite.setAlpha(0.3);
+      container.add(sprite);
     } else {
-      // 이모지 fallback (Phase 56: 폰트 24->20)
-      const iconText = this.add.text(leftX, cy - 24, chef.icon, {
-        fontSize: '20px',
-      }).setOrigin(0, 0.5);
+      // 이모지 fallback
+      const iconText = this.add.text(0, portraitY, chef.icon, {
+        fontSize: '64px',
+      }).setOrigin(0.5);
       if (isLocked) iconText.setAlpha(0.3);
+      container.add(iconText);
     }
 
-    // 셰프 색상을 CSS hex 색상으로 변환
-    let hexColor;
-    if (isLocked) {
-      hexColor = '#555555';
-    } else {
-      const r = (chef.color >> 16) & 0xff;
-      const g = (chef.color >> 8) & 0xff;
-      const b = chef.color & 0xff;
-      hexColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-    }
-
-    // 셰프 이름 (Phase 56: 폰트 15->13)
-    this.add.text(leftX + 40, cy - 28, chef.nameKo, {
-      fontSize: '13px', fontStyle: 'bold',
-      color: hexColor,
+    // ── 셰프 이름 (y = -68) ──
+    const nameText = this.add.text(0, -68, chef.nameKo, {
+      fontSize: '18px', fontStyle: 'bold',
+      color: isLocked ? '#555555' : hexColor,
       stroke: '#000', strokeThickness: 2,
-    }).setOrigin(0, 0.5);
+    }).setOrigin(0.5);
+    container.add(nameText);
 
-    // 패시브 설명 (Phase 56: 폰트 11->10, wordWrap으로 자물쇠 아이콘 겹침 방지)
-    this.add.text(leftX + 10, cy - 10, `\uD328\uC2DC\uBE0C: ${chef.passiveDesc}`, {
-      fontSize: '10px', color: textColor || '#88cc88',
-      wordWrap: { width: isLocked ? 238 : 260 },
-    }).setOrigin(0, 0.5);
+    // ── 구분선 (y = -50) ──
+    const divLine = this.add.graphics();
+    divLine.fillStyle(chef.color, isLocked ? 0.2 : 0.4);
+    divLine.fillRect(-100, -50, 200, 1);
+    container.add(divLine);
 
-    // 스킬 이름 (Phase 56: 폰트 12->11)
-    this.add.text(leftX + 10, cy + 6, `\uC2A4\uD0AC: ${chef.skillName}`, {
-      fontSize: '11px', fontStyle: 'bold', color: textColor || '#ffcc44',
-    }).setOrigin(0, 0.5);
+    // ── 패시브 라벨 (y = -38) ──
+    const passiveLabel = this.add.text(0, -38, '\uD328\uC2DC\uBE0C:', {
+      fontSize: '11px', color: isLocked ? '#444444' : '#88cc88',
+    }).setOrigin(0.5);
+    container.add(passiveLabel);
 
-    // 스킬 설명 (Phase 56: 폰트 10->9)
-    this.add.text(leftX + 10, cy + 19, chef.skillDesc, {
-      fontSize: '9px', color: textColor || '#cccccc',
-    }).setOrigin(0, 0.5);
+    // ── 패시브 설명 (y = -20) ──
+    const passiveDesc = this.add.text(0, -20, chef.passiveDesc, {
+      fontSize: '10px', color: isLocked ? '#444444' : '#aaaaaa',
+      wordWrap: { width: 220 }, align: 'center',
+    }).setOrigin(0.5, 0);
+    container.add(passiveDesc);
 
-    // 쿨다운 표시 (Phase 56: 폰트 10->9)
+    // ── 스킬명 (y = +18) ──
+    const skillName = this.add.text(0, 18, chef.skillName, {
+      fontSize: '13px', fontStyle: 'bold',
+      color: isLocked ? '#444444' : '#ffcc44',
+    }).setOrigin(0.5);
+    container.add(skillName);
+
+    // ── 스킬 설명 (y = +38) ──
+    const skillDesc = this.add.text(0, 38, chef.skillDesc, {
+      fontSize: '10px', color: isLocked ? '#444444' : '#cccccc',
+      wordWrap: { width: 220 }, align: 'center',
+    }).setOrigin(0.5, 0);
+    container.add(skillDesc);
+
+    // ── 쿨다운 (y = +62) ──
     const cooldownSec = chef.skillCooldown / 1000;
-    this.add.text(leftX + 10, cy + 30, `\uCFE8\uB2E4\uC6B4: ${cooldownSec}\uCD08`, {
-      fontSize: '9px', color: textColor || '#888888',
-    }).setOrigin(0, 0.5);
-
-    // 선택 표시
-    if (isSelected && !isLocked) {
-      this.add.text(cx + cardW / 2 - 15, cy - 28, '\u2714', {
-        fontSize: '18px', color: '#44ff44',
-      }).setOrigin(1, 0.5);
-    }
+    const cooldownText = this.add.text(0, 62, `\uCFE8\uB2E4\uC6B4: ${cooldownSec}\uCD08`, {
+      fontSize: '10px', color: isLocked ? '#444444' : '#888888',
+    }).setOrigin(0.5);
+    container.add(cooldownText);
 
     // ── 잠금 오버레이 ──
     if (isLocked) {
-      // 자물쇠 아이콘 (카드 중앙)
-      this.add.text(cx + cardW / 2 - 30, cy, '\uD83D\uDD12', {
-        fontSize: '24px',
-      }).setOrigin(0.5).setAlpha(0.7);
+      const overlay = this.add.graphics();
+      overlay.fillStyle(0x000000, 0.75);
+      overlay.fillRoundedRect(-CARD_W / 2, -CARD_H / 2, CARD_W, CARD_H, CARD_RADIUS);
+      container.add(overlay);
 
-      // 해금 조건 텍스트 — chefData의 unlockHint 사용
-      const hintText = chef.unlockHint || '';
-      this.add.text(cx, cy + 32, hintText, {
-        fontSize: '9px', color: '#666666',
+      const lockIcon = this.add.text(0, -20, '\uD83D\uDD12', {
+        fontSize: '48px',
       }).setOrigin(0.5);
+      container.add(lockIcon);
 
-      return;  // 잠금 카드는 이벤트 바인딩 안 함
+      const hintText = chef.unlockHint || '';
+      const hint = this.add.text(0, 30, hintText, {
+        fontSize: '14px', color: '#aaaaaa',
+      }).setOrigin(0.5);
+      container.add(hint);
     }
 
-    // 클릭 이벤트
-    bg.on('pointerdown', () => {
-      ChefManager.selectChef(chef.id);
+    return container;
+  }
+
+  // ── 화살표 버튼 ──
+
+  /**
+   * 좌우 화살표 버튼을 생성한다.
+   * @private
+   */
+  _buildArrowButtons() {
+    // 왼쪽 '<'
+    const leftBtn = this.add.rectangle(22, CARD_CY, 36, 60, 0x333344, 0.8)
+      .setInteractive({ useHandCursor: true });
+    this.add.text(22, CARD_CY, '<', {
+      fontSize: '22px', fontStyle: 'bold', color: '#ffffff',
+    }).setOrigin(0.5);
+
+    leftBtn.on('pointerdown', () => {
+      const newIdx = this._currentIndex - 1 < 0 ? this._chefList.length - 1 : this._currentIndex - 1;
+      this._goToIndex(newIdx, true);
+    });
+    leftBtn.on('pointerover', () => leftBtn.setFillStyle(0x555566));
+    leftBtn.on('pointerout', () => leftBtn.setFillStyle(0x333344));
+
+    // 오른쪽 '>'
+    const rightBtn = this.add.rectangle(338, CARD_CY, 36, 60, 0x333344, 0.8)
+      .setInteractive({ useHandCursor: true });
+    this.add.text(338, CARD_CY, '>', {
+      fontSize: '22px', fontStyle: 'bold', color: '#ffffff',
+    }).setOrigin(0.5);
+
+    rightBtn.on('pointerdown', () => {
+      const newIdx = this._currentIndex + 1 >= this._chefList.length ? 0 : this._currentIndex + 1;
+      this._goToIndex(newIdx, true);
+    });
+    rightBtn.on('pointerover', () => rightBtn.setFillStyle(0x555566));
+    rightBtn.on('pointerout', () => rightBtn.setFillStyle(0x333344));
+  }
+
+  // ── 선택 버튼 ──
+
+  /**
+   * "이 셰프로 시작" 버튼을 생성한다.
+   * @private
+   */
+  _buildSelectButton() {
+    this._selectBtnBg = this.add.rectangle(CX, 549, 200, 40, 0x44cc44)
+      .setInteractive({ useHandCursor: true });
+    this._selectBtnText = this.add.text(CX, 549, '\uC774 \uC170\uD504\uB85C \uC2DC\uC791', {
+      fontSize: '14px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    this._selectBtnBg.on('pointerdown', () => {
+      const { chef, locked } = this._chefList[this._currentIndex];
+      if (locked) return;
       this._startGame(chef.id);
     });
-
-    bg.on('pointerover', () => {
-      bg.setFillStyle(0x2a2a3a);
+    this._selectBtnBg.on('pointerover', () => {
+      const { locked } = this._chefList[this._currentIndex];
+      if (!locked) {
+        this._selectBtnBg.setFillStyle(0x66ee66);
+      }
     });
-
-    bg.on('pointerout', () => {
-      bg.setFillStyle(bgColor);
+    this._selectBtnBg.on('pointerout', () => {
+      this._updateSelectButton();
     });
   }
+
+  /**
+   * 현재 인덱스에 맞게 선택 버튼 상태를 갱신한다.
+   * @private
+   */
+  _updateSelectButton() {
+    const { chef, locked } = this._chefList[this._currentIndex];
+    if (locked) {
+      this._selectBtnBg.setFillStyle(0x333333);
+      this._selectBtnText.setColor('#555555');
+      this._selectBtnText.setText('\uC7A0\uAE08\uB428');
+      this._selectBtnBg.disableInteractive();
+    } else {
+      this._selectBtnBg.setFillStyle(chef.color);
+      this._selectBtnText.setColor('#ffffff');
+      this._selectBtnText.setText('\uC774 \uC170\uD504\uB85C \uC2DC\uC791');
+      this._selectBtnBg.setInteractive({ useHandCursor: true });
+    }
+  }
+
+  // ── 하단 컨트롤 ──
+
+  /**
+   * "셰프 없이 시작" 버튼과 "< 뒤로" 버튼을 생성한다.
+   * @private
+   */
+  _buildBottomControls() {
+    // ── "셰프 없이 시작" 버튼 ──
+    const skipBtn = this.add.rectangle(245, 615, 160, 28, 0x444444)
+      .setInteractive({ useHandCursor: true });
+    this.add.text(245, 615, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
+      fontSize: '11px', color: '#aaaaaa',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    skipBtn.on('pointerdown', () => {
+      this._startGame(null);
+    });
+    skipBtn.on('pointerover', () => skipBtn.setFillStyle(0x666666));
+    skipBtn.on('pointerout', () => skipBtn.setFillStyle(0x444444));
+
+    // ── "< 뒤로" 버튼 ──
+    const backBtn = this.add.rectangle(62, 615, 80, 28, 0x444444)
+      .setInteractive({ useHandCursor: true });
+    this.add.text(62, 615, '< \uB4A4\uB85C', {
+      fontSize: '10px', color: '#cccccc',
+    }).setOrigin(0.5);
+
+    backBtn.on('pointerdown', () => {
+      this._onBack();
+    });
+    backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
+    backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
+  }
+
+  // ── 스와이프 처리 ──
+
+  /**
+   * pointerdown/pointermove/pointerup 이벤트로 스와이프를 구현한다.
+   * @private
+   */
+  _setupSwipe() {
+    this._swiping = false;
+    this._swipeStartX = 0;
+    this._swipeDragOffset = 0;
+
+    this.input.on('pointerdown', (/** @type {Phaser.Input.Pointer} */ pointer) => {
+      // tween 중에는 스와이프 시작 억제
+      if (this._tweening) return;
+      this._swiping = true;
+      this._swipeStartX = pointer.x;
+      this._swipeDragOffset = 0;
+    });
+
+    this.input.on('pointermove', (/** @type {Phaser.Input.Pointer} */ pointer) => {
+      if (!this._swiping) return;
+      const delta = pointer.x - this._swipeStartX;
+      this._swipeDragOffset = delta;
+      // 실시간으로 카드 위치를 오프셋만큼 이동
+      this._applyCardPositions(delta);
+    });
+
+    // pointerup — 캔버스 밖 포인터 해제도 처리
+    this.input.on('pointerup', (/** @type {Phaser.Input.Pointer} */ pointer) => {
+      if (!this._swiping) return;
+      this._swiping = false;
+      const delta = this._swipeDragOffset;
+
+      if (Math.abs(delta) >= SWIPE_THRESHOLD) {
+        // 스와이프 성공: 방향에 따라 인덱스 변경
+        let newIdx;
+        if (delta > 0) {
+          // 오른쪽 스와이프 → 이전 카드
+          newIdx = this._currentIndex - 1 < 0 ? this._chefList.length - 1 : this._currentIndex - 1;
+        } else {
+          // 왼쪽 스와이프 → 다음 카드
+          newIdx = this._currentIndex + 1 >= this._chefList.length ? 0 : this._currentIndex + 1;
+        }
+        this._goToIndex(newIdx, true);
+      } else {
+        // 스와이프 미달: 원위치 복귀
+        this._goToIndex(this._currentIndex, true);
+      }
+    });
+  }
+
+  // ── 카드 위치 관리 ──
+
+  /**
+   * 카드들의 위치를 현재 인덱스 기준으로 적용한다 (드래그 오프셋 포함).
+   * @param {number} dragOffset - 스와이프 드래그 오프셋 (px)
+   * @private
+   */
+  _applyCardPositions(dragOffset = 0) {
+    const total = this._cards.length;
+    for (let i = 0; i < total; i++) {
+      const card = this._cards[i];
+      // 인덱스 차이 계산 (순환 고려)
+      let diff = i - this._currentIndex;
+      // wrap: -3 ~ +3 범위로 정규화 (7장 기준)
+      if (diff > Math.floor(total / 2)) diff -= total;
+      if (diff < -Math.floor(total / 2)) diff += total;
+
+      const targetX = CX + diff * CARD_GAP + dragOffset;
+      card.setPosition(targetX, CARD_CY);
+
+      // 중앙 카드만 alpha 1, 나머지 peek
+      card.setAlpha(diff === 0 ? 1 : PEEK_ALPHA);
+      // depth로 중앙 카드를 앞에 표시
+      card.setDepth(diff === 0 ? 10 : 5 - Math.abs(diff));
+    }
+  }
+
+  /**
+   * 특정 인덱스로 캐러셀을 이동시킨다.
+   * @param {number} idx - 목표 인덱스
+   * @param {boolean} animate - tween 애니메이션 사용 여부
+   * @private
+   */
+  _goToIndex(idx, animate) {
+    // wrap 처리
+    const total = this._chefList.length;
+    if (idx < 0) idx = total - 1;
+    if (idx >= total) idx = 0;
+
+    this._currentIndex = idx;
+
+    if (!animate) {
+      this._applyCardPositions(0);
+      this._updateSelectButton();
+      return;
+    }
+
+    // tween으로 카드 위치 애니메이션
+    this._tweening = true;
+
+    for (let i = 0; i < this._cards.length; i++) {
+      const card = this._cards[i];
+      let diff = i - this._currentIndex;
+      if (diff > Math.floor(total / 2)) diff -= total;
+      if (diff < -Math.floor(total / 2)) diff += total;
+
+      const targetX = CX + diff * CARD_GAP;
+      const targetAlpha = diff === 0 ? 1 : PEEK_ALPHA;
+      const targetDepth = diff === 0 ? 10 : 5 - Math.abs(diff);
+
+      card.setDepth(targetDepth);
+
+      this.tweens.add({
+        targets: card,
+        x: targetX,
+        alpha: targetAlpha,
+        duration: TWEEN_DURATION,
+        ease: 'Power2',
+        onComplete: i === this._currentIndex ? () => {
+          this._tweening = false;
+          this._updateSelectButton();
+        } : undefined,
+      });
+    }
+  }
+
+  // ── 게임 시작 ──
 
   /**
    * 게임 시작 (셰프 선택 후).

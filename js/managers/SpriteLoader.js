@@ -275,8 +275,8 @@ const DEATH_DIR_FALLBACK = {
 /** death 애니메이션 프레임 수 (falling-back-death 템플릿 기준 7프레임) */
 const DEATH_FRAME_COUNT = 7;
 
-// ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가, Phase 27-1: andre, Phase 32-4: arjun 추가) ──
-const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'masala_guide'];
+// ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가, Phase 27-1: andre, Phase 32-4: masala_guide, Phase 57: arjun 추가) ──
+const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'masala_guide', 'arjun'];
 
 // ── 타일셋 ID 목록 (15종, Phase 33-2: cactus_cantina 추가) ──
 const TILESET_IDS = [
