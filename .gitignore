@@ -7,6 +7,9 @@ playwright-report/
 # 압축 파일
 *.zip
 
+# 에셋 교체 아카이브 (로컬 전용, 커밋 제외)
+assets/**/_archive/
+
 # OS 생성 파일
 .DS_Store
 Thumbs.db

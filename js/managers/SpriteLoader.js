@@ -146,26 +146,26 @@ const ENEMY_WALK_HASHES = {
   tempura_monk:         'walking-aaf52389',   // Phase 47-3
   dumpling_warrior: 'walking-13c0cc26',    // Phase 58: 92px (구: animating-1e8cfa3d 48px)
   mini_dumpling: 'animating-8123f320',     // Phase 21
-  wok_phantom: 'walking-ca9d64ee',         // Phase 58: 92px (구: animating-4a4ef775 48px)
+  wok_phantom: 'walking-42e907ce',         // Phase 59-4: 새 ZIP (구: walking-ca9d64ee)
   sake_specter: 'walking-61116124',        // Phase 58: 92px (구: walking-e2f2a098 68px)
   oni_minion:   'walking-cedb398e',        // Phase 58: 92px (구: walking-3d25e8be 68px)
-  shadow_dragon_spawn: 'walking-dde29672',  // Phase 25-2
-  wok_guardian: 'walking-bc1aca17',         // Phase 25-2
-  wine_specter: 'animating-aaf41951',      // Phase 27-2 (92px, chibi)
-  foie_gras_knight: 'animating-d9b31bcd', // Phase 27-2 (92px, chibi)
-  cellar_phantom: 'animating-387abc3e',   // Phase 28-2 (92px, chibi)
-  sommelier_wraith: 'animating-7cb39ccd', // Phase 28-2 (92px, chibi)
-  curry_djinn: 'animating-c40a2ab6',      // Phase 31-2 (164px, chibi)
-  naan_golem: 'animating-33505870',       // Phase 31-2 (120px, chibi)
+  shadow_dragon_spawn: 'animating-3f6fab85',  // Phase 59-4: 새 ZIP (구: walking-dde29672)
+  wok_guardian: 'animating-31e2e54f',         // Phase 59-4: 새 ZIP (구: walking-bc1aca17)
+  wine_specter: 'animating-01bb6261',      // Phase 59-4: 새 ZIP (구: animating-aaf41951)
+  foie_gras_knight: 'animating-0fa59ad7', // Phase 59-4: 새 ZIP (구: animating-d9b31bcd)
+  cellar_phantom: 'animating-bbac58ec',   // Phase 59-4: 새 ZIP (구: animating-387abc3e)
+  sommelier_wraith: 'animating-8a174a13', // Phase 59-4: 새 ZIP (구: animating-7cb39ccd)
+  curry_djinn: 'animating-57b6ea42',      // Phase 59-4: 새 ZIP (구: animating-c40a2ab6)
+  naan_golem: 'animating-9c73b120',       // Phase 59-4: 새 ZIP (구: animating-33505870)
   incense_specter: 'walking-6d4f930d',    // Phase 58: 92px 리뉴얼 (구: animating-7f60bab8 176px)
   spice_elemental: 'walking-201cc29e',    // Phase 58: 92px 리뉴얼 (구: animating-6e040724 164px)
-  masala_guide: 'animating-3594d863',     // Phase 32-5 (108px, pro)
-  taco_bandit: 'animating-a8a759af',      // Phase 33-2 (160px, pro)
-  burrito_juggernaut: 'animating-ca0e68fa', // Phase 33-2 (172px, pro)
-  cactus_wraith: 'animating-377c9fa7',    // Phase 34-2 (216px, pro)
-  luchador_ghost: 'animating-0469ac97',  // Phase 34-2 (252px, pro)
-  candy_soldier: 'walking-4afaa9df',     // Phase 36-2 (22장 슈가 드림랜드)
-  cake_witch: 'walking-076ead3d',        // Phase 36-2 (22장 슈가 드림랜드)
+  masala_guide: 'animating-0c482b82',     // Phase 59-4: 새 ZIP (구: animating-3594d863)
+  taco_bandit: 'animating-56e93148',      // Phase 59-4: 새 ZIP (구: animating-a8a759af)
+  burrito_juggernaut: 'animating-95c9c6c4', // Phase 59-4: 새 ZIP (구: animating-ca0e68fa)
+  cactus_wraith: 'animating-e8f6f2da',    // Phase 59-4: 새 ZIP (구: animating-377c9fa7)
+  luchador_ghost: 'animating-bd76c5a1',  // Phase 59-4: 새 ZIP (구: animating-0469ac97)
+  candy_soldier: 'animating-fd901db6',     // Phase 59-4: 새 ZIP (구: walking-4afaa9df)
+  cake_witch: 'animating-739689cb',        // Phase 59-4: 새 ZIP (구: walking-076ead3d)
   macaron_knight: 'walking-532f38a1',    // Phase 47-3
   sugar_specter:  'walking-2cf239b9',    // Phase 47-3
 };
@@ -191,18 +191,18 @@ const BOSS_DEATH_HASHES = {
 };
 
 const BOSS_WALK_HASHES = {
-  cuisine_god: 'walking-a3de1caf',  // Phase 47-3: 8방향 완성 (84e4ae22의 north + a3de1caf의 7방향 합산)
-  dragon_ramen: 'walking-dcd66668',
-  lava_dessert_golem: 'walking-5514895b',
-  master_patissier: 'walking-b21b062a',
-  pasta_boss: 'walking-49c92768',
-  seafood_kraken: 'walking-f85ec5ca',
+  cuisine_god: 'animating-a4934f99',  // Phase 59-4: 새 ZIP (구: walking-a3de1caf)
+  dragon_ramen: 'animating-9d38e07f', // Phase 59-4: 새 ZIP (구: walking-dcd66668)
+  lava_dessert_golem: 'animating-716b746e', // Phase 59-4: 새 ZIP (구: walking-5514895b)
+  master_patissier: 'animating-911ef277',   // Phase 59-4: 새 ZIP (구: walking-b21b062a)
+  pasta_boss: 'animating-f3dd488a',         // Phase 59-4: 새 ZIP (구: walking-49c92768)
+  seafood_kraken: 'animating-a59183f6',     // Phase 59-4: 새 ZIP (구: walking-f85ec5ca)
   sake_oni: 'walking-910cce10',  // Phase 47-3
-  dragon_wok: 'animating-30e6c64f',     // Phase 26-1 신규 스프라이트 (기존 animating-8efd2218 교체)
-  sake_master: 'animating-8d3d020e',   // Phase 26-1 신규
-  chef_noir: 'animating-96100c0f',     // Phase 29-1 (pro 모드, 124px canvas)
-  maharaja: 'animating-2c666ada',     // Phase 32-5 (pro 모드, 212px canvas)
-  el_diablo_pepper: 'walking-acae25f3', // Phase 35-2 (pro 모드, 116px canvas)
+  dragon_wok: 'animating-45def3b2',     // Phase 59-4: 새 ZIP (구: animating-30e6c64f)
+  sake_master: 'animating-72975717',    // Phase 59-4: 새 ZIP (구: animating-8d3d020e)
+  chef_noir: 'animating-b1abb9f5',      // Phase 59-4: 새 ZIP (구: animating-96100c0f)
+  maharaja: 'animating-4971401e',       // Phase 59-4: 새 ZIP (구: animating-2c666ada)
+  el_diablo_pepper: 'animating-546539e4', // Phase 59-4: 새 ZIP (구: walking-acae25f3)
   // Phase 38-1: queen_of_taste 3페이즈 스프라이트 (136px/116px/112px canvas)
   queen_of_taste:   'walking-d0fa0cc7',  // Phase 47-3
   oni_herald:       'walking-7ae1e13e',   // Phase 53: 미니보스 walk (92x92px)
@@ -327,12 +327,18 @@ export class SpriteLoader {
 
   /**
    * HUD·UI 아이콘 (Phase 57-2).
+   * Phase 58-2: 행상인 분기 카드 카테고리 배지 4종 추가.
    * @param {Phaser.Scene} scene
    * @private
    */
   static _loadUIIcons(scene) {
     scene.load.image('icon_gold',  'assets/ui/icon_gold.png');
     scene.load.image('icon_heart', 'assets/ui/icon_heart.png');
+    // ── Phase 58-2: 행상인 분기 카드 배지 아이콘 4종 ──
+    scene.load.image('badge_mutation', 'assets/ui/branch_badge_mutation.png');
+    scene.load.image('badge_recipe',   'assets/ui/branch_badge_recipe.png');
+    scene.load.image('badge_bond',     'assets/ui/branch_badge_bond.png');
+    scene.load.image('badge_blessing', 'assets/ui/branch_badge_blessing.png');
   }
 
   /**
