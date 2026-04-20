@@ -81,8 +81,8 @@ const BOSS_IDS = [
 // ── 타워 ID 목록 (8종, Phase 19-1: wasabi_cannon, spice_grinder 추가) ──
 const TOWER_IDS = ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'];
 
-// ── 셰프 ID 목록 (5종, Phase 19-1: yuki_chef, lao_chef 추가) ──
-const CHEF_IDS = ['petit_chef', 'flame_chef', 'ice_chef', 'yuki_chef', 'lao_chef'];
+// ── 셰프 ID 목록 (7종, Phase 56: Named 동료 7종으로 갱신) ──
+const CHEF_IDS = ['mimi_chef', 'rin_chef', 'mage_chef', 'yuki_chef', 'lao_chef', 'andre_chef', 'arjun_chef'];
 
 // ── 재료 파일 매핑 (게임 내 ID → 에셋 파일명) ──
 // gameData.js의 INGREDIENT_TYPES ID와 에셋 파일명이 다른 경우를 매핑한다.

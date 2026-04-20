@@ -3,13 +3,16 @@
  * Phase 6: 3종 셰프, 패시브 + 액티브 스킬.
  * Phase 8-6: 영업 액티브 스킬 (serviceSkill) 추가.
  * Phase 19-1: 시즌 2 셰프 2종 (유키, 라오) 데이터 추가.
+ * Phase 56: 익명 셰프 → Named 동료 교체 (petit→mimi, flame→rin, ice→mage),
+ *           앙드레/아르준 신규 추가, 7종 CHEF_ORDER 갱신.
  */
 
 export const CHEF_TYPES = {
-  petit_chef: {
-    id: 'petit_chef',
-    nameKo: '꼬마 셰프',
-    icon: '👨‍🍳',
+  // ── Group 1: 항상 해금 ──
+  mimi_chef: {
+    id: 'mimi_chef',
+    nameKo: '미미',
+    icon: '👧',
     color: 0x44cc44,
     passiveDesc: '재료 수거 범위 +30%, 조리시간 −15%',
     passiveType: 'collect_range',
@@ -27,9 +30,9 @@ export const CHEF_TYPES = {
       cooldown: 90000,  // 90초
     },
   },
-  flame_chef: {
-    id: 'flame_chef',
-    nameKo: '불꽃 요리사',
+  rin_chef: {
+    id: 'rin_chef',
+    nameKo: '린',
     icon: '🔥',
     color: 0xff4444,
     passiveDesc: '화염 타워 피해 +20%, 그릴 요리 수익 +25%',
@@ -48,15 +51,16 @@ export const CHEF_TYPES = {
       cooldown: 120000,  // 120초
     },
   },
-  ice_chef: {
-    id: 'ice_chef',
-    nameKo: '얼음 요리장',
-    icon: '❄️',
-    color: 0x44aaff,
-    passiveDesc: 'CC(둔화/빙결) 지속 +25%, 손님 인내심 +20%',
+  mage_chef: {
+    id: 'mage_chef',
+    nameKo: '메이지',
+    icon: '🧁',
+    color: 0xcc88ff,
+    passiveDesc: 'CC(둔화/빙결) 지속 +25%, 디저트 요리 수익 +20%',
     passiveType: 'cc_duration',
     passiveValue: 0.25,
-    skillName: '블리자드 코스',
+    dessertRewardBonus: 0.20,
+    skillName: '마법진 설탕',
     skillDesc: '전체 적 3초 빙결',
     skillType: 'global_freeze',
     skillValue: { duration: 3000 },
@@ -76,6 +80,7 @@ export const CHEF_TYPES = {
     nameKo: '유키',
     icon: '❄️',
     color: 0x87ceeb,
+    unlockHint: '7장 클리어 시 해금',
     passiveDesc: '조리시간 -20%, ★★★+ 레시피 보상 +15%',
     passiveType: 'cook_time',
     passiveValue: 0.20,
@@ -96,6 +101,7 @@ export const CHEF_TYPES = {
     nameKo: '라오',
     icon: '🐉',
     color: 0xff4500,
+    unlockHint: '10장 클리어 시 해금',
     passiveDesc: '도구 공격력 +15%, 재료 드롭률 +10%',
     passiveType: 'tower_damage',
     passiveValue: 0.15,
@@ -111,6 +117,53 @@ export const CHEF_TYPES = {
       cooldown: 120000,
     },
   },
+  // ── Phase 56: 신규 셰프 ──
+  andre_chef: {
+    id: 'andre_chef',
+    nameKo: '앙드레',
+    icon: '🥐',
+    color: 0xf5d76e,
+    unlockHint: '13장 클리어 시 해금',
+    passiveDesc: '양식 요리 수익 +25%, 손님 팁 +15%',
+    passiveType: 'western_reward',
+    passiveValue: 0.25,
+    tipBonus: 0.15,
+    skillName: '오마카세 코스',
+    skillDesc: '현재 손님 전체 만족도 20 즉시 추가 + 인내심 리셋',
+    skillType: 'omakase',
+    skillValue: { satisfactionBonus: 20 },
+    skillCooldown: 120000,
+    serviceSkill: {
+      name: '플랑베',
+      desc: '다음 5개 요리 수익 2배',
+      type: 'flambe',
+      value: { count: 5, multiplier: 2.0 },
+      cooldown: 100000,
+    },
+  },
+  arjun_chef: {
+    id: 'arjun_chef',
+    nameKo: '아르준',
+    icon: '🪬',
+    color: 0xff8800,
+    unlockHint: '17장 클리어 시 해금',
+    passiveDesc: '향신료 타워 공격 속도 +20%, 재료 드롭률 +15%',
+    passiveType: 'spice_attack_speed',
+    passiveValue: 0.20,
+    dropRateBonus: 0.15,
+    skillName: '마살라 폭풍',
+    skillDesc: '전체 적 독 데미지 10초 (DPS 20) + 이동속도 -30%',
+    skillType: 'masala_storm',
+    skillValue: { dps: 20, duration: 10000, slowRate: 0.30 },
+    skillCooldown: 150000,
+    serviceSkill: {
+      name: '비밀 향신료',
+      desc: '다음 3명 손님 주문 랜덤 요리로 교체 (수익 +50%)',
+      type: 'secret_spice',
+      value: { count: 3, rewardMultiplier: 1.5 },
+      cooldown: 120000,
+    },
+  },
 };
 
-export const CHEF_ORDER = ['petit_chef', 'flame_chef', 'ice_chef', 'yuki_chef', 'lao_chef'];
+export const CHEF_ORDER = ['mimi_chef', 'rin_chef', 'mage_chef', 'yuki_chef', 'lao_chef', 'andre_chef', 'arjun_chef'];

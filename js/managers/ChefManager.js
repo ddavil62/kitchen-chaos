@@ -3,6 +3,8 @@
  * Phase 7-2: 영업 패시브 메서드 추가 (조리시간, 그릴보상, 인내심).
  * Phase 8-6: 영업 액티브 스킬 조회 (getServiceSkill).
  * Phase 19-1: 유키 cook_time 패시브, 라오 tower_damage 패시브 + power_surge 상태 추가.
+ * Phase 56: 구 ID → 신 ID 교체 (petit→mimi, flame→rin, ice→mage),
+ *           앙드레/아르준 신규 패시브 헬퍼 메서드 추가.
  */
 
 import { CHEF_TYPES } from '../data/chefData.js';
@@ -52,7 +54,7 @@ export class ChefManager {
   }
 
   /**
-   * 수거 범위 보너스 (petit_chef).
+   * 수거 범위 보너스 (mimi_chef).
    * @returns {number} 1.0 ~ 1.3
    */
   static getCollectRangeBonus() {
@@ -60,7 +62,7 @@ export class ChefManager {
   }
 
   /**
-   * 그릴 피해 보너스 (flame_chef).
+   * 그릴 피해 보너스 (rin_chef).
    * @returns {number} 1.0 ~ 1.2
    */
   static getGrillDamageBonus() {
@@ -68,7 +70,7 @@ export class ChefManager {
   }
 
   /**
-   * CC 지속 보너스 (ice_chef).
+   * CC 지속 보너스 (mage_chef).
    * @returns {number} 1.0 ~ 1.25
    */
   static getCCDurationBonus() {
@@ -78,12 +80,12 @@ export class ChefManager {
   // ── 영업 패시브 (Phase 7-2) ──
 
   /**
-   * 조리 시간 배율 (petit_chef -15%, yuki_chef -20%).
+   * 조리 시간 배율 (mimi_chef -15%, yuki_chef -20%).
    * @returns {number} 0.80~1.0
    */
   static getCookTimeBonus() {
     const id = ChefManager.getSelectedChef();
-    if (id === 'petit_chef') return 0.85;
+    if (id === 'mimi_chef') return 0.85;
     if (id === 'yuki_chef') return 0.80;
     return 1.0;
   }
@@ -98,21 +100,21 @@ export class ChefManager {
   }
 
   /**
-   * 그릴 카테고리 요리 보상 배율 (flame_chef 선택 시 +25%).
+   * 그릴 카테고리 요리 보상 배율 (rin_chef 선택 시 +25%).
    * @returns {number} 1.25 또는 1.0
    */
   static getGrillRewardBonus() {
     const id = ChefManager.getSelectedChef();
-    return id === 'flame_chef' ? 1.25 : 1.0;
+    return id === 'rin_chef' ? 1.25 : 1.0;
   }
 
   /**
-   * 손님 인내심 배율 (ice_chef 선택 시 +20%).
+   * 손님 인내심 배율 (mage_chef 선택 시 +20%).
    * @returns {number} 1.20 또는 1.0
    */
   static getPatienceBonus() {
     const id = ChefManager.getSelectedChef();
-    return id === 'ice_chef' ? 1.20 : 1.0;
+    return id === 'mage_chef' ? 1.20 : 1.0;
   }
 
   // ── power_surge (lao_chef 채집 스킬) ──
@@ -153,7 +155,7 @@ export class ChefManager {
     return ChefManager._powerSurgeTimer > 0;
   }
 
-  // ── Phase 43: 유키/라오 미구현 패시브 ──
+  // ── Phase 43: 유키/라오 패시브 ──
 
   /**
    * 고급 레시피(tier >= 3) 보상 배율 (yuki_chef 선택 시 +15%).
@@ -165,12 +167,52 @@ export class ChefManager {
   }
 
   /**
-   * 재료 추가 드롭 확률 (lao_chef 선택 시 10%).
-   * @returns {number} 0.10 또는 0.0
+   * 재료 추가 드롭 확률 (lao_chef 10%, arjun_chef 15% 누적).
+   * @returns {number} 0.0 ~ 0.15
    */
   static getDropRateBonus() {
     const id = ChefManager.getSelectedChef();
-    return id === 'lao_chef' ? 0.10 : 0.0;
+    if (id === 'arjun_chef') return 0.15;
+    if (id === 'lao_chef') return 0.10;
+    return 0.0;
+  }
+
+  // ── Phase 56: 신규 셰프 패시브 헬퍼 ──
+
+  /**
+   * 디저트 요리 수익 배율 (mage_chef 선택 시 +20%).
+   * @returns {number} 1.20 또는 1.0
+   */
+  static getDessertRewardBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'mage_chef' ? 1.20 : 1.0;
+  }
+
+  /**
+   * 손님 팁 배율 (andre_chef 선택 시 +15%).
+   * @returns {number} 1.15 또는 1.0
+   */
+  static getTipBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'andre_chef' ? 1.15 : 1.0;
+  }
+
+  /**
+   * 양식 요리 수익 배율 (andre_chef 선택 시 +25%).
+   * @returns {number} 1.25 또는 1.0
+   */
+  static getWesternRewardBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'andre_chef' ? 1.25 : 1.0;
+  }
+
+  /**
+   * 향신료 타워 공격 속도 배율 (arjun_chef 선택 시 +20%).
+   * @returns {number} 1.20 또는 1.0
+   */
+  static getSpiceAttackSpeedBonus() {
+    const id = ChefManager.getSelectedChef();
+    return id === 'arjun_chef' ? 1.20 : 1.0;
   }
 
   // ── 영업 액티브 스킬 (Phase 8-6) ──

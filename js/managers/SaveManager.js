@@ -27,7 +27,7 @@
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 21;
+const SAVE_VERSION = 23;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -51,7 +51,7 @@ function createDefault() {
     },
     unlockedRecipes: [],  // 해금한 레시피 ID 목록 (스타터 12종은 코드에서 항상 해금)
     // ── Phase 6 추가 ──
-    selectedChef: null,       // 'petit_chef' | 'flame_chef' | 'ice_chef'
+    selectedChef: null,       // 'mimi_chef' | 'rin_chef' | 'mage_chef' | 'yuki_chef' | 'lao_chef' | 'andre_chef' | 'arjun_chef'
     completedOrders: [],      // 완료된 오더 통계용
     // ── Phase 7-3 추가 ──
     cookingSlots: 2,          // 동시 조리 슬롯 수 (기본 2)
@@ -1128,6 +1128,19 @@ export class SaveManager {
         data.endless.unlocked = false;
       }
       data.version = 22;
+    }
+
+    // v22 → v23: TD 셰프 ID 교체 마이그레이션 (Phase 56)
+    if (data.version < 23) {
+      const chefIdMap = {
+        'petit_chef': 'mimi_chef',
+        'flame_chef': 'rin_chef',
+        'ice_chef':   'mage_chef',
+      };
+      if (data.selectedChef && chefIdMap[data.selectedChef]) {
+        data.selectedChef = chefIdMap[data.selectedChef];
+      }
+      data.version = 23;
     }
 
     return data;
