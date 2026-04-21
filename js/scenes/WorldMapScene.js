@@ -10,6 +10,8 @@
  */
 
 import Phaser from 'phaser';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
 import { STAGES } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
@@ -90,8 +92,8 @@ export class WorldMapScene extends Phaser.Scene {
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ─���
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
-    // 1. 배경
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0a0a1a);
+    // Phase 60-16: 배경 rect → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
 
     // 2. 현재 그룹 상태 (Phase 24-2)
     this._currentGroup = 1;
@@ -152,11 +154,12 @@ export class WorldMapScene extends Phaser.Scene {
     const totalW = tabW * 3 + tabGap * 2;
     const startX = (GAME_WIDTH - totalW) / 2 + tabW / 2;
 
-    // ── 탭 1: 1~6장 (항상 활성) ──
-    this._tab1Bg = this.add.rectangle(startX, tabY, tabW, tabH, 0x3344aa)
-      .setStrokeStyle(2, 0x5566cc)
-      .setInteractive({ useHandCursor: true })
-      .setDepth(40);
+    // Phase 60-16: 탭 1 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    this._tab1Bg = NineSliceFactory.raw(this, startX, tabY, tabW, tabH, 'btn_primary_normal');
+    this._tab1Bg.setTint(0x3344aa);
+    const tab1Hit = new Phaser.Geom.Rectangle(-tabW / 2, -tabH / 2, tabW, tabH);
+    this._tab1Bg.setInteractive(tab1Hit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    this._tab1Bg.setDepth(40);
     this._tab1Text = this.add.text(startX, tabY, '1~6\uC7A5', {
       fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5).setDepth(41);
@@ -171,9 +174,10 @@ export class WorldMapScene extends Phaser.Scene {
     const tab2X = startX + tabW + tabGap;
     const tab2Locked = !this._season2Unlocked;
     const tab2Color = tab2Locked ? 0x222222 : 0x2a2a44;
-    this._tab2Bg = this.add.rectangle(tab2X, tabY, tabW, tabH, tab2Color)
-      .setStrokeStyle(2, tab2Locked ? 0x333333 : 0x4444aa)
-      .setDepth(40);
+    // Phase 60-16: 탭 2 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    this._tab2Bg = NineSliceFactory.raw(this, tab2X, tabY, tabW, tabH, 'btn_primary_normal');
+    this._tab2Bg.setTint(tab2Color);
+    this._tab2Bg.setDepth(40);
 
     const tab2Label = tab2Locked ? '\uD83D\uDD12 7~15\uC7A5' : '7~15\uC7A5';
     const tab2TextColor = tab2Locked ? '#555555' : '#aaaacc';
@@ -182,7 +186,8 @@ export class WorldMapScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(41);
 
     if (!tab2Locked) {
-      this._tab2Bg.setInteractive({ useHandCursor: true });
+      const tab2HitArea = new Phaser.Geom.Rectangle(-tabW / 2, -tabH / 2, tabW, tabH);
+      this._tab2Bg.setInteractive(tab2HitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       this._tab2Bg.on('pointerdown', () => {
         if (this._currentGroup === 2) return;
         SoundManager.playSFX('sfx_ui_tap');
@@ -194,9 +199,10 @@ export class WorldMapScene extends Phaser.Scene {
     const tab3X = tab2X + tabW + tabGap;
     const tab3Locked = !this._season3Unlocked;
     const tab3Color = tab3Locked ? 0x222222 : 0x2a2a44;
-    this._tab3Bg = this.add.rectangle(tab3X, tabY, tabW, tabH, tab3Color)
-      .setStrokeStyle(2, tab3Locked ? 0x333333 : 0x4444aa)
-      .setDepth(40);
+    // Phase 60-16: 탭 3 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    this._tab3Bg = NineSliceFactory.raw(this, tab3X, tabY, tabW, tabH, 'btn_primary_normal');
+    this._tab3Bg.setTint(tab3Color);
+    this._tab3Bg.setDepth(40);
 
     const tab3Label = tab3Locked ? '\uD83D\uDD12 16~24\uC7A5' : '16~24\uC7A5';
     const tab3TextColor = tab3Locked ? '#555555' : '#aaaacc';
@@ -205,7 +211,8 @@ export class WorldMapScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(41);
 
     if (!tab3Locked) {
-      this._tab3Bg.setInteractive({ useHandCursor: true });
+      const tab3HitArea = new Phaser.Geom.Rectangle(-tabW / 2, -tabH / 2, tabW, tabH);
+      this._tab3Bg.setInteractive(tab3HitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       this._tab3Bg.on('pointerdown', () => {
         if (this._currentGroup === 3) return;
         SoundManager.playSFX('sfx_ui_tap');
@@ -228,19 +235,16 @@ export class WorldMapScene extends Phaser.Scene {
       this._panelContainer = null;
     }
 
-    // 탭 하이라이트 갱신 헬퍼
+    // Phase 60-16: 탭 하이라이트 갱신 — setFillStyle → setTint (NineSlice Container)
     const setTab = (bg, text, isActive, isLocked) => {
       if (isActive) {
-        bg.setFillStyle(0x3344aa);
-        bg.setStrokeStyle(2, 0x5566cc);
+        bg.setTint(0x3344aa);
         text.setColor('#ffffff');
       } else if (isLocked) {
-        bg.setFillStyle(0x222222);
-        bg.setStrokeStyle(2, 0x333333);
+        bg.setTint(0x222222);
         text.setColor('#555555');
       } else {
-        bg.setFillStyle(0x2a2a44);
-        bg.setStrokeStyle(2, 0x4444aa);
+        bg.setTint(0x2a2a44);
         text.setColor('#aaaacc');
       }
     };
@@ -541,12 +545,17 @@ export class WorldMapScene extends Phaser.Scene {
    * @private
    */
   _createHUD() {
-    // 배경
-    this.add.rectangle(180, 20, 360, 40, 0x0d0d1a).setDepth(50);
+    // Phase 60-16: HUD 배경 rect → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(this, 180, 20, 360, 40, 'dark').setDepth(50);
 
-    // 뒤로가기 버튼
-    const backBg = this.add.rectangle(30, 20, 50, 30, 0x444444)
-      .setInteractive({ useHandCursor: true }).setDepth(51);
+    // Phase 60-16: 뒤로가기 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    const BACK_W = 50;
+    const BACK_H = 30;
+    const backBg = NineSliceFactory.raw(this, 30, 20, BACK_W, BACK_H, 'btn_secondary_normal');
+    backBg.setTint(0x444444);
+    const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
+    backBg.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    backBg.setDepth(51);
     this.add.text(30, 20, '< \uB4A4\uB85C', {
       fontSize: '12px',
       color: '#cccccc',
@@ -559,8 +568,9 @@ export class WorldMapScene extends Phaser.Scene {
         this.scene.start('MenuScene');
       });
     });
-    backBg.on('pointerover', () => backBg.setFillStyle(0x666666));
-    backBg.on('pointerout', () => backBg.setFillStyle(0x444444));
+    // Phase 60-16: setFillStyle → setTexture + setTint
+    backBg.on('pointerover', () => { backBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBg.setTint(0x666666); });
+    backBg.on('pointerout', () => { backBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBg.setTint(0x444444); });
 
     // 총 별점 (Phase 24-2: 그룹별 필터)
     const { current, max } = SaveManager.getTotalStars(this._currentGroup);
@@ -584,16 +594,20 @@ export class WorldMapScene extends Phaser.Scene {
    * @private
    */
   _createEndlessSection() {
-    // 구분선
-    this.add.rectangle(180, 555, 360, 1, 0x333355);
+    // Phase 60-16: 구분선 rect → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, 180, 555, 360, 2);
 
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
     if (isEndlessUnlocked) {
-      // 해금된 경우
-      const endlessBtn = this.add.rectangle(180, 575, 200, 36, 0x6622cc)
-        .setInteractive({ useHandCursor: true });
+      // Phase 60-16: 엔드리스 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+      const WM_ENDLESS_W = 200;
+      const WM_ENDLESS_H = 36;
+      const endlessBtn = NineSliceFactory.raw(this, 180, 575, WM_ENDLESS_W, WM_ENDLESS_H, 'btn_primary_normal');
+      endlessBtn.setTint(0x6622cc);
+      const wmEndlessHit = new Phaser.Geom.Rectangle(-WM_ENDLESS_W / 2, -WM_ENDLESS_H / 2, WM_ENDLESS_W, WM_ENDLESS_H);
+      endlessBtn.setInteractive(wmEndlessHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       this.add.text(180, 575, '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC', {
         fontSize: '15px',
         fontStyle: 'bold',
@@ -609,8 +623,9 @@ export class WorldMapScene extends Phaser.Scene {
           this.scene.start('ChefSelectScene', { stageId: 'endless' });
         });
       });
-      endlessBtn.on('pointerover', () => endlessBtn.setFillStyle(0x8833ee));
-      endlessBtn.on('pointerout', () => endlessBtn.setFillStyle(0x6622cc));
+      // Phase 60-16: setFillStyle → setTexture + setTint
+      endlessBtn.on('pointerover', () => { endlessBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); endlessBtn.setTint(0x8833ee); });
+      endlessBtn.on('pointerout', () => { endlessBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); endlessBtn.setTint(0x6622cc); });
 
       // 최고 기록 표시
       if (endlessRecord.bestWave > 0) {
@@ -620,8 +635,8 @@ export class WorldMapScene extends Phaser.Scene {
         }).setOrigin(0.5);
       }
     } else {
-      // 잠금된 경우
-      this.add.rectangle(180, 575, 200, 36, 0x444444);
+      // Phase 60-16: 잠금 엔드리스 rect → NineSliceFactory.panel 'dark' + setTint
+      NineSliceFactory.panel(this, 180, 575, 200, 36, 'dark').setTint(0x444444);
       this.add.text(180, 575, '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (24-6 \uD074\uB9AC\uC5B4 \uD544\uC694)', {
         fontSize: '12px',
         color: '#666666',
@@ -678,9 +693,8 @@ export class WorldMapScene extends Phaser.Scene {
       this._closeStagePanel();
     });
 
-    // 패널 배경
-    const panelBg = this.add.rectangle(GAME_WIDTH / 2, panelH / 2, panelW, panelH, 0x1a1a2e)
-      .setStrokeStyle(2, 0x4444aa);
+    // Phase 60-16: 패널 배경 rect → NineSliceFactory.panel 'dark'
+    const panelBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, panelH / 2, panelW, panelH, 'dark');
     container.add(panelBg);
 
     // 챕터 제목
@@ -709,8 +723,8 @@ export class WorldMapScene extends Phaser.Scene {
     closeBtn.on('pointerover', () => closeBtn.setColor('#ff0000'));
     closeBtn.on('pointerout', () => closeBtn.setColor('#ff6666'));
 
-    // 구분선
-    const divider = this.add.rectangle(GAME_WIDTH / 2, 38, panelW - 20, 1, 0x4444aa);
+    // Phase 60-16: 구분선 rect → NineSliceFactory.dividerH
+    const divider = NineSliceFactory.dividerH(this, GAME_WIDTH / 2, 38, panelW - 20, 2);
     container.add(divider);
 
     // 스테이지 목록 컨테이너 (스크롤용)
@@ -818,17 +832,15 @@ export class WorldMapScene extends Phaser.Scene {
     const itemW = 280;
     const itemH = 50;
 
-    // 챕터별 배경색/테두리색
+    // Phase 60-16: 스테이지 항목 배경 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
     const bgColor = unlocked ? 0x1a1a3a : 0x1a1a1a;
-    const borderColor = unlocked ? 0x4444aa : 0x333333;
-
-    // 배경
-    const bg = this.add.rectangle(cx, localY, itemW, itemH, bgColor)
-      .setStrokeStyle(2, borderColor);
+    const bg = NineSliceFactory.raw(this, cx, localY, itemW, itemH, 'btn_secondary_normal');
+    bg.setTint(bgColor);
     container.add(bg);
 
     if (unlocked) {
-      bg.setInteractive({ useHandCursor: true });
+      const stageHit = new Phaser.Geom.Rectangle(-itemW / 2, -itemH / 2, itemW, itemH);
+      bg.setInteractive(stageHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
       bg.on('pointerdown', () => {
         SoundManager.playSFX('sfx_ui_tap');
@@ -837,8 +849,9 @@ export class WorldMapScene extends Phaser.Scene {
           this.scene.start('ChefSelectScene', { stageId });
         });
       });
-      bg.on('pointerover', () => bg.setFillStyle(0x2a2a4a));
-      bg.on('pointerout', () => bg.setFillStyle(bgColor));
+      // Phase 60-16: setFillStyle → setTexture + setTint
+      bg.on('pointerover', () => { bg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); bg.setTint(0x2a2a4a); });
+      bg.on('pointerout', () => { bg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); bg.setTint(bgColor); });
     }
 
     // 스테이지 번호
