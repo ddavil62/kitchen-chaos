@@ -771,6 +771,9 @@ export class GatheringScene extends Phaser.Scene {
     // scrollY 최대 = 755 - 480 = 275 → height = 275 + 640 = 915
     this.cameras.main.setBounds(-300, 0, 916, 915);
 
+    // 두 번째 터치 포인터 활성화 (핀치 줌용)
+    this.input.addPointer(1);
+
     // 맵 영역 전체를 덮는 투명 히트 영역 (화면 고정 — SF=0)
     const hitArea = this.add.rectangle(
       GAME_WIDTH / 2,
@@ -787,6 +790,16 @@ export class GatheringScene extends Phaser.Scene {
     this._mapDragActive = false;
     this._mapIsDragging = false;
 
+    // ── 핀치 줌 상태 ──
+    // 두 손가락 거리 변화량 기반 카메라 줌. 줌 범위 [0.6, 2.0].
+    // 맵 영역 핀치일 때만 활성화되어 HUD 영역 제스처와 충돌 방지.
+    const MIN_ZOOM = 0.6;
+    const MAX_ZOOM = 2.0;
+    let pinchActive = false;
+    let pinchStartDist = 0;
+    let pinchStartZoom = 1;
+    this._mapZoom = this.cameras.main.zoom;
+
     hitArea.on('pointerdown', (pointer) => {
       dragStartX = pointer.x;
       dragStartY = pointer.y;
@@ -797,6 +810,39 @@ export class GatheringScene extends Phaser.Scene {
     });
 
     this.input.on('pointermove', (pointer) => {
+      const p1 = this.input.pointer1;
+      const p2 = this.input.pointer2;
+
+      // ── 2-포인터: 핀치 줌 ──
+      if (p1 && p2 && p1.isDown && p2.isDown) {
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (!pinchActive) {
+          pinchActive = true;
+          pinchStartDist = dist;
+          pinchStartZoom = this.cameras.main.zoom;
+          // 핀치 시작 시 진행 중이던 드래그/탭 중단
+          this._mapDragActive = false;
+          this._mapIsDragging = false;
+        }
+        if (pinchStartDist > 0) {
+          const ratio = dist / pinchStartDist;
+          const newZoom = Phaser.Math.Clamp(
+            pinchStartZoom * ratio, MIN_ZOOM, MAX_ZOOM
+          );
+          this.cameras.main.setZoom(newZoom);
+          this._mapZoom = newZoom;
+        }
+        return;
+      }
+      // 두 번째 포인터가 떨어지면 핀치 종료 (다음 프레임부터 드래그 재개 가능)
+      if (pinchActive) {
+        pinchActive = false;
+        return;
+      }
+
+      // ── 1-포인터: 드래그 ──
       if (!pointer.isDown || !this._mapDragActive) return;
       const dx = pointer.x - dragStartX;
       const dy = pointer.y - dragStartY;
@@ -804,8 +850,10 @@ export class GatheringScene extends Phaser.Scene {
         this._mapIsDragging = true;
       }
       if (this._mapIsDragging) {
-        this.cameras.main.scrollX -= (pointer.x - lastPointerX);
-        this.cameras.main.scrollY -= (pointer.y - lastPointerY);
+        // 줌 반영: 스크린 픽셀 delta를 월드 좌표 delta로 환산.
+        const z = this.cameras.main.zoom || 1;
+        this.cameras.main.scrollX -= (pointer.x - lastPointerX) / z;
+        this.cameras.main.scrollY -= (pointer.y - lastPointerY) / z;
       }
       lastPointerX = pointer.x;
       lastPointerY = pointer.y;
@@ -818,6 +866,8 @@ export class GatheringScene extends Phaser.Scene {
         return;
       }
       if (this.isGameOver || this.isVictory) return;
+      // 핀치 종료 직후의 pointerup은 탭으로 처리하지 않음
+      if (pinchActive) return;
       // worldX/worldY: 카메라 스크롤이 반영된 월드 좌표
       const { col, row } = worldToCell(pointer.worldX, pointer.worldY);
       if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
