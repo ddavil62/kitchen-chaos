@@ -1434,32 +1434,36 @@ export class ServiceScene extends Phaser.Scene {
     // ── Phase 8-4: 직원 아이콘 표시 ──
     this._createStaffIcons();
 
-    // 일시정지 버튼
-    const pauseBtn = this.add.rectangle(GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, 80, 36, 0x444466)
-      .setStrokeStyle(1, 0x6666aa)
-      .setInteractive({ useHandCursor: true })
-      .setDepth(601);
-    this.pauseLabel = this.add.text(GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, '\u23F8 \uC77C\uC2DC\uC815\uC9C0', {
-      fontSize: '11px', color: '#ffffff',
-    }).setOrigin(0.5).setDepth(602);
-
-    pauseBtn.on('pointerdown', () => this._togglePause());
-
-    // 장사 마감 버튼 — 일시정지 상태일 때만 표시
-    this.closingBtn = this.add.rectangle(GAME_WIDTH - 145, BOTTOM_Y + BOTTOM_H / 2, 80, 36, 0x662222)
-      .setStrokeStyle(1, 0xaa4444)
-      .setInteractive({ useHandCursor: true })
-      .setDepth(601)
-      .setVisible(false);
-    this.closingLabel = this.add.text(GAME_WIDTH - 145, BOTTOM_Y + BOTTOM_H / 2, '🔒 마감', {
-      fontSize: '11px', color: '#ffaaaa',
-    }).setOrigin(0.5).setDepth(602).setVisible(false);
-
-    this.closingBtn.on('pointerdown', () => {
-      if (this.isPaused && !this.isServiceOver) {
-        this._endService('manual');
+    // Phase 60-5: primitive rect 버튼 → NineSliceFactory.button
+    // 일시정지 버튼 (secondary 변형, 크림/나무결 톤)
+    const pauseBtn = NineSliceFactory.button(
+      this, GAME_WIDTH - 50, BOTTOM_Y + BOTTOM_H / 2, 80, 44,
+      '\u23F8 \uC77C\uC2DC\uC815\uC9C0',
+      {
+        variant: 'secondary',
+        onClick: () => this._togglePause(),
+        textStyle: { fontSize: '11px' },
       }
-    });
+    );
+    pauseBtn.setDepth(601);
+    this.pauseLabel = pauseBtn._label; // 외부 참조 호환 (현재 미사용이나 유지)
+
+    // 장사 마감 버튼 — 일시정지 상태일 때만 표시 (danger 변형, 붉은 톤)
+    this.closingBtn = NineSliceFactory.button(
+      this, GAME_WIDTH - 145, BOTTOM_Y + BOTTOM_H / 2, 80, 44,
+      '🔒 마감',
+      {
+        variant: 'danger',
+        onClick: () => {
+          if (this.isPaused && !this.isServiceOver) {
+            this._endService('manual');
+          }
+        },
+        textStyle: { fontSize: '11px' },
+      }
+    );
+    this.closingBtn.setDepth(601).setVisible(false);
+    this.closingLabel = this.closingBtn._label; // 외부 참조 호환
   }
 
   /**

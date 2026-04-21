@@ -291,14 +291,18 @@ export class GatheringScene extends Phaser.Scene {
     }).setOrigin(0.5, 0).setDepth(101).setScrollFactor(0);
 
     // 메뉴(나가기) 버튼 — HUD 좌측 상단
-    this._menuBtn = this.add.rectangle(18, HUD_HEIGHT / 2, 28, 26, 0x333355)
-      .setDepth(101).setInteractive({ useHandCursor: true })
-      .setStrokeStyle(1, 0x6666aa).setScrollFactor(0);
-    this.add.text(18, HUD_HEIGHT / 2 - 2, '≡', {
-      fontSize: '14px', color: '#ccccff',
-    }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
-
-    this._menuBtn.on('pointerdown', () => this._showMenuPopup());
+    // Phase 60-5: primitive rect → NineSliceFactory.button(icon 변형).
+    // 크기 28×26 → 36×32 (btn_icon insets 14×14에 맞춰 확장, HUD_HEIGHT=40 내 수용).
+    this._menuBtn = NineSliceFactory.button(
+      this, 22, HUD_HEIGHT / 2, 36, 32,
+      '≡',
+      {
+        variant: 'icon',
+        onClick: () => this._showMenuPopup(),
+        textStyle: { fontSize: '18px', color: '#ffffff' },
+      }
+    );
+    this._menuBtn.setDepth(101).setScrollFactor(0);
   }
 
   /**
