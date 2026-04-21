@@ -1402,8 +1402,8 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createBottomBar() {
-    // Phase 52: depth 100→600 상향 (테이블 3레이어 depth 범위와 분리)
-    this.add.rectangle(GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_H / 2, GAME_WIDTH, BOTTOM_H, 0x1c0e00)
+    // Phase 60-7: rectangle 배경 → 9-slice panel_dark
+    NineSliceFactory.panel(this, GAME_WIDTH / 2, BOTTOM_Y + BOTTOM_H / 2, GAME_WIDTH, BOTTOM_H, 'dark')
       .setDepth(600);
 
     // ── Phase 8-6: 셰프 영업 액티브 스킬 버튼 ──
@@ -1411,17 +1411,20 @@ export class ServiceScene extends Phaser.Scene {
     const skill = ChefManager.getServiceSkill();
 
     if (chefData && skill) {
-      // 스킬 버튼 배경 (120x36)
-      this.skillBtnBg = this.add.rectangle(70, BOTTOM_Y + 14, 120, 36, 0x446688, 0.9)
-        .setStrokeStyle(1, 0x6688aa)
-        .setInteractive({ useHandCursor: true })
-        .setDepth(601);
-      // 스킬 버튼 텍스트
-      this.skillBtnText = this.add.text(70, BOTTOM_Y + 14, `${chefData.icon} ${skill.name}`, {
-        fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
-      }).setOrigin(0.5).setDepth(602);
-
-      this.skillBtnBg.on('pointerdown', () => this._onSkillTap());
+      // Phase 60-7: rectangle+text → 9-slice button (primary 변형).
+      // skillBtnBg = Container, skillBtnText = 내부 라벨 (외부 참조 호환 유지).
+      const skillBtn = NineSliceFactory.button(
+        this, 70, BOTTOM_Y + 14, 120, 36,
+        `${chefData.icon} ${skill.name}`,
+        {
+          variant: 'primary',
+          onClick: () => this._onSkillTap(),
+          textStyle: { fontSize: '11px', color: '#ffffff', fontStyle: 'bold' },
+        }
+      );
+      skillBtn.setDepth(601);
+      this.skillBtnBg = skillBtn;
+      this.skillBtnText = skillBtn._label;
     } else {
       // 셰프 미선택 시 기존 텍스트 표시
       this.skillBtnBg = null;
@@ -1606,18 +1609,20 @@ export class ServiceScene extends Phaser.Scene {
     const skill = ChefManager.getServiceSkill();
     if (!chefData || !skill) return;
 
+    // Phase 60-7: skillBtnBg는 Container(_bg = 9-slice). setFillStyle 대신 _bg.setTint 사용.
+    const bgNS = this.skillBtnBg._bg;
     if (this.skillCooldownLeft > 0) {
       // 쿨다운 중: 어둡게 + 남은 초 표시
-      this.skillBtnBg.setFillStyle(0x333344, 0.9);
+      if (bgNS) bgNS.setTint(0x555566);
       const remainSec = Math.ceil(this.skillCooldownLeft / 1000);
       this.skillBtnText.setText(`${remainSec}\uCD08`).setColor('#888888');
     } else if (this.patienceResetRemaining > 0) {
       // 꼬마셰프: 리셋 남은 수 표시
-      this.skillBtnBg.setFillStyle(0x44aa44, 0.9);
+      if (bgNS) bgNS.setTint(0x88dd88);
       this.skillBtnText.setText(`\uB9AC\uC14B \uB0A8\uC74C: ${this.patienceResetRemaining}\uBA85`).setColor('#ffffff');
     } else {
       // 준비 완료: 밝게 + 스킬 이름
-      this.skillBtnBg.setFillStyle(0x446688, 0.9);
+      if (bgNS && bgNS.clearTint) bgNS.clearTint();
       this.skillBtnText.setText(`${chefData.icon} ${skill.name}`).setColor('#ffffff');
     }
   }
