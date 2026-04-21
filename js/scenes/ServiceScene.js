@@ -25,6 +25,7 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { STAGES } from '../data/stageData.js';
 import { ALL_SERVING_RECIPES, RECIPE_MAP } from '../data/recipeData.js';
 import { INGREDIENT_TYPES } from '../data/gameData.js';
@@ -603,12 +604,13 @@ export class ServiceScene extends Phaser.Scene {
   _createHUD() {
     // Phase 19-6: HUD 배경 웜 다크 (#1c0e00)로 통일
     // Phase 52: depth 100→600 상향 (테이블 3레이어 depth 범위 10~509와 분리)
-    this.add.rectangle(GAME_WIDTH / 2, HUD_H / 2, GAME_WIDTH, HUD_H, 0x1c0e00)
-      .setDepth(600);
-    // HUD 하단 골드 구분선 (1px, 반투명)
-    this.add.rectangle(GAME_WIDTH / 2, HUD_H, GAME_WIDTH, 1, 0xffd700)
-      .setAlpha(0.4)
-      .setDepth(600);
+    // Phase 60-3: primitive rectangle → nineslice panel_dark (어두운 나무결 HUD 배경).
+    const hudBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, HUD_H / 2, GAME_WIDTH, HUD_H, 'dark');
+    hudBg.setDepth(600);
+    // HUD 하단 골드 구분선 — nineslice divider_h (2px)
+    const hudDivider = NineSliceFactory.dividerH(this, GAME_WIDTH / 2, HUD_H, GAME_WIDTH, 2);
+    hudDivider.setDepth(600);
+    hudDivider.setAlpha(0.9);
 
     this.goldText = this.add.text(10, 10, `\uD83E\uDE99 ${this.totalGold}`, {
       fontSize: '14px', color: '#ffd700', fontStyle: 'bold',
