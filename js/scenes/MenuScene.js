@@ -5,6 +5,7 @@
  * Phase 11-2: "게임 시작" -> WorldMapScene 전환.
  * Phase 11-3b: fadeIn 300ms 통일, 도감 버튼 Secondary 팔레트 적용.
  * Phase 11-3d: 하단 버전 표기(APP_VERSION) 추가.
+ * Phase 61: 메뉴 비주얼 에셋 적용 (배경 이미지 + 타이틀 로고 이미지).
  */
 
 import Phaser from 'phaser';
@@ -25,32 +26,25 @@ export class MenuScene extends Phaser.Scene {
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_menu');
 
-    // Phase 60-15: 배경 rect → NineSliceFactory.panel 'dark'
-    NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
+    // Phase 61: 메뉴 배경 이미지 (depth -1, 배경 최하단)
+    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'menu_bg').setDepth(-1);
 
-    // 장식 원들 (카툰 느낌)
-    [
-      { x: 40, y: 100, r: 30, c: 0xff6b35, a: 0.3 },
-      { x: 320, y: 200, r: 50, c: 0xdc143c, a: 0.2 },
-      { x: 80, y: 500, r: 40, c: 0xffd700, a: 0.2 },
-    ].forEach(o => {
-      this.add.circle(o.x, o.y, o.r, o.c, o.a);
-    });
+    // Phase 60-15 → Phase 61: panel 'dark' 알파 0.5로 낮춰 배경 이미지가 비치도록 조정
+    const darkPanel = NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
+    darkPanel.setAlpha(0.5);
 
-    // 타이틀 블록 (Container로 단일 관리)
-    const titleBlock = this.add.container(GAME_WIDTH / 2, 220);
-    titleBlock.add(this.add.text(0, -60, 'Kitchen', {
-      fontSize: '48px', fontStyle: 'bold',
-      color: '#ffd700', stroke: '#8b4500', strokeThickness: 6,
-    }).setOrigin(0.5));
-    titleBlock.add(this.add.text(0, 0, 'Chaos', {
-      fontSize: '48px', fontStyle: 'bold',
-      color: '#ff6b35', stroke: '#8b0000', strokeThickness: 6,
-    }).setOrigin(0.5));
-    titleBlock.add(this.add.text(0, 55, 'Tycoon', {
-      fontSize: '28px',
-      color: '#ffffff', stroke: '#333333', strokeThickness: 4,
-    }).setOrigin(0.5));
+    // Phase 61: 타이틀 로고 이미지로 교체 (기존 텍스트 3줄 titleBlock 제거)
+    const titleLogo = this.add.image(GAME_WIDTH / 2, 220, 'menu_title_logo').setOrigin(0.5);
+    // 최대 폭 320px, 초과 시 비율 유지 축소
+    if (titleLogo.width > 320) {
+      titleLogo.setDisplaySize(320, titleLogo.height * (320 / titleLogo.width));
+    }
+
+    // Phase 61: 미미 스프라이트 - 컨셉 A "주방을 지키는 셰프" 시각화
+    const mimiSprite = this.add.image(GAME_WIDTH - 52, 200, 'mimi_menu')
+      .setOrigin(0.5)
+      .setDisplaySize(80, 80);
+    this.textures.get('mimi_menu').setFilter(Phaser.Textures.FilterMode.NEAREST);
 
     // 부제목
     this.add.text(GAME_WIDTH / 2, 320, '주방을 지켜라!', {
@@ -208,8 +202,8 @@ export class MenuScene extends Phaser.Scene {
       fontSize: '12px', color: '#aaaaaa',
     }).setOrigin(0.5);
 
-    // ── 버전 표기 (Phase 42: y 632 -> 636 -> 634 -> 632 -> 634) ──
-    this.add.text(GAME_WIDTH / 2, 634, `v${APP_VERSION}`, {
+    // ── 버전 표기 (Phase 61 AD3: 634 -> 630, 하단 여백 5px 확보) ──
+    this.add.text(GAME_WIDTH / 2, 630, `v${APP_VERSION}`, {
       fontSize: '10px',
       color: '#555555',
     }).setOrigin(0.5);

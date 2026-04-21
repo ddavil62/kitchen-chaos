@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-20 (Phase 57 완료)
+> 최종 업데이트: 2026-04-21 (Phase 61 완료)
 
 ## 프로젝트 개요
 
@@ -14,7 +14,7 @@
 |------|------|
 | 엔진 | Phaser.js 3 |
 | 언어 | JavaScript (바닐라) |
-| 아트 | PixelLab API (픽셀 아트) |
+| 아트 | PixelLab API + SD Forge SDXL (픽셀 아트, 메뉴 비주얼) |
 | 사운드 | Web Audio API (프로시저럴) |
 | 빌드 | Vite + Capacitor (Android) |
 | 테스트 | Playwright |
@@ -41,6 +41,7 @@
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 34개 업적, 해금 판정/보상(골드/코인/정수), 카테고리 탭 UI |
 | 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated 에셋 로드, portrait 9종 (arjun 포함) |
+| 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰 |
 | 데이터 | stageData.js / gameData.js / recipeData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 284종 |
 
 ### 게임 루프
@@ -82,6 +83,7 @@
 | 셰프 스킬 재설계 | passiveDesc 3건 교정, 미력사 버프 5종 ServiceScene 실제 로직 연결, 요코 chain_serve 구현, 독립 계수 곱셈 원칙 코드 반영 | 완료 |
 | 영업씬 렌더링 재구성 | 테이블 3레이어 분리 렌더링(back/customer/front), 손님 독립 스프라이트(5종x2상태), HUD depth 600+ 상향 | 완료 |
 | 쿠폰 코드 시스템 | 설정 메뉴 쿠폰 입력 UI, 일반 쿠폰 3종(프로덕션), DEV 치트 5종(트리쉐이킹), giftIngredients 세이브 v20 | 완료 |
+| 메뉴 비주얼 에셋 | MenuScene에 배경 이미지(menu_bg), 타이틀 로고(menu_title_logo), 미미 스프라이트, 앱 아이콘(app_icon_512) 도입. 장식 원 제거, panel dark alpha 0.5 | 완료 |
 
 ## 콘텐츠 규모
 

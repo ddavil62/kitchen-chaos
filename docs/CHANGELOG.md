@@ -1,5 +1,52 @@
 # Changelog
 
+## [Phase 61] 2026-04-21 -- 메인 메뉴 비주얼 에셋 3종 도입
+
+### Added
+
+- **`assets/ui/menu_bg.png`**: 메뉴 배경 이미지 360x640 RGB PNG (291KB)
+  - SD Forge SDXL Base 1.0, steps=30, CFG=7.0, DPM++ 2M Karras, seed=4025870268
+  - 1024x1024 생성 -> 9:16 크롭(576x1024) -> 360x640 LANCZOS 리사이즈
+  - 어두운 주방 내부 + 창문 너머 오렌지/보라 전장 구도
+  - 버튼 영역(y=390-640) 평균 밝기 36.1/255 (< 40 기준 PASS)
+- **`assets/ui/menu_title_logo.png`**: 타이틀 로고 320x150 RGBA PNG (9.5KB)
+  - PIL 직접 렌더링, Impact.ttf 폰트 (NeoDunggeunmoPro 미설치로 2순위 적용)
+  - Kitchen=#ffd700 stroke=#8b4500 / Chaos=#ff6b35 stroke=#8b0000 / Tycoon=#ffffff stroke=#333333
+  - 불꽃 파티클 5개, 스파크 6개, 연기 원 2개 장식
+- **`assets/ui/app_icon_512.png`**: 앱 아이콘 512x512 RGB PNG (154KB)
+  - SD Forge Counterfeit v3(배경, seed=3885348100) + mimi_chef south.png 3.48x nearest-neighbor 업스케일 + PIL KC 로고 합성
+  - 미미 + 보라 미력 적 실루엣 + KC 골드 로고, 오렌지 림라이트 글로우
+  - Play Console/Android 런처용, Phaser preload 제외 (메모리 절약)
+- **MenuScene.js**: 미미 스프라이트 배치
+  - `mimi_menu` 키로 `assets/chefs/mimi_chef/rotations/south.png` 재활용
+  - x=308, y=200, 80x80, NEAREST 필터 (픽셀 아트 선명도 유지)
+  - AD2 REVISE로 추가됨: 컨셉 A "주방을 지키는 셰프" 시각화 목적
+
+### Changed
+
+- **`js/scenes/MenuScene.js`**: 배경 + 타이틀 로고 교체
+  - 변경 전: NineSliceFactory.panel 'dark' 단색 배경 + 장식 원 3개 + 텍스트 3줄(Kitchen/Chaos/Tycoon)
+  - 변경 후: menu_bg 이미지(depth=-1) + panel dark alpha=0.5(반투명) + menu_title_logo 이미지(x=180, y=220)
+  - 장식 원 forEach 블록 완전 제거
+  - titleBlock 컨테이너(텍스트 3줄) -> menu_title_logo 이미지 교체
+  - 폭 320px 초과 시 비율 유지 축소 로직 포함
+  - 부제목 "주방을 지켜라!" (y=320) 유지
+  - 버전 텍스트 y좌표: 634 -> 630 (AD3 권장 수정, 모바일 네비게이션 바 겹침 방지)
+  - 버튼 y좌표 동결 (390/450/496/534/578)
+- **`js/scenes/BootScene.js`**: menu_bg + menu_title_logo + mimi_menu 3종 preload 추가
+
+### Notes
+
+- QA 판정: PASS (22/23, 1건 환경 한정 headless Chromium 로드 시간 -- Phase 61 이슈 아님)
+- AD2 판정: REVISE -> 미미 스프라이트 추가 후 APPROVED (WARN 4건 허용)
+- AD3 판정: APPROVED (WARN 6건 허용, FAIL 1건 구조적 특성으로 무효)
+- AD3 선택 수정(미미 80x80->100x100 확대) 미적용, 현행 80x80 유지
+- 타이틀 로고 폰트: 스펙 1순위 NeoDunggeunmoPro -> 미설치로 Impact.ttf 적용 (브랜드 레터링으로 허용)
+- 배경 #6622cc(미력 보라) 미검출: SD 생성 한계, #330c32(어두운 자주-보라)로 대체. 시각적 기능 정상
+- 스펙: `.claude/specs/2026-04-21-kc-phase61-menu-visuals-spec.md`
+- 구현 리포트: `.claude/specs/2026-04-21-kc-phase61-coder-report.md`
+- QA: `.claude/specs/2026-04-21-kc-phase61-qa.md`
+
 ## [Phase 57] 2026-04-20 -- ChefSelectScene 가로 캐러셀 UI 개편
 
 ### Added
