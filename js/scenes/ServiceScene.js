@@ -1141,20 +1141,21 @@ export class ServiceScene extends Phaser.Scene {
 
   /** @private */
   _createCookingSlots() {
-    // Phase 19-6: 조리·재고·레시피 구역 공통 배경 (웜 다크 톤 통합)
-    this.add.rectangle(
+    // Phase 60-8: 조리·재고·레시피 공통 배경을 9-slice panel_dark로 교체
+    NineSliceFactory.panel(
+      this,
       GAME_WIDTH / 2,
       COOK_Y + (RECIPE_Y + RECIPE_H - COOK_Y) / 2,
       GAME_WIDTH,
       RECIPE_Y + RECIPE_H - COOK_Y,
-      0x1c1008,
+      'dark',
     ).setDepth(0);
     // 🔥 조리 섹션 레이블
     this.add.text(10, COOK_Y + 4, '\uD83D\uDD25 \uC870\uB9AC', {
       fontSize: '10px', color: '#8B6914', fontStyle: 'bold',
     }).setDepth(10);
-    // COOK↔STOCK 구분선 (앰버 1px)
-    this.add.rectangle(GAME_WIDTH / 2, STOCK_Y, GAME_WIDTH, 1, 0x8B6914).setDepth(9);
+    // COOK↔STOCK 구분선 (Phase 60-8: 1px rect → divider_h 2px 앰버 톤)
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, STOCK_Y, GAME_WIDTH, 2).setDepth(9);
 
     /** @type {Phaser.GameObjects.Container[]} */
     this.cookSlotContainers = [];
@@ -1279,8 +1280,8 @@ export class ServiceScene extends Phaser.Scene {
   /** @private */
   _createInventoryPanel() {
     // Phase 19-6: 개별 배경 제거 — _createCookingSlots() 공통 배경으로 통합
-    // STOCK↔RECIPE 구분선 (앰버 1px)
-    this.add.rectangle(GAME_WIDTH / 2, RECIPE_Y, GAME_WIDTH, 1, 0x8B6914).setDepth(9);
+    // STOCK↔RECIPE 구분선 (Phase 60-8: 1px rect → divider_h 2px)
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, RECIPE_Y, GAME_WIDTH, 2).setDepth(9);
 
     this.add.text(10, STOCK_Y + 5, '\uD83E\uDD55 \uC7AC\uACE0', {
       fontSize: '11px', color: '#8B6914', fontStyle: 'bold',
