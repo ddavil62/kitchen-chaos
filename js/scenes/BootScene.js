@@ -7,6 +7,7 @@
  * Phase 11-3d: 초기화 시 세이브 데이터 크기 콘솔 로깅.
  * Phase 12: Android 하드웨어 백버튼 글로벌 리스너 등록.
  * Phase 12: 앱 백그라운드/포그라운드 전환 시 오디오 일시정지/재개.
+ * Phase 60-2: NeoDunggeunmoPro 한글 픽셀 폰트 Font Loading API 프리로드.
  */
 
 import Phaser from 'phaser';
@@ -44,11 +45,38 @@ export class BootScene extends Phaser.Scene {
       loadText.destroy();
     });
 
+    // ── 한글 픽셀 폰트 프리로드 (Phase 60-2: NeoDunggeunmoPro) ──
+    // Phaser Canvas는 @font-face만으로는 렌더링 시점에 폰트 사용을 보장하지 않으므로
+    // Font Loading API로 명시적으로 로드한 뒤 create()로 진행해야 한다.
+    this._fontReady = this._preloadFonts();
+
     // ── 스프라이트 에셋 로드 ──
     SpriteLoader.preload(this);
 
     // ── 9-slice UI 에셋 로드 (Phase 60-2) ──
     this._preloadNineSliceUI();
+  }
+
+  /**
+   * NeoDunggeunmoPro 웹폰트를 Font Loading API로 강제 로드한다.
+   * 실패 시 Noto Sans KR → sans-serif 폴백이 자동 적용된다.
+   * @returns {Promise<void>} 폰트 로드 완료 프로미스
+   * @private
+   */
+  _preloadFonts() {
+    if (!document.fonts || !document.fonts.load) {
+      return Promise.resolve();
+    }
+    // 다양한 크기를 모두 로드하여 Canvas 렌더링 직전 폴백 플래시 방지.
+    const sizes = ['11px', '13px', '14px', '16px', '22px'];
+    const promises = sizes.map((sz) =>
+      document.fonts.load(`${sz} "NeoDunggeunmoPro"`).catch(() => null),
+    );
+    return Promise.all(promises)
+      .then(() => document.fonts.ready)
+      .catch(() => {
+        console.warn('[BootScene] NeoDunggeunmoPro 폰트 로드 실패 — 폴백 폰트 사용');
+      });
   }
 
   /**
@@ -111,7 +139,13 @@ export class BootScene extends Phaser.Scene {
     // ── 앱 백그라운드/포그라운드 전환 리스너 (Phase 12) ──
     this._setupAppStateListener();
 
-    this._startGame();
+    // ── 폰트 로드가 끝난 뒤 메뉴 씬으로 전환 (Canvas 렌더 폴백 방지) ──
+    const proceed = () => this._startGame();
+    if (this._fontReady && typeof this._fontReady.then === 'function') {
+      this._fontReady.then(proceed, proceed);
+    } else {
+      proceed();
+    }
   }
 
   /**

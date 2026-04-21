@@ -3,6 +3,18 @@
  * 모바일 최적화(터치 제스처 비활성, 선택 방지).
  */
 
+/* ── 한글 픽셀 폰트: NeoDunggeunmoPro (네오둥근모) ────────────────
+ * Phase 60 9-slice UI에 맞는 레트로 둥근 픽셀 폰트.
+ * 무료 라이선스 (noonnu.cc CDN, jsdelivr).
+ */
+@font-face {
+  font-family: 'NeoDunggeunmoPro';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/NeoDunggeunmoPro-Regular.woff2') format('woff2');
+  font-display: swap;
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   margin: 0;
   padding: 0;

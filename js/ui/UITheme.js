@@ -135,40 +135,40 @@ export const TEXT_STYLE = Object.freeze({
     fontSize: '22px',
     fontStyle: 'bold',
     color: '#3a2818',
-    fontFamily: '"Noto Sans KR", sans-serif',
+    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
   },
   HEADING: {
     fontSize: '16px',
     fontStyle: 'bold',
     color: '#3a2818',
-    fontFamily: '"Noto Sans KR", sans-serif',
+    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
   },
   BODY: {
     fontSize: '13px',
     color: '#3a2818',
-    fontFamily: '"Noto Sans KR", sans-serif',
+    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
   },
   CAPTION: {
     fontSize: '11px',
     color: '#7a6a5a',
-    fontFamily: '"Noto Sans KR", sans-serif',
+    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
   },
   BUTTON_PRIMARY: {
     fontSize: '14px',
     fontStyle: 'bold',
     color: '#3a2818',
-    fontFamily: '"Noto Sans KR", sans-serif',
+    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
   },
   BUTTON_DANGER: {
     fontSize: '14px',
     fontStyle: 'bold',
     color: '#ffffff',
-    fontFamily: '"Noto Sans KR", sans-serif',
+    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
   },
   BUTTON_DISABLED: {
     fontSize: '14px',
     color: '#8a8a8a',
-    fontFamily: '"Noto Sans KR", sans-serif',
+    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
   },
 });
 

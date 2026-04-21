@@ -1400,7 +1400,7 @@ export class GatheringScene extends Phaser.Scene {
     const cy = cam.scrollY + cam.height / 2 - 40;
     const txt = this.add.text(cx, cy, label, {
       fontSize: '20px',
-      fontFamily: 'Arial',
+      fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
       color: `#${color.toString(16).padStart(6, '0')}`,
       stroke: '#000000',
       strokeThickness: 4,
