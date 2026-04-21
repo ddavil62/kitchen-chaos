@@ -26,6 +26,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { STAGES } from '../data/stageData.js';
 import { ALL_SERVING_RECIPES, RECIPE_MAP } from '../data/recipeData.js';
 import { INGREDIENT_TYPES } from '../data/gameData.js';
@@ -1356,13 +1357,14 @@ export class ServiceScene extends Phaser.Scene {
       const y = startY + row * (btnH + gapY) + btnH / 2;
 
       // 스크롤 영역 밖이면 일단 생성은 하되 클리핑으로 처리
-      // Phase 19-6: 버튼 배경 웜 다크 팔레트로 통합
-      const bg = this.add.rectangle(x, y, btnW, btnH, 0x2d1a0a)
-        .setStrokeStyle(1, 0x4a3520)
-        .setInteractive({ useHandCursor: true })
-        .setDepth(10);
-      bg.on('pointerover', () => bg.setFillStyle(0x4a2e10));
-      bg.on('pointerout',  () => bg.setFillStyle(0x2d1a0a));
+      // Phase 60-10: rectangle → NineSliceFactory.raw 'btn_secondary_normal' (Container)
+      const bg = NineSliceFactory.raw(this, x, y, btnW, btnH, 'btn_secondary_normal').setDepth(10);
+      const bgHitArea = new Phaser.Geom.Rectangle(-btnW / 2, -btnH / 2, btnW, btnH);
+      bg.setInteractive(bgHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      if (bg.input) bg.input.cursor = 'pointer';
+      // Hover 텍스처 스왑 (setFillStyle 대체)
+      bg.on('pointerover', () => bg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED));
+      bg.on('pointerout',  () => bg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL));
 
       // 레시피 이름 + 재료 요약
       const ingStr = Object.entries(recipe.ingredients)
@@ -1387,13 +1389,13 @@ export class ServiceScene extends Phaser.Scene {
     for (const entry of this.recipeButtons) {
       const canMake = this.inventoryManager.hasEnough(entry.recipe.ingredients);
       if (canMake) {
-        // Phase 19-6: 활성 색상 웜 팔레트
-        entry.btn.setFillStyle(0x2d1a0a).setAlpha(1);
+        // Phase 60-10: setFillStyle → setTexture (normal/disabled 스왑)
+        entry.btn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL).setAlpha(1);
         entry.text.setColor('#e8c87a');
         if (entry.soldOutText) entry.soldOutText.setVisible(false);
       } else {
-        // Phase 19-6: 비활성 색상 웜 팔레트
-        entry.btn.setFillStyle(0x1c1008).setAlpha(0.5);
+        // Phase 60-10: 비활성 텍스처로 스왑
+        entry.btn.setTexture(NS_KEYS.BTN_SECONDARY_DISABLED).setAlpha(0.5);
         entry.text.setColor('#6b4a2a');
         // 솔드아웃 라벨 표시
         if (!entry.soldOutText) {
