@@ -2615,14 +2615,13 @@ export class ServiceScene extends Phaser.Scene {
 
     const container = this.add.container(0, 0).setDepth(2000);
 
-    // 반투명 오버레이
+    // 반투명 오버레이 (유지: 풀스크린 단순 딤)
     const overlay = this.add.rectangle(cx, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5)
       .setInteractive();
     container.add(overlay);
 
-    // 팝업 배경
-    const bg = this.add.rectangle(cx, panelCy, panelW, panelH, 0x1a0000)
-      .setStrokeStyle(2, 0xffd700);
+    // Phase 60-11: 팝업 배경 rectangle → NineSliceFactory.panel 'parchment'(양피지 톤, 금색 리본 어울림)
+    const bg = NineSliceFactory.panel(this, cx, panelCy, panelW, panelH, 'parchment');
     container.add(bg);
 
     // 제목
@@ -2650,23 +2649,20 @@ export class ServiceScene extends Phaser.Scene {
     }).setOrigin(0.5);
     container.add(bonusText);
 
-    // 확인 버튼
-    const okBtn = this.add.rectangle(cx, 278, 120, 36, 0xff6b35)
-      .setInteractive({ useHandCursor: true });
-    container.add(okBtn);
-    const okText = this.add.text(cx, 278, '\uD655\uC778', {
-      fontSize: '14px', fontStyle: 'bold', color: '#ffffff',
-      stroke: '#000', strokeThickness: 2,
-    }).setOrigin(0.5);
-    container.add(okText);
-
     /** 팝업 닫기 */
     const closePopup = () => {
       if (autoCloseTimer) autoCloseTimer.remove();
       container.destroy();
     };
 
-    okBtn.on('pointerdown', closePopup);
+    // Phase 60-11: 확인 버튼 rectangle+text → NineSliceFactory.button 'primary' (내부 _label 사용, onClick으로 닫기)
+    const okBtn = NineSliceFactory.button(this, cx, 278, 120, 36, '\uD655\uC778', {
+      variant: 'primary',
+      textStyle: { fontSize: '14px', fontStyle: 'bold', color: '#ffffff' },
+      onClick: closePopup,
+    });
+    container.add(okBtn);
+
     overlay.on('pointerdown', closePopup);
 
     // 4초 자동 닫기
