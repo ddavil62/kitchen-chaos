@@ -12,6 +12,7 @@
  */
 
 import Phaser from 'phaser';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { GAME_WIDTH, GAME_HEIGHT, GRID_COLS, GRID_ROWS,
          CELL_W, CELL_H, HALF_W, HALF_H,
          HUD_HEIGHT, GAME_AREA_Y, GAME_AREA_HEIGHT, TOWER_BAR_Y, TOWER_BAR_HEIGHT,
@@ -270,8 +271,12 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _createHUD() {
-    const hudBg = this.add.rectangle(GAME_WIDTH / 2, HUD_HEIGHT / 2, GAME_WIDTH, HUD_HEIGHT, 0x1a1a2e);
+    // Phase 60-4: primitive rectangle → nineslice panel_dark (나무결 HUD 배경) + divider_h.
+    const hudBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, HUD_HEIGHT / 2, GAME_WIDTH, HUD_HEIGHT, 'dark');
     hudBg.setDepth(100).setScrollFactor(0);
+    const hudDivider = NineSliceFactory.dividerH(this, GAME_WIDTH / 2, HUD_HEIGHT, GAME_WIDTH, 2);
+    hudDivider.setDepth(100).setScrollFactor(0);
+    hudDivider.setAlpha(0.9);
 
     this.waveText = this.add.text(GAME_WIDTH / 2, 10, '\uC6E8\uC774\uBE0C 0/8', {
       fontSize: '13px', color: '#ffffff',
