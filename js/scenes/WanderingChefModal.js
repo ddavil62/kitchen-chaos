@@ -6,6 +6,8 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { WANDERING_CHEFS, GRADE_NAMES, GRADE_COLORS, GRADE_COSTS } from '../data/wanderingChefData.js';
 
@@ -18,13 +20,13 @@ export class WanderingChefModal extends Phaser.Scene {
     // 반투명 오버레이
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.75);
 
-    // 메인 패널
+    // Phase 60-19: 메인 패널 rect → NineSliceFactory.panel 'dark' + setTint
     const panelW = GAME_WIDTH - 20;
     const panelH = GAME_HEIGHT - 80;
     const panelX = GAME_WIDTH / 2;
     const panelY = GAME_HEIGHT / 2 + 10;
-    this.add.rectangle(panelX, panelY, panelW, panelH, 0x150c22)
-      .setStrokeStyle(2, 0x8833cc);
+    NineSliceFactory.panel(this, panelX, panelY, panelW, panelH, 'dark')
+      .setTint(0x150c22);
 
     // ── 헤더 ──
     this.add.text(GAME_WIDTH / 2, 52, '유랑 미력사', {
@@ -40,15 +42,19 @@ export class WanderingChefModal extends Phaser.Scene {
       fontSize: '11px', color: '#888888',
     }).setOrigin(0, 0.5);
 
-    // ── 닫기 버튼 (44x44 터치 타겟) ──
-    const closeBtn = this.add.rectangle(338, 30, 44, 44, 0x443344)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-19: 닫기 버튼 rect → NineSliceFactory.raw 'btn_icon_normal' + setTint
+    const CLOSE_SIZE = 44;
+    const closeBtn = NineSliceFactory.raw(this, 338, 30, CLOSE_SIZE, CLOSE_SIZE, 'btn_icon_normal');
+    closeBtn.setTint(0x443344);
+    const closeHit = new Phaser.Geom.Rectangle(-CLOSE_SIZE / 2, -CLOSE_SIZE / 2, CLOSE_SIZE, CLOSE_SIZE);
+    closeBtn.setInteractive(closeHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(338, 30, '\u2715', {
       fontSize: '14px', color: '#ccaadd',
     }).setOrigin(0.5);
     closeBtn.on('pointerdown', () => this._close());
-    closeBtn.on('pointerover', () => closeBtn.setFillStyle(0x664466));
-    closeBtn.on('pointerout', () => closeBtn.setFillStyle(0x443344));
+    // Phase 60-19: setFillStyle → setTexture + setTint
+    closeBtn.on('pointerover', () => { closeBtn.setTexture(NS_KEYS.BTN_ICON_PRESSED); closeBtn.setTint(0x664466); });
+    closeBtn.on('pointerout', () => { closeBtn.setTexture(NS_KEYS.BTN_ICON_NORMAL); closeBtn.setTint(0x443344); });
 
     // ── 카드 목록 ──
     this._listContainer = this.add.container(0, 0);
@@ -125,9 +131,9 @@ export class WanderingChefModal extends Phaser.Scene {
       const enhLevel = wc.enhancements[chef.id] || 1;
       const costs = GRADE_COSTS[chef.grade];
 
-      // 카드 배경
-      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + CARD_H / 2, CARD_W, CARD_H, 0x1a1030)
-        .setStrokeStyle(1, isHired ? 0x9944cc : (isUnlocked ? 0x554466 : 0x333333));
+      // Phase 60-19: 카드 배경 rect → NineSliceFactory.panel 'parchment' + setTint
+      const cardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, y + CARD_H / 2, CARD_W, CARD_H, 'parchment');
+      cardBg.setTint(0x1a1030);
       this._listContainer.add(cardBg);
 
       // 아이콘 + 이름 + 칭호
@@ -147,9 +153,10 @@ export class WanderingChefModal extends Phaser.Scene {
         })
       );
 
-      // 등급 뱃지 (카드 우측 안쪽에 완전 수용)
+      // Phase 60-19: 등급 뱃지 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
       const gradeColor = GRADE_COLORS[chef.grade];
-      const gradeBadge = this.add.rectangle(GAME_WIDTH - 52, y + 10, 60, 18, gradeColor, 0.8);
+      const gradeBadge = NineSliceFactory.raw(this, GAME_WIDTH - 52, y + 10, 60, 18, 'btn_primary_normal');
+      gradeBadge.setTint(gradeColor).setAlpha(0.8);
       this._listContainer.add(gradeBadge);
       this._listContainer.add(
         this.add.text(GAME_WIDTH - 52, y + 10, GRADE_NAMES[chef.grade], {
@@ -190,8 +197,12 @@ export class WanderingChefModal extends Phaser.Scene {
         if (enhLevel < 3) {
           const upgCost = enhLevel === 1 ? costs.upgrade1to2 : costs.upgrade2to3;
           const canUpg = essence >= upgCost;
-          const upgBtn = this.add.rectangle(GAME_WIDTH - 85, y + CARD_H - 18, 80, 22, canUpg ? 0x774400 : 0x333333)
-            .setInteractive({ useHandCursor: canUpg });
+          // Phase 60-19: 강화 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+          const UPG_W = 80, UPG_H = 22;
+          const upgBtn = NineSliceFactory.raw(this, GAME_WIDTH - 85, y + CARD_H - 18, UPG_W, UPG_H, 'btn_primary_normal');
+          upgBtn.setTint(canUpg ? 0x774400 : 0x333333);
+          const upgHit = new Phaser.Geom.Rectangle(-UPG_W / 2, -UPG_H / 2, UPG_W, UPG_H);
+          upgBtn.setInteractive(upgHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: canUpg });
           this._listContainer.add(upgBtn);
           this._listContainer.add(
             this.add.text(GAME_WIDTH - 85, y + CARD_H - 18, `\uAC15\uD654 \uD83D\uDCA0${upgCost}`, {
@@ -213,9 +224,12 @@ export class WanderingChefModal extends Phaser.Scene {
           );
         }
 
-        // 해고 버튼
-        const fireBtn = this.add.rectangle(GAME_WIDTH - 18, y + CARD_H - 18, 54, 22, 0x440022)
-          .setInteractive({ useHandCursor: true });
+        // Phase 60-19: 해고 버튼 rect → NineSliceFactory.raw 'btn_danger_normal' + setTint
+        const FIRE_W = 54, FIRE_H = 22;
+        const fireBtn = NineSliceFactory.raw(this, GAME_WIDTH - 18, y + CARD_H - 18, FIRE_W, FIRE_H, 'btn_danger_normal');
+        fireBtn.setTint(0x440022);
+        const fireHit = new Phaser.Geom.Rectangle(-FIRE_W / 2, -FIRE_H / 2, FIRE_W, FIRE_H);
+        fireBtn.setInteractive(fireHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
         this._listContainer.add(fireBtn);
         this._listContainer.add(
           this.add.text(GAME_WIDTH - 18, y + CARD_H - 18, '\uD574\uACE0', {
@@ -237,9 +251,13 @@ export class WanderingChefModal extends Phaser.Scene {
         const canHire = essence >= hireCost && hiredCount < hireLimit;
         const slotFull = hiredCount >= hireLimit;
 
+        // Phase 60-19: 고용 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+        const HIRE_W = 100, HIRE_H = 22;
         const hireBtnColor = canHire ? 0x442266 : 0x222222;
-        const hireBtn = this.add.rectangle(GAME_WIDTH - 65, y + CARD_H - 18, 100, 22, hireBtnColor)
-          .setInteractive({ useHandCursor: canHire });
+        const hireBtn = NineSliceFactory.raw(this, GAME_WIDTH - 65, y + CARD_H - 18, HIRE_W, HIRE_H, 'btn_primary_normal');
+        hireBtn.setTint(hireBtnColor);
+        const hireHit = new Phaser.Geom.Rectangle(-HIRE_W / 2, -HIRE_H / 2, HIRE_W, HIRE_H);
+        hireBtn.setInteractive(hireHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: canHire });
         this._listContainer.add(hireBtn);
 
         let hireBtnLabel;

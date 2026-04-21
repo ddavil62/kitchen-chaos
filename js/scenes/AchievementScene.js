@@ -11,6 +11,8 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { ACHIEVEMENT_CATEGORIES } from '../data/achievementData.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
@@ -44,8 +46,8 @@ export class AchievementScene extends Phaser.Scene {
     /** @type {number} 드래그 시작 시 스크롤 오프셋 */
     this._dragStartScrollY = 0;
 
-    // 배경
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x1a0a00);
+    // Phase 60-19: 배경 rect → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
 
     // ── 상단 바 ──
     this.add.text(20, 25, '\uD83C\uDFC6 \uC5C5\uC801', {
@@ -80,15 +82,20 @@ export class AchievementScene extends Phaser.Scene {
     // ── 스크롤 입력 ──
     this._setupScrollInput();
 
-    // ── 하단 돌아가기 버튼 ──
-    const backBtn = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT - 25, 180, 40, 0x444444)
-      .setInteractive({ useHandCursor: true }).setDepth(10);
+    // Phase 60-19: 돌아가기 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    const BACK_W = 180;
+    const BACK_H = 40;
+    const backBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, GAME_HEIGHT - 25, BACK_W, BACK_H, 'btn_secondary_normal');
+    backBtn.setTint(0x444444).setDepth(10);
+    const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
+    backBtn.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 25, '\uB3CC\uC544\uAC00\uAE30', {
       fontSize: '16px', color: '#cccccc', stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(10);
     backBtn.on('pointerdown', () => this._fadeToScene('MenuScene'));
-    backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
-    backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
+    // Phase 60-19: setFillStyle → setTexture + setTint
+    backBtn.on('pointerover', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBtn.setTint(0x666666); });
+    backBtn.on('pointerout', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBtn.setTint(0x444444); });
   }
 
   // ── 잔액 표시 ──
@@ -113,8 +120,11 @@ export class AchievementScene extends Phaser.Scene {
       const x = 5 + i * tabW;
       const w = tabW - 2;
 
-      const bg = this.add.rectangle(x + w / 2, TAB_Y, w, 36, 0x333333)
-        .setInteractive({ useHandCursor: true });
+      // Phase 60-19: 탭 배경 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+      const bg = NineSliceFactory.raw(this, x + w / 2, TAB_Y, w, 36, 'btn_secondary_normal');
+      bg.setTint(0x333333);
+      const bgHit = new Phaser.Geom.Rectangle(-w / 2, -18, w, 36);
+      bg.setInteractive(bgHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       const txt = this.add.text(x + w / 2, TAB_Y, cat.labelKo, {
         fontSize: '11px', fontStyle: 'bold', color: '#aaaaaa',
       }).setOrigin(0.5);
@@ -125,11 +135,12 @@ export class AchievementScene extends Phaser.Scene {
         this._updateTabHighlight();
         this._renderContent();
       });
+      // Phase 60-19: setFillStyle → setTint
       bg.on('pointerover', () => {
-        if (cat.id !== this._activeTab) bg.setFillStyle(0x444444);
+        if (cat.id !== this._activeTab) bg.setTint(0x444444);
       });
       bg.on('pointerout', () => {
-        bg.setFillStyle(cat.id === this._activeTab ? 0xff6b35 : 0x333333);
+        bg.setTint(cat.id === this._activeTab ? 0xff6b35 : 0x333333);
       });
 
       this._tabBgs[cat.id] = bg;
@@ -143,7 +154,8 @@ export class AchievementScene extends Phaser.Scene {
   _updateTabHighlight() {
     for (const cat of ACHIEVEMENT_CATEGORIES) {
       const isActive = cat.id === this._activeTab;
-      this._tabBgs[cat.id].setFillStyle(isActive ? 0xff6b35 : 0x333333);
+      // Phase 60-19: setFillStyle → setTint
+      this._tabBgs[cat.id].setTint(isActive ? 0xff6b35 : 0x333333);
       this._tabTexts[cat.id].setColor(isActive ? '#ffffff' : '#aaaaaa');
     }
   }
@@ -188,10 +200,10 @@ export class AchievementScene extends Phaser.Scene {
     const cardW = GAME_WIDTH - 16;
     const cardX = 8;
 
-    // 카드 배경
+    // Phase 60-19: 카드 배경 rect → NineSliceFactory.panel 'parchment' + setTint
     const bgColor = item.claimed ? 0x1a2a1a : (item.unlocked ? 0x2a2200 : 0x222222);
-    const bg = this.add.rectangle(cardX + cardW / 2, y + CARD_HEIGHT / 2, cardW, CARD_HEIGHT, bgColor)
-      .setStrokeStyle(1, item.unlocked ? 0xffd700 : 0x444444);
+    const bg = NineSliceFactory.panel(this, cardX + cardW / 2, y + CARD_HEIGHT / 2, cardW, CARD_HEIGHT, 'parchment');
+    bg.setTint(bgColor);
     container.add(bg);
 
     // 아이콘
@@ -235,9 +247,11 @@ export class AchievementScene extends Phaser.Scene {
       const btnX = statusX - btnW / 2;
       const btnY = y + CARD_HEIGHT / 2;
 
-      const claimBg = this.add.rectangle(btnX, btnY, btnW, btnH, 0xcc8800)
-        .setInteractive({ useHandCursor: true })
-        .setStrokeStyle(1, 0xffd700);
+      // Phase 60-19: 수령 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+      const claimBg = NineSliceFactory.raw(this, btnX, btnY, btnW, btnH, 'btn_primary_normal');
+      claimBg.setTint(0xcc8800);
+      const claimHit = new Phaser.Geom.Rectangle(-btnW / 2, -btnH / 2, btnW, btnH);
+      claimBg.setInteractive(claimHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       container.add(claimBg);
 
       const claimText = this.add.text(btnX, btnY, `\uC218\uB839 ${rewardLabel}`, {
@@ -251,8 +265,9 @@ export class AchievementScene extends Phaser.Scene {
         // 카드를 다시 렌더링
         this._renderContent();
       });
-      claimBg.on('pointerover', () => claimBg.setFillStyle(0xee9900));
-      claimBg.on('pointerout', () => claimBg.setFillStyle(0xcc8800));
+      // Phase 60-19: setFillStyle → setTexture + setTint
+      claimBg.on('pointerover', () => { claimBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); claimBg.setTint(0xee9900); });
+      claimBg.on('pointerout', () => { claimBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); claimBg.setTint(0xcc8800); });
 
     } else {
       // 미달성: 진행률 바
@@ -261,15 +276,17 @@ export class AchievementScene extends Phaser.Scene {
       const barX = statusX - barW;
       const barY = y + CARD_HEIGHT / 2 - 6;
 
-      // 바 배경
-      const barBg = this.add.rectangle(barX + barW / 2, barY + barH / 2, barW, barH, 0x444444);
+      // Phase 60-19: 진행 바 배경 rect → NineSliceFactory.panel 'stone' + setTint
+      const barBg = NineSliceFactory.panel(this, barX + barW / 2, barY + barH / 2, barW, barH, 'stone');
+      barBg.setTint(0x444444);
       container.add(barBg);
 
-      // 바 채움
+      // Phase 60-19: 진행 바 채움 rect → NineSliceFactory.raw 'bar_fill' + setTint
       const ratio = Math.min(item.current / item.threshold, 1);
       const fillW = Math.max(1, barW * ratio);
       const fillColor = ratio >= 1 ? 0x44ff44 : 0xff6b35;
-      const barFill = this.add.rectangle(barX + fillW / 2, barY + barH / 2, fillW, barH, fillColor);
+      const barFill = NineSliceFactory.raw(this, barX + fillW / 2, barY + barH / 2, fillW, barH, 'bar_fill');
+      barFill.setTint(fillColor);
       container.add(barFill);
 
       // 수치 텍스트

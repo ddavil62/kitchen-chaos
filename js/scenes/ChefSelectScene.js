@@ -13,6 +13,8 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { CHEF_TYPES, CHEF_ORDER } from '../data/chefData.js';
 import { ChefManager } from '../managers/ChefManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
@@ -80,8 +82,9 @@ export class ChefSelectScene extends Phaser.Scene {
     // ── 씬 전환 fadeIn ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
-    // ── 배경 ──
-    this.add.rectangle(CX, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0d0d1a);
+    // Phase 60-19: 배경 rect → NineSliceFactory.panel 'dark' + setTint
+    NineSliceFactory.panel(this, CX, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark')
+      .setTint(0x0d0d1a);
 
     // ── 타이틀 ──
     this.add.text(CX, 18, '\uC170\uD504\uB97C \uC120\uD0DD\uD558\uC138\uC694', {
@@ -297,9 +300,12 @@ export class ChefSelectScene extends Phaser.Scene {
    * @private
    */
   _buildArrowButtons() {
-    // 왼쪽 '<'
-    const leftBtn = this.add.rectangle(22, CARD_CY, 36, 60, 0x333344, 0.8)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-19: 왼쪽 화살표 rect → NineSliceFactory.raw 'btn_icon_normal' + setTint
+    const ARROW_W = 36, ARROW_H = 60;
+    const leftBtn = NineSliceFactory.raw(this, 22, CARD_CY, ARROW_W, ARROW_H, 'btn_icon_normal');
+    leftBtn.setTint(0x333344).setAlpha(0.8);
+    const leftHit = new Phaser.Geom.Rectangle(-ARROW_W / 2, -ARROW_H / 2, ARROW_W, ARROW_H);
+    leftBtn.setInteractive(leftHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(22, CARD_CY, '<', {
       fontSize: '22px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5);
@@ -308,12 +314,15 @@ export class ChefSelectScene extends Phaser.Scene {
       const newIdx = this._currentIndex - 1 < 0 ? this._chefList.length - 1 : this._currentIndex - 1;
       this._goToIndex(newIdx, true);
     });
-    leftBtn.on('pointerover', () => leftBtn.setFillStyle(0x555566));
-    leftBtn.on('pointerout', () => leftBtn.setFillStyle(0x333344));
+    // Phase 60-19: setFillStyle → setTexture + setTint
+    leftBtn.on('pointerover', () => { leftBtn.setTexture(NS_KEYS.BTN_ICON_PRESSED); leftBtn.setTint(0x555566); });
+    leftBtn.on('pointerout', () => { leftBtn.setTexture(NS_KEYS.BTN_ICON_NORMAL); leftBtn.setTint(0x333344); });
 
-    // 오른쪽 '>'
-    const rightBtn = this.add.rectangle(338, CARD_CY, 36, 60, 0x333344, 0.8)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-19: 오른쪽 화살표 rect → NineSliceFactory.raw 'btn_icon_normal' + setTint
+    const rightBtn = NineSliceFactory.raw(this, 338, CARD_CY, ARROW_W, ARROW_H, 'btn_icon_normal');
+    rightBtn.setTint(0x333344).setAlpha(0.8);
+    const rightHit = new Phaser.Geom.Rectangle(-ARROW_W / 2, -ARROW_H / 2, ARROW_W, ARROW_H);
+    rightBtn.setInteractive(rightHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(338, CARD_CY, '>', {
       fontSize: '22px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5);
@@ -322,8 +331,9 @@ export class ChefSelectScene extends Phaser.Scene {
       const newIdx = this._currentIndex + 1 >= this._chefList.length ? 0 : this._currentIndex + 1;
       this._goToIndex(newIdx, true);
     });
-    rightBtn.on('pointerover', () => rightBtn.setFillStyle(0x555566));
-    rightBtn.on('pointerout', () => rightBtn.setFillStyle(0x333344));
+    // Phase 60-19: setFillStyle → setTexture + setTint
+    rightBtn.on('pointerover', () => { rightBtn.setTexture(NS_KEYS.BTN_ICON_PRESSED); rightBtn.setTint(0x555566); });
+    rightBtn.on('pointerout', () => { rightBtn.setTexture(NS_KEYS.BTN_ICON_NORMAL); rightBtn.setTint(0x333344); });
   }
 
   // ── 선택 버튼 ──
@@ -333,8 +343,12 @@ export class ChefSelectScene extends Phaser.Scene {
    * @private
    */
   _buildSelectButton() {
-    this._selectBtnBg = this.add.rectangle(CX, 549, 200, 40, 0x44cc44)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-19: 선택 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    const SELECT_W = 200, SELECT_H = 40;
+    this._selectBtnBg = NineSliceFactory.raw(this, CX, 549, SELECT_W, SELECT_H, 'btn_primary_normal');
+    this._selectBtnBg.setTint(0x44cc44);
+    const selectHit = new Phaser.Geom.Rectangle(-SELECT_W / 2, -SELECT_H / 2, SELECT_W, SELECT_H);
+    this._selectBtnBg.setInteractive(selectHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this._selectBtnText = this.add.text(CX, 549, '\uC774 \uC170\uD504\uB85C \uC2DC\uC791', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
@@ -348,7 +362,8 @@ export class ChefSelectScene extends Phaser.Scene {
     this._selectBtnBg.on('pointerover', () => {
       const { locked } = this._chefList[this._currentIndex];
       if (!locked) {
-        this._selectBtnBg.setFillStyle(0x66ee66);
+        // Phase 60-19: setFillStyle → setTint
+        this._selectBtnBg.setTint(0x66ee66);
       }
     });
     this._selectBtnBg.on('pointerout', () => {
@@ -363,15 +378,19 @@ export class ChefSelectScene extends Phaser.Scene {
   _updateSelectButton() {
     const { chef, locked } = this._chefList[this._currentIndex];
     if (locked) {
-      this._selectBtnBg.setFillStyle(0x333333);
+      // Phase 60-19: setFillStyle → setTint
+      this._selectBtnBg.setTint(0x333333);
       this._selectBtnText.setColor('#555555');
       this._selectBtnText.setText('\uC7A0\uAE08\uB428');
       this._selectBtnBg.disableInteractive();
     } else {
-      this._selectBtnBg.setFillStyle(chef.color);
+      // Phase 60-19: setFillStyle → setTint
+      this._selectBtnBg.setTint(chef.color);
       this._selectBtnText.setColor('#ffffff');
       this._selectBtnText.setText('\uC774 \uC170\uD504\uB85C \uC2DC\uC791');
-      this._selectBtnBg.setInteractive({ useHandCursor: true });
+      const SELECT_W = 200, SELECT_H = 40;
+      const selectHit = new Phaser.Geom.Rectangle(-SELECT_W / 2, -SELECT_H / 2, SELECT_W, SELECT_H);
+      this._selectBtnBg.setInteractive(selectHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     }
   }
 
@@ -382,9 +401,12 @@ export class ChefSelectScene extends Phaser.Scene {
    * @private
    */
   _buildBottomControls() {
-    // ── "셰프 없이 시작" 버튼 ──
-    const skipBtn = this.add.rectangle(245, 615, 160, 28, 0x444444)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-19: "셰프 없이 시작" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    const SKIP_W = 160, SKIP_H = 28;
+    const skipBtn = NineSliceFactory.raw(this, 245, 615, SKIP_W, SKIP_H, 'btn_secondary_normal');
+    skipBtn.setTint(0x444444);
+    const skipHit = new Phaser.Geom.Rectangle(-SKIP_W / 2, -SKIP_H / 2, SKIP_W, SKIP_H);
+    skipBtn.setInteractive(skipHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(245, 615, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
       fontSize: '11px', color: '#aaaaaa',
       stroke: '#000', strokeThickness: 2,
@@ -393,12 +415,16 @@ export class ChefSelectScene extends Phaser.Scene {
     skipBtn.on('pointerdown', () => {
       this._startGame(null);
     });
-    skipBtn.on('pointerover', () => skipBtn.setFillStyle(0x666666));
-    skipBtn.on('pointerout', () => skipBtn.setFillStyle(0x444444));
+    // Phase 60-19: setFillStyle → setTexture + setTint
+    skipBtn.on('pointerover', () => { skipBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); skipBtn.setTint(0x666666); });
+    skipBtn.on('pointerout', () => { skipBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); skipBtn.setTint(0x444444); });
 
-    // ── "< 뒤로" 버튼 ──
-    const backBtn = this.add.rectangle(62, 615, 80, 28, 0x444444)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-19: "< 뒤로" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    const BACK_W = 80, BACK_H = 28;
+    const backBtn = NineSliceFactory.raw(this, 62, 615, BACK_W, BACK_H, 'btn_secondary_normal');
+    backBtn.setTint(0x444444);
+    const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
+    backBtn.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(62, 615, '< \uB4A4\uB85C', {
       fontSize: '10px', color: '#cccccc',
     }).setOrigin(0.5);
@@ -406,8 +432,9 @@ export class ChefSelectScene extends Phaser.Scene {
     backBtn.on('pointerdown', () => {
       this._onBack();
     });
-    backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
-    backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
+    // Phase 60-19: setFillStyle → setTexture + setTint
+    backBtn.on('pointerover', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBtn.setTint(0x666666); });
+    backBtn.on('pointerout', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBtn.setTint(0x444444); });
   }
 
   // ── 스와이프 처리 ──

@@ -15,6 +15,8 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
 
 // ── 레이아웃 상수 (C1+M 확정) ──
@@ -95,19 +97,16 @@ export class DialogueScene extends Phaser.Scene {
       0x000000, 0.3
     ).setDepth(PANEL_DEPTH - 1).setInteractive();
 
-    // ── 대화 패널 배경 ──
-    this._panelBg = this.add.rectangle(
-      GAME_WIDTH / 2, PANEL_Y + PANEL_HEIGHT / 2,
-      GAME_WIDTH, PANEL_HEIGHT,
-      PANEL_COLOR, PANEL_ALPHA
-    ).setDepth(PANEL_DEPTH);
+    // Phase 60-19: 대화 패널 배경 rect → NineSliceFactory.panel 'dark' + setTint
+    this._panelBg = NineSliceFactory.panel(
+      this, GAME_WIDTH / 2, PANEL_Y + PANEL_HEIGHT / 2,
+      GAME_WIDTH, PANEL_HEIGHT, 'dark'
+    );
+    this._panelBg.setTint(PANEL_COLOR).setAlpha(PANEL_ALPHA).setDepth(PANEL_DEPTH);
 
-    // 패널 상단 구분선
-    this._panelLine = this.add.rectangle(
-      GAME_WIDTH / 2, PANEL_Y,
-      GAME_WIDTH, 2,
-      0xff6b35, 0.6
-    ).setDepth(PANEL_DEPTH);
+    // Phase 60-19: 패널 상단 구분선 rect → NineSliceFactory.dividerH
+    this._panelLine = NineSliceFactory.dividerH(this, GAME_WIDTH / 2, PANEL_Y, GAME_WIDTH, 2);
+    this._panelLine.setTint(0xff6b35).setAlpha(0.6).setDepth(PANEL_DEPTH);
 
     // ── 캐릭터 초상화: 패널 위 돌출 (C1 레이아웃) ──
     this._portraitImage = this.add.image(PORTRAIT_CENTER_X, PORTRAIT_CENTER_Y, '__DEFAULT')
@@ -327,14 +326,15 @@ export class DialogueScene extends Phaser.Scene {
     limited.forEach((choice, i) => {
       const btnY = CHOICE_BASE_Y + i * (CHOICE_BTN_HEIGHT + CHOICE_BTN_GAP);
 
-      // 버튼 배경
-      const bg = this.add.rectangle(
-        GAME_WIDTH / 2, btnY,
+      // Phase 60-19: 선택지 배경 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+      const bg = NineSliceFactory.raw(
+        this, GAME_WIDTH / 2, btnY,
         CHOICE_BTN_WIDTH, CHOICE_BTN_HEIGHT,
-        CHOICE_BTN_COLOR, 0.9
-      ).setDepth(TEXT_DEPTH + 1)
-        .setStrokeStyle(1, 0xffd700)
-        .setInteractive({ useHandCursor: true });
+        'btn_primary_normal'
+      );
+      bg.setTint(CHOICE_BTN_COLOR).setAlpha(0.9).setDepth(TEXT_DEPTH + 1);
+      const choiceHit = new Phaser.Geom.Rectangle(-CHOICE_BTN_WIDTH / 2, -CHOICE_BTN_HEIGHT / 2, CHOICE_BTN_WIDTH, CHOICE_BTN_HEIGHT);
+      bg.setInteractive(choiceHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
       // 버튼 텍스트
       const label = this.add.text(GAME_WIDTH / 2, btnY, choice.label, {
@@ -344,13 +344,13 @@ export class DialogueScene extends Phaser.Scene {
         strokeThickness: 1,
       }).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
 
-      // 호버 효과
-      bg.on('pointerover', () => bg.setFillStyle(CHOICE_BTN_HOVER));
-      bg.on('pointerout', () => bg.setFillStyle(CHOICE_BTN_COLOR));
+      // Phase 60-19: setFillStyle → setTint
+      bg.on('pointerover', () => bg.setTint(CHOICE_BTN_HOVER));
+      bg.on('pointerout', () => bg.setTint(CHOICE_BTN_COLOR));
 
       // 선택 시: 터치 피드백 + 분기 진행 (AD 검수: pointerdown 피드백 추가)
       bg.on('pointerdown', () => {
-        bg.setFillStyle(0x7a6a20);
+        bg.setTint(0x7a6a20);
         this.time.delayedCall(80, () => {
           this._clearChoices();
           this._showingChoices = false;
