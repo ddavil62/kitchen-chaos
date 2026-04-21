@@ -1167,10 +1167,10 @@ export class ServiceScene extends Phaser.Scene {
 
       const container = this.add.container(cx, cy).setDepth(10);
 
-      // 슬롯 배경 — Phase 19-6: 웜 다크 팔레트로 통합
-      const bgRect = this.add.rectangle(0, 0, slotW - 10, COOK_H - 10, 0x2d1a08)
-        .setStrokeStyle(1, 0x4a3520);
-      container.add(bgRect);
+      // 슬롯 배경 (Phase 60-9: rectangle → NineSliceFactory.panel 'stone')
+      // 외부 panel_dark와 명도 대비를 위해 석조 텍스처 사용.
+      const bgPanel = NineSliceFactory.panel(this, 0, 0, slotW - 10, COOK_H - 10, 'stone');
+      container.add(bgPanel);
       if (SpriteLoader.hasTexture(this, 'counter_cooking')) {
         // 카운터 이미지를 슬롯 왼쪽에 자연 크기(비율 유지)로 배치
         const iconH = COOK_H - 14;
@@ -1186,13 +1186,16 @@ export class ServiceScene extends Phaser.Scene {
       }).setOrigin(0.5);
       container.add(label);
 
-      // 진행 바 배경
-      const progBg = this.add.rectangle(0, 10, slotW - 30, 8, 0x444455);
-      container.add(progBg);
-      // 진행 바
-      const progFill = this.add.rectangle(-(slotW - 30) / 2, 10, slotW - 30, 8, 0x44aaff)
-        .setOrigin(0, 0.5);
-      container.add(progFill);
+      // 진행 바 (Phase 60-9: progBg+progFill rect → NineSliceFactory.progressBar)
+      // 높이 14로 확장(bar_frame_h insets 6+6 요구 수용). 동일 위치 유지(y=10 → y=12).
+      const progBar = NineSliceFactory.progressBar(this, 0, 12, slotW - 30, 14, {
+        tint: 0x44aaff,
+        value: 0,
+        shine: false,
+        paddingX: 2,
+        paddingY: 2,
+      });
+      container.add(progBar);
 
       // 버리기 버튼 — ready 상태일 때만 표시
       const discardBtnW = 60;
@@ -1209,8 +1212,8 @@ export class ServiceScene extends Phaser.Scene {
       discardBtn.on('pointerdown', () => this._discardDish(i));
 
       container.setData('label', label);
-      container.setData('progBg', progBg);
-      container.setData('progFill', progFill);
+      // Phase 60-9: progFill 데이터키를 progressBar Container로 재사용(setValue/setTint API 기반)
+      container.setData('progFill', progBar);
       container.setData('progWidth', slotW - 30);
       container.setData('discardBtn', discardBtn);
       container.setData('discardLabel', discardLabel);
@@ -1239,9 +1242,11 @@ export class ServiceScene extends Phaser.Scene {
     discardLabel?.setVisible(false);
 
     // Phase 8-5: 주방 사고로 비활성화된 슬롯
+    // Phase 60-9: progFill은 progressBar Container → setValue(0~1)/setTint 사용.
     if (idx === this.accidentSlotIdx) {
       label.setText('\uD83D\uDD25 \uC0AC\uC6A9 \uBD88\uAC00').setColor('#ff4444');
-      progFill.setScale(0, 1).setFillStyle(0xff4444);
+      progFill.setValue(0);
+      progFill.setTint(0xff4444);
       return;
     }
 
@@ -1250,13 +1255,14 @@ export class ServiceScene extends Phaser.Scene {
       const remain = Math.ceil(slot.washTimeLeft / 1000);
       label.setText(`\uC138\uCC99\uC911... ${remain}\uCD08`).setColor('#aaaaaa');
       const ratio = 1 - (slot.washTimeLeft / WASH_TIME_MS);
-      progFill.setScale(Math.max(0, ratio), 1).setFillStyle(0x888888);
+      progFill.setValue(Math.max(0, ratio));
+      progFill.setTint(0x888888);
       return;
     }
 
     if (!slot.recipe) {
       label.setText('\uBE48 \uC2AC\uB86F').setColor('#888888');
-      progFill.setScale(0, 1);
+      progFill.setValue(0);
       return;
     }
 
@@ -1266,12 +1272,14 @@ export class ServiceScene extends Phaser.Scene {
 
     if (slot.ready) {
       label.setText(`\u2705 ${slot.recipe.nameKo}`).setColor('#44ff44');
-      progFill.setScale(1, 1).setFillStyle(0x44ff44);
+      progFill.setValue(1);
+      progFill.setTint(0x44ff44);
     } else {
       const remain = Math.ceil(slot.timeLeft / 1000);
       label.setText(`\uC870\uB9AC\uC911: ${slot.recipe.nameKo} ${remain}\uCD08`).setColor('#ffffff');
       const ratio = 1 - (slot.timeLeft / slot.totalTime);
-      progFill.setScale(Math.max(0, ratio), 1).setFillStyle(0x44aaff);
+      progFill.setValue(Math.max(0, ratio));
+      progFill.setTint(0x44aaff);
     }
   }
 
