@@ -1201,10 +1201,15 @@ export class ServiceScene extends Phaser.Scene {
       // 버리기 버튼 — ready 상태일 때만 표시
       const discardBtnW = 60;
       const discardBtnX = (slotW - 10) / 2 - discardBtnW / 2 - 2;
-      const discardBtn = this.add.rectangle(discardBtnX, -12, discardBtnW, 20, 0x662222)
-        .setStrokeStyle(1, 0xaa4444)
-        .setInteractive({ useHandCursor: true })
+      // Phase 60-20: rect → NineSliceFactory.raw btn_danger_normal + setTint
+      const discardBtn = NineSliceFactory.raw(this, discardBtnX, -12, discardBtnW, 20, 'btn_danger_normal')
+        .setTint(0x662222)
         .setVisible(false);
+      discardBtn.setInteractive(
+        new Phaser.Geom.Rectangle(-discardBtnW / 2, -10, discardBtnW, 20),
+        Phaser.Geom.Rectangle.Contains,
+        { useHandCursor: true },
+      );
       container.add(discardBtn);
       const discardLabel = this.add.text(discardBtnX, -12, '🗑 버리기', {
         fontSize: '9px', color: '#ffaaaa',
@@ -2967,9 +2972,10 @@ export class ServiceScene extends Phaser.Scene {
     const bannerX = GAME_WIDTH / 2;
     const bannerY = HUD_H + 30;
 
-    // 배너 배경 (Phase 52: depth 250→700 상향)
-    const bg = this.add.rectangle(bannerX, bannerY, bannerW, bannerH, evtDef.bannerColor, 0.9)
-      .setStrokeStyle(1, 0xffffff)
+    // Phase 60-20: rect → NineSliceFactory.panel 'parchment' + setTint (배너 배경)
+    const bg = NineSliceFactory.panel(this, bannerX, bannerY, bannerW, bannerH, 'parchment')
+      .setTint(evtDef.bannerColor)
+      .setAlpha(0.9)
       .setDepth(700);
 
     // 배너 텍스트 (Phase 52: depth 251→701 상향)

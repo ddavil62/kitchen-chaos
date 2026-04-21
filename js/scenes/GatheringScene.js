@@ -514,15 +514,19 @@ export class GatheringScene extends Phaser.Scene {
 
     categories.forEach((cat, i) => {
       const cx = 30 + i * 50;
-      const bg = this.add.rectangle(cx, tabY, 46, 14,
-        cat.id === this._activeTowerCategory ? 0x885500 : 0x333355
-      ).setDepth(101).setInteractive({ useHandCursor: true }).setScrollFactor(0);
+      // Phase 60-20: rect → NineSliceFactory.tab (active/inactive 텍스처 스왑)
+      const tab = NineSliceFactory.tab(this, cx, tabY, 46, 14, cat.label, {
+        active: cat.id === this._activeTowerCategory,
+        textStyle: { fontSize: '10px', color: '#ffffff' },
+      });
+      tab.setDepth(101).setScrollFactor(0);
+      tab.setInteractive(
+        new Phaser.Geom.Rectangle(-23, -7, 46, 14),
+        Phaser.Geom.Rectangle.Contains,
+        { useHandCursor: true },
+      );
 
-      const label = this.add.text(cx, tabY, cat.label, {
-        fontSize: '10px', color: '#ffffff',
-      }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
-
-      bg.on('pointerdown', () => {
+      tab.on('pointerdown', () => {
         if (this._activeTowerCategory === cat.id) return;
         this._activeTowerCategory = cat.id;
         this.selectedTowerType = null;
@@ -530,7 +534,7 @@ export class GatheringScene extends Phaser.Scene {
         this._updateTabHighlight();
       });
 
-      this._towerTabObjects.push({ bg, label, category: cat.id });
+      this._towerTabObjects.push({ bg: tab, label: tab._label, category: cat.id });
     });
   }
 
@@ -539,10 +543,9 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _updateTabHighlight() {
+    // Phase 60-20: setFillStyle → NineSliceFactory.tab setActive (텍스처 스왑)
     this._towerTabObjects.forEach(tab => {
-      tab.bg.setFillStyle(
-        tab.category === this._activeTowerCategory ? 0x885500 : 0x333355
-      );
+      tab.bg.setActive(tab.category === this._activeTowerCategory);
     });
   }
 
@@ -581,9 +584,14 @@ export class GatheringScene extends Phaser.Scene {
       const available = owned - deployed;
       const cx = btnWidth * i + btnWidth / 2;
 
-      const bg = this.add.rectangle(cx, btnY, btnWidth - 4, 30,
-        available > 0 ? 0x333355 : 0x222233
-      ).setDepth(101).setInteractive({ useHandCursor: true });
+      // Phase 60-20: rect → NineSliceFactory.raw btn_secondary_normal + setTint
+      const bg = NineSliceFactory.raw(this, cx, btnY, btnWidth - 4, 30, 'btn_secondary_normal')
+        .setDepth(101).setTint(available > 0 ? 0x333355 : 0x222233);
+      bg.setInteractive(
+        new Phaser.Geom.Rectangle(-(btnWidth - 4) / 2, -15, btnWidth - 4, 30),
+        Phaser.Geom.Rectangle.Contains,
+        { useHandCursor: true },
+      );
 
       const name = this.add.text(cx, btnY - 5, def.nameKo, {
         fontSize: '11px', color: available > 0 ? '#ffffff' : '#666666',
@@ -632,9 +640,14 @@ export class GatheringScene extends Phaser.Scene {
       const cx = btnWidth * i + btnWidth / 2;
       const canCraft = this.inventoryManager.hasEnough(recipe.ingredients);
 
-      const bg = this.add.rectangle(cx, btnY, btnWidth - 4, 30,
-        canCraft ? 0x335533 : 0x333333
-      ).setDepth(101).setInteractive({ useHandCursor: true });
+      // Phase 60-20: rect → NineSliceFactory.raw btn_secondary_normal + setTint
+      const bg = NineSliceFactory.raw(this, cx, btnY, btnWidth - 4, 30, 'btn_secondary_normal')
+        .setDepth(101).setTint(canCraft ? 0x335533 : 0x333333);
+      bg.setInteractive(
+        new Phaser.Geom.Rectangle(-(btnWidth - 4) / 2, -15, btnWidth - 4, 30),
+        Phaser.Geom.Rectangle.Contains,
+        { useHandCursor: true },
+      );
 
       const name = this.add.text(cx, btnY - 5, recipe.nameKo, {
         fontSize: '10px', color: canCraft ? '#88ff88' : '#666666',
@@ -713,6 +726,7 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _updateTowerBarSelection() {
+    // Phase 60-20: setFillStyle → setTint (NineSlice Container)
     this._towerBarButtons.forEach(btn => {
       const inventory = ToolManager.getToolInventory();
       const owned = inventory[btn.id]?.count || 0;
@@ -720,9 +734,9 @@ export class GatheringScene extends Phaser.Scene {
       const available = owned - deployed;
 
       if (btn.id === this.selectedTowerType) {
-        btn.bg.setFillStyle(0x885500);
+        btn.bg.setTint(0x885500);
       } else {
-        btn.bg.setFillStyle(available > 0 ? 0x333355 : 0x222233);
+        btn.bg.setTint(available > 0 ? 0x333355 : 0x222233);
       }
     });
   }
@@ -1080,16 +1094,27 @@ export class GatheringScene extends Phaser.Scene {
     const btnW = 48;
     const gap = 4;
 
+    // Phase 60-20: rect → NineSliceFactory.raw btn_primary/danger + setTint
     // [이동] 버튼 (파랑)
-    this._moveBg = this.add.rectangle(cx - btnW / 2 - gap / 2, btnY, btnW, 22, 0x2255aa, 0.92)
-      .setDepth(200).setInteractive({ useHandCursor: true });
+    this._moveBg = NineSliceFactory.raw(this, cx - btnW / 2 - gap / 2, btnY, btnW, 22, 'btn_primary_normal')
+      .setDepth(200).setTint(0x2255aa).setAlpha(0.92);
+    this._moveBg.setInteractive(
+      new Phaser.Geom.Rectangle(-btnW / 2, -11, btnW, 22),
+      Phaser.Geom.Rectangle.Contains,
+      { useHandCursor: true },
+    );
     this._moveLabel = this.add.text(cx - btnW / 2 - gap / 2, btnY, '이동', {
       fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(201);
 
     // [회수] 버튼 (빨강)
-    this._recallBg = this.add.rectangle(cx + btnW / 2 + gap / 2, btnY, btnW, 22, 0xaa3333, 0.92)
-      .setDepth(200).setInteractive({ useHandCursor: true });
+    this._recallBg = NineSliceFactory.raw(this, cx + btnW / 2 + gap / 2, btnY, btnW, 22, 'btn_danger_normal')
+      .setDepth(200).setTint(0xaa3333).setAlpha(0.92);
+    this._recallBg.setInteractive(
+      new Phaser.Geom.Rectangle(-btnW / 2, -11, btnW, 22),
+      Phaser.Geom.Rectangle.Contains,
+      { useHandCursor: true },
+    );
     this._recallLabel = this.add.text(cx + btnW / 2 + gap / 2, btnY, '회수', {
       fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(201);
@@ -2058,8 +2083,9 @@ export class GatheringScene extends Phaser.Scene {
 
     // 최초 생성
     if (!this._orderContainer) {
-      this._orderBg = this.add.rectangle(GAME_WIDTH / 2, 34, 280, 14, 0x222244, 0.85)
-        .setDepth(101);
+      // Phase 60-20: rect → NineSliceFactory.panel 'dark' + setTint + setAlpha
+      this._orderBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, 34, 280, 14, 'dark')
+        .setDepth(101).setTint(0x222244).setAlpha(0.85);
       this._orderLabel = this.add.text(GAME_WIDTH / 2, 34, '', {
         fontSize: '9px', color: '#ffffff',
         stroke: '#000000', strokeThickness: 1,
@@ -2080,14 +2106,15 @@ export class GatheringScene extends Phaser.Scene {
 
     let displayText = `[오더] ${status.descKo} ${progressText}`;
 
+    // Phase 60-20: setFillStyle → setTint (NineSlice Container)
     if (status.completed) {
-      this._orderBg.setFillStyle(0x225522, 0.85);
+      this._orderBg.setTint(0x225522);
       this._orderLabel.setColor('#44ff44');
     } else if (status.failed) {
-      this._orderBg.setFillStyle(0x552222, 0.85);
+      this._orderBg.setTint(0x552222);
       this._orderLabel.setColor('#ff4444');
     } else {
-      this._orderBg.setFillStyle(0x222244, 0.85);
+      this._orderBg.setTint(0x222244);
       this._orderLabel.setColor('#ffffff');
     }
 
@@ -2158,24 +2185,34 @@ export class GatheringScene extends Phaser.Scene {
     const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5)
       .setDepth(300).setInteractive();
 
-    // 팝업 배경
-    const popBg = this.add.rectangle(cx, cy, 200, 120, 0x1a1a2e)
-      .setDepth(301).setStrokeStyle(2, 0x6666aa);
+    // Phase 60-20: rect → NineSliceFactory.panel 'parchment'
+    const popBg = NineSliceFactory.panel(this, cx, cy, 200, 120, 'parchment')
+      .setDepth(301);
 
     const title = this.add.text(cx, cy - 36, '일시 정지', {
-      fontSize: '14px', color: '#ffffff', fontStyle: 'bold',
+      fontSize: '14px', color: '#3a2818', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(302);
 
-    // [계속하기] 버튼
-    const resumeBg = this.add.rectangle(cx, cy - 4, 160, 28, 0x225522)
-      .setDepth(301).setInteractive({ useHandCursor: true });
+    // Phase 60-20: rect → NineSliceFactory.raw btn_primary_normal + setTint (계속하기)
+    const resumeBg = NineSliceFactory.raw(this, cx, cy - 4, 160, 28, 'btn_primary_normal')
+      .setDepth(301).setTint(0x225522);
+    resumeBg.setInteractive(
+      new Phaser.Geom.Rectangle(-80, -14, 160, 28),
+      Phaser.Geom.Rectangle.Contains,
+      { useHandCursor: true },
+    );
     const resumeLabel = this.add.text(cx, cy - 4, '계속하기', {
       fontSize: '13px', color: '#88ff88',
     }).setOrigin(0.5).setDepth(302);
 
-    // [메뉴로 나가기] 버튼
-    const exitBg = this.add.rectangle(cx, cy + 30, 160, 28, 0x552222)
-      .setDepth(301).setInteractive({ useHandCursor: true });
+    // Phase 60-20: rect → NineSliceFactory.raw btn_danger_normal + setTint (메뉴로 나가기)
+    const exitBg = NineSliceFactory.raw(this, cx, cy + 30, 160, 28, 'btn_danger_normal')
+      .setDepth(301).setTint(0x552222);
+    exitBg.setInteractive(
+      new Phaser.Geom.Rectangle(-80, -14, 160, 28),
+      Phaser.Geom.Rectangle.Contains,
+      { useHandCursor: true },
+    );
     const exitLabel = this.add.text(cx, cy + 30, '메뉴로 나가기', {
       fontSize: '13px', color: '#ff8888',
     }).setOrigin(0.5).setDepth(302);
@@ -2213,7 +2250,9 @@ export class GatheringScene extends Phaser.Scene {
     }
 
     const msgY = GAME_AREA_Y + GAME_AREA_HEIGHT / 2;
-    const bg = this.add.rectangle(GAME_WIDTH / 2, msgY, 280, 70, 0x000000, 0.8).setDepth(120);
+    // Phase 60-20: rect → NineSliceFactory.panel 'dark' + setAlpha
+    const bg = NineSliceFactory.panel(this, GAME_WIDTH / 2, msgY, 280, 70, 'dark')
+      .setDepth(120).setAlpha(0.8);
     const text = this.add.text(GAME_WIDTH / 2, msgY, message, {
       fontSize: '15px', color: '#ffffff', align: 'center', lineSpacing: 5,
       stroke: '#000000', strokeThickness: 2,
