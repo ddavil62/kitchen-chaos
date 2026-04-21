@@ -22,12 +22,15 @@
  *           addGiftIngredients, consumeGiftIngredients 헬퍼 추가.
  * Phase 55-4: v21 마이그레이션 — endless.stormCount, missionSuccessCount, noLeakStreak 추가.
  *             incrementEndlessStormCount, incrementEndlessMissionSuccess, updateEndlessNoLeakStreak 헬퍼 추가.
+ * Phase 58-1: v24 마이그레이션 — 행상인 분기 카드 시스템 branchCards 필드 추가
+ *             (toolMutations, unlockedBranchRecipes, chefBonds, activeBlessing).
+ *             분기 카드 헬퍼 메서드 9개 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 23;
+const SAVE_VERSION = 24;
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -132,6 +135,15 @@ function createDefault() {
       stormCount: 0,              // 누적 미력 폭풍의 눈 클리어 횟수
       missionSuccessCount: 0,     // 누적 정화 임무 성공 횟수
       noLeakStreak: 0,            // 현재 라이프 손실 없이 연속 클리어 중인 웨이브 수
+    },
+    // ── Phase 58-1 추가: 분기 카드 시스템 ──
+    branchCards: {
+      toolMutations: {},          // { [toolId]: mutationId } — 변이된 도구 맵 (도구당 1개, 되돌릴 수 없음)
+      unlockedBranchRecipes: [],  // 해금된 분기 레시피 ID 배열
+      chefBonds: [],              // 해금된 인연 카드 ID 배열 (예: ['bond_lao_grill'])
+      activeBlessing: null,       // { id: string, remainingStages: number } | null — 활성 축복
+      // ── Phase 58-2 추가: 방문별 선택 완료 상태 ──
+      lastVisit: null,            // { stageId: string, selectedCardId: string } | null — 마지막 행상인 방문에서 이미 선택한 카드
     },
   };
 }
@@ -862,6 +874,183 @@ export class SaveManager {
     SaveManager.save(data);
   }
 
+  // ── 분기 카드 시스템 (Phase 58-1) ──
+
+  /**
+   * branchCards 필드를 안전하게 조회한다. 마이그레이션 누락 등 예외 상황 방어용.
+   * @returns {{ toolMutations: object, unlockedBranchRecipes: string[], chefBonds: string[], activeBlessing: object|null }}
+   * @private
+   */
+  static _getBranchCards() {
+    const data = SaveManager.load();
+    if (!data.branchCards) {
+      data.branchCards = {
+        toolMutations: {},
+        unlockedBranchRecipes: [],
+        chefBonds: [],
+        activeBlessing: null,
+        lastVisit: null,
+      };
+      SaveManager.save(data);
+    }
+    // Phase 58-2: lastVisit 필드 누락 방어 (v24 기존 세이브 호환)
+    if (data.branchCards.lastVisit === undefined) {
+      data.branchCards.lastVisit = null;
+    }
+    return data.branchCards;
+  }
+
+  /**
+   * 변이된 도구 맵 반환.
+   * @returns {{ [toolId: string]: string }} 예: { pan: 'mut_pan_flame' }
+   */
+  static getToolMutations() {
+    return { ...SaveManager._getBranchCards().toolMutations };
+  }
+
+  /**
+   * 도구에 변이를 적용한다. 이미 변이가 있으면 덮어쓰지 않는다 (되돌릴 수 없음).
+   * @param {string} toolId
+   * @param {string} mutationId
+   * @returns {boolean} 신규 적용 성공 여부 (이미 변이가 있으면 false)
+   */
+  static applyToolMutation(toolId, mutationId) {
+    const data = SaveManager.load();
+    if (!data.branchCards) {
+      data.branchCards = { toolMutations: {}, unlockedBranchRecipes: [], chefBonds: [], activeBlessing: null };
+    }
+    if (data.branchCards.toolMutations[toolId]) {
+      return false; // 이미 변이 적용됨 (되돌릴 수 없음 규칙)
+    }
+    data.branchCards.toolMutations[toolId] = mutationId;
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
+   * 해금된 분기 레시피 ID 목록 반환.
+   * @returns {string[]}
+   */
+  static getUnlockedBranchRecipes() {
+    return [...SaveManager._getBranchCards().unlockedBranchRecipes];
+  }
+
+  /**
+   * 분기 레시피 해금 추가. 중복 방지.
+   * @param {string} recipeId
+   * @returns {boolean} 신규 해금 여부
+   */
+  static unlockBranchRecipe(recipeId) {
+    const data = SaveManager.load();
+    if (!data.branchCards) {
+      data.branchCards = { toolMutations: {}, unlockedBranchRecipes: [], chefBonds: [], activeBlessing: null };
+    }
+    if (data.branchCards.unlockedBranchRecipes.includes(recipeId)) return false;
+    data.branchCards.unlockedBranchRecipes.push(recipeId);
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
+   * 해금된 인연 카드 ID 목록 반환.
+   * @returns {string[]}
+   */
+  static getChefBonds() {
+    return [...SaveManager._getBranchCards().chefBonds];
+  }
+
+  /**
+   * 인연 카드 해금 추가. 중복 방지.
+   * @param {string} bondId - 카드 자체의 ID (예: 'bond_lao_grill')
+   * @returns {boolean} 신규 해금 여부
+   */
+  static unlockChefBond(bondId) {
+    const data = SaveManager.load();
+    if (!data.branchCards) {
+      data.branchCards = { toolMutations: {}, unlockedBranchRecipes: [], chefBonds: [], activeBlessing: null };
+    }
+    if (data.branchCards.chefBonds.includes(bondId)) return false;
+    data.branchCards.chefBonds.push(bondId);
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
+   * 현재 활성 축복을 반환한다. 없으면 null.
+   * @returns {{ id: string, remainingStages: number }|null}
+   */
+  static getActiveBlessing() {
+    const bless = SaveManager._getBranchCards().activeBlessing;
+    return bless ? { ...bless } : null;
+  }
+
+  /**
+   * 활성 축복을 설정한다. 기존 값을 덮어쓴다 (갱신 규칙). null 전달 시 해제.
+   * @param {{ id: string, remainingStages: number }|null} blessing
+   */
+  static setActiveBlessing(blessing) {
+    const data = SaveManager.load();
+    if (!data.branchCards) {
+      data.branchCards = { toolMutations: {}, unlockedBranchRecipes: [], chefBonds: [], activeBlessing: null };
+    }
+    if (blessing === null || blessing === undefined) {
+      data.branchCards.activeBlessing = null;
+    } else {
+      data.branchCards.activeBlessing = {
+        id: blessing.id,
+        remainingStages: Math.max(0, blessing.remainingStages | 0),
+      };
+    }
+    SaveManager.save(data);
+  }
+
+  /**
+   * 활성 축복의 잔여 스테이지를 1 차감한다. 0 이하가 되면 null로 초기화.
+   * ResultScene 정산 직후(MerchantScene 또는 ChefSelectScene 전환 직전)에만 호출한다.
+   * @returns {{ id: string, remainingStages: number }|null} 차감 후 활성 축복 (없으면 null)
+   */
+  static decrementBlessingStages() {
+    const data = SaveManager.load();
+    if (!data.branchCards || !data.branchCards.activeBlessing) return null;
+    const bless = data.branchCards.activeBlessing;
+    bless.remainingStages = (bless.remainingStages | 0) - 1;
+    if (bless.remainingStages <= 0) {
+      data.branchCards.activeBlessing = null;
+      SaveManager.save(data);
+      return null;
+    }
+    SaveManager.save(data);
+    return { ...data.branchCards.activeBlessing };
+  }
+
+  /**
+   * 현재 stageId 기준 방문에서 이미 선택한 카드 정보를 반환한다.
+   * @param {string} stageId - 확인할 행상인 방문의 stageId
+   * @returns {{ stageId: string, selectedCardId: string }|null} 같은 stageId이면 이미 선택한 카드 정보, 아니면 null
+   */
+  static getLastVisitSelection(stageId) {
+    const visit = SaveManager._getBranchCards().lastVisit;
+    if (!visit || visit.stageId !== stageId) return null;
+    return { ...visit };
+  }
+
+  /**
+   * 현재 행상인 방문에서 분기 카드를 선택했음을 기록한다.
+   * 이후 동일 stageId로 MerchantScene에 재진입해도 "이미 선택됨" 상태가 복원된다.
+   * @param {string} stageId
+   * @param {string} selectedCardId
+   */
+  static markVisitSelection(stageId, selectedCardId) {
+    const data = SaveManager.load();
+    if (!data.branchCards) {
+      data.branchCards = {
+        toolMutations: {}, unlockedBranchRecipes: [], chefBonds: [], activeBlessing: null, lastVisit: null,
+      };
+    }
+    data.branchCards.lastVisit = { stageId: String(stageId), selectedCardId: String(selectedCardId) };
+    SaveManager.save(data);
+  }
+
   // ── localStorage 용량 체크 (Phase 11-3d) ──
 
   /**
@@ -1141,6 +1330,22 @@ export class SaveManager {
         data.selectedChef = chefIdMap[data.selectedChef];
       }
       data.version = 23;
+    }
+
+    // v23 → v24: 행상인 분기 카드 시스템 추가 (Phase 58-1)
+    if (data.version < 24) {
+      data.branchCards = data.branchCards || {
+        toolMutations: {},
+        unlockedBranchRecipes: [],
+        chefBonds: [],
+        activeBlessing: null,
+      };
+      // 부분 필드 누락 방어 (혹시 사용자가 수동으로 branchCards 일부만 추가한 경우)
+      if (!data.branchCards.toolMutations)         data.branchCards.toolMutations = {};
+      if (!data.branchCards.unlockedBranchRecipes) data.branchCards.unlockedBranchRecipes = [];
+      if (!data.branchCards.chefBonds)             data.branchCards.chefBonds = [];
+      if (data.branchCards.activeBlessing === undefined) data.branchCards.activeBlessing = null;
+      data.version = 24;
     }
 
     return data;

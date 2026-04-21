@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Phase 52 AD 재검증</title>
+<style>
+body { background: #1a1a2e; color: #e0e0e0; font-family: monospace; margin: 0; padding: 16px; }
+h1 { color: #00FFD4; font-size: 16px; margin-bottom: 8px; }
+h2 { color: #FFD700; font-size: 13px; margin: 12px 0 6px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+.checker {
+  background-image:
+    linear-gradient(45deg, #888 25%, transparent 25%),
+    linear-gradient(-45deg, #888 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #888 75%),
+    linear-gradient(-45deg, transparent 75%, #888 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: #aaa;
+  border: 1px solid #555;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+img { image-rendering: pixelated; }
+.lbl { font-size: 9px; color: #aaa; text-align: center; display: block; margin-top: 2px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; align-items: flex-end; }
+.item { text-align: center; }
+.hall-cell {
+  position: relative;
+  border: 1px solid #444;
+  border-radius: 4px;
+  overflow: hidden;
+  display: inline-block;
+  width: 220px; height: 160px;
+}
+.hall-cell .lbl2 {
+  position: absolute; bottom: 2px; left: 2px;
+  font-size: 8px; background: rgba(0,0,0,0.75); color: #fff; padding: 1px 3px; border-radius: 2px;
+  z-index: 10;
+}
+</style>
+</head>
+<body>
+<h1>Phase 52 AD 모드2 재검증 - 2026-04-19</h1>
+<h2>F1. 전 20장 체커보드 투명 확인 (투명=PASS, 흰박스=FAIL)</h2>
+<h2 style="font-size:11px;color:#88f;">테이블 back (96x64)</h2>
+<div class="row">  <div class="item"><div class="checker" style="width:96px;height:64px;"><img src="assets/service/table_lv0_back.png" width="96" height="64"></div><span class="lbl">lv0_back</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:64px;"><img src="assets/service/table_lv1_back.png" width="96" height="64"></div><span class="lbl">lv1_back</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:64px;"><img src="assets/service/table_lv2_back.png" width="96" height="64"></div><span class="lbl">lv2_back</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:64px;"><img src="assets/service/table_lv3_back.png" width="96" height="64"></div><span class="lbl">lv3_back</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:64px;"><img src="assets/service/table_lv4_back.png" width="96" height="64"></div><span class="lbl">lv4_back</span></div>
+</div>
+<h2 style="font-size:11px;color:#88f;">테이블 front (96x52)</h2>
+<div class="row">  <div class="item"><div class="checker" style="width:96px;height:52px;"><img src="assets/service/table_lv0_front.png" width="96" height="52"></div><span class="lbl">lv0_front</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:52px;"><img src="assets/service/table_lv1_front.png" width="96" height="52"></div><span class="lbl">lv1_front</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:52px;"><img src="assets/service/table_lv2_front.png" width="96" height="52"></div><span class="lbl">lv2_front</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:52px;"><img src="assets/service/table_lv3_front.png" width="96" height="52"></div><span class="lbl">lv3_front</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:52px;"><img src="assets/service/table_lv4_front.png" width="96" height="52"></div><span class="lbl">lv4_front</span></div>
+</div>
+<h2 style="font-size:11px;color:#88f;">손님 waiting</h2>
+<div class="row">  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_normal_waiting.png" width="96" height="128"></div><span class="lbl">normal_w</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_vip_waiting.png" width="96" height="128"></div><span class="lbl">vip_w</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_gourmet_waiting.png" width="96" height="128"></div><span class="lbl">gourmet_w</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_rushed_waiting.png" width="96" height="128"></div><span class="lbl">rushed_w</span></div>
+  <div class="item"><div class="checker" style="width:128px;height:128px;"><img src="assets/service/customer_group_waiting.png" width="128" height="128"></div><span class="lbl">group_w</span></div>
+</div>
+<h2 style="font-size:11px;color:#88f;">손님 seated</h2>
+<div class="row">  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_normal_seated.png" width="96" height="128"></div><span class="lbl">normal_s</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_vip_seated.png" width="96" height="128"></div><span class="lbl">vip_s</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_gourmet_seated.png" width="96" height="128"></div><span class="lbl">gourmet_s</span></div>
+  <div class="item"><div class="checker" style="width:96px;height:128px;"><img src="assets/service/customer_rushed_seated.png" width="96" height="128"></div><span class="lbl">rushed_s</span></div>
+  <div class="item"><div class="checker" style="width:128px;height:128px;"><img src="assets/service/customer_group_seated.png" width="128" height="128"></div><span class="lbl">group_s</span></div>
+</div>
+<h2>F2. customer_group_waiting 천막 제거 확인</h2>
+<div class="row">
+  <div class="item"><div class="checker" style="width:128px;height:128px;"><img src="assets/service/customer_group_waiting.png" width="128" height="128"></div><span class="lbl">group_waiting (천막제거후)</span></div>
+  <div class="item"><div class="checker" style="width:128px;height:128px;"><img src="assets/service/customer_group_seated.png" width="128" height="128"></div><span class="lbl">group_seated</span></div>
+</div>
+<h2>F3. 테이블 back+front 합성 정렬 (lv0~lv4)</h2>
+<div class="row">
+  <div class="item">
+    <div class="checker" style="width:96px;height:116px;">
+      <div style="position:relative;width:96px;height:116px;">
+        <img src="assets/service/table_lv0_back.png" style="position:absolute;top:0;left:0;width:96px;height:64px;">
+        <img src="assets/service/table_lv0_front.png" style="position:absolute;top:64px;left:0;width:96px;height:52px;">
+      </div>
+    </div>
+    <span class="lbl">lv0 back+front</span>
+  </div>
+  <div class="item">
+    <div class="checker" style="width:96px;height:116px;">
+      <div style="position:relative;width:96px;height:116px;">
+        <img src="assets/service/table_lv1_back.png" style="position:absolute;top:0;left:0;width:96px;height:64px;">
+        <img src="assets/service/table_lv1_front.png" style="position:absolute;top:64px;left:0;width:96px;height:52px;">
+      </div>
+    </div>
+    <span class="lbl">lv1 back+front</span>
+  </div>
+  <div class="item">
+    <div class="checker" style="width:96px;height:116px;">
+      <div style="position:relative;width:96px;height:116px;">
+        <img src="assets/service/table_lv2_back.png" style="position:absolute;top:0;left:0;width:96px;height:64px;">
+        <img src="assets/service/table_lv2_front.png" style="position:absolute;top:64px;left:0;width:96px;height:52px;">
+      </div>
+    </div>
+    <span class="lbl">lv2 back+front</span>
+  </div>
+  <div class="item">
+    <div class="checker" style="width:96px;height:116px;">
+      <div style="position:relative;width:96px;height:116px;">
+        <img src="assets/service/table_lv3_back.png" style="position:absolute;top:0;left:0;width:96px;height:64px;">
+        <img src="assets/service/table_lv3_front.png" style="position:absolute;top:64px;left:0;width:96px;height:52px;">
+      </div>
+    </div>
+    <span class="lbl">lv3 back+front</span>
+  </div>
+  <div class="item">
+    <div class="checker" style="width:96px;height:116px;">
+      <div style="position:relative;width:96px;height:116px;">
+        <img src="assets/service/table_lv4_back.png" style="position:absolute;top:0;left:0;width:96px;height:64px;">
+        <img src="assets/service/table_lv4_front.png" style="position:absolute;top:64px;left:0;width:96px;height:52px;">
+      </div>
+    </div>
+    <span class="lbl">lv4 back+front</span>
+  </div>
+</div>
+<h2>F1-B. 홀 바닥 합성 (floor_hall.png 위 오버레이)</h2>
+<div class="row">
+  <div class="item">
+    <div class="hall-cell">
+      <img src="assets/service/floor_hall.png" style="position:absolute;top:0;left:0;width:220px;height:160px;object-fit:cover;">
+      <img src="assets/service/table_lv0_back.png" style="position:absolute;top:30px;left:60px;width:96px;height:64px;image-rendering:pixelated;">
+      <span class="lbl2">lv0_back</span>
+    </div>
+  </div>
+  <div class="item">
+    <div class="hall-cell">
+      <img src="assets/service/floor_hall.png" style="position:absolute;top:0;left:0;width:220px;height:160px;object-fit:cover;">
+      <img src="assets/service/table_lv1_back.png" style="position:absolute;top:30px;left:60px;width:96px;height:64px;image-rendering:pixelated;">
+      <span class="lbl2">lv1_back</span>
+    </div>
+  </div>
+  <div class="item">
+    <div class="hall-cell">
+      <img src="assets/service/floor_hall.png" style="position:absolute;top:0;left:0;width:220px;height:160px;object-fit:cover;">
+      <img src="assets/service/customer_normal_waiting.png" style="position:absolute;top:10px;left:60px;width:96px;height:128px;image-rendering:pixelated;">
+      <span class="lbl2">normal_w</span>
+    </div>
+  </div>
+  <div class="item">
+    <div class="hall-cell">
+      <img src="assets/service/floor_hall.png" style="position:absolute;top:0;left:0;width:220px;height:160px;object-fit:cover;">
+      <img src="assets/service/customer_group_waiting.png" style="position:absolute;top:10px;left:45px;width:128px;height:128px;image-rendering:pixelated;">
+      <span class="lbl2">group_w</span>
+    </div>
+  </div>
+  <div class="item">
+    <div class="hall-cell">
+      <img src="assets/service/floor_hall.png" style="position:absolute;top:0;left:0;width:220px;height:160px;object-fit:cover;">
+      <img src="assets/service/customer_group_seated.png" style="position:absolute;top:10px;left:45px;width:128px;height:128px;image-rendering:pixelated;">
+      <span class="lbl2">group_s</span>
+    </div>
+  </div>
+  <div class="item">
+    <div class="hall-cell">
+      <img src="assets/service/floor_hall.png" style="position:absolute;top:0;left:0;width:220px;height:160px;object-fit:cover;">
+      <img src="assets/service/table_lv4_back.png" style="position:absolute;top:30px;left:60px;width:96px;height:64px;image-rendering:pixelated;">
+      <span class="lbl2">lv4_back</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

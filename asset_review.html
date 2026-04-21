@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Kitchen Chaos Phase 52 - Asset Review</title>
+<style>
+  body { background: #2a2a2a; color: #fff; font-family: monospace; margin: 0; padding: 16px; }
+  h1 { font-size: 18px; color: #FFD700; margin-bottom: 8px; }
+  h2 { font-size: 14px; color: #00FFD4; margin: 12px 0 6px; border-bottom: 1px solid #444; padding-bottom: 4px; }
+  .section { margin-bottom: 20px; }
+  .row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 8px; }
+  .cell { text-align: center; }
+  .cell span { display: block; font-size: 10px; color: #aaa; margin-top: 4px; }
+  .cell img { image-rendering: pixelated; border: 1px solid #555; background: #1a1a1a; display: block; }
+  .bg-check { background: #8B4513 !important; }
+  .combined { position: relative; display: inline-block; }
+  .combined img.back { display: block; }
+  .combined img.front { position: absolute; bottom: 0; left: 0; }
+  .warn { color: #FF6B35; font-size: 11px; }
+</style>
+</head>
+<body>
+<h1>Kitchen Chaos Phase 52 - Asset AD Review</h1>
+
+<div class="section">
+<h2>테이블 back (96x64) - 등급 비교</h2>
+<div class="row">
+  <div class="cell"><img src="assets/service/table_lv0_back.png" width="96" height="64"><span>lv0 back</span></div>
+  <div class="cell"><img src="assets/service/table_lv1_back.png" width="96" height="64"><span>lv1 back</span></div>
+  <div class="cell"><img src="assets/service/table_lv2_back.png" width="96" height="64"><span>lv2 back</span></div>
+  <div class="cell"><img src="assets/service/table_lv3_back.png" width="96" height="64"><span>lv3 back</span></div>
+  <div class="cell"><img src="assets/service/table_lv4_back.png" width="96" height="64"><span>lv4 back</span></div>
+</div>
+<p class="warn">* 배경색이 흰색인지 확인 필요 (기존 에셋은 투명 배경)</p>
+</div>
+
+<div class="section">
+<h2>테이블 front (96x52) - 등급 비교</h2>
+<div class="row">
+  <div class="cell"><img src="assets/service/table_lv0_front.png" width="96" height="52"><span>lv0 front</span></div>
+  <div class="cell"><img src="assets/service/table_lv1_front.png" width="96" height="52"><span>lv1 front</span></div>
+  <div class="cell"><img src="assets/service/table_lv2_front.png" width="96" height="52"><span>lv2 front</span></div>
+  <div class="cell"><img src="assets/service/table_lv3_front.png" width="96" height="52"><span>lv3 front</span></div>
+  <div class="cell"><img src="assets/service/table_lv4_front.png" width="96" height="52"><span>lv4 front</span></div>
+</div>
+</div>
+
+<div class="section">
+<h2>테이블 back+front 합성 (갈색 배경으로 투명도 확인)</h2>
+<div class="row">
+  <div class="cell" style="background:#8B4513; padding:4px;">
+    <div class="combined">
+      <img class="back" src="assets/service/table_lv0_back.png" width="96" height="64">
+      <img class="front" src="assets/service/table_lv0_front.png" width="96" height="52">
+    </div>
+    <span>lv0 합성</span>
+  </div>
+  <div class="cell" style="background:#8B4513; padding:4px;">
+    <div class="combined">
+      <img class="back" src="assets/service/table_lv1_back.png" width="96" height="64">
+      <img class="front" src="assets/service/table_lv1_front.png" width="96" height="52">
+    </div>
+    <span>lv1 합성</span>
+  </div>
+  <div class="cell" style="background:#8B4513; padding:4px;">
+    <div class="combined">
+      <img class="back" src="assets/service/table_lv2_back.png" width="96" height="64">
+      <img class="front" src="assets/service/table_lv2_front.png" width="96" height="52">
+    </div>
+    <span>lv2 합성</span>
+  </div>
+  <div class="cell" style="background:#8B4513; padding:4px;">
+    <div class="combined">
+      <img class="back" src="assets/service/table_lv3_back.png" width="96" height="64">
+      <img class="front" src="assets/service/table_lv3_front.png" width="96" height="52">
+    </div>
+    <span>lv3 합성</span>
+  </div>
+  <div class="cell" style="background:#8B4513; padding:4px;">
+    <div class="combined">
+      <img class="back" src="assets/service/table_lv4_back.png" width="96" height="64">
+      <img class="front" src="assets/service/table_lv4_front.png" width="96" height="52">
+    </div>
+    <span>lv4 합성</span>
+  </div>
+</div>
+</div>
+
+<div class="section">
+<h2>기존(레거시) 테이블 vs 신규 테이블 비교</h2>
+<div class="row">
+  <div class="cell"><img src="assets/service/table_lv0.png" width="96" height="80"><span>lv0 (레거시 80px)</span></div>
+  <div class="cell"><img src="assets/service/table_lv1.png" width="96" height="80"><span>lv1 (레거시)</span></div>
+  <div class="cell" style="border-left: 2px solid #FF6B35; padding-left:8px;"><img src="assets/service/table_lv0_back.png" width="96" height="64"><span>lv0 back (신규)</span></div>
+  <div class="cell"><img src="assets/service/table_lv0_front.png" width="96" height="52"><span>lv0 front (신규)</span></div>
+</div>
+</div>
+
+<div class="section">
+<h2>손님 waiting - 5종 비교 (48x64, group 64x64)</h2>
+<div class="row">
+  <div class="cell"><img src="assets/service/customer_normal_waiting.png" width="48" height="64"><span>normal waiting</span></div>
+  <div class="cell"><img src="assets/service/customer_vip_waiting.png" width="48" height="64"><span>vip waiting</span></div>
+  <div class="cell"><img src="assets/service/customer_gourmet_waiting.png" width="48" height="64"><span>gourmet waiting</span></div>
+  <div class="cell"><img src="assets/service/customer_rushed_waiting.png" width="48" height="64"><span>rushed waiting</span></div>
+  <div class="cell"><img src="assets/service/customer_group_waiting.png" width="64" height="64"><span>group waiting (64w)</span></div>
+</div>
+</div>
+
+<div class="section">
+<h2>손님 seated - 5종 비교</h2>
+<div class="row">
+  <div class="cell"><img src="assets/service/customer_normal_seated.png" width="48" height="64"><span>normal seated</span></div>
+  <div class="cell"><img src="assets/service/customer_vip_seated.png" width="48" height="64"><span>vip seated</span></div>
+  <div class="cell"><img src="assets/service/customer_gourmet_seated.png" width="48" height="64"><span>gourmet seated</span></div>
+  <div class="cell"><img src="assets/service/customer_rushed_seated.png" width="48" height="64"><span>rushed seated</span></div>
+  <div class="cell"><img src="assets/service/customer_group_seated.png" width="64" height="64"><span>group seated (64w)</span></div>
+</div>
+</div>
+
+<div class="section">
+<h2>손님 waiting vs seated 상태 비교</h2>
+<div class="row">
+  <div class="cell"><img src="assets/service/customer_vip_waiting.png" width="48" height="64"><span>vip waiting</span></div>
+  <div class="cell"><img src="assets/service/customer_vip_seated.png" width="48" height="64"><span>vip seated</span></div>
+  <div class="cell" style="margin-left:16px;"><img src="assets/service/customer_normal_waiting.png" width="48" height="64"><span>normal waiting</span></div>
+  <div class="cell"><img src="assets/service/customer_normal_seated.png" width="48" height="64"><span>normal seated</span></div>
+</div>
+</div>
+
+<div class="section">
+<h2>기존(레거시) 손님 vs 신규 손님 비교</h2>
+<div class="row">
+  <div class="cell"><img src="assets/service/customer_normal.png" width="48" height="48"><span>normal (레거시 48px)</span></div>
+  <div class="cell"><img src="assets/service/customer_vip.png" width="48" height="48"><span>vip (레거시)</span></div>
+  <div class="cell" style="border-left: 2px solid #FF6B35; padding-left:8px;"><img src="assets/service/customer_normal_waiting.png" width="48" height="64"><span>normal waiting (신규)</span></div>
+  <div class="cell"><img src="assets/service/customer_normal_seated.png" width="48" height="64"><span>normal seated (신규)</span></div>
+</div>
+</div>
+
+</body>
+</html>

@@ -7,7 +7,7 @@
  *
  * 레이아웃 (360x640 기준, C1+M 확정):
  *   y=460~640: 대화 패널 (높이 180px)
- *   y=388~484: 포트레이트 96px (하단이 패널 상단과 24px 겹침 — "패널 위로 솟은" 룩)
+ *   y=368~464: 포트레이트 96px (실루엣 하단이 패널 상단에 밀착, 이미지 투명 패딩 4px만 진입)
  *   y=468: 이름 18px (좌측) / 건너뛰기 14px (우측) — 같은 행
  *   y=496~: 대사 텍스트 16px (wordWrap 328px)
  *   y=628, x=340: 진행 힌트 "▼" (텍스트 완료 시만 깜빡임)
@@ -29,13 +29,14 @@ const TEXT_DEPTH = 201;
 
 const PORTRAIT_SIZE = 96;
 const PORTRAIT_CENTER_X = 16 + PORTRAIT_SIZE / 2;   // 64
-// 포트레이트는 하단이 패널 상단과 24px 겹치도록 배치. 이미지 하단의
-// 투명/옷 영역이 패널 위로 자연스럽게 이어져 '허공에 떠있는' 인상을 제거한다.
-const PORTRAIT_OVERLAP = 24;
-const PORTRAIT_CENTER_Y = PANEL_Y - PORTRAIT_SIZE / 2 + PORTRAIT_OVERLAP; // 436
+// 포트레이트 이미지는 하단에 약 4px의 투명 패딩이 있다. 그 투명 패딩만큼만
+// 패널과 겹치게 하여, 캐릭터 실루엣 하단이 패널 상단에 정확히 맞닿도록 한다.
+// (과도한 overlap은 캐릭터가 패널 '안으로 파고든' 인상을 주므로 피한다.)
+const PORTRAIT_OVERLAP = 4;
+const PORTRAIT_CENTER_Y = PANEL_Y - PORTRAIT_SIZE / 2 + PORTRAIT_OVERLAP; // 416
 
-// 이름은 포트레이트 우측에서 시작 (포트레이트 하단이 패널과 겹치므로)
-const NAME_X = 16 + PORTRAIT_SIZE + 8; // 120
+// 이름은 좌상단 고정 (포트레이트가 패널 상단에 맞닿으므로 이름과 겹치지 않음)
+const NAME_X = 16;
 const NAME_Y = PANEL_Y + 8;   // 468
 
 const DIALOGUE_X = 16;
