@@ -8,6 +8,8 @@
  */
 
 import Phaser from 'phaser';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
@@ -23,8 +25,8 @@ export class MenuScene extends Phaser.Scene {
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_menu');
 
-    // 배경 그라디언트 효과
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x1a0a00);
+    // Phase 60-15: 배경 rect → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
 
     // 장식 원들 (카툰 느낌)
     [
@@ -56,9 +58,13 @@ export class MenuScene extends Phaser.Scene {
       color: '#cccccc',
     }).setOrigin(0.5);
 
-    // 게임 시작 버튼 (Phase 11-1: y 390으로 이동)
-    const btn = this.add.rectangle(GAME_WIDTH / 2, 390, 200, 60, 0xff6b35)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 게임 시작 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    const BTN_START_W = 200;
+    const BTN_START_H = 60;
+    const btn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 390, BTN_START_W, BTN_START_H, 'btn_primary_normal');
+    btn.setTint(0xff6b35);
+    const btnHit = new Phaser.Geom.Rectangle(-BTN_START_W / 2, -BTN_START_H / 2, BTN_START_W, BTN_START_H);
+    btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
     this.add.text(GAME_WIDTH / 2, 390, '\u25B6 \uAC8C\uC784 \uC2DC\uC791', {
       fontSize: '22px',
@@ -75,8 +81,9 @@ export class MenuScene extends Phaser.Scene {
       });
     });
 
-    btn.on('pointerover', () => btn.setFillStyle(0xff8c00));
-    btn.on('pointerout', () => btn.setFillStyle(0xff6b35));
+    // Phase 60-15: setFillStyle → setTexture + setTint
+    btn.on('pointerover', () => { btn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); btn.setTint(0xff8c00); });
+    btn.on('pointerout', () => { btn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); btn.setTint(0xff6b35); });
 
     // 펄싱 애니메이션
     this.tweens.add({
@@ -89,9 +96,13 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.InOut',
     });
 
-    // 상점 버튼 (Phase 11-1: y 450으로 이동)
-    const shopBtn = this.add.rectangle(GAME_WIDTH / 2, 450, 160, 40, 0x886600)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 상점 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    const SHOP_W = 160;
+    const SHOP_H = 40;
+    const shopBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 450, SHOP_W, SHOP_H, 'btn_primary_normal');
+    shopBtn.setTint(0x886600);
+    const shopHit = new Phaser.Geom.Rectangle(-SHOP_W / 2, -SHOP_H / 2, SHOP_W, SHOP_H);
+    shopBtn.setInteractive(shopHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, 450, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
       fontSize: '16px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
@@ -102,12 +113,17 @@ export class MenuScene extends Phaser.Scene {
         this.scene.start('ShopScene');
       });
     });
-    shopBtn.on('pointerover', () => shopBtn.setFillStyle(0xaa8800));
-    shopBtn.on('pointerout', () => shopBtn.setFillStyle(0x886600));
+    // Phase 60-15: setFillStyle → setTexture + setTint
+    shopBtn.on('pointerover', () => { shopBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); shopBtn.setTint(0xaa8800); });
+    shopBtn.on('pointerout', () => { shopBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); shopBtn.setTint(0x886600); });
 
-    // 도감 버튼 (Phase 11-1: y 500으로 이동, Phase 11-3b: Secondary 팔레트 적용, Phase 42: y 496)
-    const bookBtn = this.add.rectangle(GAME_WIDTH / 2, 496, 160, 36, 0x886600)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 도감 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    const BOOK_W = 160;
+    const BOOK_H = 36;
+    const bookBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 496, BOOK_W, BOOK_H, 'btn_primary_normal');
+    bookBtn.setTint(0x886600);
+    const bookHit = new Phaser.Geom.Rectangle(-BOOK_W / 2, -BOOK_H / 2, BOOK_W, BOOK_H);
+    bookBtn.setInteractive(bookHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, 496, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
@@ -118,12 +134,17 @@ export class MenuScene extends Phaser.Scene {
         this.scene.start('RecipeCollectionScene');
       });
     });
-    bookBtn.on('pointerover', () => bookBtn.setFillStyle(0xaa8800));
-    bookBtn.on('pointerout', () => bookBtn.setFillStyle(0x886600));
+    // Phase 60-15: setFillStyle → setTexture + setTint
+    bookBtn.on('pointerover', () => { bookBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); bookBtn.setTint(0xaa8800); });
+    bookBtn.on('pointerout', () => { bookBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); bookBtn.setTint(0x886600); });
 
-    // ── 업적 버튼 (Phase 42) ──
-    const achieveBtn = this.add.rectangle(GAME_WIDTH / 2, 534, 160, 36, 0x886600)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 업적 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    const ACHIEVE_W = 160;
+    const ACHIEVE_H = 36;
+    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 534, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
+    achieveBtn.setTint(0x886600);
+    const achieveHit = new Phaser.Geom.Rectangle(-ACHIEVE_W / 2, -ACHIEVE_H / 2, ACHIEVE_W, ACHIEVE_H);
+    achieveBtn.setInteractive(achieveHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, 534, '\uD83C\uDFC6 \uC5C5\uC801', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
@@ -134,16 +155,22 @@ export class MenuScene extends Phaser.Scene {
         this.scene.start('AchievementScene');
       });
     });
-    achieveBtn.on('pointerover', () => achieveBtn.setFillStyle(0xaa8800));
-    achieveBtn.on('pointerout', () => achieveBtn.setFillStyle(0x886600));
+    // Phase 60-15: setFillStyle → setTexture + setTint
+    achieveBtn.on('pointerover', () => { achieveBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); achieveBtn.setTint(0xaa8800); });
+    achieveBtn.on('pointerout', () => { achieveBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); achieveBtn.setTint(0x886600); });
 
     // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570 -> 578) ──
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
+    // Phase 60-15: 엔드리스 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    const ENDLESS_W = 180;
+    const ENDLESS_H = 40;
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x444444;
-    const endlessBtn = this.add.rectangle(GAME_WIDTH / 2, 578, 180, 40, endlessColor)
-      .setInteractive({ useHandCursor: isEndlessUnlocked });
+    const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 578, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
+    endlessBtn.setTint(endlessColor);
+    const endlessHit = new Phaser.Geom.Rectangle(-ENDLESS_W / 2, -ENDLESS_H / 2, ENDLESS_W, ENDLESS_H);
+    endlessBtn.setInteractive(endlessHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: isEndlessUnlocked });
 
     const endlessLabel = isEndlessUnlocked
       ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC'
@@ -162,8 +189,9 @@ export class MenuScene extends Phaser.Scene {
           this.scene.start('ChefSelectScene', { stageId: 'endless' });
         });
       });
-      endlessBtn.on('pointerover', () => endlessBtn.setFillStyle(0x8833ee));
-      endlessBtn.on('pointerout', () => endlessBtn.setFillStyle(0x6622cc));
+      // Phase 60-15: setFillStyle → setTexture + setTint
+      endlessBtn.on('pointerover', () => { endlessBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); endlessBtn.setTint(0x8833ee); });
+      endlessBtn.on('pointerout', () => { endlessBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); endlessBtn.setTint(0x6622cc); });
     }
 
     // 엔드리스 베스트 기록 표시 (Phase 42: y 574 -> 593 -> 602 -> 607)
@@ -254,9 +282,8 @@ export class MenuScene extends Phaser.Scene {
       .setInteractive(); // 하위 클릭 차단
     container.add(overlay);
 
-    // ── 패널 배경 ──
-    const panelBg = this.add.rectangle(cx, panelY + panelH / 2, panelW, panelH, 0x2a1500)
-      .setStrokeStyle(2, 0xff6b35);
+    // Phase 60-15: 설정 패널 배경 rect → NineSliceFactory.panel 'dark'
+    const panelBg = NineSliceFactory.panel(this, cx, panelY + panelH / 2, panelW, panelH, 'dark');
     container.add(panelBg);
 
     // ── 타이틀 ──
@@ -316,10 +343,13 @@ export class MenuScene extends Phaser.Scene {
     // ── 음소거 토글 (y=360) ──
     this._createMuteToggle(container, 360, settings.muted);
 
-    // ── 쿠폰 입력 버튼 (y=408, Phase 54) ──
-    const couponBg = this.add.rectangle(cx, 408, 240, 36, 0x1a3366)
-      .setStrokeStyle(1, 0x666666)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 쿠폰 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    const COUPON_BTN_W = 240;
+    const COUPON_BTN_H = 36;
+    const couponBg = NineSliceFactory.raw(this, cx, 408, COUPON_BTN_W, COUPON_BTN_H, 'btn_secondary_normal');
+    couponBg.setTint(0x1a3366);
+    const couponHit = new Phaser.Geom.Rectangle(-COUPON_BTN_W / 2, -COUPON_BTN_H / 2, COUPON_BTN_W, COUPON_BTN_H);
+    couponBg.setInteractive(couponHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     container.add(couponBg);
 
     const couponLabel = this.add.text(cx, 408, '\uD83C\uDF9F \uCFE0\uD3F0 \uC785\uB825', {
@@ -335,8 +365,9 @@ export class MenuScene extends Phaser.Scene {
       SoundManager.playSFX('sfx_ui_tap');
       this._openCouponModal();
     });
-    couponBg.on('pointerover', () => couponBg.setFillStyle(0x264d99));
-    couponBg.on('pointerout', () => couponBg.setFillStyle(0x1a3366));
+    // Phase 60-15: setFillStyle → setTexture + setTint
+    couponBg.on('pointerover', () => { couponBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); couponBg.setTint(0x264d99); });
+    couponBg.on('pointerout', () => { couponBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); couponBg.setTint(0x1a3366); });
   }
 
   /**
@@ -381,9 +412,8 @@ export class MenuScene extends Phaser.Scene {
       .setInteractive();
     container.add(overlay);
 
-    // ── 모달 배경 ──
-    const modalBg = this.add.rectangle(cx, cy, modalW, modalH, 0x1a1a2e)
-      .setStrokeStyle(2, 0x88ccff);
+    // Phase 60-15: 모달 배경 rect → NineSliceFactory.panel 'dark'
+    const modalBg = NineSliceFactory.panel(this, cx, cy, modalW, modalH, 'dark');
     container.add(modalBg);
 
     // ── 타이틀 ──
@@ -412,10 +442,12 @@ export class MenuScene extends Phaser.Scene {
     closeBtn.on('pointerout', () => closeBtn.setColor('#ff6666'));
     container.add(closeBtn);
 
-    // ── 입력 영역 배경 ──
-    const inputBg = this.add.rectangle(cx, cy - 35, 220, 36, 0x2a2a4a)
-      .setStrokeStyle(1, 0x555555)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 입력 영역 배경 rect → NineSliceFactory.panel 'stone'
+    const INPUT_BG_W = 220;
+    const INPUT_BG_H = 36;
+    const inputBg = NineSliceFactory.panel(this, cx, cy - 35, INPUT_BG_W, INPUT_BG_H, 'stone');
+    const inputHit = new Phaser.Geom.Rectangle(-INPUT_BG_W / 2, -INPUT_BG_H / 2, INPUT_BG_W, INPUT_BG_H);
+    inputBg.setInteractive(inputHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     container.add(inputBg);
 
     // ── 입력 텍스트 표시 ──
@@ -558,10 +590,13 @@ export class MenuScene extends Phaser.Scene {
     };
     hiddenInput.addEventListener('keydown', onKeydown);
 
-    // ── 제출 버튼 ──
-    const submitBg = this.add.rectangle(cx, cy + 65, 160, 36, 0x335533)
-      .setStrokeStyle(1, 0x666666)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 제출 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    const SUBMIT_W = 160;
+    const SUBMIT_H = 36;
+    const submitBg = NineSliceFactory.raw(this, cx, cy + 65, SUBMIT_W, SUBMIT_H, 'btn_primary_normal');
+    submitBg.setTint(0x335533);
+    const submitHit = new Phaser.Geom.Rectangle(-SUBMIT_W / 2, -SUBMIT_H / 2, SUBMIT_W, SUBMIT_H);
+    submitBg.setInteractive(submitHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     container.add(submitBg);
 
     const submitLabel = this.add.text(cx, cy + 65, '\uD655\uC778', {
@@ -576,8 +611,9 @@ export class MenuScene extends Phaser.Scene {
     submitBg.on('pointerdown', () => {
       submit();
     });
-    submitBg.on('pointerover', () => submitBg.setFillStyle(0x447744));
-    submitBg.on('pointerout', () => submitBg.setFillStyle(0x335533));
+    // Phase 60-15: setFillStyle → setTexture + setTint
+    submitBg.on('pointerover', () => { submitBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); submitBg.setTint(0x447744); });
+    submitBg.on('pointerout', () => { submitBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); submitBg.setTint(0x335533); });
 
     // 오버레이 클릭 시 닫기 (모달 영역 외부)
     overlay.on('pointerdown', (pointer) => {
@@ -726,10 +762,13 @@ export class MenuScene extends Phaser.Scene {
   _createMuteToggle(container, y, initMuted) {
     const cx = GAME_WIDTH / 2;
 
-    // ── 토글 배경 ──
-    const toggleBg = this.add.rectangle(cx, y, 240, 36, initMuted ? 0x882222 : 0x335533)
-      .setStrokeStyle(1, 0x666666)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-15: 음소거 토글 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    const MUTE_W = 240;
+    const MUTE_H = 36;
+    const toggleBg = NineSliceFactory.raw(this, cx, y, MUTE_W, MUTE_H, 'btn_secondary_normal');
+    toggleBg.setTint(initMuted ? 0x882222 : 0x335533);
+    const muteHit = new Phaser.Geom.Rectangle(-MUTE_W / 2, -MUTE_H / 2, MUTE_W, MUTE_H);
+    toggleBg.setInteractive(muteHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     container.add(toggleBg);
 
     // ── 토글 텍스트 ──
@@ -750,8 +789,8 @@ export class MenuScene extends Phaser.Scene {
       SoundManager.setMuted(muted);
       SaveManager.saveSoundSettings({ muted });
 
-      // 시각적 업데이트
-      toggleBg.setFillStyle(muted ? 0x882222 : 0x335533);
+      // Phase 60-15: setFillStyle → setTint (NineSlice Container)
+      toggleBg.setTint(muted ? 0x882222 : 0x335533);
       muteText.setText(muted ? '\ud83d\udd07 \uc804\uccb4 \uc74c\uc18c\uac70: ON' : '\ud83d\udd07 \uc804\uccb4 \uc74c\uc18c\uac70: OFF');
       muteText.setColor(muted ? '#ff6666' : '#88ff88');
       SoundManager.playSFX('sfx_ui_tap');
