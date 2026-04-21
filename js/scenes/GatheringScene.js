@@ -587,7 +587,7 @@ export class GatheringScene extends Phaser.Scene {
       });
 
       // 컨테이너로 묶어 한 번에 destroy 가능
-      const container = this.add.container(0, 0, [bg, name, countLabel]).setDepth(100).setScrollFactor(0, true);
+      const container = this.add.container(0, 0, [bg, name, countLabel]).setDepth(100).setScrollFactor(0, 0, true);
       this._towerBarButtons.push({ container, bg, id });
     });
 
@@ -633,7 +633,7 @@ export class GatheringScene extends Phaser.Scene {
         this._activateBuffRecipe(recipe);
       });
 
-      const container = this.add.container(0, 0, [bg, name, ingLabel]).setDepth(100).setScrollFactor(0, true);
+      const container = this.add.container(0, 0, [bg, name, ingLabel]).setDepth(100).setScrollFactor(0, 0, true);
       this._towerBarButtons.push({ container, bg, id: recipe.id });
     });
   }
@@ -1977,7 +1977,7 @@ export class GatheringScene extends Phaser.Scene {
         stroke: '#000000', strokeThickness: 1,
       }).setOrigin(0.5).setDepth(102);
       this._orderContainer = this.add.container(0, 0, [this._orderBg, this._orderLabel])
-        .setDepth(101).setScrollFactor(0, true);
+        .setDepth(101).setScrollFactor(0, 0, true);
     }
 
     this._orderContainer.setVisible(true);
@@ -2094,7 +2094,7 @@ export class GatheringScene extends Phaser.Scene {
 
     this._menuPopup = this.add.container(0, 0,
       [overlay, popBg, title, resumeBg, resumeLabel, exitBg, exitLabel],
-    ).setDepth(300).setScrollFactor(0, true);
+    ).setDepth(300).setScrollFactor(0, 0, true);
 
     const close = () => {
       this._menuPopup?.destroy();
@@ -2131,7 +2131,7 @@ export class GatheringScene extends Phaser.Scene {
       stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(121);
 
-    this._messagePopup = this.add.container(0, 0, [bg, text]).setDepth(999).setScrollFactor(0, true);
+    this._messagePopup = this.add.container(0, 0, [bg, text]).setDepth(999).setScrollFactor(0, 0, true);
 
     this.time.delayedCall(duration, () => {
       if (this._messagePopup) {
