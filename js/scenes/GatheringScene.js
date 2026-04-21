@@ -493,9 +493,10 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _renderTowerBarBackground() {
-    this.add.rectangle(
-      GAME_WIDTH / 2, TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2,
-      GAME_WIDTH, TOWER_BAR_HEIGHT, 0x111122
+    // Phase 60-12: 도구 바 배경 rect → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(
+      this, GAME_WIDTH / 2, TOWER_BAR_Y + TOWER_BAR_HEIGHT / 2,
+      GAME_WIDTH, TOWER_BAR_HEIGHT, 'dark'
     ).setDepth(100).setScrollFactor(0);
   }
 
@@ -734,10 +735,10 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _createIngredientBar() {
-    // 배경
-    this.add.rectangle(
-      GAME_WIDTH / 2, INGREDIENT_BAR_Y + INGREDIENT_BAR_HEIGHT / 2,
-      GAME_WIDTH, INGREDIENT_BAR_HEIGHT, 0x0d0d1a
+    // Phase 60-12: 재료 수집 바 배경 rect → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(
+      this, GAME_WIDTH / 2, INGREDIENT_BAR_Y + INGREDIENT_BAR_HEIGHT / 2,
+      GAME_WIDTH, INGREDIENT_BAR_HEIGHT, 'dark'
     ).setDepth(100).setScrollFactor(0);
 
     // 타이틀
@@ -1960,12 +1961,22 @@ export class GatheringScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;
     const cy = WAVE_CONTROL_Y + WAVE_CONTROL_HEIGHT / 2;
 
-    // 웨이브 컨트롤 배경
-    this.add.rectangle(cx, cy, GAME_WIDTH, WAVE_CONTROL_HEIGHT, 0x111122)
+    // Phase 60-12: 웨이브 컨트롤 배경 rect → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(this, cx, cy, GAME_WIDTH, WAVE_CONTROL_HEIGHT, 'dark')
       .setDepth(100).setScrollFactor(0);
 
-    this._waveBtnBg = this.add.rectangle(cx, cy, 160, 36, 0xff6b35)
-      .setDepth(115).setInteractive({ useHandCursor: true }).setScrollFactor(0);
+    // Phase 60-12: 웨이브 시작 버튼 rect → NineSliceFactory.raw 'btn_primary_normal'
+    // 주황색 유지를 위해 setTint(0xff6b35) 사용. 컨테이너 hitArea를 중앙 원점 기준으로 등록.
+    const WBTN_W = 160;
+    const WBTN_H = 36;
+    const waveBtnBg = NineSliceFactory.raw(this, cx, cy, WBTN_W, WBTN_H, 'btn_primary_normal')
+      .setDepth(115).setScrollFactor(0);
+    waveBtnBg.setTint(0xff6b35);
+    const waveBtnHit = new Phaser.Geom.Rectangle(-WBTN_W / 2, -WBTN_H / 2, WBTN_W, WBTN_H);
+    waveBtnBg.setInteractive(waveBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    if (waveBtnBg.input) waveBtnBg.input.cursor = 'pointer';
+    this._waveBtnBg = waveBtnBg;
+
     this._waveBtnText = this.add.text(cx, cy, '\uC6E8\uC774\uBE0C \uC2DC\uC791 \u25B6', {
       fontSize: '15px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000000', strokeThickness: 3,
@@ -1978,10 +1989,16 @@ export class GatheringScene extends Phaser.Scene {
       if (this._tutorial?.isActive()) this._tutorial.advance();
     });
     this._waveBtnBg.on('pointerover', () => {
-      if (this._waveBtnEnabled) this._waveBtnBg.setFillStyle(0xff8c00);
+      if (this._waveBtnEnabled) {
+        this._waveBtnBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED);
+        this._waveBtnBg.setTint(0xff8c00);
+      }
     });
     this._waveBtnBg.on('pointerout', () => {
-      if (this._waveBtnEnabled) this._waveBtnBg.setFillStyle(0xff6b35);
+      if (this._waveBtnEnabled) {
+        this._waveBtnBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL);
+        this._waveBtnBg.setTint(0xff6b35);
+      }
     });
 
     this._waveBtnEnabled = true;
@@ -1996,7 +2013,9 @@ export class GatheringScene extends Phaser.Scene {
   _setWaveButtonEnabled(enabled) {
     this._waveBtnEnabled = enabled;
     if (enabled) {
-      this._waveBtnBg.setFillStyle(0xff6b35).setAlpha(1);
+      // Phase 60-12: setFillStyle → setTexture + setTint
+      this._waveBtnBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL);
+      this._waveBtnBg.setTint(0xff6b35).setAlpha(1);
       this._waveBtnText.setAlpha(1);
       this._waveBtnText.setText('채집 시작 ▶');
       this._waveBtnBg.setVisible(true);
