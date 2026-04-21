@@ -46,6 +46,39 @@ export class BootScene extends Phaser.Scene {
 
     // ── 스프라이트 에셋 로드 ──
     SpriteLoader.preload(this);
+
+    // ── 9-slice UI 에셋 로드 (Phase 60-2) ──
+    this._preloadNineSliceUI();
+  }
+
+  /**
+   * Phase 60-1 산출물인 9-slice UI 에셋 28종과 manifest.json을 로드한다.
+   * 경로: /sprites/ui/nineslice/*.png, /sprites/ui/nineslice/manifest.json
+   * Phaser 텍스처 키는 'ui_ns_{filename}' 규칙을 따른다(UITheme.NS_KEY_MAP 참조).
+   * @private
+   */
+  _preloadNineSliceUI() {
+    const NS_ROOT = '/sprites/ui/nineslice';
+    this.load.json('ui_ns_manifest', `${NS_ROOT}/manifest.json`);
+
+    const FILES = [
+      // 패널
+      'panel_wood', 'panel_parchment', 'panel_dark', 'panel_stone', 'panel_glow_selected',
+      // 버튼
+      'btn_primary_normal', 'btn_primary_pressed', 'btn_primary_disabled',
+      'btn_secondary_normal', 'btn_secondary_pressed', 'btn_secondary_disabled',
+      'btn_danger_normal', 'btn_danger_pressed', 'btn_danger_disabled',
+      'btn_icon_normal', 'btn_icon_pressed', 'btn_icon_disabled',
+      // 바
+      'bar_frame_h', 'bar_frame_thick', 'bar_fill', 'bar_shine_overlay',
+      // 탭
+      'tab_active', 'tab_inactive',
+      // 기타
+      'tooltip_bg', 'badge_circle', 'divider_h', 'divider_v', 'letterbox',
+    ];
+    for (const name of FILES) {
+      this.load.image(`ui_ns_${name}`, `${NS_ROOT}/${name}.png`);
+    }
   }
 
   create() {
@@ -185,9 +218,17 @@ export class BootScene extends Phaser.Scene {
 
   /**
    * 메뉴 씬으로 전환.
+   * URL 쿼리 ?dev=nineslice 진입 시 NineSliceSandbox로 라우팅(Phase 60-2).
    * @private
    */
   _startGame() {
+    try {
+      const dev = new URL(window.location.href).searchParams.get('dev');
+      if (dev === 'nineslice') {
+        this.scene.start('NineSliceSandbox');
+        return;
+      }
+    } catch { /* 무시 */ }
     this.scene.start('MenuScene');
   }
 }
