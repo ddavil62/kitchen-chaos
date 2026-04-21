@@ -13,6 +13,7 @@
 
 import Phaser from 'phaser';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { GAME_WIDTH, GAME_HEIGHT, GRID_COLS, GRID_ROWS,
          CELL_W, CELL_H, HALF_W, HALF_H,
          HUD_HEIGHT, GAME_AREA_Y, GAME_AREA_HEIGHT, TOWER_BAR_Y, TOWER_BAR_HEIGHT,
@@ -325,19 +326,26 @@ export class GatheringScene extends Phaser.Scene {
 
     const btnX = 90;
     const btnY = 8;
+    const BTN_W = 36;
+    const BTN_H = 32;
 
-    // 아이콘 배경 (둥근 사각형)
-    this._skillBtnBg = this.add.rectangle(btnX, btnY + 10, 30, 30, 0x333355)
-      .setDepth(101).setInteractive({ useHandCursor: true })
-      .setStrokeStyle(2, this._chefData.color).setScrollFactor(0);
+    // 아이콘 배경 (9-slice, Phase 60-6): 셰프 색상을 tint로 적용
+    this._skillBtnBg = NineSliceFactory.raw(this, btnX, btnY + 10, BTN_W, BTN_H, 'btn_icon_normal');
+    this._skillBtnBg.setDepth(101).setScrollFactor(0);
+    this._skillBtnBg.setTint(this._chefData.color);
+    // Container 기본 hitArea 미설정 → 명시적 Rectangle(useHandCursor: true)
+    this._skillBtnHitArea = new Phaser.Geom.Rectangle(-BTN_W / 2, -BTN_H / 2, BTN_W, BTN_H);
+    this._skillBtnBg.setInteractive(this._skillBtnHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    // setInteractive(hitArea, cb, opts) 시그니처가 useHandCursor 옵션을 안 받는 환경 대비
+    if (this._skillBtnBg.input) this._skillBtnBg.input.cursor = 'pointer';
 
     // 셰프 아이콘
     this._skillBtnIcon = this.add.text(btnX, btnY + 6, this._chefData.icon, {
       fontSize: '14px',
     }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
 
-    // 쿨다운 오버레이 (어둡게)
-    this._skillCooldownOverlay = this.add.rectangle(btnX, btnY + 10, 30, 30, 0x000000, 0.6)
+    // 쿨다운 오버레이 (어둡게) — 버튼 크기와 동기화
+    this._skillCooldownOverlay = this.add.rectangle(btnX, btnY + 10, BTN_W, BTN_H, 0x000000, 0.6)
       .setDepth(103).setVisible(false).setScrollFactor(0);
 
     // 쿨다운 텍스트
@@ -353,11 +361,12 @@ export class GatheringScene extends Phaser.Scene {
       this._activateChefSkill();
     });
 
+    // Hover: PRESSED 텍스처로 스왑 (기존 setFillStyle 대체)
     this._skillBtnBg.on('pointerover', () => {
-      if (this._skillReady) this._skillBtnBg.setFillStyle(0x555577);
+      if (this._skillReady) this._skillBtnBg.setTexture(NS_KEYS.BTN_ICON_PRESSED);
     });
     this._skillBtnBg.on('pointerout', () => {
-      this._skillBtnBg.setFillStyle(0x333355);
+      this._skillBtnBg.setTexture(NS_KEYS.BTN_ICON_NORMAL);
     });
   }
 
@@ -449,8 +458,9 @@ export class GatheringScene extends Phaser.Scene {
       this._skillCooldownTimer = 0;
       this._skillCooldownOverlay.setVisible(false);
       this._skillCooldownText.setVisible(false);
-      // 버튼 인터랙션 복원
-      this._skillBtnBg.setInteractive({ useHandCursor: true });
+      // 버튼 인터랙션 복원 (Container용: 저장해둔 hitArea 재사용)
+      this._skillBtnBg.setInteractive(this._skillBtnHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      if (this._skillBtnBg.input) this._skillBtnBg.input.cursor = 'pointer';
 
       // 준비 완료 연출
       this.tweens.add({
