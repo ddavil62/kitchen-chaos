@@ -5,6 +5,8 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { ALL_RECIPES, RECIPE_CATEGORIES, TIER_COLORS, TIER_NAMES } from '../data/recipeData.js';
 import { TOOL_DEFS } from '../data/gameData.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
@@ -19,8 +21,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
     this._currentCategory = 'all';
     this._detailContainer = null;
 
-    // ── 배경 ──
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x1a0a00);
+    // ── 배경 (Phase 60-17: rectangle → NineSliceFactory.panel 'dark') ──
+    NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
 
     // ── 헤더 ──
     this.add.text(GAME_WIDTH / 2, 30, '📖 레시피 도감', {
@@ -41,20 +43,18 @@ export class RecipeCollectionScene extends Phaser.Scene {
     this._gridContainer = this.add.container(0, 0).setDepth(1);
     this._renderGrid();
 
-    // ── 뒤로가기 버튼 (Phase 11-3b: Disabled 팔레트 + 터치 피드백 + fadeOut) ──
-    const backBtn = this.add.rectangle(50, 30, 70, 28, 0x444444)
-      .setInteractive({ useHandCursor: true }).setDepth(10);
-    this.add.text(50, 30, '← 돌아가기', {
-      fontSize: '10px', color: '#ffffff',
-    }).setOrigin(0.5).setDepth(11);
-    backBtn.on('pointerdown', () => {
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start('MenuScene');
-      });
+    // ── 뒤로가기 버튼 (Phase 60-17: rectangle → NineSliceFactory.button 'secondary') ──
+    const backBtn = NineSliceFactory.button(this, 50, 30, 70, 28, '← 돌아가기', {
+      variant: 'secondary',
+      textStyle: { fontSize: '10px', color: '#ffffff' },
+      onClick: () => {
+        this.cameras.main.fadeOut(300, 0, 0, 0);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+          this.scene.start('MenuScene');
+        });
+      },
     });
-    backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
-    backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
+    backBtn.setDepth(10);
 
     this.cameras.main.fadeIn(300, 0, 0, 0);
   }
@@ -67,67 +67,50 @@ export class RecipeCollectionScene extends Phaser.Scene {
     // 간격: 3px, 너비: all=28, 나머지=34 (도구 탭 포함 9개 적합)
     const gap = 3;
 
-    // 레시피 카테고리 탭
+    // Phase 60-17: 레시피 카테고리 탭 rectangle → NineSliceFactory.tab
     RECIPE_CATEGORIES.forEach(cat => {
       const w = cat.id === 'all' ? 28 : 34;
       const isActive = cat.id === this._currentCategory;
-      const bg = this.add.rectangle(cx + w / 2, y, w, 20,
-        isActive ? 0xff6b35 : 0x333333
-      ).setInteractive({ useHandCursor: true });
+      const tab = NineSliceFactory.tab(this, cx + w / 2, y, w, 20, cat.icon, {
+        active: isActive,
+        textStyle: { fontSize: '11px', color: isActive ? '#ffffff' : '#888888' },
+      });
+      tab.setInteractive(new Phaser.Geom.Rectangle(-w / 2, -10, w, 20), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
-      const label = this.add.text(cx + w / 2, y, `${cat.icon}`, {
-        fontSize: '11px', color: isActive ? '#ffffff' : '#888888',
-      }).setOrigin(0.5);
-
-      bg.on('pointerdown', () => {
+      tab.on('pointerdown', () => {
         this._currentCategory = cat.id;
         this._refreshTabs();
         this._renderGrid();
       });
-      // Phase 11-3b: 탭 터치 피드백
-      bg.on('pointerover', () => {
-        if (cat.id !== this._currentCategory) bg.setFillStyle(0x444444);
-      });
-      bg.on('pointerout', () => {
-        bg.setFillStyle(cat.id === this._currentCategory ? 0xff6b35 : 0x333333);
-      });
 
-      this._tabObjects.push({ bg, label, catId: cat.id });
+      this._tabObjects.push({ bg: tab, label: tab._label, catId: cat.id });
       cx += w + gap;
     });
 
-    // 도구 탭 추가
+    // Phase 60-17: 도구 탭 rectangle → NineSliceFactory.tab
     const toolTab = { id: 'tools', nameKo: '\uB3C4\uAD6C', icon: '\uD83D\uDD27' };
     const tw = 34;
     const isToolActive = this._currentCategory === 'tools';
-    const toolBg = this.add.rectangle(cx + tw / 2, y, tw, 20,
-      isToolActive ? 0xff6b35 : 0x333333
-    ).setInteractive({ useHandCursor: true });
+    const toolTabNs = NineSliceFactory.tab(this, cx + tw / 2, y, tw, 20, toolTab.icon, {
+      active: isToolActive,
+      textStyle: { fontSize: '11px', color: isToolActive ? '#ffffff' : '#888888' },
+    });
+    toolTabNs.setInteractive(new Phaser.Geom.Rectangle(-tw / 2, -10, tw, 20), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
-    const toolLabel = this.add.text(cx + tw / 2, y, toolTab.icon, {
-      fontSize: '11px', color: isToolActive ? '#ffffff' : '#888888',
-    }).setOrigin(0.5);
-
-    toolBg.on('pointerdown', () => {
+    toolTabNs.on('pointerdown', () => {
       this._currentCategory = 'tools';
       this._refreshTabs();
       this._renderGrid();
     });
-    toolBg.on('pointerover', () => {
-      if (this._currentCategory !== 'tools') toolBg.setFillStyle(0x444444);
-    });
-    toolBg.on('pointerout', () => {
-      toolBg.setFillStyle(this._currentCategory === 'tools' ? 0xff6b35 : 0x333333);
-    });
 
-    this._tabObjects.push({ bg: toolBg, label: toolLabel, catId: 'tools' });
+    this._tabObjects.push({ bg: toolTabNs, label: toolTabNs._label, catId: 'tools' });
   }
 
-  /** 탭 활성 상태 갱신 */
+  /** 탭 활성 상태 갱신 (Phase 60-17: setFillStyle → setActive + setColor) */
   _refreshTabs() {
     this._tabObjects.forEach(({ bg, label, catId }) => {
       const isActive = catId === this._currentCategory;
-      bg.setFillStyle(isActive ? 0xff6b35 : 0x333333);
+      bg.setActive(isActive);
       label.setColor(isActive ? '#ffffff' : '#888888');
     });
   }
@@ -207,10 +190,9 @@ export class RecipeCollectionScene extends Phaser.Scene {
     const cy = GAME_HEIGHT / 2 + 60;
     const container = this.add.container(0, 0).setDepth(50);
 
-    // 반투명 오버레이
-    const overlay = this.add.rectangle(cx, cy, 300, 240, 0x000000, 0.9)
-      .setStrokeStyle(2, TIER_COLORS[recipe.tier] || 0xcccccc);
-    container.add(overlay);
+    // Phase 60-17: 레시피 상세 팝업 배경 rectangle → NineSliceFactory.panel 'dark'
+    const popupBg = NineSliceFactory.panel(this, cx, cy, 300, 240, 'dark');
+    container.add(popupBg);
 
     if (unlocked) {
       // 해금된 레시피: 모든 정보 표시
@@ -263,20 +245,16 @@ export class RecipeCollectionScene extends Phaser.Scene {
       }
     }
 
-    // 닫기 버튼 (Phase 11-3b: Danger 팔레트 + 터치 피드백)
-    const closeBtn = this.add.rectangle(cx + 120, cy - 100, 40, 24, 0xcc2222)
-      .setInteractive({ useHandCursor: true });
-    container.add(closeBtn);
-    const closeText = this.add.text(cx + 120, cy - 100, '✕', {
-      fontSize: '14px', color: '#ffffff',
-    }).setOrigin(0.5);
-    container.add(closeText);
-    closeBtn.on('pointerup', () => {
-      container.destroy();
-      this._detailContainer = null;
+    // Phase 60-17: 닫기 버튼 rectangle → NineSliceFactory.button 'danger'
+    const closeBtn = NineSliceFactory.button(this, cx + 120, cy - 100, 40, 24, '✕', {
+      variant: 'danger',
+      textStyle: { fontSize: '14px', color: '#ffffff' },
+      onClick: () => {
+        container.destroy();
+        this._detailContainer = null;
+      },
     });
-    closeBtn.on('pointerover', () => closeBtn.setFillStyle(0xff3333));
-    closeBtn.on('pointerout', () => closeBtn.setFillStyle(0xcc2222));
+    container.add(closeBtn);
 
     this._detailContainer = container;
   }
@@ -313,9 +291,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
       const y = startY + row * rowGap;
       const count = (inventory[toolId] || { count: 0 }).count;
 
-      // 셀 배경 + 테두리
-      const cellBg = this.add.rectangle(x, y, 80, 80, 0x1a1000)
-        .setStrokeStyle(1, 0x444444);
+      // Phase 60-17: 셀 배경 rectangle → NineSliceFactory.panel 'stone'
+      const cellBg = NineSliceFactory.panel(this, x, y, 80, 80, 'stone');
       this._gridContainer.add(cellBg);
 
       // 색상 박스 (38x38)
@@ -336,8 +313,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
       }).setOrigin(0.5);
       this._gridContainer.add(countTxt);
 
-      // 셀 클릭 → 상세 팝업
-      cellBg.setInteractive({ useHandCursor: true });
+      // 셀 클릭 → 상세 팝업 (Phase 60-17: Container hitArea 명시)
+      cellBg.setInteractive(new Phaser.Geom.Rectangle(-40, -40, 80, 80), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       cellBg.on('pointerup', () => this._showToolDetail(def));
     });
   }
@@ -373,9 +350,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
       GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5).setInteractive();
     container.add(overlay);
 
-    // 팝업 배경 (320 x 동적 높이)
-    const popBg = this.add.rectangle(cx, cy, 320, popupH, 0x221100)
-      .setStrokeStyle(2, toolDef.color);
+    // Phase 60-17: 팝업 배경 rectangle → NineSliceFactory.panel 'parchment'
+    const popBg = NineSliceFactory.panel(this, cx, cy, 320, popupH, 'parchment');
     container.add(popBg);
 
     // ── 팝업 상단 기준 Y 좌표 ──
@@ -388,24 +364,23 @@ export class RecipeCollectionScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 2,
     }));
 
-    // 닫기 버튼 (X)
-    const closeBtn = this.add.rectangle(cx + 130, topY + 20, 36, 24, 0xcc2222)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-17: 닫기 버튼 rectangle → NineSliceFactory.button 'danger'
+    const closeBtn = NineSliceFactory.button(this, cx + 130, topY + 20, 36, 24, '\u2715', {
+      variant: 'danger',
+      textStyle: { fontSize: '14px', color: '#ffffff' },
+    });
     container.add(closeBtn);
-    container.add(this.add.text(cx + 130, topY + 20, '\u2715', {
-      fontSize: '14px', color: '#ffffff',
-    }).setOrigin(0.5));
 
-    // 구분선
-    container.add(this.add.rectangle(cx, topY + 42, 280, 1, 0x444444));
+    // Phase 60-17: 구분선 rectangle → NineSliceFactory.dividerH
+    container.add(NineSliceFactory.dividerH(this, cx, topY + 42, 280, 2));
 
     // 기능 설명 (descKo)
     container.add(this.add.text(cx, topY + 54, toolDef.descKo || '', {
       fontSize: '12px', color: '#cccccc', wordWrap: { width: 270 }, lineSpacing: 3,
     }).setOrigin(0.5, 0));
 
-    // 구분선
-    container.add(this.add.rectangle(cx, topY + 94, 280, 1, 0x444444));
+    // Phase 60-17: 구분선 rectangle → NineSliceFactory.dividerH
+    container.add(NineSliceFactory.dividerH(this, cx, topY + 94, 280, 2));
 
     // 스탯 비교표 헤더
     const tableX = cx - 120;
@@ -443,8 +418,8 @@ export class RecipeCollectionScene extends Phaser.Scene {
       rowY += 18;
     }
 
-    // 구분선
-    container.add(this.add.rectangle(cx, rowY + 12, 280, 1, 0x444444));
+    // Phase 60-17: 구분선 rectangle → NineSliceFactory.dividerH
+    container.add(NineSliceFactory.dividerH(this, cx, rowY + 12, 280, 2));
 
     // 로어 (loreKo)
     container.add(this.add.text(cx, rowY + 22, toolDef.loreKo || '', {
@@ -452,14 +427,12 @@ export class RecipeCollectionScene extends Phaser.Scene {
       wordWrap: { width: 270 }, lineSpacing: 2,
     }).setOrigin(0.5, 0));
 
-    // 닫기 콜백
+    // Phase 60-17: 닫기 콜백 (NineSliceFactory.button이 press/release 상태를 자체 처리)
     const closeFn = () => {
       container.destroy();
       this._detailContainer = null;
     };
     closeBtn.on('pointerup', closeFn);
-    closeBtn.on('pointerover', () => closeBtn.setFillStyle(0xff3333));
-    closeBtn.on('pointerout', () => closeBtn.setFillStyle(0xcc2222));
     overlay.on('pointerup', closeFn);
 
     this._detailContainer = container;
