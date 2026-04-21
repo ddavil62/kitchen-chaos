@@ -12,6 +12,8 @@
 
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
+import { NS_KEYS } from '../ui/UITheme.js';
 import { STAGES, STAGE_ORDER } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
@@ -54,9 +56,10 @@ export class ResultScene extends Phaser.Scene {
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_result');
 
-    // 배경 — 엔드리스 모드 게임오버는 짙은 보라 배경
-    const bgColor = this.isEndless ? 0x0a0020 : (this.isMarketFailed ? 0x330000 : 0x001a00);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, bgColor);
+    // Phase 60-18: 배경 rectangle → NineSliceFactory.panel 'dark' + 상태별 tint
+    const bgTint = this.isEndless ? 0x8844cc : (this.isMarketFailed ? 0xcc4444 : 0x44cc44);
+    const bgPanel = NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
+    bgPanel.setTint(bgTint);
 
     if (this.isEndless) {
       this._createEndlessResultView();
@@ -94,8 +97,8 @@ export class ResultScene extends Phaser.Scene {
       fontSize: '16px', color: '#ffffff',
     }).setOrigin(0.5);
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, 110, GAME_WIDTH - 40, 1, 0x444444);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, 110, GAME_WIDTH - 40, 2);
 
     // 섹션: 이번 도전 결과
     this.add.text(GAME_WIDTH / 2, 125, '\uD83D\uDCCA \uC774\uBC88 \uB3C4\uC804 \uACB0\uACFC', {
@@ -126,8 +129,8 @@ export class ResultScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, 230, GAME_WIDTH - 40, 1, 0x444444);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, 230, GAME_WIDTH - 40, 2);
 
     // 섹션: 역대 최고 기록
     this.add.text(GAME_WIDTH / 2, 245, '\uD83C\uDFC6 \uC5ED\uB300 \uCD5C\uACE0 \uAE30\uB85D', {
@@ -146,8 +149,8 @@ export class ResultScene extends Phaser.Scene {
       fontSize: '14px', color: '#cccccc',
     }).setOrigin(0.5);
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, 340, GAME_WIDTH - 40, 1, 0x444444);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, 340, GAME_WIDTH - 40, 2);
 
     // 버튼: 다시 도전
     this._createButton(365, '\uB2E4\uC2DC \uB3C4\uC804!', 0x6622cc, () => {
@@ -262,8 +265,8 @@ export class ResultScene extends Phaser.Scene {
     }).setOrigin(0.5);
     y += 24;
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 40, 1, 0x444444);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 40, 2);
     y += 12;
 
     // ── 장보기 섹션 ──
@@ -283,8 +286,8 @@ export class ResultScene extends Phaser.Scene {
       });
     y += 30;
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 60, 1, 0x333333);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 60, 2);
     y += 12;
 
     // ── 영업 섹션 ──
@@ -318,8 +321,8 @@ export class ResultScene extends Phaser.Scene {
       y += 30;
     }
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 60, 1, 0x333333);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 60, 2);
     y += 12;
 
     // ── 평가 섹션 ──
@@ -352,8 +355,8 @@ export class ResultScene extends Phaser.Scene {
     });
     y += 40;
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 60, 1, 0x333333);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 60, 2);
     y += 12;
 
     // ── 보상 섹션 ──
@@ -372,8 +375,8 @@ export class ResultScene extends Phaser.Scene {
     });
     y += 32;
 
-    // 구분선
-    this.add.rectangle(GAME_WIDTH / 2, y, GAME_WIDTH - 40, 1, 0x444444);
+    // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
+    NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 40, 2);
     y += 18;
 
     // ── 버튼 ──
@@ -422,6 +425,8 @@ export class ResultScene extends Phaser.Scene {
 
   /**
    * 버튼 생성 헬퍼.
+   * Phase 60-18: rectangle → NineSliceFactory.raw 'btn_primary_normal' + setTint(color).
+   * hover 시 pressed 텍스처로 스왑, pointerout 시 normal 복귀.
    * @param {number} y
    * @param {string} label
    * @param {number} color
@@ -429,19 +434,21 @@ export class ResultScene extends Phaser.Scene {
    * @private
    */
   _createButton(y, label, color, onClick) {
-    const btn = this.add.rectangle(GAME_WIDTH / 2, y, 220, 44, color)
-      .setInteractive({ useHandCursor: true });
+    const BTN_W = 220;
+    const BTN_H = 44;
+    const btnBg = NineSliceFactory.raw(this, GAME_WIDTH / 2, y, BTN_W, BTN_H, 'btn_primary_normal');
+    btnBg.setTint(color);
+    const hitArea = new Phaser.Geom.Rectangle(-BTN_W / 2, -BTN_H / 2, BTN_W, BTN_H);
+    btnBg.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
     this.add.text(GAME_WIDTH / 2, y, label, {
       fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 3,
     }).setOrigin(0.5);
 
-    btn.on('pointerdown', onClick);
-    btn.on('pointerover', () => btn.setFillStyle(
-      Phaser.Display.Color.ValueToColor(color).lighten(30).color
-    ));
-    btn.on('pointerout', () => btn.setFillStyle(color));
+    btnBg.on('pointerdown', onClick);
+    btnBg.on('pointerover', () => btnBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED));
+    btnBg.on('pointerout', () => btnBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL));
   }
 
   /**
