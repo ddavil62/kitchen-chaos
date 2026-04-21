@@ -43,6 +43,7 @@ import { StoryManager } from '../managers/StoryManager.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { WANDERING_CHEFS, getWanderingChefById } from '../data/wanderingChefData.js';
+import { BranchEffects } from '../managers/BranchEffects.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -336,6 +337,25 @@ export class ServiceScene extends Phaser.Scene {
 
     // ── 해금된 서빙 레시피 목록 ──
     this.availableRecipes = ALL_SERVING_RECIPES.filter(r => RecipeManager.isUnlocked(r.id));
+
+    // ── Phase 58-3: 행상인 recipe 카드로 해금된 분기 레시피를 이번 영업 풀에 추가 ──
+    // 분기 레시피는 RecipeManager 해금 체계와 무관하게 branchCards.unlockedBranchRecipes에만
+    // 기록되므로, ServiceScene 진입 시점에 RECIPE_MAP에서 해당 정의를 조회하여 append한다.
+    // 영업 종료 시 `consumeBranchRecipe`로 제거되어 "1회 한정" 규약을 유지한다.
+    this._sessionBranchRecipeIds = [];
+    try {
+      const unlockedBranchIds = SaveManager.getUnlockedBranchRecipes();
+      for (const id of unlockedBranchIds) {
+        const def = RECIPE_MAP[id];
+        if (def && !this.availableRecipes.some(r => r.id === id)) {
+          this.availableRecipes.push(def);
+          this._sessionBranchRecipeIds.push(id);
+        }
+      }
+    } catch (err) {
+      // SaveManager 누락 방어 — 치명적이지 않으므로 조용히 무시
+      console.warn('[ServiceScene] 분기 레시피 주문 풀 추가 실패:', err);
+    }
 
     // ── UI 생성 ──
     this._createHUD();
@@ -1893,7 +1913,10 @@ export class ServiceScene extends Phaser.Scene {
     // 비 오는 날 이벤트: 인내심 +50%
     const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
 
-    const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * typeMult * eventPatienceMult;
+    // Phase 58-3: 축복 'patron_patience' — 인내심 최대치 +value (0.25 → ×1.25)
+    const patienceBlessingMult = 1 + BranchEffects.getBlessingMultiplier('patron_patience');
+
+    const totalPatience = basePat * chefPatienceBonus * (1 + tablePatienceBonus + interiorPatienceBonus) * typeMult * eventPatienceMult * patienceBlessingMult;
 
     const customer = {
       dish: recipe.id,
@@ -2306,8 +2329,10 @@ export class ServiceScene extends Phaser.Scene {
     const kitchenBonus = KITCHEN_COOK_BONUS[this.interiorKitchen] || 0;
     // Phase 51-2: 유랑 미력사 조리 시간 감소 버프 반영
     const wanderingCookReduce = this._buffCookTimeReduce || 0;
+    // Phase 58-3: 축복 'cook_speed' — 조리시간 감소 비율 (예: 0.2 → -20%)
+    const blessingCookSpeed = BranchEffects.getBlessingMultiplier('cook_speed');
     // precision_cut(유키 serviceSkill): 남은 카운트가 있으면 즉시 조리
-    let totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus) * (1 - wanderingCookReduce);
+    let totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus) * (1 - wanderingCookReduce) * (1 - blessingCookSpeed);
     if (this._precisionCutRemaining > 0) {
       totalTime = 0;
       this._precisionCutRemaining--;
@@ -2711,6 +2736,13 @@ export class ServiceScene extends Phaser.Scene {
       this.totalGold = Math.floor(this.totalGold * 0.5);
     }
 
+    // ── Phase 58-3: 축복 'gold_gain' — 영업 수입(매출+팁)에 배수 적용 ──
+    const goldMultiplier = BranchEffects.getBlessingMultiplier('gold_gain'); // 기본 1.0
+    if (goldMultiplier !== 1.0) {
+      this.totalGold = Math.floor(this.totalGold * goldMultiplier);
+      this.tipTotal  = Math.floor(this.tipTotal * goldMultiplier);
+    }
+
     // Phase 13-2: 영업 수입을 영구 골드에 누적
     const earnedGold = this.totalGold + this.tipTotal;
     if (earnedGold > 0) {
@@ -2719,6 +2751,14 @@ export class ServiceScene extends Phaser.Scene {
       // ── 업적: 누적 골드 카운터 + 체크 (Phase 42) ──
       AchievementManager.increment('total_gold_earned', earnedGold);
       AchievementManager.check(this, 'total_gold_earned', 0);
+    }
+
+    // ── Phase 58-3: 이번 영업에서 추가된 분기 레시피는 1회 한정 규약에 따라 소비 ──
+    if (Array.isArray(this._sessionBranchRecipeIds) && this._sessionBranchRecipeIds.length > 0) {
+      for (const recipeId of this._sessionBranchRecipeIds) {
+        SaveManager.consumeBranchRecipe(recipeId);
+      }
+      this._sessionBranchRecipeIds = [];
     }
     // ── 업적: 직원/인테리어 체크 (Phase 42) ──
     AchievementManager.check(this, 'staff_hired', 0);

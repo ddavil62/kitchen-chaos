@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-20
-> 기준: Phase 57 완료 + Phase 58~59 계획 추가
+> 최종 업데이트: 2026-04-22
+> 기준: Phase 58 완료 + Phase 59 계획
 
 ---
 
@@ -62,8 +62,10 @@
 | Phase 55-3 | 미력 폭풍 + 유랑 미력사 엔드리스 지원 + 정화 임무 4종 (EndlessMissionManager 신규) | ✅ 완료 |
 | Phase 55-4 | 엔드리스 웨이브 구간별 배경 테마 전환 + 업적 4개 추가(총 34개) + SaveManager v21 | ✅ 완료 |
 | Phase 56 | TD 셰프 Named Character 개편 (7종) | ✅ 완료 |
+| Phase 57 | ChefSelectScene 가로 캐러셀 UI + 메인 메뉴 비주얼 에셋 | ✅ 완료 |
+| Phase 58 | 행상인 로그라이크 분기 선택 (분기 카드 32장 + 세이브 v24 + 게임플레이 반영) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 55-4 완료 (2026-04-19) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 284종, 재료 32종, 셰프 5종 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21).
+**현재 구현 완성도**: Phase 58 완료 (2026-04-22) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21). 행상인 분기 카드 시스템: 4카테고리×8장=32장, 매 방문 3택 1 되돌릴 수 없는 선택, 배지 아이콘 4종, BranchEffects 매니저로 변이 tint·Bond 시너지·Blessing 실효·분기 레시피 주문 풀 편입(v24).
 
 ### 현재 콘텐츠 규모
 
@@ -72,13 +74,16 @@
 | 적 종류 | 57종 (일반 43 + 미니보스 1 + 보스 13) |
 | 도구 종류 | 8종 — 영구 보유, 업그레이드 3단계 |
 | 재료 종류 | 32종 |
-| 레시피 | 284종 (서빙 231 + 버프 53) |
+| 레시피 | 292종 (서빙 231 + 버프 53 + 분기 8) |
 | 스테이지 | 143슬롯 (전체 구현, placeholder 0개) |
-| 셰프 | 5종 (꼬마/불꽃/얼음/유키/라오, 전원 패시브+액티브 스킬 구현 완료) |
+| 셰프 | 7종 Named (미미/린/메이지/유키/라오/앙드레/아르준, 전원 패시브+액티브 스킬 구현 완료) |
 | 업적 | 34개 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 6) |
+| 분기 카드 | 32장 (변이 8 / 레시피 8 / 인연 8 / 축복 8) |
+| 신규 UI 에셋 | `branch_badge_{mutation,recipe,bond,blessing}.png` 4종 (32×32) |
+| 신규 매니저 | `BranchEffects.js` (분기 카드 효과 조회 경량 어댑터) |
 | 대화 스크립트 | ~106종 |
 | 스토리 트리거 | ~111항목 (triggerPoint 8종) |
-| 세이브 버전 | v21 |
+| 세이브 버전 | v24 |
 
 ### 게임 루프
 
@@ -338,6 +343,21 @@ Phase 57-5: 하단 3패널 슬라이드업 분리 (full, ui)
               ↓
 Phase 57-6: 타이틀 텍스트 통합 (quick, ui)
               - MenuScene.js: Kitchen/Chaos/Tycoon 텍스트 3개 → TextStyle 단일 블록 (#8)
+              ↓
+Phase 58-1: 분기 카드 데이터 + 세이브 v24 (full, none) ✅ 완료 (2026-04-20)
+              - merchantBranchData.js 신규 (32장, 피셔-예이츠 선정)
+              - SaveManager v23 → v24 마이그레이션 + 헬퍼 10개
+              ↓
+Phase 58-2: MerchantScene 탭 UI + 배지 아이콘 4종 (full, both) ✅ 완료 (2026-04-20)
+              - 2탭 UI(도구 구매/분기 선택), 카드 3장 레이아웃, 확인 팝업
+              - branch_badge_{mutation,recipe,bond,blessing}.png 4종 (32×32)
+              - AD 모드3 REVISE 반영 (탭 Y/높이, helpText 2줄, 팝업 버튼 크기, 배지 display 28×28)
+              ↓
+Phase 58-3: 게임플레이 반영 + Recipe 주문 풀 편입 (full, art+ui) ✅ 완료 (2026-04-20)
+              - BranchEffects.js 신규 매니저 (카드 효과 조회 어댑터)
+              - 4 카테고리 실효: 변이 tint + Bond 시너지 + Blessing 5종(gold_gain/cook_speed/patron_patience/exp_gain/ingredient_drop_count+drop_rate)
+              - Recipe 보완: BRANCH_SERVING_RECIPES 8장 recipeData.js 편입, ServiceScene availableRecipes append + 1회 한정 소비(consumeBranchRecipe)
+              - Playwright 통합 QA 26 PASS
 ```
 
 ---
@@ -357,33 +377,53 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 
 **리워크 목표**: 스테이지마다 "상태 변화"가 체감되는 구조로 전환. 쇼츠/클립 소재 자동 발생.
 
-### Phase 58 — 행상인 로그라이크 분기 선택 (full, ui)
-
-> 참고 문서(예정): `docs/MERCHANT_BRANCHING_DESIGN.md`
+### Phase 58 — 행상인 로그라이크 분기 선택 (full, both) ✅ 완료 (2026-04-22)
 
 **목표**: 행상인을 "수치 환전소"에서 "게임 방향이 갈리는 분기점"으로 전환.
 
 **핵심 메커닉**: 매 행상인 방문 시 기존 도구 구매 옵션에 더해 **"3택 1 분기 카드"**를 제시. 선택은 되돌릴 수 없음.
 
-**분기 카드 유형 (초안)**:
+**분기 카드 유형 (확정)**:
 
-| 카테고리 | 예시 | 효과 범위 |
+| 카테고리 | 장수 | 효과 범위 |
 |---------|------|----------|
-| **변이(Mutation)** | pan → 화염팬(범위 공격) / 대장장이팬(공속 x2) / 스튜팬(냉기 부여) | 해당 도구 영구 변이 |
-| **레시피 해금(Recipe)** | 이번 스테이지 한정 고수익 특수 메뉴 3종 중 1 | 1회 영업 한정 |
-| **셰프 인연(Bond)** | 특정 셰프+도구 조합 시 영구 시너지 해금 | 해당 셰프 편성 시 상시 |
-| **미력의 축복(Blessing)** | 다음 3스테이지 특정 자원 드롭율 ×1.5 등 | 시간 제한 |
+| **변이(Mutation)** | 8장 (도구 8종 각 1장) | 해당 도구 영구 변이 (splash/chain/burn_stack/phase_through/freeze_extend/aura_boost/cluster/venom) |
+| **레시피 해금(Recipe)** | 8장 | 영업 1회 한정 고수익 특수 메뉴 주문 풀 편입 |
+| **셰프 인연(Bond)** | 8장 (셰프 7종 × 도구 조합, 미미 2장) | 해당 셰프 편성 + 도구 보유 시 영구 시너지 |
+| **미력의 축복(Blessing)** | 8장 | 2~3 스테이지 한정 버프 (교체 규칙: 새 카드 선택 시 기존 축복 덮어쓰기) |
 
-**의도된 효과**:
-- 플레이어는 매 행상인마다 "이번 빌드의 방향"을 결정해야 함
-- 반복 플레이 시 다른 분기를 선택하여 다양성 확보 (로그라이크 리플레이성)
-- "이 빌드 미쳤다" 순간이 자동 발생 → 쇼츠 소재
+#### Phase 58-1 — 분기 카드 데이터 + 세이브 v24 (none, AD 불필요) ✅ 완료
 
-**구현 범위**:
-- MerchantScene: 기존 도구 구매 UI 유지 + 분기 카드 3장 배치 UI 신규
-- 분기 카드 데이터 정의 (`merchantBranchData.js` 신규) — 카테고리 4종 × 각 8~12장 = 40장 내외
-- 세이브 v22: 선택된 변이/해금 상태 영구 저장
-- 변이된 도구 렌더링 (기존 도구 아이콘 + 오버레이 이펙트)
+- [x] `js/data/merchantBranchData.js` 신규 — 32장 카드 정의 (카테고리 4종 × 각 8장) + `selectBranchCards(state)` 피셔-예이츠 셔플 기반 3택 선정 + `getEligiblePool(category, state)` 중복 제외 + `getBranchCardById` / `getBranchCardsByCategory` / `BRANCH_CATEGORY_META`
+- [x] `SaveManager.js` — `SAVE_VERSION` 23 → 24, `branchCards` 필드 추가(`toolMutations`/`unlockedBranchRecipes`/`chefBonds`/`activeBlessing`), 헬퍼 메서드 10개(`getToolMutations`/`applyToolMutation`/`getUnlockedBranchRecipes`/`unlockBranchRecipe`/`consumeBranchRecipe`/`getChefBonds`/`unlockChefBond`/`getActiveBlessing`/`setActiveBlessing`/`decrementBlessingStages`)
+- [x] v23 → v24 마이그레이션 블록 (v18 이하 체인 호환성 포함)
+- [x] `applyToolMutation` 동일 toolId 재호출 차단 (되돌릴 수 없음 규약)
+
+#### Phase 58-2 — MerchantScene UI + 배지 아이콘 4종 (ui/art, AD 모드1/2/3 실행) ✅ 완료
+
+- [x] `MerchantScene.js` — 2탭 UI(`_createTabBar`/`_setActiveTab`), 분기 카드 영역(`_createBranchCardArea`/`_renderBranchCards`/`_renderBranchCard`), 확인 팝업(`_showBranchConfirmPopup`), 선택 적용(`_applyBranchCard`), 선택 완료 요약(`_renderSelectedBranchSummary`), 재빌드(`_rebuildBranchTab`)
+- [x] `assets/ui/branch_badge_mutation.png` (오렌지 불꽃, 32×32)
+- [x] `assets/ui/branch_badge_recipe.png` (초록 요리책, 32×32)
+- [x] `assets/ui/branch_badge_bond.png` (하늘 심장+셰프 모자, 32×32)
+- [x] `assets/ui/branch_badge_blessing.png` (금색 미력 광배+물방울, 32×32)
+- [x] `SpriteLoader.js` — 배지 4종 preload 등록 (텍스처 미존재 시 카테고리 이모지 폴백 16px)
+- [x] AD 모드3 REVISE 반영: `TAB_Y` 67→72, `LIST_TOP` 95→100, `TAB_HEIGHT` 20→36, `CARD_CENTER_Y` 310→250, helpText 2줄+wordWrap, 팝업 버튼 height 30→40, 배지 `setDisplaySize(28,28)`
+
+#### Phase 58-3 — 게임플레이 반영 (art+ui, BranchEffects 매니저 신규) ✅ 완료
+
+- [x] `js/managers/BranchEffects.js` 신규 — 카드 정의 + SaveManager 상태 결합 어댑터. API: `getActiveBlessingCard`/`getBlessingMultiplier`/`getBlessingDropRateFor`/`getMutationCard`/`getMutationEffect`/`hasMutation`/`getMutationTint`/`getActiveBondCard`/`getActiveBondEffect`/`getUnlockedBranchRecipes`/`getUnlockedBranchRecipeCards`
+- [x] `GatheringScene.js` (+155) — `_applyMutationToTower(tower, typeId)` (tint + 스탯 오버라이드), `_applyBondToTower` (셰프+도구 매칭 시 시너지)
+- [x] `ServiceScene.js` (+17) — `patron_patience` 인내심 배수, `cook_speed` 조리시간 감소, `gold_gain` 정산 배수
+- [x] `ResultScene.js` (+21) — `exp_gain` 축복 코인 보너스, `decrementBlessingStages()` 호출, 보상 텍스트에 `[미력의 축복 +N]` 표시
+- [x] `IngredientManager.js` (+15) — `ingredient_drop_count` 가산, `drop_rate` 재료별 배수
+- [x] `Enemy.js` (+17) — `enemy_slow` 축복 처리 *(require 호출 ESM 환경에서 미작동, 후속 수정 필요)*
+- [x] **Recipe 보완 (2026-04-20 추가)**: `recipeData.js`에 `BRANCH_SERVING_RECIPES` 8장 추가 (`branch_dragon_feast`/`branch_mireuk_tea`/`branch_grand_omakase`/`branch_golden_curry`/`branch_chaos_ramen`/`branch_frozen_dessert`/`branch_spice_bomb`/`branch_bistro_course`), `ServiceScene.create()`에서 해금된 분기 레시피를 `availableRecipes`에 append, `_endService()`에서 `consumeBranchRecipe()` 호출로 1회 한정 소비
+- [x] Playwright QA 통합 테스트 `tests/phase58-qa-integration.spec.js` — 26 PASS / 0 관련 FAIL (#27 sugar_fairy는 본 페이즈 무관 기존 이슈)
+
+**알려진 제약** (PROJECT.md 제약사항 섹션에 기록):
+- 일부 변이(`chain`/`cluster`/`venom`/`aura_boost`)와 Bond(`yuki+soup_pot`/`andre+delivery`/`mimi+salt`/`mimi+spice`) 플래그만 저장, 소비처 로직 미구현
+- `Enemy.js` `enemy_slow` ESM `require()` 버그로 미작동
+- 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약은 단순 1회 소비로 통일
 
 **의존성**: 없음 (MerchantScene 독립 작업)
 

@@ -1,10 +1,10 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-21 (Phase 61 완료)
+> 최종 업데이트: 2026-04-22 (Phase 58 완료)
 
 ## 프로젝트 개요
 
-모바일 타워 디펜스 + 레스토랑 타이쿤 하이브리드 게임(구 Kitchen Chaos Defense). 영구 도구를 배치해 적을 처치하고 재료를 채집하는(재료 채집 페이즈) → 재료로 손님에게 요리를 서빙하여 골드를 획득하는(영업 페이즈) → 골드로 도구를 구매/업그레이드하는(행상인) 3단계 루프 구조. Phaser.js 3 기반 웹 게임, Android 우선 배포.
+모바일 타워 디펜스 + 레스토랑 타이쿤 하이브리드 게임(구 Kitchen Chaos Defense). 영구 도구를 배치해 적을 처치하고 재료를 채집하는(재료 채집 페이즈) → 재료로 손님에게 요리를 서빙하여 골드를 획득하는(영업 페이즈) → 골드로 도구를 구매/업그레이드하거나 되돌릴 수 없는 로그라이크 분기 카드 3장 중 1장을 선택하는(행상인) 3단계 루프 구조. Phaser.js 3 기반 웹 게임, Android 우선 배포.
 
 세계관/스토리/캐릭터 상세: [STORY.md](STORY.md) 참조.
 
@@ -27,14 +27,15 @@
 |------|------|------|
 | 재료 채집 | GatheringScene.js | 도구 배치/회수/재배치, 적 AI, 재료 드롭, 보스 재료 드롭, 웨이브 진행 |
 | 도구 관리 | ToolManager.js | 영구 도구 인벤토리 (구매/판매/업그레이드/스탯 조회) |
-| 행상인 | MerchantScene.js | 영업 후 도구 구매/판매/업그레이드 UI |
+| 행상인 | MerchantScene.js | 2탭 UI (도구 구매/분기 선택), 도구 구매·판매·업그레이드 + 되돌릴 수 없는 3택 1 분기 카드 |
+| 분기 효과 | BranchEffects.js + merchantBranchData.js | 분기 카드 32장 정의(mutation/recipe/bond/blessing × 8), 게임플레이 씬에서 배수·시너지·tint 조회하는 경량 어댑터 |
 | 월드맵 | WorldMapScene.js | 24챕터 3그룹 탭(1~6/7~15/16~24장), 9노드 3x3 맵, 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js + EndlessMissionManager.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입, 미력 폭풍 이벤트, 정화 임무 4종, 통계 트래킹(폭풍/임무/무결) |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (3레이어 분리 렌더링+depth sorting+홀 데코), 챕터별 홀 배경 (바닥 8종 tileSprite+뒷벽 8종), 엔드리스 웨이브 구간별 배경 테마 전환, 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 ~106종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), ~111항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v23, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients/endless통계 헬퍼 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v24, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients/endless통계/branchCards 헬퍼 |
 | 쿠폰 | CouponRegistry.js | 쿠폰 레지스트리, redeemCoupon() API, 일반 3종+DEV 치트 5종, 사용 이력 localStorage 관리 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
@@ -42,7 +43,7 @@
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 34개 업적, 해금 판정/보상(골드/코인/정수), 카테고리 탭 UI |
 | 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated 에셋 로드, portrait 9종 (arjun 포함) |
 | 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰 |
-| 데이터 | stageData.js / gameData.js / recipeData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 284종 |
+| 데이터 | stageData.js / gameData.js / recipeData.js / merchantBranchData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 292종(일반 284+분기 8), 분기 카드 32장 |
 
 ### 게임 루프
 
@@ -84,6 +85,7 @@
 | 영업씬 렌더링 재구성 | 테이블 3레이어 분리 렌더링(back/customer/front), 손님 독립 스프라이트(5종x2상태), HUD depth 600+ 상향 | 완료 |
 | 쿠폰 코드 시스템 | 설정 메뉴 쿠폰 입력 UI, 일반 쿠폰 3종(프로덕션), DEV 치트 5종(트리쉐이킹), giftIngredients 세이브 v20 | 완료 |
 | 메뉴 비주얼 에셋 | MenuScene에 배경 이미지(menu_bg), 타이틀 로고(menu_title_logo), 미미 스프라이트, 앱 아이콘(app_icon_512) 도입. 장식 원 제거, panel dark alpha 0.5 | 완료 |
+| 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 tint + Bond 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭) + 분기 레시피 1회 한정 주문 풀 편입 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -92,11 +94,12 @@
 | 적 | 57종 (일반 43 + 미니보스 1 + 보스 13, oni_herald 미니보스 에셋 완료) |
 | 도구 | 8종 (pan, salt, grill, delivery, freezer, soup_pot, wasabi_cannon, spice_grinder) |
 | 재료 | 32종 |
-| 레시피 | 284종 (서빙 231 + 버프 53) |
+| 레시피 | 292종 (서빙 231 + 버프 53 + 분기 8) |
 | 스테이지 | 143슬롯 (1~24장 전체 구현, placeholder 0개) |
 | 셰프 | 7종 Named (미미/린/메이지/유키/라오/앙드레/아르준, 전원 패시브+액티브 스킬) |
 | 업적 | 34개 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 6) |
-| 세이브 버전 | v23 |
+| 분기 카드 | 32장 (변이 8 / 레시피 8 / 인연 8 / 축복 8) |
+| 세이브 버전 | v24 |
 
 ## 알려진 제약사항
 
@@ -108,6 +111,9 @@
 - mini_dumpling metadata 92x92 vs 실제 PNG 36x36 불일치 (분열 소환 적 의도적 소형, SpriteLoader 스케일 처리)
 - portrait/스프라이트 텍스처가 Phaser에 로드되지 않아 이모지 fallback으로 동작 중 (Vite 경로 매핑 이슈, Phase 56부터 지속)
 - portrait_arjun.png가 애니메/일러스트 스타일로 생성됨 (기존 portrait은 픽셀아트 스타일). 텍스처 로딩 이슈 해결 시 스타일 불일치 노출 예상
+- 분기 카드 중 일부 변이(chain/cluster/venom/aura_boost)와 Bond(yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice)는 플래그만 저장되고 소비처 로직 미구현 상태 (tint 시각 효과는 정상, 실제 전투 수치 반영은 부분적). 후속 Quick Fix로 보완 예정
+- `Enemy.js`의 `enemy_slow` 축복 처리가 `require()` 호출로 작성되어 ESM 환경에서 조용히 실패. `bles_enemy_slow` 카드는 실효 미반영 (후속 수정 필요)
+- 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약은 현재 단순 1회 소비로 통일됨 (카드 descKo의 수치와 실제 동작 불일치, 후속 밸런스 조정 예정)
 
 ## 향후 계획
 

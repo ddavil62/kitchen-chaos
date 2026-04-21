@@ -38,6 +38,7 @@ import { TutorialManager } from '../managers/TutorialManager.js';
 import { ToolManager } from '../managers/ToolManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
+import { BranchEffects } from '../managers/BranchEffects.js';
 
 export class GatheringScene extends Phaser.Scene {
   constructor() {
@@ -999,6 +1000,9 @@ export class GatheringScene extends Phaser.Scene {
     tower.setDepth(10 + col + row);
     this.towers.add(tower);
 
+    // ── Phase 58-3: 변이(Mutation) 시각 + 스탯 오버라이드 ──
+    this._applyMutationToTower(tower, typeId);
+
     // 타워 클릭은 hitArea(worldToCell)로 처리 — 별도 setInteractive 불필요
 
     // 현재 버프 적용
@@ -1855,6 +1859,157 @@ export class GatheringScene extends Phaser.Scene {
     else if (effectType === 'buff_narcotize_immunity') tower.applyBuff('speed', effectValue);
     else if (effectType === 'buff_dark_immunity') tower.applyBuff('damage', effectValue);
     else if (effectType === 'buff_wine_immunity') tower.applyBuff('speed', effectValue);
+  }
+
+  // ── Phase 58-3: 분기 카드 변이 / 인연 적용 ──────────────────────
+
+  /**
+   * 배치 직후 타워에 변이(Mutation) 효과를 반영한다.
+   *
+   * 시각: `_bodySprite.setTint(color)`로 기존 도구 아이콘에 색조를 덧씌운다.
+   *       (AD 확정 방식 A — 별도 PNG 오버레이 없이 tint로 구분)
+   * 스탯: 변이 타입별 오버라이드를 tower 필드에 직접 반영한다.
+   *       - splash: tower.data_.splashRadius += N
+   *       - burn_stack: tower.burnMultiplier *= N (중첩 배수를 기존 화상 곱에 반영)
+   *       - phase_through: delivery collectInterval 감소
+   *       - freeze_extend: tower._freezeExtend 플래그 + Projectile 참조
+   *       - aura_boost: soup_pot aura 관련 (58-3 MVP — 아우라 계산은 추후)
+   *       - chain / cluster / venom: 58-3 MVP 범위에서는 플래그만 세팅
+   *
+   * @param {Tower} tower
+   * @param {string} typeId
+   * @private
+   */
+  _applyMutationToTower(tower, typeId) {
+    const effect = BranchEffects.getMutationEffect(typeId);
+    if (!effect) return;
+
+    // ── 시각 tint ──
+    const tint = BranchEffects.getMutationTint(typeId);
+    if (tint !== null && tower._bodySprite && tower._bodySprite.setTint) {
+      tower._bodySprite.setTint(tint);
+    }
+
+    // ── 스탯/동작 오버라이드 ──
+    switch (effect.type) {
+      case 'splash':
+        // splashRadius 가산 (기본값 없으면 0 → 가산 후 양수)
+        tower.data_.splashRadius = (tower.data_.splashRadius || 0) + (effect.splashRadius || 0);
+        break;
+      case 'burn_stack':
+        // 화상 데미지 배수 (기존 burnMultiplier에 곱)
+        tower.burnMultiplier = (tower.burnMultiplier || 1.0) * (effect.stackMultiplier || 1);
+        tower._maxBurnStacks = effect.maxStacks || 1;
+        break;
+      case 'phase_through':
+        // delivery 전용: 수거 간격 감소 (effect.collectIntervalDelta는 음수)
+        if (typeId === 'delivery') {
+          const base = tower.data_.collectInterval || 2000;
+          tower.data_.collectInterval = Math.max(300, base + (effect.collectIntervalDelta || 0));
+        }
+        break;
+      case 'freeze_extend':
+        // freezer 전용: 빙결 지속 가산 (초 → ms로 환산)
+        if (tower.data_.freezeDuration !== undefined) {
+          tower.data_.freezeDuration += Math.floor((effect.freezeDurationDelta || 0) * 1000);
+        }
+        tower._refreezeChance = effect.refreezeChance || 0;
+        break;
+      case 'aura_boost':
+        // soup_pot 전용: 아우라 배수/반경 (소프트 플래그)
+        tower._auraMultiplier = (tower._auraMultiplier || 1.0) * (effect.auraMultiplier || 1.0);
+        if (tower.data_.auraRadius !== undefined) {
+          tower.data_.auraRadius += (effect.auraRadiusDelta || 0);
+        }
+        break;
+      case 'cluster':
+        // wasabi_cannon 전용: 발사 시 multi-shot (플래그 + 탄 수/감소 비율 설정)
+        tower._clusterCount = effect.clusterCount || 1;
+        tower._perShotDamageRatio = effect.perShotDamageRatio || 1.0;
+        if (tower.data_.splashRadius !== undefined) {
+          tower.data_.splashRadius = Math.max(0, tower.data_.splashRadius + (effect.splashRadiusDelta || 0));
+        }
+        break;
+      case 'venom':
+        // spice_grinder 전용: DoT 지속 연장(s → ms) + 독 둔화
+        if (tower.data_.dotDuration !== undefined) {
+          tower.data_.dotDuration += Math.floor((effect.dotDurationDelta || 0) * 1000);
+        }
+        tower._poisonSlowPct = effect.poisonSlowPct || 0;
+        break;
+      case 'chain':
+        // salt 전용: 둔화 연쇄 (플래그/반경만 저장)
+        tower._chainCount = effect.chainCount || 0;
+        tower._chainRadius = effect.chainRadius || 0;
+        break;
+      default:
+        break;
+    }
+
+    // ── 인연(Bond) 시너지 ──
+    this._applyBondToTower(tower, typeId);
+  }
+
+  /**
+   * 선택 셰프와 도구 조합에 매칭되는 Bond 카드가 있으면 타워에 시너지를 적용한다.
+   * 단순 damage/burn/range 배수만 반영한다. 추가 조건부 시너지는 플래그로 저장만 한다.
+   *
+   * @param {Tower} tower
+   * @param {string} typeId
+   * @private
+   */
+  _applyBondToTower(tower, typeId) {
+    const bondEffect = BranchEffects.getActiveBondEffect(typeId);
+    if (!bondEffect) return;
+
+    switch (bondEffect.type) {
+      case 'damage_pct':
+        // grill 라오 시너지 — 공격력 +value(%)
+        tower.damageMultiplier = (tower.damageMultiplier || 1.0) * (1 + (bondEffect.value || 0));
+        break;
+      case 'burn_damage_flat':
+        // rin 린 시너지 — 팬 화상 플랫 가산 (Projectile 쪽은 burnDamage 필드 사용)
+        tower.data_.burnDamage = (tower.data_.burnDamage || 0) + (bondEffect.value || 0);
+        break;
+      case 'freeze_radius_flat':
+        // mage 메이지 시너지 — 빙결 범위 가산
+        tower.range = (tower.range || 0) + (bondEffect.value || 0);
+        tower.baseRange = tower.range;
+        break;
+      case 'cook_speed_pct':
+        // yuki 유키 시너지 — 조리시간 감소 (영업 씬에서 참조할 플래그)
+        tower._bondCookSpeedBonus = bondEffect.value || 0;
+        break;
+      case 'tip_pct':
+        // andre 앙드레 시너지 — 팁 보너스 (ServiceScene에서 참조할 플래그)
+        tower._bondTipBonus = bondEffect.value || 0;
+        break;
+      case 'wasabi_synergy':
+        // arjun 아르준 시너지 — splashRadius 가산 + 독 스택 추가
+        if (tower.data_.splashRadius !== undefined) {
+          tower.data_.splashRadius += (bondEffect.splashRadiusDelta || 0);
+        }
+        tower._poisonStackBonus = bondEffect.poisonStackBonus || 0;
+        break;
+      case 'collect_radius_on_slow':
+        // mimi 미미 시너지 — 둔화 적 대상 수거 범위 가산 (플래그만)
+        tower._collectRadiusOnSlow = bondEffect.value || 0;
+        break;
+      case 'drop_rate_on_poison':
+        // mimi 미미 향신료 — 중독 적 재료 드롭률 가산 (IngredientManager 참조용 플래그)
+        tower._dropRateOnPoison = bondEffect.value || 0;
+        break;
+      default:
+        break;
+    }
+
+    // 시각 피드백: 약한 green glow (tint alpha 덧씌움은 Phaser 제약으로 생략, 단순 scale pulse)
+    this.tweens.add({
+      targets: tower,
+      scaleX: { from: 1.1, to: 1 },
+      scaleY: { from: 1.1, to: 1 },
+      duration: 240, ease: 'Back.easeOut',
+    });
   }
 
   // ── 배달 도구 자동 수거 ────────────────────────────────────────

@@ -952,6 +952,24 @@ export class SaveManager {
   }
 
   /**
+   * 분기 레시피 1회 한정 사용 처리.
+   * 영업 종료 시 해당 영업에서 사용된 분기 레시피를 해금 목록에서 제거한다.
+   * (카드 설명에 따라 반복 등장이 가능해도 "이번 영업 한정"이라는 공통 규약 하에
+   *  현재 구현은 단순 제거만 수행한다.)
+   * @param {string} recipeId
+   * @returns {boolean} 실제 제거 여부
+   */
+  static consumeBranchRecipe(recipeId) {
+    const data = SaveManager.load();
+    if (!data.branchCards || !Array.isArray(data.branchCards.unlockedBranchRecipes)) return false;
+    const idx = data.branchCards.unlockedBranchRecipes.indexOf(recipeId);
+    if (idx === -1) return false;
+    data.branchCards.unlockedBranchRecipes.splice(idx, 1);
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
    * 해금된 인연 카드 ID 목록 반환.
    * @returns {string[]}
    */

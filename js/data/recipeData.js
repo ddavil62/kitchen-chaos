@@ -1866,8 +1866,83 @@ export const ALL_BUFF_RECIPES = [
   },
 ];
 
-/** 전체 레시피 (서빙 + 버프) 통합 목록 */
-export const ALL_RECIPES = [...ALL_SERVING_RECIPES, ...ALL_BUFF_RECIPES];
+// ──────────────────────────────────────────────────────────────────
+// Phase 58-3: 분기 레시피 (행상인 recipe 카테고리 카드 해금 전용)
+// ──────────────────────────────────────────────────────────────────
+/**
+ * 행상인 분기 카드 중 recipe 카테고리로 해금되는 특수 고수익 레시피.
+ *
+ * - `branch_` 접두어로 일반 레시피와 구분된다.
+ * - 이번 영업 1회 한정(혹은 카드 설명에 따라 소수 반복) 등장이므로 재료는 기본 채집 재료
+ *   (carrot/meat/egg/rice/flour/squid/fish/mushroom/cheese) 위주로 구성.
+ * - baseReward는 기존 ★★★★★ 레시피(최대 524) 대비 1.5~2배 수준으로 책정하되,
+ *   각 카드의 rewardMultiplier 상대 비율을 유지한다.
+ * - starter/unlockCost는 의미 없으나 스키마 호환을 위해 0으로 둔다.
+ *   해금은 `SaveManager.branchCards.unlockedBranchRecipes`로 관리한다.
+ *
+ * @type {Array<object>}
+ */
+export const BRANCH_SERVING_RECIPES = [
+  // 드래곤 연회 — mult×3.0, 재료 6종 (고티어 연회)
+  {
+    id: 'branch_dragon_feast', nameKo: '드래곤 연회', icon: '🐉', category: 'special',
+    tier: 5, ingredients: { meat: 2, rice: 1, squid: 1, egg: 1, pepper: 1 },
+    baseReward: 780, cookTime: 14000,
+    unlockCost: 0, branch: true,
+  },
+  // 미력의 차 — mult×1.0, 재료 2종 (정수 보너스 특화, 보상은 중간)
+  {
+    id: 'branch_mireuk_tea', nameKo: '미력의 차', icon: '🍵', category: 'special',
+    tier: 3, ingredients: { mushroom: 1, rice: 1 },
+    baseReward: 240, cookTime: 5000,
+    unlockCost: 0, branch: true,
+  },
+  // 그랜드 오마카세 — mult×4.0, 재료 8종 (역대 최대 규모)
+  {
+    id: 'branch_grand_omakase', nameKo: '그랜드 오마카세', icon: '🍣', category: 'special',
+    tier: 5, ingredients: { fish: 2, squid: 2, rice: 2, egg: 1, cheese: 1 },
+    baseReward: 1040, cookTime: 20000,
+    unlockCost: 0, branch: true,
+  },
+  // 황금 카레 — mult×2.5, 재료 4종 (팁 확정 컨셉)
+  {
+    id: 'branch_golden_curry', nameKo: '황금 카레', icon: '🍛', category: 'special',
+    tier: 4, ingredients: { meat: 1, carrot: 1, rice: 1, pepper: 1 },
+    baseReward: 650, cookTime: 10000,
+    unlockCost: 0, branch: true,
+  },
+  // 카오스 라멘 — mult×2.0, 재료 3종 (반복 등장 가능)
+  {
+    id: 'branch_chaos_ramen', nameKo: '카오스 라멘', icon: '🍜', category: 'noodle',
+    tier: 4, ingredients: { flour: 1, meat: 1, egg: 1 },
+    baseReward: 520, cookTime: 8000,
+    unlockCost: 0, branch: true,
+  },
+  // 극지 파르페 — mult×2.0, 재료 2종, 조리 매우 빠름
+  {
+    id: 'branch_frozen_dessert', nameKo: '극지 파르페', icon: '🍨', category: 'dessert',
+    tier: 4, ingredients: { egg: 1, flour: 1 },
+    baseReward: 520, cookTime: 1000,
+    unlockCost: 0, branch: true,
+  },
+  // 스파이스 폭탄 — mult×1.8, 재료 2종, 빠른 조리
+  {
+    id: 'branch_spice_bomb', nameKo: '스파이스 폭탄', icon: '💥', category: 'fry',
+    tier: 3, ingredients: { pepper: 1, meat: 1 },
+    baseReward: 470, cookTime: 3500,
+    unlockCost: 0, branch: true,
+  },
+  // 비스트로 풀코스 — mult×5.0, 4단계 코스
+  {
+    id: 'branch_bistro_course', nameKo: '비스트로 풀코스', icon: '🍽️', category: 'special',
+    tier: 5, ingredients: { meat: 2, fish: 1, cheese: 1, flour: 1, carrot: 1 },
+    baseReward: 1300, cookTime: 24000,
+    unlockCost: 0, branch: true,
+  },
+];
+
+/** 전체 레시피 (서빙 + 버프 + 분기) 통합 목록 */
+export const ALL_RECIPES = [...ALL_SERVING_RECIPES, ...ALL_BUFF_RECIPES, ...BRANCH_SERVING_RECIPES];
 
 /** ID→레시피 빠른 조회 맵 */
 export const RECIPE_MAP = Object.fromEntries(

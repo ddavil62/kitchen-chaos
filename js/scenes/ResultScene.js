@@ -19,6 +19,7 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
+import { BranchEffects } from '../managers/BranchEffects.js';
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -235,6 +236,7 @@ export class ResultScene extends Phaser.Scene {
 
     // 세이브 업데이트
     let totalCoinsEarned = 0;
+    let blessingCoinBonus = 0;
     if (stars > 0) {
       totalCoinsEarned = SaveManager.clearStage(this.stageId, stars);
       // bestSatisfaction 갱신
@@ -247,6 +249,21 @@ export class ResultScene extends Phaser.Scene {
       AchievementManager.check(this, 'chapter_cleared', parseInt(this.stageId.split('-')[0]));
       AchievementManager.check(this, 'three_star_count', 0);
       AchievementManager.check(this, 'recipe_unlocked', 0);
+
+      // ── Phase 58-3: 축복 'exp_gain' — 클리어 코인 +value 적용 ──
+      // 활성 축복이 'exp_gain'일 때만 value(고정 +N)를 추가 지급한다. 없으면 0.
+      blessingCoinBonus = BranchEffects.getBlessingMultiplier('exp_gain') | 0;
+      if (blessingCoinBonus > 0) {
+        // SaveManager에 코인 반영 (clearStage 내부에서는 이미 저장이 끝났으므로 별도 가산)
+        const saveData = SaveManager.load();
+        saveData.kitchenCoins = (saveData.kitchenCoins || 0) + blessingCoinBonus;
+        SaveManager.save(saveData);
+        totalCoinsEarned += blessingCoinBonus;
+      }
+
+      // ── Phase 58-3: 축복 잔여 스테이지 차감 ──
+      // 스테이지가 "클리어 완료"된 시점에 한 번만 차감. 0 이하가 되면 activeBlessing은 null로 초기화된다.
+      SaveManager.decrementBlessingStages();
     }
 
     // 스크롤 가능한 컨테이너
@@ -368,6 +385,10 @@ export class ResultScene extends Phaser.Scene {
     let rewardText = `+${totalCoinsEarned} 코인`;
     if (isFirstClear && stars > 0) {
       rewardText += ' (첫 클리어 보너스 포함!)';
+    }
+    // Phase 58-3: 축복 경험치 보너스 표시
+    if (blessingCoinBonus > 0) {
+      rewardText += ` [미력의 축복 +${blessingCoinBonus}]`;
     }
     this.add.text(40, y, rewardText, {
       fontSize: '15px', fontStyle: 'bold', color: '#ffcc00',

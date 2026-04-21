@@ -21,6 +21,7 @@
 import Phaser from 'phaser';
 import { PATH_WAYPOINTS, FRESHNESS_WINDOW_MS } from '../config.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
+import { BranchEffects } from '../managers/BranchEffects.js';
 
 export class Enemy extends Phaser.GameObjects.Container {
   /**
@@ -49,6 +50,15 @@ export class Enemy extends Phaser.GameObjects.Container {
       this.hp = spawnData.hpOverride;
     }
     this.speed = enemyData.speed;
+
+    // ── Phase 58-3: 축복 'enemy_slow' — 전 적 이동속도 −value (예: 0.15 → -15%) ──
+    // 최초 속도 설정 시점에 한 번만 곱한다. 이후 enrage/fresh 로직이 data_.speed를 참조하므로 data_.speed도 함께 조정.
+    // (Enemy 인스턴스의 enemyData는 공유 객체일 수 있으므로 shallow copy 후 수정)
+    const slow = BranchEffects.getBlessingMultiplier('enemy_slow') || 0;
+    if (slow > 0 && slow < 1) {
+      this.speed = this.speed * (1 - slow);
+      this.data_ = { ...enemyData, speed: enemyData.speed * (1 - slow) };
+    }
     this.goldReward = 0;
     this.ingredientType = enemyData.ingredient;
 

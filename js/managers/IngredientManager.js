@@ -11,6 +11,7 @@ import { GameEventBus } from '../events/GameEventBus.js';
 import { ChefManager } from './ChefManager.js';
 import { UpgradeManager } from './UpgradeManager.js';
 import { SpriteLoader } from './SpriteLoader.js';
+import { BranchEffects } from './BranchEffects.js';
 
 /**
  * @typedef {object} IngredientDrop
@@ -51,6 +52,20 @@ export class IngredientManager {
     if (Math.random() < ChefManager.getDropRateBonus()) {
       count += 1;
     }
+
+    // ── Phase 58-3: 축복 'ingredient_drop_count' — 전 재료 드롭 수 +value ──
+    const dropCountBonus = BranchEffects.getBlessingMultiplier('ingredient_drop_count') | 0;
+    if (dropCountBonus > 0) {
+      count += dropCountBonus;
+    }
+
+    // ── Phase 58-3: 축복 'drop_rate' — 특정 재료 배수 적용 ──
+    // 예: 'bles_drop_carrot' → target: 'carrot', value: 2.0 → 당근일 때만 2배
+    const dropRateMult = BranchEffects.getBlessingDropRateFor(type);
+    if (dropRateMult !== 1.0 && dropRateMult > 0) {
+      count = Math.max(1, Math.round(count * dropRateMult));
+    }
+
     this._createDrop(enemy.x, enemy.y, type, count, enemy.isFresh);
   }
 

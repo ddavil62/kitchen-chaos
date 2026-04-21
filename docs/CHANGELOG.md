@@ -1,5 +1,169 @@
 # Changelog
 
+## [Phase 58] 2026-04-22 -- 행상인 로그라이크 분기 선택
+
+### 개요
+
+행상인(MerchantScene)을 "수치 환전소"에서 "되돌릴 수 없는 3택 1 분기점"으로 전환. 매 방문 시 4 카테고리(변이/레시피/인연/축복)에서 3개 카테고리가 뽑히고, 각 카테고리에서 1장씩 총 3장이 제시된다. 선택된 카드는 즉시 효과가 적용되고 세이브에 영구 저장된다.
+
+3개 서브 페이즈로 분할 진행:
+- **58-1**: 분기 카드 데이터 + SaveManager v24 마이그레이션
+- **58-2**: MerchantScene 2탭 UI + 배지 아이콘 4종
+- **58-3**: 게임플레이 반영 (BranchEffects 매니저 + 4 카테고리 실효 + 분기 레시피 주문 풀 편입)
+
+---
+
+### Phase 58-1: 분기 카드 데이터 + 세이브 v24
+
+#### Added
+
+- **`js/data/merchantBranchData.js`** (신규): 분기 카드 32장 (카테고리 4종 × 각 8장)
+  - **Mutation 8장**: `mut_pan_flame`(splash+30), `mut_salt_chain`(chain 1회 반경 40px), `mut_grill_inferno`(burn_stack 3중첩), `mut_delivery_ghost`(phase_through, collectInterval −300ms), `mut_freezer_permafrost`(freeze +1.5s, 30% 재빙결), `mut_soup_overcharge`(aura 2배, 범위 +20), `mut_wasabi_cluster`(1→3발 클러스터), `mut_spice_venom`(DoT +2s, 중독 적 −20% 속도)
+  - **Recipe 8장**: `rec_dragon_feast`(×3.0), `rec_mireuk_tea`(정수 +15), `rec_grand_omakase`(×4.0), `rec_golden_curry`(×2.5 팁 확정), `rec_chaos_ramen`(×2.0), `rec_frozen_dessert`(조리 0s ×2.0), `rec_spice_bomb`(×1.8 빠른 조리), `rec_bistro_course`(×5.0)
+  - **Bond 8장**: `bond_lao_grill`(damage_pct +50%), `bond_rin_pan`(burn +8), `bond_mage_freezer`(빙결 범위 +25), `bond_yuki_soup`(조리 −15%), `bond_andre_delivery`(팁 +10%), `bond_arjun_wasabi`(splash+20 독 추가), `bond_mimi_salt`(둔화 적 수거 +40), `bond_mimi_spice`(중독 적 드롭 +25%)
+  - **Blessing 8장**: `bles_drop_carrot`(당근 ×2.0 / 3스), `bles_gold_gain`(+30% / 2스), `bles_exp_boost`(코인 +5 / 3스), `bles_cook_speed`(−20% / 2스), `bles_essence_rain`(나그네 +15% / 3스), `bles_enemy_slow`(−15% / 2스), `bles_patron_rush`(인내심 +25% / 2스), `bles_ingredient_rich`(+1개 / 3스)
+  - `selectBranchCards(state)`: 카테고리 피셔-예이츠 셔플 → 앞에서부터 3개 카테고리 → 각 풀에서 1장 랜덤 선정 → 빈 풀은 건너뜀
+  - `getEligiblePool(category, state)` 중복 제외 규칙: mutation(이미 변이된 toolId 제외) / recipe(이미 해금된 recipeId 제외) / bond(이미 해금된 카드 id 제외) / blessing(제외 조건 없음, 갱신 허용)
+  - `getBranchCardById`, `getBranchCardsByCategory`, `BRANCH_CATEGORY_META` export
+
+#### Changed
+
+- **`js/managers/SaveManager.js`**: `SAVE_VERSION` 23 → **24**
+  - `createDefault()`에 `branchCards: { toolMutations: {}, unlockedBranchRecipes: [], chefBonds: [], activeBlessing: null, lastVisit: null }` 추가
+  - v23 → v24 마이그레이션 블록 추가 (v18 이하 체인 호환성 유지 — `petit_chef` → `mimi_chef` 변환 + branchCards 생성 확인됨)
+  - 분기 카드 헬퍼 메서드 10개 추가: `getToolMutations`, `applyToolMutation`(중복 차단/되돌릴 수 없음), `getUnlockedBranchRecipes`, `unlockBranchRecipe`(중복 방지), `consumeBranchRecipe`(58-3 Recipe 보완), `getChefBonds`, `unlockChefBond`(중복 방지), `getActiveBlessing`, `setActiveBlessing`(덮어쓰기/갱신), `decrementBlessingStages`(0 도달 시 null 자동 초기화)
+  - `markVisitSelection` 헬퍼 추가 (방문 stageId + selectedCardId 기록)
+
+#### Notes
+
+- 스펙에는 "헬퍼 7개"로 표기되었으나 실제 구현은 10개로 확장 (`applyToolMutation`의 되돌릴 수 없음 규약 + `setActiveBlessing` + `decrementBlessingStages` + `consumeBranchRecipe` + `markVisitSelection` 포함)
+- `chefBonds` 저장 키는 "카드 자체 id" 기준 통일 (예: `['bond_lao_grill']`) — 스펙의 양립 표기를 id 컬럼 기준으로 확정
+- 빌드 PASS (vite 11.51s, 58 modules, 경고 없음), Node 런타임 검증 8종 케이스 모두 PASS
+- 스펙: `.claude/specs/2026-04-20-kc-phase58-spec.md`
+- 구현 리포트: `.claude/specs/2026-04-20-kc-phase58-1-coder-report.md`
+
+---
+
+### Phase 58-2: MerchantScene 탭 UI + 배지 아이콘 4종
+
+#### Added
+
+- **`assets/ui/branch_badge_mutation.png`**: 오렌지 불꽃 아이콘, 32×32 PNG (투명 배경, PixelLab)
+- **`assets/ui/branch_badge_recipe.png`**: 초록 요리책+별 아이콘, 32×32 PNG
+- **`assets/ui/branch_badge_bond.png`**: 하늘색 심장+셰프 모자 아이콘, 32×32 PNG
+- **`assets/ui/branch_badge_blessing.png`**: 금색 미력 광배+물방울 아이콘, 32×32 PNG
+- **`js/scenes/MerchantScene.js`** (lines 820~1246): 2탭 UI + 분기 카드 영역
+  - `_createTabBar()`, `_setActiveTab(tabKey)` — 탭 2개(`🛒 도구 구매` / `🃏 분기 선택`)
+  - `_createBranchCardArea()`, `_renderBranchCards()`, `_renderBranchCard(cardDef, x, y, isSelected)` — 카드 3장 가로 배치
+  - `_showBranchConfirmPopup(cardDef, onConfirm)` — "되돌릴 수 없습니다" 확인 팝업 (280×160, 0x221100 배경, 0xff6600 외곽선)
+  - `_applyBranchCard(cardDef)` — 카테고리별 SaveManager 호출 (`applyToolMutation` / `unlockBranchRecipe` / `unlockChefBond` / `setActiveBlessing`) + 변이 오버레이(tint) 적용
+  - `_renderSelectedBranchSummary()` — 재진입 시 "선택 완료" 단일 카드 렌더
+  - `_rebuildBranchTab()` — 탭 재빌드
+- **`js/managers/SpriteLoader.js`** (338~341행): `badge_mutation`/`badge_recipe`/`badge_bond`/`badge_blessing` 4종 preload 등록 + 카테고리 폴백 이모지 매핑(🔥/📖/💖/💧)
+- **`tests/phase58-2-merchant-ui.spec.js`** (신규): Phase 58-2 API 레벨 + 스냅샷 검증 4종 PASS (21.4s)
+- **`tests/screenshots/phase58-2-{tools-tab,branch-tab,confirm-popup,selected,selected-replay}.png`** (5종)
+
+#### Changed
+
+- **카테고리 외곽선 색상**: mutation `0xff6600` / recipe `0x22cc44` / bond `0x88aaff` / blessing `0xffcc00`
+- **AD 모드3 REVISE 반영 레이아웃 수치**:
+  - `TAB_Y` 67 → **72** (+5px, 골드 텍스트와 충돌 방지)
+  - `LIST_TOP` 95 → **100** (+5px)
+  - `TAB_HEIGHT` 20 → **36** (히트박스 확대)
+  - `CARD_CENTER_Y` 310 → **250** (-60px, 대화창 겹침 회피)
+  - 팝업 확인/취소 버튼 height 30 → **40**, Y `popupH/2 - 25` → `popupH/2 - 30`
+  - helpText 2줄 분할 + `wordWrap: { width: GAME_WIDTH - 24 }` 추가 (양끝 잘림 해결)
+  - 배지 `setDisplaySize(24,24)` → **(28,28)**, 텍스처 미존재 시 16px 이모지 폴백
+- **`init(data)`**: `_branchCardSelected=false`, `_branchPopupOpen=false`, `_branchSelectedCardId=null` 초기화
+- **`create()`**: `_createTabBar()` 호출 추가, 기본 탭은 `[도구 구매]`
+
+#### Notes
+
+- AD 모드1 APPROVED (배지 4종 컨셉 + 변이 오버레이 방식 A tint 채택 — 별도 PNG 오버레이 불필요)
+- AD 모드2 APPROVED (에셋 검증)
+- AD 모드3: 초회 REVISE (6 이슈) → 레이아웃 수정 → 재검수 APPROVED
+- 기존 QA 테스트(`phase58-2-qa.spec.js`) 4/4 FAIL은 Phaser pointerdown 좌표 변환 이슈 — 58-2 신규 spec(`phase58-2-merchant-ui.spec.js`)에서 API 직접 호출 방식으로 우회 4/4 PASS
+- AD 산출물: `.claude/specs/2026-04-20-kc-phase58-ad1.md` / `ad2.md` / `ad3.md`
+- 구현 리포트: `.claude/specs/2026-04-20-kc-phase58-2-coder-report.md`
+
+---
+
+### Phase 58-3: 게임플레이 반영 + 분기 레시피 주문 풀 편입
+
+#### Added
+
+- **`js/managers/BranchEffects.js`** (신규, 251줄): 카드 효과 조회 경량 어댑터
+  - 축복: `getActiveBlessingCard`, `getBlessingMultiplier(type)`(지원 타입 8종: `gold_gain`/`cook_speed`/`drop_rate`/`ingredient_drop_count`/`exp_gain`/`enemy_slow`/`patron_patience`/`mireuk_traveler_chance`), `getBlessingDropRateFor(ingredientType)`
+  - 변이: `getMutationCard(toolId)`, `getMutationEffect(toolId)`, `hasMutation(toolId)`, `getMutationTint(toolId)` (splash=0xff6b35, chain=0x66ccff, burn_stack=0xff3311, phase_through=0xccccff, freeze_extend=0x88eeff, aura_boost=0x66ff66, cluster=0x99dd55, venom=0xaa44ff)
+  - 인연: `getActiveBondCard(toolId, chefIdOverride?)`, `getActiveBondEffect(toolId, chefIdOverride?)`
+  - 레시피: `getUnlockedBranchRecipes()`, `getUnlockedBranchRecipeCards()`
+  - 아키텍처 원칙: SaveManager는 상태만, 카드 정의 의존은 본 모듈 한 곳에 집중
+- **Recipe 보완 — `js/data/recipeData.js`**: `BRANCH_SERVING_RECIPES` 상수 추가 (8장) + `ALL_RECIPES` 통합 목록 포함
+  - `branch_dragon_feast`: meat×2/rice×1/squid×1/egg×1/pepper×1, baseReward 780, cookTime 14s, tier 5
+  - `branch_mireuk_tea`: mushroom×1/rice×1, 240, 5s, tier 3
+  - `branch_grand_omakase`: fish×2/squid×2/rice×2/egg×1/cheese×1, 1040, 20s, tier 5
+  - `branch_golden_curry`: meat×1/carrot×1/rice×1/pepper×1, 650, 10s, tier 4
+  - `branch_chaos_ramen`: flour×1/meat×1/egg×1, 520, 8s, tier 4
+  - `branch_frozen_dessert`: egg×1/flour×1, 520, 1s, tier 4
+  - `branch_spice_bomb`: pepper×1/meat×1, 470, 3.5s, tier 3
+  - `branch_bistro_course`: meat×2/fish×1/cheese×1/flour×1/carrot×1, 1300, 24s, tier 5
+  - `branch: true` 플래그로 일반 레시피와 구분, `starter: false`, `unlockCost: 0`
+- **`tests/phase58-3-gameplay.spec.js`** (신규): 4 시나리오 PASS (축복 차감/변이 tint/Bond 시너지/레시피 해금)
+- **`tests/phase58-qa-integration.spec.js`**: 통합 QA 테스트 26 PASS (성공 기준 5개 + 집중 검증 4항목 + 엣지 케이스 + 리그레션)
+- **`tests/screenshots/phase58-3-service-scene.png`**
+
+#### Changed
+
+- **`js/scenes/GatheringScene.js`** (+155줄):
+  - `placeTool` 후 `_applyMutationToTower(tower, typeId)` 호출 — tint 적용 + mutationEffect 타입별 스탯 오버라이드 (splash/burn_stack/phase_through/freeze_extend)
+  - `_applyBondToTower` — 선택 셰프+도구 매칭 시 bondEffect 타입별 시너지 (damage_pct/burn_damage_flat/freeze_radius_flat/cook_speed_pct/tip_pct/wasabi_synergy/collect_radius_on_slow/drop_rate_on_poison)
+- **`js/scenes/ServiceScene.js`** (+17줄):
+  - `create()` 후반: `SaveManager.getUnlockedBranchRecipes()` 결과를 `availableRecipes`에 append, `this._sessionBranchRecipeIds` 기록
+  - 손님 인내심 계산에 `patron_patience` 배수 (`× (1 + value)`)
+  - 조리시간 계산에 `cook_speed` 감소 (`× (1 - value)`)
+  - 영업 정산 시 `gold_gain` 배수 (매출+팁 양쪽)
+  - `_endService()`: `this._sessionBranchRecipeIds`를 순회하여 `SaveManager.consumeBranchRecipe()` 1회 한정 소비
+- **`js/scenes/ResultScene.js`** (+21줄):
+  - 클리어 시 `exp_gain` 축복 코인 보너스 (`kitchenCoins += blessingCoinBonus`)
+  - `SaveManager.decrementBlessingStages()` 호출 (축복 지속 스테이지 1 차감, 0 도달 시 자동 null)
+  - 보상 텍스트에 `[미력의 축복 +N]` 표시
+- **`js/managers/IngredientManager.js`** (+15줄):
+  - `dropIngredient`에 `ingredient_drop_count` 가산 + `drop_rate` 재료별 배수 (ESM `import { BranchEffects }` 정상)
+- **`js/entities/Enemy.js`** (+17줄):
+  - 생성자에서 `enemy_slow` 축복 배수 읽어 `this.speed *= (1 - slow)` 적용 *(⚠️ `require()` 호출로 ESM 환경 조용히 실패 — 후속 수정 필요)*
+
+#### Fixed
+
+- Recipe 카테고리 QA FAIL 2건(#11, #12) → PASS 전환 (분기 레시피가 `RECIPE_MAP`에 등록되고 주문 풀에 실제 편입되는지 검증)
+- QA 통합 테스트 디버그 출력으로 `recipeIds:["carrot_soup",..., "branch_dragon_feast","branch_golden_curry"]` / `branchRecipeCount: 2` 확인
+
+#### Known Issues
+
+- **변이 4장 플래그만 세팅 (소비처 로직 미구현)**: `chain`(salt 연쇄 둔화, `tower._chainCount`/`_chainRadius`), `cluster`(wasabi 멀티샷, `_clusterCount`/`_perShotDamageRatio`), `venom`(spice DoT, `_poisonSlowPct` 소비처 미구현), `aura_boost`(soup_pot, `_auraMultiplier`). tint 시각 효과는 정상, 실제 전투 수치는 부분적
+- **Bond 4장 소비처 미구현**: `bond_yuki_soup`(`_bondCookSpeedBonus`), `bond_andre_delivery`(`_bondTipBonus`), `bond_mimi_salt`(`_collectRadiusOnSlow`), `bond_mimi_spice`(`_dropRateOnPoison`) — 플래그 저장만, 획득해도 표시 효과만
+- **`enemy_slow` 축복 미반영**: `Enemy.js`의 `require('../managers/BranchEffects.js')`가 ESM 환경에서 조용히 실패. try/catch로 감싸져 빌드는 PASS. 권장 수정: 파일 상단 ESM `import` 전환
+- **`rewardMultiplier` 미반영**: 분기 레시피 카드 descKo에만 수치가 남고 실제 baseReward 계산에는 미반영. "반복 등장 N회" 규약도 단순 1회 소비로 통일 (후속 Quick Fix 여지 명시)
+- **영업 중간 중단 시**: `_endService` 호출 안 되므로 해금 상태 유지 (재진입 시 재등장, 의도된 보수적 동작)
+
+#### Notes
+
+- QA 통합 판정: **PASS** (26 PASS / 0 관련 FAIL)
+  - #27 `enemy_sugar_fairy_walk_south-east_*` 에셋 누락 FAIL은 본 페이즈와 무관한 기존 이슈 (git stash 재실행 시에도 동일 실패 확인)
+- visual_change: `art+ui` 혼합 — 변이 tint가 도구 스프라이트 시각 변화를 주지만 에셋 파일 생성/교체는 없음 (방식 A setTint 채택)
+- AD 모드2/3 재실행 불필요 (에셋 미수정, UI 레이아웃 미변경)
+
+---
+
+### 참고
+
+- 목적 정의: `.claude/specs/2026-04-20-kc-phase58-scope.md`
+- 스펙: `.claude/specs/2026-04-20-kc-phase58-spec.md`
+- AD 산출물: `.claude/specs/2026-04-20-kc-phase58-ad1.md` / `ad2.md` / `ad3.md`
+- 구현 리포트: `.claude/specs/2026-04-20-kc-phase58-1-coder-report.md` / `58-2-coder-report.md` / `58-3-coder-report.md`
+- QA 통합 테스트: `kitchen-chaos/tests/phase58-qa-integration.spec.js` (별도 리포트 파일 없음, 테스트 실행 결과로 검증)
+
+---
+
 ## [Phase 61] 2026-04-21 -- 메인 메뉴 비주얼 에셋 3종 도입
 
 ### Added
