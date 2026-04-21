@@ -232,10 +232,15 @@ export class Enemy extends Phaser.GameObjects.Container {
     // death 애니메이션 스케일 재조정에 사용 (프레임 크기 불일치 방어)
     this._targetSize = targetSize;
 
+    // 발을 타일 중앙에 정렬: 적 스프라이트는 캔버스 약 75% 지점에 발이 있어
+    // origin (0.5, 0.5)로 놓으면 발이 타일 바닥 라인에 떨어진다. 25%만큼 위로 보정.
+    const visualOffsetY = (hasWalkAnim || hasSprite) ? -targetSize * 0.25 : 0;
+    this._visualOffsetY = visualOffsetY;
+
     if (hasWalkAnim) {
       // ── 걷기 애니메이션 스프라이트 사용 ──
       const firstFrameKey = `${prefix}_${id}_walk_south_0`;
-      const sprite = this.scene.add.sprite(0, 0, firstFrameKey);
+      const sprite = this.scene.add.sprite(0, visualOffsetY, firstFrameKey);
       const texW = sprite.width || 48;
       sprite.setScale(targetSize / texW);
       sprite.play(walkAnimKey);
@@ -243,7 +248,7 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._bodySprite = sprite;
     } else if (hasSprite) {
       // ── 정지 이미지 fallback ──
-      const sprite = this.scene.add.image(0, 0, spriteKey);
+      const sprite = this.scene.add.image(0, visualOffsetY, spriteKey);
       const texW = sprite.width;
       sprite.setScale(targetSize / texW);
       this.add(sprite);
@@ -253,8 +258,8 @@ export class Enemy extends Phaser.GameObjects.Container {
       this._buildShapeFallback(data, color, id);
     }
 
-    // HP 바 (스프라이트/도형 공통)
-    const hpBarY = isBoss ? -30 : (isMidBoss ? -26 : -22);
+    // HP 바 (스프라이트/도형 공통) — 스프라이트 오프셋과 함께 위로 이동
+    const hpBarY = (isBoss ? -30 : (isMidBoss ? -26 : -22)) + visualOffsetY;
     const hpBarW = isBoss ? 40 : 26;  // Phase 38-1: 보스 체력바 너비 확대
     const hpBarH = isBoss ? 5 : 3;    // Phase 38-1: 보스 체력바 높이 확대
     this.hpBarBg = this.scene.add.rectangle(0, hpBarY, hpBarW, hpBarH, 0x333333);
