@@ -6,6 +6,7 @@
  */
 
 import Phaser from 'phaser';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { UPGRADE_DEFS, UPGRADE_IDS } from '../data/upgradeData.js';
 import { ALL_SERVING_RECIPES, ALL_BUFF_RECIPES, TIER_COLORS, TIER_NAMES, RECIPE_CATEGORIES } from '../data/recipeData.js';
@@ -79,8 +80,8 @@ export class ShopScene extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Container} */
     this._contentContainer = null;
 
-    // 배경
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x1a0a00);
+    // Phase 60-14: 씬 배경 rectangle → NineSliceFactory.panel 'dark'
+    NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
 
     // 상단 바: 타이틀 + 코인
     this._coinText = this.add.text(GAME_WIDTH - 20, 25, '', {
@@ -112,15 +113,16 @@ export class ShopScene extends Phaser.Scene {
       this._tutorial.start();
     }
 
-    // 하단 돌아가기 버튼
-    const backBtn = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT - 35, 180, 40, 0x444444)
-      .setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 35, '돌아가기', {
-      fontSize: '16px', color: '#cccccc', stroke: '#000', strokeThickness: 2,
-    }).setOrigin(0.5);
-    backBtn.on('pointerdown', () => this._fadeToScene('MenuScene'));
-    backBtn.on('pointerover', () => backBtn.setFillStyle(0x666666));
-    backBtn.on('pointerout', () => backBtn.setFillStyle(0x444444));
+    // Phase 60-14: 하단 돌아가기 버튼 rectangle+text → NineSliceFactory.button 'secondary'
+    const backBtn = NineSliceFactory.button(
+      this, GAME_WIDTH / 2, GAME_HEIGHT - 35, 180, 40,
+      '돌아가기',
+      {
+        variant: 'secondary',
+        textStyle: { fontSize: '16px', color: '#cccccc', stroke: '#000', strokeThickness: 2 },
+        onClick: () => this._fadeToScene('MenuScene'),
+      }
+    );
   }
 
   /** 코인 표시 갱신 */
@@ -146,17 +148,19 @@ export class ShopScene extends Phaser.Scene {
     const tabCount = tabs.length;
     const tabW = Math.floor((GAME_WIDTH - 10) / tabCount);
 
+    // Phase 60-14: 탭 rectangle → NineSliceFactory.tab (active/inactive 텍스처 스왑)
     tabs.forEach((tab, i) => {
       const x = 5 + i * tabW;
       const w = tabW - 2;
 
-      const bg = this.add.rectangle(x + w / 2, tabY, w, 28, 0x333333)
-        .setInteractive({ useHandCursor: true });
-      const txt = this.add.text(x + w / 2, tabY, tab.label, {
-        fontSize: '11px', fontStyle: 'bold', color: '#aaaaaa',
-      }).setOrigin(0.5);
+      const tabContainer = NineSliceFactory.tab(
+        this, x + w / 2, tabY, w, 28, tab.label,
+        { active: tab.key === this._activeTab, textStyle: { fontSize: '11px', fontStyle: 'bold' } }
+      );
+      const tabHitArea = new Phaser.Geom.Rectangle(-w / 2, -14, w, 28);
+      tabContainer.setInteractive(tabHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
-      bg.on('pointerdown', () => {
+      tabContainer.on('pointerdown', () => {
         const prevTab = this._activeTab;
         this._activeTab = tab.key;
         this._recipeFilter = 'all';
@@ -166,39 +170,28 @@ export class ShopScene extends Phaser.Scene {
         // ── Phase 11-3a: 상점 튜토리얼 진행 ──
         if (this._tutorial?.isActive()) {
           const step = this._tutorial._stepIndex;
-          // step 0 → 1: 업그레이드 탭에서 다른 탭으로 이동
           if (step === 0 && prevTab === 'upgrade' && tab.key !== 'upgrade') {
             this._tutorial.advance();
-          }
-          // step 1 → 2: 레시피 탭 선택
-          else if (step === 1 && tab.key === 'recipe') {
+          } else if (step === 1 && tab.key === 'recipe') {
             this._tutorial.advance();
-          }
-          // step 2 → end: 테이블/인테리어/직원 탭 선택
-          else if (step === 2 && (tab.key === 'table' || tab.key === 'interior' || tab.key === 'staff')) {
+          } else if (step === 2 && (tab.key === 'table' || tab.key === 'interior' || tab.key === 'staff')) {
             this._tutorial.advance();
           }
         }
       });
-      // Phase 11-3b: 탭 터치 피드백
-      bg.on('pointerover', () => {
-        if (tab.key !== this._activeTab) bg.setFillStyle(0x444444);
-      });
-      bg.on('pointerout', () => {
-        bg.setFillStyle(tab.key === this._activeTab ? 0x553300 : 0x333333);
-      });
 
-      this._tabBgs[tab.key] = bg;
-      this._tabTexts[tab.key] = txt;
+      this._tabBgs[tab.key] = tabContainer;
+      this._tabTexts[tab.key] = tabContainer._label;
     });
 
     this._updateTabHighlight();
   }
 
+  // Phase 60-14: setFillStyle/setColor → NineSliceFactory.tab.setActive 텍스처 스왑
   _updateTabHighlight() {
     for (const key of ALL_TABS) {
       const active = key === this._activeTab;
-      this._tabBgs[key].setFillStyle(active ? 0x553300 : 0x333333);
+      this._tabBgs[key].setActive(active);
       this._tabTexts[key].setColor(active ? '#ffd700' : '#aaaaaa');
     }
   }
@@ -241,9 +234,8 @@ export class ShopScene extends Phaser.Scene {
       const cost = isMax ? 0 : def.costs[lvl];
       const y = startY + i * cardH;
 
-      // 카드 배경
-      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 8, 0x2a1a0a)
-        .setStrokeStyle(1, 0x555533);
+      // Phase 60-14: 카드 배경 rectangle → NineSliceFactory.panel 'dark'
+      const cardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 8, 'dark');
       this._contentContainer.add(cardBg);
 
       // 이름 + 레벨
@@ -273,31 +265,28 @@ export class ShopScene extends Phaser.Scene {
         })
       );
 
-      // 구매 버튼
+      // Phase 60-14: 구매 버튼 rectangle → NineSliceFactory.button 'primary'
       if (!isMax) {
         const coins = SaveManager.getCoins();
         const canBuy = coins >= cost;
         const btnX = GAME_WIDTH - 60;
         const btnY = y + 42;
 
-        const btn = this.add.rectangle(btnX, btnY, 60, 24, canBuy ? 0x886600 : 0x333333)
-          .setInteractive({ useHandCursor: canBuy });
+        const btn = NineSliceFactory.button(
+          this, btnX, btnY, 60, 24, `${cost} 🪙`,
+          {
+            variant: 'primary',
+            disabled: !canBuy,
+            textStyle: { fontSize: '12px', fontStyle: 'bold', color: canBuy ? '#ffcc00' : '#666666' },
+            onClick: () => {
+              if (UpgradeManager.purchase(id)) {
+                this._updateCoinDisplay();
+                this._renderContent();
+              }
+            },
+          }
+        );
         this._contentContainer.add(btn);
-
-        const btnTxt = this.add.text(btnX, btnY, `${cost} 🪙`, {
-          fontSize: '12px', fontStyle: 'bold',
-          color: canBuy ? '#ffcc00' : '#666666',
-        }).setOrigin(0.5);
-        this._contentContainer.add(btnTxt);
-
-        if (canBuy) {
-          btn.on('pointerdown', () => {
-            if (UpgradeManager.purchase(id)) {
-              this._updateCoinDisplay();
-              this._renderContent();
-            }
-          });
-        }
       }
     });
   }
@@ -310,20 +299,20 @@ export class ShopScene extends Phaser.Scene {
     const cats = RECIPE_CATEGORIES;
     const catW = Math.floor((GAME_WIDTH - 20) / cats.length);
 
+    // Phase 60-14: 필터 버튼 rectangle → NineSliceFactory.tab (active/inactive 스왑)
     cats.forEach((cat, i) => {
       const x = 10 + i * catW + catW / 2;
       const active = this._recipeFilter === cat.id;
 
-      const bg = this.add.rectangle(x, filterY, catW - 4, 22, active ? 0x553300 : 0x222222)
-        .setInteractive({ useHandCursor: true });
-      this._contentContainer.add(bg);
+      const filterTab = NineSliceFactory.tab(
+        this, x, filterY, catW - 4, 22, cat.nameKo,
+        { active, textStyle: { fontSize: '10px', color: active ? '#ffd700' : '#888888' } }
+      );
+      const hitArea = new Phaser.Geom.Rectangle(-(catW - 4) / 2, -11, catW - 4, 22);
+      filterTab.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      this._contentContainer.add(filterTab);
 
-      const txt = this.add.text(x, filterY, cat.nameKo, {
-        fontSize: '10px', color: active ? '#ffd700' : '#888888',
-      }).setOrigin(0.5);
-      this._contentContainer.add(txt);
-
-      bg.on('pointerdown', () => {
+      filterTab.on('pointerdown', () => {
         this._recipeFilter = cat.id;
         this._renderContent();
       });
@@ -353,10 +342,11 @@ export class ShopScene extends Phaser.Scene {
       // 등급 색상 라인
       const tierColor = TIER_COLORS[recipe.tier] || 0xcccccc;
 
-      // 카드 배경
-      const bgColor = isUnlocked ? 0x1a2a1a : 0x2a1a0a;
-      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + rowH / 2, 340, rowH - 4, bgColor)
-        .setStrokeStyle(2, isUnlocked ? 0x44aa44 : tierColor);
+      // Phase 60-14: 레시피 카드 배경 rectangle → NineSliceFactory.panel
+      // 해금 완료: 'stone' (녹색 tint), 미해금: 'dark' (등급색 tint)
+      const cardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, y + rowH / 2, 340, rowH - 4,
+        isUnlocked ? 'stone' : 'dark');
+      if (isUnlocked) cardBg.setTint(0x88cc88);
       this._contentContainer.add(cardBg);
 
       if (!isVisible) {
@@ -408,27 +398,24 @@ export class ShopScene extends Phaser.Scene {
           })
         );
 
-        // 해금 버튼
+        // Phase 60-14: 해금 버튼 rectangle → NineSliceFactory.button 'primary'
         const btnX = GAME_WIDTH - 55;
         const btnY2 = y + rowH / 2;
-        const btn = this.add.rectangle(btnX, btnY2, 70, 26, canAfford ? 0x886600 : 0x333333)
-          .setInteractive({ useHandCursor: canAfford });
-        this._contentContainer.add(btn);
-
-        const btnTxt = this.add.text(btnX, btnY2, `${recipe.unlockCost} 🪙`, {
-          fontSize: '12px', fontStyle: 'bold',
-          color: canAfford ? '#ffcc00' : '#666666',
-        }).setOrigin(0.5);
-        this._contentContainer.add(btnTxt);
-
-        if (canAfford) {
-          btn.on('pointerdown', () => {
-            if (RecipeManager.purchaseRecipe(recipe.id)) {
-              this._updateCoinDisplay();
-              this._renderContent();
-            }
-          });
-        }
+        const unlockBtn = NineSliceFactory.button(
+          this, btnX, btnY2, 70, 26, `${recipe.unlockCost} 🪙`,
+          {
+            variant: 'primary',
+            disabled: !canAfford,
+            textStyle: { fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#ffcc00' : '#666666' },
+            onClick: () => {
+              if (RecipeManager.purchaseRecipe(recipe.id)) {
+                this._updateCoinDisplay();
+                this._renderContent();
+              }
+            },
+          }
+        );
+        this._contentContainer.add(unlockBtn);
       }
     });
 
@@ -474,9 +461,8 @@ export class ShopScene extends Phaser.Scene {
       const nextGradeName = isMax ? '' : TABLE_GRADE_NAMES[grade + 1];
       const cost = isMax ? 0 : TABLE_UPGRADE_COSTS[grade];
 
-      // 카드 배경
-      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, 0x2a1a0a)
-        .setStrokeStyle(1, 0x555533);
+      // Phase 60-14: 테이블 카드 배경 rectangle → NineSliceFactory.panel 'dark'
+      const cardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, 'dark');
       this._contentContainer.add(cardBg);
 
       // 테이블 번호 + 현재 등급
@@ -507,16 +493,23 @@ export class ShopScene extends Phaser.Scene {
         const btnX = GAME_WIDTH - 55;
         const btnY = y + 38;
 
-        const btn = this.add.rectangle(btnX, btnY, 70, 22, canBuy ? 0x886600 : 0x333333)
-          .setInteractive({ useHandCursor: canBuy });
-        this._contentContainer.add(btn);
-
-        this._contentContainer.add(
-          this.add.text(btnX, btnY, `${cost} 🪙`, {
-            fontSize: '11px', fontStyle: 'bold',
-            color: canBuy ? '#ffcc00' : '#666666',
-          }).setOrigin(0.5)
+        // Phase 60-14: 테이블 업그레이드 버튼 rectangle → NineSliceFactory.button 'primary'
+        const btn = NineSliceFactory.button(
+          this, btnX, btnY, 70, 22, `${cost} 🪙`,
+          {
+            variant: 'primary',
+            disabled: !canBuy,
+            textStyle: { fontSize: '11px', fontStyle: 'bold', color: canBuy ? '#ffcc00' : '#666666' },
+            onClick: () => {
+              if (SaveManager.spendCoins(cost)) {
+                SaveManager.upgradeTable(i);
+                this._updateCoinDisplay();
+                this._renderContent();
+              }
+            },
+          }
         );
+        this._contentContainer.add(btn);
 
         // 다음 등급 효과 미리보기
         this._contentContainer.add(
@@ -524,16 +517,6 @@ export class ShopScene extends Phaser.Scene {
             fontSize: '9px', color: '#888888',
           })
         );
-
-        if (canBuy) {
-          btn.on('pointerdown', () => {
-            if (SaveManager.spendCoins(cost)) {
-              SaveManager.upgradeTable(i);
-              this._updateCoinDisplay();
-              this._renderContent();
-            }
-          });
-        }
       }
 
       y += cardH;
@@ -555,8 +538,8 @@ export class ShopScene extends Phaser.Scene {
         // 이전 테이블이 해금되어야 다음 해금 가능
         const isNext = i === unlockedCount;
 
-        const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + 28, 340, 44, 0x1a1a1a)
-          .setStrokeStyle(1, 0x444444);
+        // Phase 60-14: 잠긴 테이블 카드 배경 rectangle → NineSliceFactory.panel 'stone'
+        const cardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, y + 28, 340, 44, 'stone');
         this._contentContainer.add(cardBg);
 
         // 잠김 표시
@@ -580,26 +563,23 @@ export class ShopScene extends Phaser.Scene {
           const btnX = GAME_WIDTH - 55;
           const btnY = y + 28;
 
-          const btn = this.add.rectangle(btnX, btnY, 70, 24, canBuy ? 0x886600 : 0x333333)
-            .setInteractive({ useHandCursor: canBuy });
-          this._contentContainer.add(btn);
-
-          this._contentContainer.add(
-            this.add.text(btnX, btnY, `${unlockCost} 🪙`, {
-              fontSize: '12px', fontStyle: 'bold',
-              color: canBuy ? '#ffcc00' : '#666666',
-            }).setOrigin(0.5)
+          // Phase 60-14: 테이블 해금 버튼 rectangle → NineSliceFactory.button 'primary'
+          const btn = NineSliceFactory.button(
+            this, btnX, btnY, 70, 24, `${unlockCost} 🪙`,
+            {
+              variant: 'primary',
+              disabled: !canBuy,
+              textStyle: { fontSize: '12px', fontStyle: 'bold', color: canBuy ? '#ffcc00' : '#666666' },
+              onClick: () => {
+                if (SaveManager.spendCoins(unlockCost)) {
+                  SaveManager.unlockTable();
+                  this._updateCoinDisplay();
+                  this._renderContent();
+                }
+              },
+            }
           );
-
-          if (canBuy) {
-            btn.on('pointerdown', () => {
-              if (SaveManager.spendCoins(unlockCost)) {
-                SaveManager.unlockTable();
-                this._updateCoinDisplay();
-                this._renderContent();
-              }
-            });
-          }
+          this._contentContainer.add(btn);
         }
 
         y += 50;
@@ -631,9 +611,8 @@ export class ShopScene extends Phaser.Scene {
       const isMax = level >= 5;
       const cost = isMax ? 0 : def.costs[level];
 
-      // 카드 배경
-      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, 0x2a1a0a)
-        .setStrokeStyle(1, 0x555533);
+      // Phase 60-14: 인테리어 카드 배경 rectangle → NineSliceFactory.panel 'dark'
+      const cardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, 'dark');
       this._contentContainer.add(cardBg);
 
       // 이름 + 아이콘
@@ -658,19 +637,16 @@ export class ShopScene extends Phaser.Scene {
         })
       );
 
-      // 레벨 게이지 바
+      // Phase 60-14: 레벨 게이지 바 rectangle → NineSliceFactory.progressBar
       const barX = 20;
       const barY = y + 50;
       const barW = 200;
-      const barH = 8;
-      const barBg = this.add.rectangle(barX + barW / 2, barY, barW, barH, 0x333333);
-      this._contentContainer.add(barBg);
-      if (level > 0) {
-        const fillW = Math.floor(barW * (level / 5));
-        const barFill = this.add.rectangle(barX + fillW / 2, barY, fillW, barH, 0x44aa44)
-          .setOrigin(0.5, 0.5);
-        this._contentContainer.add(barFill);
-      }
+      const barH = 14; // bar_frame_h insets(6+6) 수용을 위해 8→14 확장
+      const progBar = NineSliceFactory.progressBar(
+        this, barX + barW / 2, barY, barW, barH,
+        { tint: 0x44aa44, value: level / 5, shine: false }
+      );
+      this._contentContainer.add(progBar);
       // 레벨 점 표시 (5단계)
       for (let lv = 0; lv < 5; lv++) {
         const dotX = barX + Math.floor(barW * ((lv + 0.5) / 5));
@@ -688,16 +664,23 @@ export class ShopScene extends Phaser.Scene {
         const btnX = GAME_WIDTH - 55;
         const btnY2 = y + 62;
 
-        const btn = this.add.rectangle(btnX, btnY2, 70, 24, canBuy ? 0x886600 : 0x333333)
-          .setInteractive({ useHandCursor: canBuy });
-        this._contentContainer.add(btn);
-
-        this._contentContainer.add(
-          this.add.text(btnX, btnY2, `${cost} 🪙`, {
-            fontSize: '12px', fontStyle: 'bold',
-            color: canBuy ? '#ffcc00' : '#666666',
-          }).setOrigin(0.5)
+        // Phase 60-14: 인테리어 업그레이드 버튼 rectangle → NineSliceFactory.button 'primary'
+        const btn = NineSliceFactory.button(
+          this, btnX, btnY2, 70, 24, `${cost} 🪙`,
+          {
+            variant: 'primary',
+            disabled: !canBuy,
+            textStyle: { fontSize: '12px', fontStyle: 'bold', color: canBuy ? '#ffcc00' : '#666666' },
+            onClick: () => {
+              if (SaveManager.spendCoins(cost)) {
+                SaveManager.upgradeInterior(def.type);
+                this._updateCoinDisplay();
+                this._renderContent();
+              }
+            },
+          }
         );
+        this._contentContainer.add(btn);
 
         // 다음 효과 미리보기
         this._contentContainer.add(
@@ -705,16 +688,6 @@ export class ShopScene extends Phaser.Scene {
             fontSize: '9px', color: '#888888',
           })
         );
-
-        if (canBuy) {
-          btn.on('pointerdown', () => {
-            if (SaveManager.spendCoins(cost)) {
-              SaveManager.upgradeInterior(def.type);
-              this._updateCoinDisplay();
-              this._renderContent();
-            }
-          });
-        }
       }
     });
   }
@@ -745,10 +718,10 @@ export class ShopScene extends Phaser.Scene {
       const hired = SaveManager.isStaffHired(staffId);
       const y = startY + 28 + i * cardH;
 
-      // 카드 배경
-      const bgColor = hired ? 0x1a2a1a : 0x2a1a0a;
-      const cardBg = this.add.rectangle(GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6, bgColor)
-        .setStrokeStyle(1, hired ? 0x44aa44 : 0x555533);
+      // Phase 60-14: 직원 카드 배경 rectangle → NineSliceFactory.panel
+      const cardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, y + cardH / 2, 340, cardH - 6,
+        hired ? 'stone' : 'dark');
+      if (hired) cardBg.setTint(0x88cc88);
       this._contentContainer.add(cardBg);
 
       // 아이콘 + 이름
@@ -779,16 +752,23 @@ export class ShopScene extends Phaser.Scene {
           const btnX = GAME_WIDTH - 55;
           const btnY = y + 55;
 
-          const btn = this.add.rectangle(btnX, btnY, 80, 26, canBuy ? 0x886600 : 0x333333)
-            .setInteractive({ useHandCursor: canBuy });
-          this._contentContainer.add(btn);
-
-          this._contentContainer.add(
-            this.add.text(btnX, btnY, `${staffType.price} \uD83E\uDE99`, {
-              fontSize: '13px', fontStyle: 'bold',
-              color: canBuy ? '#ffcc00' : '#666666',
-            }).setOrigin(0.5)
+          // Phase 60-14: 직원 구매 버튼 rectangle → NineSliceFactory.button 'primary'
+          const btn = NineSliceFactory.button(
+            this, btnX, btnY, 80, 26, `${staffType.price} \uD83E\uDE99`,
+            {
+              variant: 'primary',
+              disabled: !canBuy,
+              textStyle: { fontSize: '13px', fontStyle: 'bold', color: canBuy ? '#ffcc00' : '#666666' },
+              onClick: () => {
+                if (SaveManager.spendCoins(staffType.price)) {
+                  SaveManager.hireStaff(staffId);
+                  this._updateCoinDisplay();
+                  this._renderContent();
+                }
+              },
+            }
           );
+          this._contentContainer.add(btn);
 
           // 가격 설명
           this._contentContainer.add(
@@ -796,16 +776,6 @@ export class ShopScene extends Phaser.Scene {
               fontSize: '10px', color: '#888888',
             })
           );
-
-          if (canBuy) {
-            btn.on('pointerdown', () => {
-              if (SaveManager.spendCoins(staffType.price)) {
-                SaveManager.hireStaff(staffId);
-                this._updateCoinDisplay();
-                this._renderContent();
-              }
-            });
-          }
         } else if (staffType.purchaseType === 'iap') {
           // IAP 미구현 — 잠금 표시
           this._contentContainer.add(
@@ -820,8 +790,8 @@ export class ShopScene extends Phaser.Scene {
     // ── 유랑 미력사 고용 섹션 ──
     const wandererSectionY = startY + 28 + staffIds.length * cardH + 10;
 
-    // 구분선
-    const divLine = this.add.rectangle(GAME_WIDTH / 2, wandererSectionY, GAME_WIDTH - 20, 1, 0x444444);
+    // Phase 60-14: 구분선 rectangle → NineSliceFactory.dividerH
+    const divLine = NineSliceFactory.dividerH(this, GAME_WIDTH / 2, wandererSectionY, GAME_WIDTH - 20, 2);
     this._contentContainer.add(divLine);
 
     // 섹션 헤더
@@ -852,9 +822,11 @@ export class ShopScene extends Phaser.Scene {
 
     // "고용 화면 열기" 버튼 카드
     const wBtnY = wandererSectionY + 44;
-    const wCardBg = this.add.rectangle(GAME_WIDTH / 2, wBtnY, 340, 52, 0x1a1020)
-      .setStrokeStyle(1, 0x7722aa)
-      .setInteractive({ useHandCursor: true });
+    // Phase 60-14: 유랑 미력사 카드 배경 rectangle → NineSliceFactory.panel 'dark' + 보라 tint
+    const wCardBg = NineSliceFactory.panel(this, GAME_WIDTH / 2, wBtnY, 340, 52, 'dark');
+    wCardBg.setTint(0xaa88cc);
+    const wCardHit = new Phaser.Geom.Rectangle(-170, -26, 340, 52);
+    wCardBg.setInteractive(wCardHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this._contentContainer.add(wCardBg);
 
     this._contentContainer.add(
@@ -863,29 +835,27 @@ export class ShopScene extends Phaser.Scene {
       }).setOrigin(0.5)
     );
 
+    // Phase 60-14: 고용 화면 열기 버튼 rectangle+text → NineSliceFactory.button 'secondary' + 보라 tint
     const openBtnX = GAME_WIDTH / 2;
     const openBtnY2 = wBtnY + 12;
-    const openBtn = this.add.rectangle(openBtnX, openBtnY2, 160, 24, 0x552288)
-      .setInteractive({ useHandCursor: true });
-    this._contentContainer.add(openBtn);
-    this._contentContainer.add(
-      this.add.text(openBtnX, openBtnY2, '\uACE0\uC6A9 \uD654\uBA74 \uC5F4\uAE30', {
-        fontSize: '12px', fontStyle: 'bold', color: '#e0aaff',
-      }).setOrigin(0.5)
+    const openBtn = NineSliceFactory.button(
+      this, openBtnX, openBtnY2, 160, 24, '\uACE0\uC6A9 \uD654\uBA74 \uC5F4\uAE30',
+      {
+        variant: 'secondary',
+        textStyle: { fontSize: '12px', fontStyle: 'bold', color: '#e0aaff' },
+        onClick: () => {
+          this.scene.launch('WanderingChefModal');
+          this.scene.pause();
+        },
+      }
     );
+    openBtn._bg.setTint(0xaa88cc);
+    this._contentContainer.add(openBtn);
 
     wCardBg.on('pointerdown', () => {
       this.scene.launch('WanderingChefModal');
       this.scene.pause();
     });
-    openBtn.on('pointerdown', () => {
-      this.scene.launch('WanderingChefModal');
-      this.scene.pause();
-    });
-    wCardBg.on('pointerover', () => wCardBg.setFillStyle(0x2a1030));
-    wCardBg.on('pointerout', () => wCardBg.setFillStyle(0x1a1020));
-    openBtn.on('pointerover', () => openBtn.setFillStyle(0x6633aa));
-    openBtn.on('pointerout', () => openBtn.setFillStyle(0x552288));
   }
 
   /**
