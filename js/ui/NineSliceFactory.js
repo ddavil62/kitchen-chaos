@@ -151,10 +151,11 @@ function createNineSlice(scene, x, y, width, height, textureKey, manifestKey, or
     // originX/Y 기반으로 좌상단 좌표 결정
     // originX=0.5 → x0 = -w/2 (중심 정렬)
     // originX=0   → x0 = 0    (좌측 정렬)
+    // Math.round()로 정수화: 서브픽셀 위치의 9조각 경계 블리딩 방지 (Phase 62)
     const oX = container._nsOriginX ?? 0.5;
     const oY = container._nsOriginY ?? 0.5;
-    const x0 = -w * oX;
-    const y0 = -h * oY;
+    const x0 = Math.round(-w * oX);
+    const y0 = Math.round(-h * oY);
 
     // 코너는 원본 크기 유지
     tl.setPosition(x0,             y0);

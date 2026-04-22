@@ -477,8 +477,9 @@ export class WorldMapScene extends Phaser.Scene {
 
       // 5. 별점 표시 (해금된 경우)
       if (state.unlocked) {
+        // Phase 62: 9px로 줄여 "★ 18/18" 같은 긴 텍스트가 노드 원(반경 40) 테두리를 벗어나지 않도록 함
         const starText = this.add.text(x, y + 30, `\u2605 ${state.currentStars}/${state.maxStars}`, {
-          fontSize: '10px',
+          fontSize: '9px',
           color: '#ffd700',
         }).setOrigin(0.5);
         this._mapContainer.add(starText);

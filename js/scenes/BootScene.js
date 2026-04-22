@@ -198,7 +198,11 @@ export class BootScene extends Phaser.Scene {
     }
 
     // ── 브라우저 환경 폴백 (탭 전환, 화면 끄기 등) ──
+    // Phase 62: _bootComplete 플래그로 초기 로딩 중 visibilitychange 이벤트 무시.
+    // 첫 페이지 로드 시 document.hidden 상태 변화가 game.pause()를 트리거해
+    // MenuScene 초기화가 완료되기 전에 SHUTDOWN 상태로 빠지는 타이밍 버그를 방지한다.
     document.addEventListener('visibilitychange', () => {
+      if (!this._bootComplete) return;
       this._handleAppState(!document.hidden);
     });
   }
@@ -262,6 +266,8 @@ export class BootScene extends Phaser.Scene {
    * @private
    */
   _startGame() {
+    // Phase 62: 부팅 완료 표시 — 이후부터 visibilitychange 이벤트를 처리한다.
+    this._bootComplete = true;
     try {
       const dev = new URL(window.location.href).searchParams.get('dev');
       if (dev === 'nineslice') {

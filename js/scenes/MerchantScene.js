@@ -458,9 +458,11 @@ export class MerchantScene extends Phaser.Scene {
       }
 
       if (previewParts.length > 0) {
-        const previewStr = previewParts.join(', ');
+        // Phase 62: previewParts 최대 2개로 제한하고 wordWrap 적용 — 우측 화면 초과 방지
+        const previewStr = previewParts.slice(0, 2).join(', ');
         const previewTxt = this.add.text(x + 150, y + 12, previewStr, {
           fontSize: '10px', color: '#aaaaaa',
+          wordWrap: { width: GAME_WIDTH - (x + 150) - 8 },
         }).setOrigin(0, 0.5);
         this.listContainer.add(previewTxt);
       }
