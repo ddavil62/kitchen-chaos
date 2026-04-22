@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 65 시나리오 일관성 전수 수정 완료)
+> 최종 업데이트: 2026-04-22 (Phase 66 개그씬 확장 완료)
 
 ## 프로젝트 개요
 
@@ -33,8 +33,8 @@
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js + EndlessMissionManager.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입, 미력 폭풍 이벤트, 정화 임무 4종, 통계 트래킹(폭풍/임무/무결) |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (3레이어 분리 렌더링+depth sorting+홀 데코), 챕터별 홀 배경 (바닥 8종 tileSprite+뒷벽 8종), 엔드리스 웨이브 구간별 배경 테마 전환, 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결 |
-| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 ~106종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
-| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), ~111항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
+| 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 119종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
+| 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 120항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v24, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients/endless통계/branchCards 헬퍼 |
 | 쿠폰 | CouponRegistry.js | 쿠폰 레지스트리, redeemCoupon() API, 일반 3종+DEV 치트 5종, 사용 이력 localStorage 관리 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
@@ -72,7 +72,7 @@
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
 | 도구/행상인/채집 | 영구 도구 8종, 구매/판매/업그레이드, 행상인 UI, 재료 채집 TD, 도구 도감/팝업 | 완료 |
-| 대화/스토리 | 스크립트 ~106종, 트리거 ~111항목, 선택지 분기, 초상화 9종, 15캐릭터, 시나리오 일관성 검증 완료 | 완료 |
+| 대화/스토리 | 스크립트 119종, 트리거 120항목, 선택지 분기, 초상화 9종, 15캐릭터, 시나리오 일관성 검증+개그씬 확장 완료 | 완료 |
 | 영업 씬 비주얼 | 아이소메트릭 홀 (3레이어 분리 렌더링, 테이블 front/back 10종+손님 10종+챕터별 바닥 8종+뒷벽 8종, 홀 데코, depth 체계 정비) | 완료 |
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 그룹3 콘텐츠 (16~24장) | 인도(16~18)/멕시칸(19~21)/디저트·최종(22~24) 아크, 적 14종+보스 3종(maharaja/el_diablo_pepper/queen_of_taste 3페이즈), 레시피 57종, 대화 28종, 전 스테이지(16-1~24-6) 구현, 밸런스 QA 완료 | 완료 |
@@ -120,6 +120,19 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 66 — 개그씬 확장 (2026-04-22)
+
+스크립트 톤 경량화를 위해 dialogueData.js/storyData.js에 개그씬을 대폭 추가. 기존 대사 교체 없이 추가만 수행, 미디엄 강도(픽 웃음 수준).
+
+- **team_side 10종 신규**: 1~5, 7, 9, 11~13장 누락 챕터 전수 커버 (merchant_enter 트리거)
+- **chapter_intro 14종 보강**: 도착 리액션 개그 1~5줄 삽입 (금지 구간 7개 미변경)
+- **service_event 3종 보강**: happy_hour/food_review/kitchen_accident에 2~3줄 추가
+- **gathering_enter 막간극 3종 신규**: gag_midstage_7/10/13 (7-4, 10-4, 13-4)
+- **캐릭터 성격 개그 8건**: 메이지 논문 폭주, 유키 건조, 앙드레 와인 비유, 아르준 향신료 열거
+- **수치**: 대화 키 106 -> 119개, 트리거 107 -> 120개, dialogueData.js +296줄, storyData.js +26줄
+- QA: Playwright 21/21 PASS, vite build PASS
+- 스펙: `.claude/specs/2026-04-22-kc-gag-expansion-spec.md`
 
 ### Phase 65 — 시나리오 일관성 전수 수정 (2026-04-22)
 

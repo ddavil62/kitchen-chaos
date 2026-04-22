@@ -32,6 +32,9 @@
  *   chapter16_epilogue 포코/미미 예고 2줄 추가, side_15b 린 그룹2 이탈 briefing 5줄 추가.
  * Phase GH 시나리오 수정: (한숨) 지문 다양화(2건→0건), chapter21_boss 엘 디아블로 루차도르 색채 강화,
  *   team_side_24 메이지 내면 동기 대사 1줄 삽입.
+ * Phase 66-1: team_side 누락 챕터 전수 커버 — team_side_1~5, 7, 9, 11~13 신규 10종 추가. 누적 ~116종.
+ * Phase 66-2: chapter_intro 도착 리액션 개그 삽입 — 14개 intro에 1~2줄 개그 추가 (금지 구간 ch5/6/12/15/18/21/24 제외).
+ * Phase 66-3: service_event 3종 대사 보강(각 2~3줄) + gathering_enter 막간극 3종 신규 추가 (gag_midstage_7, 10, 13). 누적 ~119종.
  * 각 대화는 id, skippable 여부, lines 배열(speaker, portrait, portraitKey, text, choices?)로 구성된다.
  *
  * 세계관: "식란(食亂)" — 음식의 미력(味力)이 폭주하여 식재료가 괴물로 변하는 자연 현상.
@@ -137,6 +140,8 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '초보?! 나도 파스타 보스를 혼자 정화했다고!' },
       { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '파스타 하나로? 하, 흥미롭네. 그럼 증명해 봐!' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '아이고... 둘 다 불이야 불. 프라이팬 태우지 말고...' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '(포코를 보며) 저 사람이랑 만났을 때 불이랑 프라이팬이 있었는데, 그게 자기소개야 싸움 시작이야?' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '둘 다.' },
     ]
   },
   rin_first_meet: {
@@ -291,6 +296,8 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '포코, 지금 상황 파악 좀...' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '뭐? 위기와 기회는 한 끗 차이야!' },
       { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...저 고양이는 정말 대단해. 다른 의미로.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '(조용히) 포코 씨, 지금 BBQ 재료 채집 계획서 쓰고 있어?' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(빠르게 종이를 접으며) 아니!' },
     ]
   },
   chapter4_mage_joins: {
@@ -393,6 +400,171 @@ export const DIALOGUES = {
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '이 정도는 해야지! ...단, 파티 음식 재료비는 별도야.' },
     ]
   },
+
+  // ── Phase 66-1: team_side 누락 챕터 전수 커버 (1~5, 7, 9, 11~13) ──
+
+  // team_side_1 — merchant_enter 1회 (1장 클리어 후, 미미+포코 2인조 시절 회고)
+  team_side_1: {
+    id: 'team_side_1',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '미미, 처음 당근이 칼 들고 덤빌 때 기억해?' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '기억하고 싶지 않아!! 너 그때 도구 팔겠다고 뛰어나왔잖아!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '사업 타이밍이 중요하거든. 위기일수록 좋은 도구가 필요해!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '나는 살아남을 생각만 했는데 너는 할인 계산 하고 있었던 거야?!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '둘 다 동시에 했어. 나는 멀티태스킹의 달인이니까!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '(이마를 짚으며) ...그래서 우리가 이기긴 했지.' },
+    ],
+  },
+
+  // team_side_2 — merchant_enter 1회 (2장 클리어 후, 린 등장 첫인상 회고)
+  team_side_2: {
+    id: 'team_side_2',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '린, 나 솔직히 처음에 적인 줄 알았어.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '뭐?' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '프라이팬에서 불이 나오는데 누가 동료라고 생각해!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...불꽃 미력사가 불을 쓰는 건 당연하지.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '나도 솔직히 린이 식란 쪽인 줄 알았어. 잠깐이지만.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '(둘을 싸늘하게 보며) ...그거 알고 계속 데리고 다닌 거야?' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '실력이 검증됐으니까! (재빠르게) 도구 볼래요?' },
+    ],
+  },
+
+  // team_side_3 — merchant_enter 1회 (3장 클리어 후, 메이지 합류 전 해변 인상)
+  team_side_3: {
+    id: 'team_side_3',
+    skippable: true,
+    lines: [
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '메이지 씨, 처음 봤을 때 왜 갑자기 미력 측정을 했어요?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '비정상적인 반응이 감지됐거든요. 당연한 거 아닌가요?' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '처음 보는 사람한테 장비 들이미는 게 당연해?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '연구자한테는요. (진지하게) 당신도 미력 수치가 궁금한데요, 린 씨.' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...됐거든.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '나 측정해줘! 행상인의 미력이 어느 정도인지 궁금했는데!' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '(장비를 켜며) 오, 이건 처음 보는 패턴이에요. 논문 쓸 수 있겠어요!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '(조용히) 포코가 연구 대상이 됐어...' },
+    ],
+  },
+
+  // team_side_4 — merchant_enter 1회 (4장 클리어 후, 화산 지대 생존 회고)
+  team_side_4: {
+    id: 'team_side_4',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '화산 정화 재료로 BBQ 해봤어? 정말 최고의 풍미야!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '(입 다물고) ...인정. 맛있긴 했어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '린이 인정했어?! 포코 요리가?!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '요리한 건 포코가 아니라 내가 구운 거야!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '나는 재료 조달했지! 역할 분담이야!' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '라바 골렘 정화 직후 재료 채취가 위생적으로 안전한지 검토가 필요해요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(살짝 얼어서) ...안전하지 않아?' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '모르겠어요. 논문을 써볼게요.' },
+    ],
+  },
+
+  // team_side_5 — merchant_enter 1회 (5장 클리어 후, 포코 실종 에피소드 후기)
+  team_side_5: {
+    id: 'team_side_5',
+    skippable: true,
+    lines: [
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '...포코, 솔직히 물어볼게. 그때 납치된 게 맞아? 스스로 간 거 아니야?' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '왜 그 생각을!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '식란이 제일 심한 곳에서 사라졌잖아. 딱 장사 좋을 것 같은 곳이더라고.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '그건 우연이야! 완전히!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '아, 나도 1%는 그 생각 했어...' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '미미까지!!' },
+      { speaker: '메이지', portrait: '\u{1F9C1}', portraitKey: 'mage', text: '(기록하며) 피납 상황에서 상인 행동 패턴... 흥미로운 표본이에요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '기록하지 마!!!' },
+    ],
+  },
+
+  // team_side_7 — merchant_enter 1회 (7장 클리어 후 + yuki_side_7 시청 후, 유키 첫날 합류 뒷이야기)
+  team_side_7: {
+    id: 'team_side_7',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '유키 씨, 하루에 말 몇 마디나 해요?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(잠시 생각하다가) ...필요한 만큼요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '그게 몇 마디야?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '...오늘은 이미 많이 했어요.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '저 진짜로 세어봤는데 오늘 열다섯 마디 하셨어요!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(3초 침묵) ...그렇군요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(조용히) 열여섯이 됐어.' },
+    ],
+  },
+
+  // team_side_9 — merchant_enter 1회 (9장 클리어 후, 사케 오니 보스전 회고)
+  team_side_9: {
+    id: 'team_side_9',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '저 사케 오니... 냄새가 진짜 좋은 최상급 사케 냄새였어요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(차갑게) 그게 지금 중요해요?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '아니, 나는 그냥 — 정화되면 마실 수 있나 싶어서.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(긴 침묵) ...안 돼요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '왜요?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '오니한테서 우려낸 사케거든요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(크게 망연자실하며) 아아...' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(소매에서 작은 병 꺼내며) 일반 사케 팔까?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '포코 씨, 저리 가줘요.' },
+    ],
+  },
+
+  // team_side_11 — merchant_enter 1회 (11장 클리어 후 + lao_side_11 시청 후, 용의 주방 2층 탐사 회고)
+  team_side_11: {
+    id: 'team_side_11',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '이 층에 있는 웍들... 전부 우리 가문 거예요. 장인이 만든 거야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(둘러보며) 수십 개가 있네요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '우리 할아버지가 말씀하셨어요. "웍이 있는 한 요리사는 무너지지 않는다"고.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '멋진 말이에요!' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(팔짱을 끼며) 그래서 나는 위기 때마다 웍을 꺼내. 항상 효과 있어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(평소 톤으로) 지난번에 웍으로 드래곤 머리 막다가 쪼개졌잖아요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(침묵)' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '...그건 예외였어.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '웍 수리 비용이 얼마인지 아세요? 내가 견적 내줄게요!' },
+    ],
+  },
+
+  // team_side_12 — merchant_enter 1회 (12장 클리어 후 + lao_side_12 시청 후, 사케 마스터 대면 후기)
+  team_side_12: {
+    id: 'team_side_12',
+    skippable: true,
+    lines: [
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '파리에서 연락이 왔어. 별빛 비스트로라는 곳에서 식란이 발생하고 있대.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '파리요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '응, 프랑스.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '멀어요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '나는 괜찮아! 세계 어디든!' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '우선 어떤 상황인지 더 알아야 하지 않을까요?' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '현지 셰프가 직접 연락 해왔어. 굉장히 정중한 프랑스어로.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '정중한 프랑스어요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '내가 3번 읽어도 무슨 말인지 모르겠어.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '번역기 안 돼?' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '번역기도 "매우 프랑스적인 표현"이라고 나와.' },
+    ],
+  },
+
+  // team_side_13 — merchant_enter 1회 (13장 클리어 후 + mimi_side_13 시청 후, 앙드레 합류 첫날 뒷이야기)
+  team_side_13: {
+    id: 'team_side_13',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '앙드레 씨, 아까 미력 설명할 때 와인 비유가 몇 번이었어요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(차분하게) 열한 번이요. 제가 셌거든요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(무표정) 자각하고 계신 거군요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '물론이죠. 저는 와인을 통해 세계를 이해해요. 비유가 많은 건 이해의 깊이예요.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '아까 식란 강도를 "탄닌이 과한 그르나슈"에 비유하셨는데 저는 와인을 몰라서...' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(온화하게) 걱정 마세요. 지금부터 가르쳐 드리죠.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(조용히 뒷걸음질 치며) 저는 됐어요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(반짝이며) 고급 와인 도구도 혹시 필요하신가요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(포코를 보며 천천히) ...참 독특한 상인이군요.' },
+    ],
+  },
+
   chapter6_final_battle: {
     id: 'chapter6_final_battle',
     skippable: true,
@@ -475,6 +647,8 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '소문?! 아직 개업한 지 얼마 안 됐는데!' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '미력사가 만든 요리는 소문이 빠르거든. 자, 빨리 조리 시작!' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '알겠어! 최대한 빨리 서빙할게!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(앞치마에서 카탈로그를 꺼내며) 해피아워 기념 도구 세트도 있는데—' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '지금 나 바쁘거든요!!' },
     ]
   },
   event_food_review_dialogue: {
@@ -485,6 +659,8 @@ export const DIALOGUES = {
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '오호~ 맛집 리뷰어가 왔군! 이건 대박 기회야!' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '서빙 5명 분량을 완벽하게 해내면 좋은 평가를 받을 수 있어.' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '긴장되지만... 할머니 식당의 명예를 위해! 최선을 다할게!' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '좋은 리뷰 나오면 내 도구 광고도 좀 끼워줄 수 있지 않을까—' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '리뷰어한테 왜 광고를 부탁해!!' },
     ]
   },
   event_kitchen_accident_dialogue: {
@@ -495,6 +671,9 @@ export const DIALOGUES = {
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '침착해! 주방 사고는 가끔 일어나는 거야!' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '조리 슬롯 하나를 잠깐 못 쓰게 되겠지만, 다른 슬롯으로 버텨!' },
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '알겠어! 하나 없어도 해낼 수 있어! 아마도!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '(어딘가에서) 방심이 사고를 만든다. 항상 집중해.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '린?! 언제부터 주방에 있었어?!' },
+      { speaker: '린', portrait: '\u{1F525}', portraitKey: 'rin', text: '처음부터.' },
     ]
   },
 
@@ -578,6 +757,9 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '사케 오니?' },
       { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '쓰러뜨리면 마을이 회복될 거야. 이게 처음부터 내 목적이었어.' },
       { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(진지하게) 조심해야 해. 우리 구역 식란보다 오래된 놈이야.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '포코 씨도 진지해질 수 있구나.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '나 항상 진지해! (잠깐 뜸 들이다가) ...이자카야 정화되면 사케 유통 사업 어떨까요, 유키 씨?' },
+      { speaker: '유키', portrait: '\u{2744}\u{FE0F}', portraitKey: 'yuki', text: '(차갑게) 먼저 들어가요.' },
     ],
   },
   chapter7_yuki_joins: {
@@ -642,6 +824,8 @@ export const DIALOGUES = {
       { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(진지하게) 맞아. 드래곤 웍 — 이 주방 심층부를 통째로 삼켰어. 같이 들어가서 끝내보자고.' },
       { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '연락 주셔서 다행이에요. 같이 해봐요!' },
       { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(긴장하며) 용 형상의 웍... 이건 예사 보스가 아니겠군.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(포코를 보며) 당신 지금 내 가문 주방에 처음 온 건데 왜 웍 가격 계산하는 눈빛이야?' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(손을 번쩍 들며) 직업병이에요!' },
     ],
   },
   chapter10_lao_joins: {
@@ -657,6 +841,10 @@ export const DIALOGUES = {
       { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '당연히 같이 해야죠! 유키 씨도 처음엔 혼자 하려 했는데, 이젠 우리 팀이잖아요.' },
       { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(차갑게) ...나는 그런 말 한 적 없어.' },
       { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '했어.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(지나가듯) 그때 라오 씨가 웍 하나로 온 주방을 들어올렸다 내리는 거 봤거든. 그거 유튜브에 올렸으면—' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '(쑥스럽게) 그건 그냥 근육 자랑이었어.' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '근데 도구까지 같이 날아갔잖아요.' },
+      { speaker: '\uB77C\uC624', portrait: '\uD83D\uDC09', portraitKey: 'lao', text: '...기억력 좋네.' },
       { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '환영해요, 라오!' },
       { speaker: 'narrator', portrait: '', text: '라오가 정식으로 미미 팀의 일원이 되었다.' },
     ],
@@ -750,6 +938,8 @@ export const DIALOGUES = {
       { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '문에 미력이 가득 차 있어. 이게 봉인이야?' },
       { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(문을 손으로 짚으며) 오래된 거야. 아주 오래된 봉인. 봉인을 친 사람이 누군지 \u2014' },
       { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(긴장하며) 사케 오니가 안에 있어. 문 너머에서 미력이 흘러나오고 있어.' },
+      { speaker: '\uD3EC\uCF54', portrait: '\uD83D\uDC31', portraitKey: 'poco', text: '(코를 막으며) 사케 냄새... 정화하면 이거 전부 최고급 술이 되는 거지?' },
+      { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(차갑게) 포코 씨, 분위기 파악하세요.' },
       { speaker: '\uBBF8\uBBF8', portrait: '\uD83D\uDC67', portraitKey: 'mimi', text: '자, 들어가자. 거기서 끝내는 거야.' },
       { speaker: '\uC720\uD0A4', portrait: '\u2744\uFE0F', portraitKey: 'yuki', text: '(조용히) ...응. 여기서 끝낸다.' },
     ],
@@ -796,6 +986,8 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '사케 오니의 봉인이 해제된 후. 라오가 이끄는 팀이 가문 주방 아래 심층부로 들어선다.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(멈추며) ...이 아래가 진짜 심층부야. 할아버지도 이곳엔 거의 들어오지 않았다고 하셨어.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(벽을 두드리며) 돌 재질이 최고급이네. 팔각 문양... 미력 미술품으로 팔면—' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(포코 손을 막으며) 두드리지 마요.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '공기가 달라. 향신료 냄새가 엄청나게 진해.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(벽에 새겨진 문양을 보며) 팔각 문양이야. 중국 미력사가 봉인에 사용하던 표식이에요.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(작게) ...가문 문서에 있었어. "심층부 팔각 봉인은 용의 미력을 가두는 마지막 방어선"이라고.' },
@@ -906,6 +1098,9 @@ export const DIALOGUES = {
       { speaker: '???', portrait: '🥐', text: '잘 오셨습니다. 동방의 미력사분들.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '저는 앙드레. WCA 유럽 지부장입니다. (정중히 고개를 숙이며) 연락을 기다렸어요.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '이 별빛 비스트로... 파리 최고의 미슐랭 3스타 레스토랑이었습니다. 지금은 식란의 중심지가 됐지만.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(주변을 둘러보며) 이 미력의 향... 2001년 샤토 마르고와 비슷한 복잡성이군요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(포코에게 속삭이며) 저분이 방금 식란을 와인에 비유한 거야?' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(속삭이며) 유럽 쪽 사람들은 다 저래.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '왜 저희한테 연락하신 거예요?' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(진지하게) 이 식란... 유럽 미력사들의 방식으로는 막을 수 없기 때문입니다. 무언가가 다릅니다.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '다르다는 게 무슨 의미입니까?' },
@@ -975,6 +1170,9 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(목소리가 약간 떨리며) ...여기, 뭔가 냄새가 달라요. 아직도 요리하고 있는 사람이 있는 건가요?' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(조심스럽게) 트러플과 허브 향이 섞여 있어요. 최근까지 누군가가 이 통로를 사용했다는 뜻입니다.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(코를 벌름이며) 미력 농도가 꽤 높아. 단순한 식란이 아니야 — 누군가가 의도적으로 집중시키고 있어.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(천장의 해골 장식을 보며) ...여기 인테리어 감각은 독특하네.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(작게) 저걸 앤티크로 출품하면 꽤 나가지 않을까—' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(단호하게) 납골당입니다, 포코 씨.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(벽 쪽에서 무언가를 발견하며) ...이거.' },
       { speaker: 'narrator', portrait: '', text: '낡은 가죽 노트 한 권. 표지에는 흐릿하게 「N」 이니셜이 새겨져 있다.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(숨을 들이켜며) ...이건. 누아르의 요리 철학서입니다. 제가 WCA에서 본 적 있어요.' },
@@ -1006,6 +1204,9 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(잠시 생각하다 조용히) ...일단 찾아야겠지. 그 다음 판단은, 만나고 나서.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(고개를 끄덕이며) ...맞아요. 만나기 전엔 아무것도 모르는 거예요.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(서류를 챙기며) 가죠.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '셰프 누아르가 이곳에서 요리 철학 노트를 남긴 건... 마치 장인이 오크통을 선택하는 방식이에요. 장소가 철학을 만드는 거죠.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(조용히) 와인 얘기를 안 하는 날이 있나요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(생각하다가) ...없는 것 같아요.' },
     ],
   },
 
@@ -1026,6 +1227,11 @@ export const DIALOGUES = {
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(미소 지으며) ...오히려 좋아요. 저도 하나 주시겠어요?' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(묵묵히 하나 더 건네며) ...' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(씩 웃으며) 우리 팀 최고예요!' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '이 카타콩브의 분위기... 마치 숙성 지하 셀러 같군요. 1995년 루소 샹베르탱의 어두움이 생각나요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '그게 좋은 비유예요, 나쁜 비유예요?' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '훌륭한 비유예요. 그 빈티지는 어둡지만 복잡하고 깊거든요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(짧게) 무서운 곳인 거군요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '...아, 그냥 그렇게 말하면 되겠군요. 실례했어요.' },
     ],
   },
 
@@ -1144,6 +1350,8 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '인도, 어느 오래된 향신료 시장. 미로처럼 뻗은 골목마다 색깔이 다른 가루들이 산처럼 쌓여 있다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '으아... 눈이 매워! 코도 매워! 전부 매운 거야?!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(재채기하며) 이 향신료 시장 통째로 사서 유통시키면 대박 나겠다!' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '코도 못 뚫겠는데 사업 계획부터?!' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(깊게 들이마시며) 커민, 코리앤더, 카르다몸... 이 냄새, 예전에 한번 맡아봤어. 강렬하다.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '야, 이 시장 엄청 크다? 도구 재료도 여기서 나는 거 아닐까~' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코, 지금 그게 중요한 게 아니잖아! WCA가 식란 징후 신고했잖아!' },
@@ -1185,6 +1393,16 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(씩 웃으며) 둘 다.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(귀를 쫑긋 세우며) 참, 마살라 문파 정보... 이 시장 상인들한테 묻고 다니는 중이야. 공짜로 알려줄게. 조건은 없어.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '결국 장사 얘기야!!' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(수첩을 꺼내며) 이 향신료 시장의 미력 농도... 데이터 수집하고 싶어요. 논문을 쓸 수 있을 것 같아요.' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '어떤 관점으로요?' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '"이국적 환경에서의 미력 증폭 패턴 — 식란과 향신료 미력의 교차 분석"이요.' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '(잠시 생각하다가) ...제목이 벌써 논문 3편 분량 같은데요.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '정확해요! 3편으로 나눠 쓸 계획이에요!' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '(시장을 둘러보며) 저기 왼쪽이 커민, 오른쪽이 코리앤더, 안쪽이 마살라 블렌드 구역이에요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '어떻게 바로 알아요?' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '냄새로 지도가 그려지거든요.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(코를 킁킁대며) 저는 그냥 향기롭다고만...' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '훈련이 필요해요.' },
     ],
   },
 
@@ -1216,6 +1434,8 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '거대한 석문이 열리자 향신료 먼지가 폭포처럼 쏟아졌다. 안쪽에는 황금빛 항아리들이 천장까지 쌓여 있었다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '이게… 향신료 금고야? 이 양이 다 뭐야!' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(눈이 반짝이며) 이 항아리 하나만 갖고 나가면 은퇴할 수 있어...' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(포코 목덜미를 잡으며) 봉인된 미력인데 가져가면 폭발해.' },
       { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '수백 년 전, 우리 조상이 미력을 담은 향신료들을 봉인해 쌓아온 장소다. 그것이 지금 풀려나고 있다.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(주위를 살피며) 내부에서 누군가 건드렸다는 흔적이 있습니다. 봉인이 저절로 풀리지 않아요.' },
       { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '(표정이 굳으며) …맞다. 안에서부터 열린 것이다. 우리가 알아채지 못한 사이에.' },
@@ -1243,6 +1463,13 @@ export const DIALOGUES = {
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(긴장된 표정으로) 안에 잠든 게 뭔데?' },
       { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '금고의 수호자. 봉인이 풀리면 — 그것이 깨어난다. 다음 층에서 마주칠 것이다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(프라이팬을 단단히 쥐며) …이 팀이라면 막을 수 있어요. 같이 가요.' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '(금고 앞에서 눈을 빛내며) 이건... 사프란 3등급이에요. 세계에서 1킬로그램당 가장 비싼 향신료.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '비싼 게 봉인 재료예요?' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '마살라 문파에서는요. 가치 있는 것일수록 봉인의 미력이 강해지거든요.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(멀리서) 그럼 금 대신 써도 되겠네요?' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '(무시하고) 그리고 저기 큐민은 C등급이고—' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '더 있어요?!' },
+      { speaker: '???', portrait: '🪬', portraitKey: 'arjun', text: '32종이요.' },
     ],
   },
 
@@ -1384,6 +1611,10 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '인도의 열기를 뒤로 하고 사흘이 지났다. 지평선 끝까지 펼쳐진 붉은 사막, 그 한가운데 낡은 간판 하나가 보였다.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(눈을 가리며) 저게 뭐야? 사막 한복판에 식당이?' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(입을 막으며) 모래 먹었어.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(아무렇지도 않게) 그래요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '유키 씨는 안 먹었어요?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '먹었어요. 내색 안 한 것뿐이에요.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '선인장 칸티나... 음식 냄새가 나. 근데 뭔가 이상해.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(계기를 들여다보며) 미력 반응 확인됩니다. 선인장 군락 전체에서 에너지가 폭주하고 있어요. 멕시코 식란입니다.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(칸티나 문을 밀며) 사람이 있었던 것 같은데. 최근까지.' },
@@ -1427,6 +1658,11 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '언제 그걸 챙겼어?!' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '탐색 중에 발견한 거야. 재료를 낭비하면 안 되지. 자, 한 입씩~' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(짧게 웃으며) ...그래, 먹자.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(선인장을 관찰하며) 이 선인장의 미력 저장 구조... 사막 환경에서 수분 대신 미력을 비축하는 메커니즘이에요. 데이터 수집해야겠어요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '지금? 밥 먹는 중인데?' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(타코를 한 손에 들고 수첩을 꺼내며) 병행할 수 있어요.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(짧게) ...소스 묻었어요, 수첩에.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(당황하며) 아!!' },
     ],
   },
 
@@ -1439,6 +1675,8 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '지하로 내려갈수록 공기가 달라졌다. 사막의 건조함 대신 뜨겁고 눅진한 열기, 그리고 선인장 미력의 불빛이 바닥과 벽을 물들이고 있었다.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(손을 벽에 짚으며) 뿌리가 살아 있어. 이 깊이까지 침투해 있는 게 자연이 아니야.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(선인장 뿌리를 만지며) 이 뿌리, 잘 말리면 약재로 팔 수 있을 것 같은데.' },
+      { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코 씨, 지금 상황에서 그게 우선순위예요?' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(탐지기를 응시하며) 지상의 열 배는 넘어요. 탐지기 값이 경고 범위를 넘었어요.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '이 농도라면 식란이 이미 \'근원 단계\'에 접어들었을 가능성이 있어요. 이 정도 규모가 혼자 발생하기는 어렵습니다.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '의도적이라는 거요?' },
@@ -1599,6 +1837,11 @@ export const DIALOGUES = {
     lines: [
       { speaker: 'narrator', portrait: '', text: '멕시칸 대지를 뒤로하고 팀이 발을 내디딘 곳. 공기부터 달랐다.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '이게... 설탕 냄새야? 진짜 설탕 냄새가 나!' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(달콤한 냄새에 잠깐 걸음을 멈추며) ...냄새가 좋네.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '린 씨, 방금 발걸음 멈췄잖아요.' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(재빠르게 걷기 시작하며) 안 멈췄어.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(부드럽게) 멈췄어요.' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '...안 멈췄다고!' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '슈가 드림랜드야. 과자와 디저트로 이루어진 땅이지. 달콤하다고 방심하면 안 돼.' },
       { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(데이터 패드를 들여다보며) ...미력 구조가 완전히 달라요. 향신료나 곡물 계열과 다르게, 디저트 미력은 당류의 결정 구조를 타고 전파돼요. 방어 패턴이 완전히 새로워요.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '메이지, 디저트 미력을 연구한 적 있어?' },
@@ -1621,6 +1864,11 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '여왕이 이걸 만들었다면... 단순히 달콤한 세계가 아니야. 의도적으로 군대를 꾸리고 있어.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '여왕은 이 땅의 미력 전체를 자신의 입맛대로 바꾸려 하고 있어. "내가 원하는 맛만이 진짜 맛"이라는 신념으로.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '(주먹을 쥐며) 그게 사람들이 원하는 맛인지는 여왕이 결정할 게 아니잖아요.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(주변 크림 질감을 손가락으로 확인하며) 이 크림의 미력 결정 구조... 완전히 처음 보는 패턴이에요. 논문 두 편은 쓰겠는데.' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '(답답하다는 듯) 지금 그게 중요해?' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(당황하며) 아, 맞다. 중요한 건 적을 정화하는 거죠. ...근데 정화하기 전에 샘플 좀—' },
+      { speaker: '린', portrait: '🔥', portraitKey: 'rin', text: '안 돼.' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '(조용히 수첩에 메모하며) ...나중에.' },
     ],
   },
 
@@ -1648,6 +1896,9 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '여기는... 냄새가 달라. 설탕 냄새가 아니라 뭔가 더 진하고 농밀한 느낌이야.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '미력의 파장이 굉장히 조밀해요. 22장보다 훨씬 집약되어 있어요. 여왕이 이 깊이를 직접 통제하고 있다는 증거예요.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(주먹을 쥐며) 벽이 마카롱이야. 계단도 마카롱이야. 어디에 발을 디뎌야 할지 모르겠군.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(계단을 밟으며) 마카롱 계단인데 한 개쯤 떼어 가도 모르겠지?' },
+      { speaker: '메이지', portrait: '🧁', portraitKey: 'mage', text: '포코 씨, 그거 먹으면 미력에 중독돼요.' },
+      { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(손을 거두며) ...농담이에요.' },
       { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(낮은 목소리로) 이건 단순한 디저트 세계가 아니에요. 계획된 공간이에요. 누군가가 이 땅 전체를 설계했어요.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '여왕이 여기서 뭔가를 만들고 있어. "완벽한 맛"이라는 걸.' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '완벽한 맛? 그게 뭔데?' },
@@ -1688,6 +1939,7 @@ export const DIALOGUES = {
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '정화 먼저. 레시피 연구는 그 다음이야.' },
       { speaker: '포코', portrait: '🐱', portraitKey: 'poco', text: '(소매 안에서 작은 스푼을 꺼내며) 미미, 나도 잠깐만 —' },
       { speaker: '미미', portrait: '👧', portraitKey: 'mimi', text: '포코도요?!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(팔짱을 낀 채) ...폭주 크림 시식회는 처음 봐요.' },
     ],
   },
 
@@ -1793,6 +2045,50 @@ export const DIALOGUES = {
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '맞아. 지고 싶지 않은데 지치게 만들어. (잠시 후) 그래도 여기까지 왔어.' },
       { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '여기까지 왔어요.' },
       { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(짧게 웃으며) ...끝내자.' },
+    ],
+  },
+
+  // ── Phase 66-3: gathering_enter 막간극 3종 (7-4, 10-4, 13-4) ──
+
+  // gag_midstage_7 — 7-4 gathering_enter 1회 (유키 건조한 발언)
+  gag_midstage_7: {
+    id: 'gag_midstage_7',
+    skippable: true,
+    lines: [
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(주변을 천천히 둘러보며) 여기서부터 냄새가 달라요.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '어떻게 달라요?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '더 위험한 냄새요.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '그 정도면 되게 중요한 말 아니에요?' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(걷기 시작하며) 네. 그래서 말했어요.' },
+    ],
+  },
+
+  // gag_midstage_10 — 10-4 gathering_enter 1회 (라오 웍 자부심 + 유키 반박)
+  gag_midstage_10: {
+    id: 'gag_midstage_10',
+    skippable: true,
+    lines: [
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '(웍을 들고) 여기서 이 웍이 한 번 더 활약해줘야 하는데!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '아까 벽에 부딪혀서 손잡이가 휘었잖아요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '그건 적이 미력을 너무 강하게 쏜 거야!' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '라오 씨가 몸을 피하면서 웍을 방패로 쓴 거잖아요.' },
+      { speaker: '라오', portrait: '🐉', portraitKey: 'lao', text: '...그 부분이 중요한 게 아니야.' },
+      { speaker: '유키', portrait: '❄️', portraitKey: 'yuki', text: '(짧게) 웍이 안쓰럽네요.' },
+    ],
+  },
+
+  // gag_midstage_13 — 13-4 gathering_enter 1회 (앙드레 와인 비유 + 팀원 반응)
+  gag_midstage_13: {
+    id: 'gag_midstage_13',
+    skippable: true,
+    lines: [
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(분위기를 살피며) 이 구역의 미력 밀도... 2008년 페트뤼스의 타닌 구조와 비슷해요. 겉은 부드러워 보이지만 끝이 날카롭죠.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '저 그 와인 몰라요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(잠깐) ...아, 죄송해요. 복잡하다는 뜻이에요.' },
+      { speaker: '미미', portrait: '\u{1F467}', portraitKey: 'mimi', text: '처음부터 그렇게 말해주시면 돼요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(고개를 끄덕이며) ...습관이라서요.' },
+      { speaker: '포코', portrait: '\u{1F431}', portraitKey: 'poco', text: '(고개를 끄덕이며) 나도 가격 매기는 습관이 있어서 이해해요.' },
+      { speaker: '앙드레', portrait: '🥐', portraitKey: 'andre', text: '(포코를 보며) ...달라요.' },
     ],
   },
 };

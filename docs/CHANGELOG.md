@@ -1,5 +1,121 @@
 # Changelog
 
+## [Phase 66] 2026-04-22 -- 개그씬 확장 (스크립트 톤 경량화)
+
+### 개요
+
+`dialogueData.js` 전체에 개그씬을 추가하여 스크립트 톤을 가볍게 만드는 작업. A옵션(타겟팅 확장) + 미디엄 강도(픽 웃음 수준). 기존 대사 교체 금지, 추가만 수행. 보스전 직전/감정 피크 구간 7개(ch5/6/12/15/18/21/24) 개그 투입 금지. 4개 서브 페이즈로 분할 진행.
+
+### 추가
+
+#### Phase 66-1: team_side 누락 챕터 전수 커버
+
+- **team_side_1** (ch1 클리어 후): 미미+포코 2인조 회고 — 포코 "도구 팔겠다고 뛰어나왔잖아!" 6줄
+- **team_side_2** (ch2 클리어 후): 린 등장 첫인상 회고 — "프라이팬에서 불이 나오는데 누가 동료라고" 7줄
+- **team_side_3** (ch3 클리어 후): 메이지 합류 전 해변 — 메이지 미력 측정 강행, 포코 연구 대상화 8줄
+- **team_side_4** (ch4 클리어 후): 화산 지대 BBQ 회고 — 린 인정, 메이지 위생 논문 8줄
+- **team_side_5** (ch5 클리어 후): 포코 실종 후기 — 린 "스스로 간 거 아니야?", 메이지 기록 8줄
+- **team_side_7** (ch7+yuki_side_7 시청 후): 유키 말 수 세기 — "오늘 열다섯 마디" 7줄
+- **team_side_9** (ch9 클리어 후): 사케 오니 보스전 회고 — 라오 사케 마시기 욕심, 유키 건조 거절 8줄
+- **team_side_11** (lao_side_11 시청 후): 용의 주방 웍 — 라오 할아버지 명언, 유키 "쪼개졌잖아요" 9줄
+- **team_side_12** (ch12+lao_side_12 시청 후): 파리 연락 — 포코 "정중한 프랑스어 해독 불가" 9줄
+- **team_side_13** (ch13+mimi_side_13 시청 후): 앙드레 첫날 — 와인 비유 11번 자각, 유키 뒷걸음질 10줄
+- **storyData.js**: merchant_enter 트리거 10건 등록 (각 once: true)
+- **스펙 대비 차이**: team_side_1~5 조건을 `storyFlags.chapter*_cleared` 대신 기존 패턴인 `currentChapter >= N`으로 구현 (코드 일관성)
+
+#### Phase 66-2: chapter_intro 도착 리액션 개그 삽입
+
+14개 chapter_intro에 각 1~5줄 개그 라인 추가:
+
+| intro | 추가 줄 수 | 내용 요약 |
+|-------|-----------|----------|
+| chapter2_intro | 2줄 | 미미+린 리액션 |
+| chapter4_intro | 2줄 | 미미+포코 화산 도착 |
+| chapter7_intro | 3줄 | 미미+포코+유키 일본 도착 |
+| chapter9_intro | 2줄 | 포코 사케 냄새+상인 본능 |
+| chapter10_intro | 2줄 | 라오+포코 중식 도착 |
+| chapter11_intro | 2줄 | 포코+유키 라오 직후 |
+| chapter13_intro | 3줄 | 앙드레+미미+포코 파리 도착 |
+| chapter14_intro | 3줄 | 라오+포코+앙드레 카타콩브 해골 앤티크 |
+| chapter16_intro | 2줄 | 포코+미미 (아르준 은닉→2인 개그로 대체) |
+| chapter17_intro | 2줄 | 포코+라오 항아리 상인 본능 |
+| chapter19_intro | 4줄 | 라오+유키 멕시칸 도착 |
+| chapter20_intro | 2줄 | 포코+미미 선인장 뿌리 약재 |
+| chapter22_intro | 5줄 | 린+메이지+라오+린 디저트 도착 |
+| chapter23_intro | 3줄 | 포코+메이지+포코 마카롱 계단 |
+
+- 금지 구간 7개(ch5/6/12/15/18/21/24) 일체 미변경
+- 아르준 은닉 구간(ch16/17): 아르준 speaker 노출 없음
+
+#### Phase 66-3: service_event 보강 + gathering_enter 막간극
+
+- **event_happy_hour_dialogue**: +2줄 (포코 카탈로그 + 미미 반발). 5줄 -> 7줄
+- **event_food_review_dialogue**: +2줄 (포코 광고 부탁 + 미미 반발). 4줄 -> 6줄
+- **event_kitchen_accident_dialogue**: +3줄 (린 직설 + 미미 반발 + 린 답변). 4줄 -> 7줄
+- **gag_midstage_7** (신규, 7-4 gathering_enter): 유키 건조한 발언 5줄
+- **gag_midstage_10** (신규, 10-4 gathering_enter): 라오 웍 자부심 + 유키 반박 6줄
+- **gag_midstage_13** (신규, 13-4 gathering_enter): 앙드레 와인 비유 + 팀원 반응 7줄
+- **storyData.js**: gathering_enter 트리거 3건 등록 (각 once: true, delay: 400)
+
+#### Phase 66-4: 캐릭터 성격 개그 집중 확장
+
+기존 대화 7건에 38줄 대사 추가 + team_side_23에 1줄 추가:
+
+| 대화 ID | 내용 | 추가 줄 수 |
+|---------|------|-----------|
+| team_side_16 | 메이지 논문 폭주 + ???(아르준) 향신료 분류 | 11줄 |
+| team_side_19 | 메이지 선인장 데이터 수집 + 유키 건조 | 6줄 |
+| team_side_14 | 앙드레 와인 비유 + 유키 건조한 해석 | 6줄 |
+| chapter14_mid | 앙드레 와인 철학 비유 (오크통) | 3줄 |
+| chapter17_mid | ???(아르준) 향신료 금고 흥분 (사프란 3등급, 32종) | 8줄 |
+| chapter22_mid | 메이지 드림랜드 분석 폭주 + 린 직설 | 6줄 |
+| chapter10_lao_joins | 유키 follow-up B옵션 (메타 개그 -> 라오 웍 실수담) | 4줄 |
+| team_side_23 | 유키 건조한 크림 시식 반응 | 1줄 |
+
+- **스펙 대비 차이**: chapter10_lao_joins에서 메타 개그(8-3 리넘버링 자기참조)를 사용자 B옵션 지시에 따라 라오 웍 실수담으로 대체
+
+### 캐릭터별 개그 역할 배분
+
+| 캐릭터 | 개그 유형 | 주요 등장 |
+|--------|----------|----------|
+| 미미 | 당황 리액션, 보케 | 전 페이즈 |
+| 포코 | 위기 중 영업, 할인 타이밍, 도구 판매 | team_side 전종, intro 다수 |
+| 린 | 츤데레 직설 | team_side_2/5, chapter22_mid, service_event |
+| 메이지 | 학구적 폭주, 논문 욕심 | team_side_3/16/19, chapter22_mid |
+| 유키 | 건조한 한마디, 3초 침묵 | team_side_7/9/11/14/23, gag_midstage_7/10 |
+| 라오 | 웍 자부심, 호탕한 실수 | team_side_9/11, gag_midstage_10, chapter10_lao_joins |
+| 앙드레 | 정중한 반어, 와인 비유 남발 | team_side_13/14, chapter14_mid, gag_midstage_13 |
+| 아르준 | 향신료 비유, 열거형 흥분 (16~17장 ??? 은닉) | team_side_16, chapter17_mid |
+
+### 변경 파일 목록
+
+| 파일 | 변경 유형 | 증분 |
+|------|----------|------|
+| `kitchen-chaos/js/data/dialogueData.js` | 수정 | 1828줄 -> 2124줄 (+296줄, 삭제 0줄) |
+| `kitchen-chaos/js/data/storyData.js` | 수정 | 1502줄 -> 1528줄 (+26줄, 삭제 0줄) |
+
+### QA 결과
+
+- Playwright 21/21 PASS (1분 0초)
+- vite build PASS (11.40s)
+- ESM import PASS
+- git diff 삭제 라인 0개
+- DIALOGUES 키 총 119개 (기존 106 + 신규 13)
+- STORY_TRIGGERS 총 120개 (기존 107 + 신규 13)
+- 금지 구간 7개 일체 미변경
+- 아르준 은닉 규칙 준수 (16~17장 speaker: ???)
+- Phase 65 시나리오 수정 보존 확인 (라오 chapter10_intro "(크게 웃으며)" 유지)
+- INFO 2건: event_kitchen_accident 린 미합류 시 발동 가능(once: true로 자연 해소), 신규 트리거 기존 시퀀스 뒤 위치(의도된 순서)
+
+### 참고
+
+- 스코프: `.claude/specs/2026-04-22-kc-gag-expansion-scope.md`
+- 스펙: `.claude/specs/2026-04-22-kc-gag-expansion-spec.md`
+- 페이즈 리포트: `.claude/specs/2026-04-22-kc-gag-expansion-phase{1,2,3,4}-report.md`
+- QA: `.claude/specs/2026-04-22-kc-gag-expansion-qa.md`
+
+---
+
 ## [Phase 65] 2026-04-22 -- 시나리오/캐릭터 일관성 전수 수정
 
 ### 개요

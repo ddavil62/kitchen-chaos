@@ -26,6 +26,8 @@
  *   stage_first_clear 제외 목록 갱신 (24-1, 24-3, 24-6 추가).
  * Phase 40-3: 22-6 트리거 이동 (22-5 currentChapter 23 설정 → 22-6으로 교체).
  * Phase 41: 23-6 트리거 이동 (23-5 currentChapter 24 설정 → 23-6으로 교체).
+ * Phase 66-1: team_side 누락 챕터 전수 커버 — merchant_enter 트리거 10건 추가 (team_side_1~5, 7, 9, 11~13).
+ * Phase 66-3: gathering_enter 막간극 3건 추가 (gag_midstage_7, gag_midstage_10, gag_midstage_13).
  *
  * condition(ctx, save): boolean 함수
  *   ctx  -- { stageId?, stars?, isFirstClear?, isMarketFailed? }
@@ -122,6 +124,102 @@ export const STORY_TRIGGERS = [
       save.currentChapter >= 4 &&
       save.seenDialogues.includes('poco_discount_fail') &&
       save.seenDialogues.includes('choice_sample_merchant'),
+  },
+
+  // ── Phase 66-1: team_side 누락 챕터 전수 커버 (merchant_enter 트리거 10건) ──
+
+  // merchant_enter 에서 team_side_1 (1장 클리어 후 1회, currentChapter >= 2 = 1장 클리어)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_1',
+    once: true,
+    condition: (ctx, save) =>
+      save.currentChapter >= 2 &&
+      !save.seenDialogues?.includes('team_side_1'),
+  },
+  // merchant_enter 에서 team_side_2 (2장 클리어 후 1회, currentChapter >= 3 = 2장 클리어)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_2',
+    once: true,
+    condition: (ctx, save) =>
+      save.currentChapter >= 3 &&
+      !save.seenDialogues?.includes('team_side_2'),
+  },
+  // merchant_enter 에서 team_side_3 (3장 클리어 후 1회, currentChapter >= 4 = 3장 클리어)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_3',
+    once: true,
+    condition: (ctx, save) =>
+      save.currentChapter >= 4 &&
+      !save.seenDialogues?.includes('team_side_3'),
+  },
+  // merchant_enter 에서 team_side_4 (4장 클리어 후 1회, currentChapter >= 5 = 4장 클리어)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_4',
+    once: true,
+    condition: (ctx, save) =>
+      save.currentChapter >= 5 &&
+      !save.seenDialogues?.includes('team_side_4'),
+  },
+  // merchant_enter 에서 team_side_5 (5장 클리어 후 1회, currentChapter >= 6 = 5장 클리어)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_5',
+    once: true,
+    condition: (ctx, save) =>
+      save.currentChapter >= 6 &&
+      !save.seenDialogues?.includes('team_side_5'),
+  },
+  // merchant_enter 에서 team_side_7 (7장 클리어 후 + yuki_side_7 시청 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_7',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter7_cleared === true &&
+      save.seenDialogues?.includes('yuki_side_7') &&
+      !save.seenDialogues?.includes('team_side_7'),
+  },
+  // merchant_enter 에서 team_side_9 (9장 클리어 후 1회, chapter9_cleared 플래그 사용)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_9',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter9_cleared === true &&
+      !save.seenDialogues?.includes('team_side_9'),
+  },
+  // merchant_enter 에서 team_side_11 (11장 mid 이후 + lao_side_11 시청 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_11',
+    once: true,
+    condition: (ctx, save) =>
+      save.seenDialogues?.includes('lao_side_11') &&
+      !save.seenDialogues?.includes('team_side_11'),
+  },
+  // merchant_enter 에서 team_side_12 (12장 클리어 후 + lao_side_12 시청 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_12',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter12_cleared === true &&
+      save.seenDialogues?.includes('lao_side_12') &&
+      !save.seenDialogues?.includes('team_side_12'),
+  },
+  // merchant_enter 에서 team_side_13 (13장 클리어 후 + mimi_side_13 시청 후 1회)
+  {
+    triggerPoint: 'merchant_enter',
+    dialogueId: 'team_side_13',
+    once: true,
+    condition: (ctx, save) =>
+      save.storyFlags?.chapter13_cleared === true &&
+      save.seenDialogues?.includes('mimi_side_13') &&
+      !save.seenDialogues?.includes('team_side_13'),
   },
 
   // ── GatheringScene 진입 ─────────────────────────────────────────
@@ -1399,5 +1497,32 @@ export const STORY_TRIGGERS = [
       data.storyProgress.storyFlags.lao_joined = true;
       SaveManager.save(data);
     },
+  },
+
+  // ── Phase 66-3: gathering_enter 막간극 3종 (gag_midstage) ──────────
+
+  // 7-4 진입 시 gag_midstage_7 (유키 건조한 발언)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'gag_midstage_7',
+    once: true,
+    condition: (ctx) => ctx.stageId === '7-4',
+    delay: 400,
+  },
+  // 10-4 진입 시 gag_midstage_10 (라오 웍 자부심 + 유키 반박)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'gag_midstage_10',
+    once: true,
+    condition: (ctx) => ctx.stageId === '10-4',
+    delay: 400,
+  },
+  // 13-4 진입 시 gag_midstage_13 (앙드레 와인 비유 + 팀원 반응)
+  {
+    triggerPoint: 'gathering_enter',
+    dialogueId: 'gag_midstage_13',
+    once: true,
+    condition: (ctx) => ctx.stageId === '13-4',
+    delay: 400,
   },
 ];
