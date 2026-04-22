@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 62 Unified Warm-Tone Pass 완료)
+> 최종 업데이트: 2026-04-22 (Phase 62-2 Portrait Pixelization 완료)
 
 ## 프로젝트 개요
 
@@ -110,7 +110,7 @@
 - 신규 생성 metadata.json 8건(macaron_knight, sugar_specter, sushi_ninja, tempura_monk, queen_of_taste, sake_oni, yuki_chef, lao_chef)의 id 필드가 "unknown". 향후 PixelLab 재생성 시 업데이트 필요
 - mini_dumpling metadata 92x92 vs 실제 PNG 36x36 불일치 (분열 소환 적 의도적 소형, SpriteLoader 스케일 처리)
 - portrait/스프라이트 텍스처가 Phaser에 로드되지 않아 이모지 fallback으로 동작 중 (Vite 경로 매핑 이슈, Phase 56부터 지속)
-- portrait_arjun.png가 애니메/일러스트 스타일로 생성됨 (기존 portrait은 픽셀아트 스타일). 텍스처 로딩 이슈 해결 시 스타일 불일치 노출 예상
+- portrait 8종이 SDXL 애니메 일러스트로 생성되어 픽셀 UI와 스타일 충돌 → Phase 62-2에서 nearest-neighbor 픽셀화(96px 가상 해상도)로 **단기 해소**. 장기적으로 Phase 64 PixelLab pro 재발주 예정
 - 분기 카드 중 일부 변이(chain/cluster/venom/aura_boost)와 Bond(yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice)는 플래그만 저장되고 소비처 로직 미구현 상태 (tint 시각 효과는 정상, 실제 전투 수치 반영은 부분적). 후속 Quick Fix로 보완 예정
 - `Enemy.js`의 `enemy_slow` 축복 처리가 `require()` 호출로 작성되어 ESM 환경에서 조용히 실패. `bles_enemy_slow` 카드는 실효 미반영 (후속 수정 필요)
 - 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약은 현재 단순 1회 소비로 통일됨 (카드 descKo의 수치와 실제 동작 불일치, 후속 밸런스 조정 예정)
@@ -120,6 +120,17 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 62-2 — Portrait Pixelization (2026-04-22)
+
+AD 리포트 FIX-10: SDXL 애니메 일러스트 포트레이트 8종과 픽셀 UI의 스타일 충돌을 단기 해소.
+
+- `scripts/pixelize_portraits.py` 신규: 512×512 → 96×96 nearest 다운샘플 → 512×512 nearest 업샘플 → 알파 이진화(threshold 128). 96px는 chef_sprite 92px와 유사한 해상도로 매칭도 최상.
+- 적용 대상: `portrait_mimi/rin/mage/yuki/lao/andre/arjun/poco.png` (8종).
+- 원본은 `assets/portraits/_archive/pre_pixelize_20260422_122945/` 에 백업.
+- 코드 변경 없음 (파일명 유지로 SpriteLoader/DialogueScene/ChefSelectScene/MerchantScene 자동 반영).
+- 장기 과제로 Phase 64 PixelLab pro 재발주(별도 스펙) 예정.
+- QA 스크린샷: `tests/screenshots/phase62-2-after/` 3장.
 
 ### Phase 62 — Unified Warm-Tone Pass (2026-04-22)
 
