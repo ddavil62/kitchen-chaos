@@ -1,5 +1,68 @@
 # Changelog
 
+## [Phase 65] 2026-04-22 -- 시나리오/캐릭터 일관성 전수 수정
+
+### 개요
+
+시나리오 전수 리뷰에서 발견된 21건 이슈(P0 5건, P1 9건, P2 7건)를 7개 페이즈(A~F, GH)로 나눠 전수 수정. `dialogueData.js`(1828줄), `STORY.md`, `portraits/index.html` 대상. 에셋/UI 변경 없음(visual_change: none).
+
+### 수정 (P0 -- 5건)
+
+- **P0-1 라오 첫 등장 재작성**: `chapter10_intro` L638 "(절도 있게) 처음 뵙겠습니다" -> "(크게 웃으며) 어이! 먼 길 왔어." 호쾌/호탕 톤으로 복구. 5줄 재작성.
+- **P0-2 리넘버링 잔존 제거**: `chapter10_lao_joins` L647 "8-3 클리어" -> "10-3 클리어", L672 "8장 클리어" -> "10장 클리어", `chapter10_yuki_clue` L697 "8-4 클리어" -> "10-4 클리어", `chapter10_mid` L711 "8-5 클리어" -> "10-5 클리어". 총 4건 치환.
+- **P0-3 미미 말투 전수 통일**: 유키/라오/앙드레/아르준에게 존댓말, 린/메이지/포코에게 반말로 확정. Phase B(ch1~12) 16건 + Phase C(ch13~24+side) 33건 = 총 49건 수정. 팀 전체 발화도 존댓말로 통일.
+- **P0-4 메이지 22장 briefing 삽입**: `chapter22_intro`에 메이지 대사 4줄 삽입 (디저트 미력 전공 설정 활용, 여왕 파장 경고). 7줄 -> 11줄.
+- **P0-5 유키 대표 대사 교체**: `portraits/index.html` L359 "위험한 도박이네요." -> "규율 없는 자는 결국 혼자 싸우게 돼요." (7~9장 원칙주의 색 대사로 교체).
+
+### 추가 (P1 -- 9건)
+
+- **P1-1 아르준 "???" 예고**: ch16_mid/ch16_epilogue/ch17_intro/ch17_mid/ch18_intro에서 `speaker: '아르준'` 17건 -> `speaker: '???'`로 치환. `portraitKey: 'arjun'` 유지. ch16_epilogue에 포코/미미 예고 대사 2줄 삽입. ch18_intro "아르준 씨?" -> "...네?" 정합성 조정.
+- **P1-2 린 그룹2 이탈 briefing**: `side_15b`에 린 이탈 대사 5줄 삽입 ("우리 가게. 너무 오래 비웠어."). 11줄 -> 16줄.
+- **P1-3 포코 할머니 회상**: `chapter23_mid`에 포코 "할머니도 여기 비슷한 곳까지 왔었어" + "이번엔 달라" 3줄 삽입.
+- **P1-4 누아르-여왕 거울상**: `chapter24_mid` L1721 앙드레 "정반대" + L1722 메이지 "서로의 거울" 2줄 삽입.
+- **P1-5 여왕 텔레파시**: `chapter24_mid` L1725, 1727 `speaker: '미각의 여왕'` "(멀리서, 텔레파시로)" 3줄 삽입.
+- **P1-6 엔딩 할머니 보고**: `chapter24_ending` L1763 미미 "(마음속으로) ...할머니. 지켰어." 1줄 삽입.
+- **P1-7 포코 gag 분산**: team_side_14(경매 톤), team_side_16(정보 브로커 톤 "공짜"), team_side_21(감정 톤 "무서워"). 할인 일변도 -> 3종 분산.
+- **P1-8 아르준 향신료 비유어법 확립**: chapter18_epilogue "잔향", team_side_18 "고수 향", team_side_24 "카르다몸+바닐라 블렌딩". 3건 삽입/교체.
+- **P1-9 유키/앙드레 info-dump 분할**: `chapter23_mid` 유키(단정형 결론 2줄) + 앙드레(분석형 이유 2줄) 교대 패턴으로 재구성. `team_side_23` 라오 대사 1건 제거로 9턴 -> 8턴 축약.
+
+### 수정 (P2 -- 7건)
+
+- **P2-1 STORY.md 포코 이모지**: `STORY.md` L40 이모지 🎒 -> 🐱, 설명 "상인 근성" -> "마력 품은 고양이".
+- **P2-2 (한숨) 지문 다양화**: 앙드레 "(한숨)" -> "(낮게 숨을 내쉬며)", 유키 "(한숨)" -> "(짧게 눈을 감았다 뜨며)". 대사 내 0건 달성.
+- **P2-3 미미 감탄사**: 같은 script id 내 동일 감탄사 2회 이상 반복 없음 확인. 수정 불필요.
+- **P2-4 린 일상 베이스**: Phase D `side_15b`에서 해결 ("우리 가게. 너무 오래 비웠어.").
+- **P2-5 엘 디아블로 루차도르 색채**: `chapter21_boss` L1530 "(낮게, 링 위에 선 루차도르처럼) ...Bienvenidos. 이 링에 올라온 이상, 도망은 없어."
+- **P2-6 메이지 내면 동기**: `team_side_24` L1774 할아버지 식란 사고 -> 디저트 미력 연구 동기 1줄 삽입.
+- **P2-7 team_side_23 페이싱**: 라오 대사 1건 제거, 9턴 -> 8턴.
+
+### 변경 파일 목록
+
+| 파일 | 레포 | 변경 유형 |
+|------|------|----------|
+| `kitchen-chaos/js/data/dialogueData.js` | kitchen-chaos | 대사 수정/삽입/삭제 (1802줄 -> 1828줄) |
+| `kitchen-chaos/docs/STORY.md` | kitchen-chaos | 포코 이모지/설명 수정 |
+| `studio-mockup/kitchen-chaos/portraits/index.html` | studio-mockup | 유키 대표 대사 교체 |
+
+### QA 결과
+
+- Playwright 22/22 PASS (1분 12초)
+- vite build PASS (11.36s, 63 modules)
+- JS 콘솔 에러 0건
+- 경미한 말투 일관성 이슈 7건 잔존 (모두 LOW, 후속 Quick Fix 권장)
+  - side_15b L1130 "왜요?" -> "왜?", L1132 "가요" -> "가"
+  - chapter23_mid L1673 "포코 씨..." -> "포코..."
+  - chapter22_intro L1604 "메이지 씨" -> "메이지"
+
+### 참고
+
+- 리뷰: `.claude/specs/2026-04-22-kc-scenario-review.md`
+- 스펙: `.claude/specs/2026-04-22-kc-scenario-fix-spec.md`
+- 페이즈별 리포트: `.claude/specs/2026-04-22-kc-scenario-fix-phase{A,B,C,D,E,F,GH}-report.md`
+- QA: `.claude/specs/2026-04-22-kc-scenario-fix-qa.md`
+
+---
+
 ## [Phase 58] 2026-04-22 -- 행상인 로그라이크 분기 선택
 
 ### 개요
