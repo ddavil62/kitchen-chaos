@@ -939,15 +939,12 @@ export class MerchantScene extends Phaser.Scene {
     this._tabToolsBg.on('pointerdown', () => this._setActiveTab('tools'));
     this._tabBranchBg.on('pointerdown', () => {
       // Phase 70: 골드 tint 플래시 (0.15초)
+      // AD3 REVISE: 먼저 탭 전환(#ffcc88) 후 골드(#ffcc44)로 덮어써야 실제 플래시 발생
+      this._setActiveTab('branch');
       this._tabBranchText.setColor('#ffcc44');
       this.time.delayedCall(150, () => {
-        if (this._activeTab === 'branch') {
-          this._tabBranchText.setColor('#ffcc88'); // 활성 탭 색상 유지
-        } else {
-          this._tabBranchText.setColor('#888888');
-        }
+        this._tabBranchText.setColor('#ffcc88'); // 활성 색상 복원
       });
-      this._setActiveTab('branch');
     });
   }
 
@@ -1244,7 +1241,8 @@ export class MerchantScene extends Phaser.Scene {
     // 축복 교체 경고(있을 때만)
     let replaceText = null;
     if (isReplacingBlessing) {
-      replaceText = this.add.text(cx, cy + popupH / 2 - 55,
+      // AD3 REVISE: Y -55 → -62 (okBtn 상단과 5px 여백 확보)
+      replaceText = this.add.text(cx, cy + popupH / 2 - 62,
         '\u0028\uD604\uC7AC \uCD95\uBCF5\uC774 \uAD50\uCCB4\uB429\uB2C8\uB2E4\u0029', {
           fontSize: '11px', color: '#ffaa88', align: 'center',
         }).setOrigin(0.5).setDepth(102);
