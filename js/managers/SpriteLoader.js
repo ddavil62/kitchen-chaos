@@ -215,6 +215,16 @@ const WALK_DIRS = ['south', 'south-east', 'east', 'north-east', 'north', 'north-
 /** 걷기 애니메이션 프레임 수 */
 const WALK_FRAME_COUNT = 6;
 
+/**
+ * Phase 63 FIX-15: 일부 적의 특정 방향 walk 프레임이 PixelLab 생성에서 누락된 경우,
+ * 로드를 스킵하고 인접 방향으로 폴백한다. (콘솔 404 에러 13건 방지)
+ * 각 값은 폴백 방향. 추후 누락 에셋이 추가되면 항목 삭제.
+ */
+const ENEMY_WALK_MISSING = {
+  sugar_fairy: { 'south-east': 'east' },
+  wok_phantom: { 'south-west': 'west' },
+};
+
 // ── death 애니메이션 폴더 해시 맵 (Phase 47-1~47-3) ──
 // walk hash와 별도 관리. AD 모드2 승인 후 hash를 기입한다.
 const ENEMY_DEATH_HASHES = {
@@ -399,7 +409,10 @@ export class SpriteLoader {
     for (const id of ENEMY_IDS) {
       const hash = ENEMY_WALK_HASHES[id];
       if (!hash) continue;
+      const missing = ENEMY_WALK_MISSING[id] || {};
       for (const dir of WALK_DIRS) {
+        // Phase 63 FIX-15: 누락된 방향은 로드 스킵 → registerWalkAnimations에서 폴백 애니메이션 복제
+        if (missing[dir]) continue;
         for (let f = 0; f < WALK_FRAME_COUNT; f++) {
           const key = `enemy_${id}_walk_${dir}_${f}`;
           const path = `${SPRITES_ROOT}/enemies/${id}/animations/${hash}/${dir}/frame_${String(f).padStart(3, '0')}.png`;
@@ -493,6 +506,23 @@ export class SpriteLoader {
 
     for (const id of ENEMY_IDS) register('enemy', id);
     for (const id of BOSS_IDS) register('boss', id);
+
+    // Phase 63 FIX-15: 누락 방향 → 폴백 방향의 애니메이션을 동일 키로 복제
+    for (const [id, fallbacks] of Object.entries(ENEMY_WALK_MISSING)) {
+      for (const [missingDir, fallbackDir] of Object.entries(fallbacks)) {
+        const missingKey = `enemy_${id}_walk_${missingDir}`;
+        const fallbackKey = `enemy_${id}_walk_${fallbackDir}`;
+        if (scene.anims.exists(missingKey)) continue;
+        const fallbackAnim = scene.anims.get(fallbackKey);
+        if (!fallbackAnim) continue;
+        scene.anims.create({
+          key: missingKey,
+          frames: fallbackAnim.frames.map(fr => ({ key: fr.textureKey })),
+          frameRate: 8,
+          repeat: -1,
+        });
+      }
+    }
     // Phase 38-1: queen_of_taste 페이즈 2/3 Phaser 애니메이션 등록
     for (const phaseId of ['queen_of_taste_2', 'queen_of_taste_3']) {
       if (!BOSS_WALK_HASHES[phaseId] || BOSS_WALK_HASHES[phaseId].startsWith('TBD')) continue;

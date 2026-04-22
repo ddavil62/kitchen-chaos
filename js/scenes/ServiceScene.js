@@ -863,13 +863,14 @@ export class ServiceScene extends Phaser.Scene {
                          : SpriteLoader.hasTexture(this, 'floor_hall') ? 'floor_hall'
                          : null;
     // Phase 52+: 홀 배경을 밝은 베이지 계열로 변경하여 테이블과의 대비 확보
-    this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0xC8A07A)
+    // Phase 63 FIX-14: 0xC8A07A → 0xB08862 (한 단계 어둡게), tileSprite alpha 0.35 → 0.5로 텍스처 디테일 강화
+    this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0xB08862)
       .setDepth(0);
     if (activeFloorKey) {
       this.add.tileSprite(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, activeFloorKey)
-        .setDepth(1).setAlpha(0.35);
+        .setDepth(1).setAlpha(0.5);
     } else {
-      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0xC8A07A)
+      this.add.rectangle(GAME_WIDTH / 2, HALL_Y + HALL_H / 2, GAME_WIDTH, HALL_H, 0xB08862)
         .setDepth(0);
     }
     // 아이소메트릭 격자 경계선 오버레이

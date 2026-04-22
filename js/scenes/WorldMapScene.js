@@ -427,9 +427,9 @@ export class WorldMapScene extends Phaser.Scene {
         return;
       }
 
-      // 1. 글로우 원 (진행중 전용)
+      // 1. 글로우 원 (진행중 전용) — Phase 63 FIX-12: 50 → 56
       if (state.inProgress) {
-        const glow = this.add.circle(x, y, 50, chapter.themeHex, 0.2);
+        const glow = this.add.circle(x, y, 56, chapter.themeHex, 0.2);
         this._mapContainer.add(glow);
         this._applyGlow(glow, chapter.themeHex);
       }
@@ -450,52 +450,53 @@ export class WorldMapScene extends Phaser.Scene {
         borderColor = chapter.themeHex;
       }
 
-      const bgCircle = this.add.circle(x, y, 40, bgColor)
+      // Phase 63 FIX-12: 반경 40 → 46 (직경 80→92), 챕터 아이콘 식별성 향상
+      const bgCircle = this.add.circle(x, y, 46, bgColor)
         .setStrokeStyle(borderWidth, borderColor);
       this._mapContainer.add(bgCircle);
 
       // 3. 챕터 아이콘 (PNG 우선, 없으면 이모지 폴백)
+      // Phase 63 FIX-12: 24x24 → 34x34 (패딩 감소로 아이콘 식별성 확보)
       const iconAlpha = state.unlocked ? 1.0 : 0.4;
       const iconKey = `chapter_icon_${chapter.id}`;
       let iconObj;
       if (this.textures.exists(iconKey)) {
-        iconObj = this.add.image(x, y - 6, iconKey).setDisplaySize(24, 24);
+        iconObj = this.add.image(x, y - 8, iconKey).setDisplaySize(34, 34);
       } else {
-        iconObj = this.add.text(x, y - 6, chapter.icon, { fontSize: '26px' }).setOrigin(0.5);
+        iconObj = this.add.text(x, y - 8, chapter.icon, { fontSize: '34px' }).setOrigin(0.5);
       }
       iconObj.setAlpha(iconAlpha);
       this._mapContainer.add(iconObj);
 
-      // 4. 챕터 번호 라벨
+      // 4. 챕터 번호 라벨 — Phase 63: y+18 → y+22
       const labelColor = state.unlocked ? chapter.themeColor : '#555555';
       const chapterNum = `${groupBaseChapter + idx}\uC7A5`;
-      const labelText = this.add.text(x, y + 18, chapterNum, {
+      const labelText = this.add.text(x, y + 22, chapterNum, {
         fontSize: '11px',
         color: labelColor,
       }).setOrigin(0.5);
       this._mapContainer.add(labelText);
 
-      // 5. 별점 표시 (해금된 경우)
+      // 5. 별점 표시 (해금된 경우) — Phase 63: y+30 → y+36 (반경 확대 반영)
       if (state.unlocked) {
-        // Phase 62: 9px로 줄여 "★ 18/18" 같은 긴 텍스트가 노드 원(반경 40) 테두리를 벗어나지 않도록 함
-        const starText = this.add.text(x, y + 30, `\u2605 ${state.currentStars}/${state.maxStars}`, {
+        const starText = this.add.text(x, y + 36, `\u2605 ${state.currentStars}/${state.maxStars}`, {
           fontSize: '9px',
           color: '#ffd700',
         }).setOrigin(0.5);
         this._mapContainer.add(starText);
       }
 
-      // 6. 자물쇠 (잠금 전용)
+      // 6. 자물쇠 (잠금 전용) — Phase 63: 위치 (18,-22) → (22,-26)
       if (!state.unlocked) {
-        const lockText = this.add.text(x + 18, y - 22, '\uD83D\uDD12', {
+        const lockText = this.add.text(x + 22, y - 26, '\uD83D\uDD12', {
           fontSize: '16px',
         }).setOrigin(0.5);
         this._mapContainer.add(lockText);
       }
 
-      // 7. 체크마크 (올클리어 ��용)
+      // 7. 체크마크 (올클리어 전용)
       if (state.cleared) {
-        const checkText = this.add.text(x + 18, y - 22, '\u2713', {
+        const checkText = this.add.text(x + 22, y - 26, '\u2713', {
           fontSize: '18px',
           color: '#ffd700',
           fontStyle: 'bold',
@@ -503,9 +504,9 @@ export class WorldMapScene extends Phaser.Scene {
         this._mapContainer.add(checkText);
       }
 
-      // 8. 인터랙션 (해금 노드만)
+      // 8. 인터랙션 (해금 노드만) — Phase 63: 히트 44 → 50
       if (state.unlocked) {
-        const hitArea = this.add.circle(x, y, 44, 0x000000, 0)
+        const hitArea = this.add.circle(x, y, 50, 0x000000, 0)
           .setInteractive({ useHandCursor: true });
         this._mapContainer.add(hitArea);
 

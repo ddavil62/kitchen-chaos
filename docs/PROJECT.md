@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 62-2 Portrait Pixelization 완료)
+> 최종 업데이트: 2026-04-22 (Phase 63 Tile Detail & Minor Polish 완료)
 
 ## 프로젝트 개요
 
@@ -120,6 +120,18 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 63 — Tile Detail & Minor Polish (2026-04-22)
+
+AD 리포트 M-P2 × 2 + L-P3 × 3 = 5건 해결. 코드 변경만 (에셋 신규 생성 없음).
+
+- **FIX-12 WorldMap 챕터 노드 식별성**: 배경 원 반지름 40 → 46, 아이콘 24×24 → 34×34, 번호 라벨 y+18 → y+22, 별점 y+30 → y+36, 자물쇠/체크 위치 (x+18,y-22) → (x+22,y-26), 히트 영역 44 → 50.
+- **FIX-13 GatheringScene 타일 디테일**: 플랫 컬러 다이아몬드 → 체커 패턴 2톤. 경로 셀 0xc8a46e/0xbd9862, 비경로 0x2d5a1b/0x285216.
+- **FIX-14 ServiceScene 바닥/테이블 대비**: 홀 배경 0xC8A07A → 0xB08862 (한 단계 어둡게), tileSprite alpha 0.35 → 0.5로 텍스처 디테일 강화.
+- **FIX-15 SpriteLoader 폴백 매핑**: `ENEMY_WALK_MISSING` 상수 추가. sugar_fairy.south-east → east, wok_phantom.south-west → west. 콘솔 404 13건 제거. 애니메이션 등록 시 누락 키를 폴백 프레임으로 복제.
+- **FIX-16 MenuScene 엔드리스 배너 대비**: 잠김 tint 0x444444 → 0x555555, 라벨 색 #666666 → #888888 (대비 +1 스텝).
+- QA 스크린샷: `tests/screenshots/phase63-after/` 4장.
+- 콘솔 에러: sugar_fairy/wok_phantom walk 404 13건 → 0건. 나머지 tower/tileset/table 404는 Phase 64+ 별도 스코프.
 
 ### Phase 62-2 — Portrait Pixelization (2026-04-22)
 

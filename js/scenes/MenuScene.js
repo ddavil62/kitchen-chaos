@@ -151,14 +151,16 @@ export class MenuScene extends Phaser.Scene {
     achieveBtn.on('pointerout', () => { achieveBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); achieveBtn.setTint(0x886600); });
 
     // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570 -> 578) ──
+    // Phase 63 FIX-16: 잠김 상태 tint 0x444444→0x555555, 라벨 색 #666666→#888888로 대비 +1
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
     // Phase 60-15: 엔드리스 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
     const ENDLESS_W = 180;
     const ENDLESS_H = 40;
-    const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x444444;
-    const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 578, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
+    const ENDLESS_Y = 578;
+    const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x555555;
+    const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, ENDLESS_Y, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
     endlessBtn.setTint(endlessColor);
     const endlessHit = new Phaser.Geom.Rectangle(-ENDLESS_W / 2, -ENDLESS_H / 2, ENDLESS_W, ENDLESS_H);
     endlessBtn.setInteractive(endlessHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: isEndlessUnlocked });
@@ -166,9 +168,10 @@ export class MenuScene extends Phaser.Scene {
     const endlessLabel = isEndlessUnlocked
       ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC'
       : '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (6-3 \uD074\uB9AC\uC5B4 \uD544\uC694)';
-    const endlessLabelColor = isEndlessUnlocked ? '#cc88ff' : '#666666';
+    // Phase 63 FIX-16: 잠김 라벨 #666666 → #888888 (대비 +1)
+    const endlessLabelColor = isEndlessUnlocked ? '#cc88ff' : '#888888';
 
-    this.add.text(GAME_WIDTH / 2, 578, endlessLabel, {
+    this.add.text(GAME_WIDTH / 2, ENDLESS_Y, endlessLabel, {
       fontSize: '14px', fontStyle: 'bold', color: endlessLabelColor,
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);

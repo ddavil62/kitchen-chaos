@@ -238,12 +238,21 @@ export class GatheringScene extends Phaser.Scene {
     const cols = this.stageData?.gridCols || GRID_COLS;
     const rows = this.stageData?.gridRows || GRID_ROWS;
 
+    // Phase 63 FIX-13: 플랫 컬러 → 체커 패턴 + 명도 변주로 디테일 강화.
+    // 경로 셀 2톤 (0xc8a46e / 0xbd9862), 비경로 풀 셀 2톤 (0x2d5a1b / 0x285216)
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const d = cellDiamond(col, row);
         const onPath = this.stagePathCells.has(`${col},${row}`);
+        const isCheckerAlt = ((col + row) & 1) === 1;
 
-        gfx.fillStyle(onPath ? 0xc8a46e : 0x2d5a1b);
+        let fillColor;
+        if (onPath) {
+          fillColor = isCheckerAlt ? 0xbd9862 : 0xc8a46e;
+        } else {
+          fillColor = isCheckerAlt ? 0x285216 : 0x2d5a1b;
+        }
+        gfx.fillStyle(fillColor);
         gfx.fillPoints([d.top, d.right, d.bottom, d.left], true);
 
         gfx.lineStyle(1, onPath ? 0x8b6914 : 0x1e3d12, onPath ? 0.4 : 0.3);
