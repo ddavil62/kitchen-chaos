@@ -9,8 +9,10 @@
  */
 @font-face {
   font-family: 'NeoDunggeunmoPro';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/NeoDunggeunmoPro-Regular.woff2') format('woff2');
-  font-display: swap;
+  /* 1순위: 로컬 번들 (오프라인/Android WebView 지원) */
+  src: url('assets/fonts/NeoDunggeunmoPro-Regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/NeoDunggeunmoPro-Regular.woff2') format('woff2');
+  font-display: block;
   font-weight: normal;
   font-style: normal;
 }

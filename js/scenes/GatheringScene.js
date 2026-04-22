@@ -20,7 +20,7 @@ import { GAME_WIDTH, GAME_HEIGHT, GRID_COLS, GRID_ROWS,
          INGREDIENT_BAR_Y, INGREDIENT_BAR_HEIGHT, WAVE_CONTROL_Y, WAVE_CONTROL_HEIGHT,
          PATH_CELLS, isPathCell, cellToWorld, worldToCell, cellDiamond,
          buildPathCellsFromSegments, buildWaypointsFromSegments,
-         STARTING_LIVES } from '../config.js';
+         STARTING_LIVES, FONT_FAMILY } from '../config.js';
 import { TOWER_TYPES, TOOL_DEFS, ENEMY_TYPES, INGREDIENT_TYPES, BUFF_RECIPES } from '../data/gameData.js';
 import { Enemy } from '../entities/Enemy.js';
 import { STAGES } from '../data/stageData.js';
@@ -1413,7 +1413,7 @@ export class GatheringScene extends Phaser.Scene {
     const cy = cam.scrollY + cam.height / 2 - 40;
     const txt = this.add.text(cx, cy, label, {
       fontSize: '20px',
-      fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+      fontFamily: FONT_FAMILY,
       color: `#${color.toString(16).padStart(6, '0')}`,
       stroke: '#000000',
       strokeThickness: 4,

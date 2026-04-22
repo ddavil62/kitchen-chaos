@@ -65,6 +65,8 @@ export class BootScene extends Phaser.Scene {
 
   /**
    * NeoDunggeunmoPro 웹폰트를 Font Loading API로 강제 로드한다.
+   * style.css @font-face가 로컬 번들(assets/fonts/) 우선, CDN fallback으로 등록되어 있으므로
+   * 오프라인/Android WebView 환경에서도 로컬 파일에서 정상 로드된다.
    * 실패 시 Noto Sans KR → sans-serif 폴백이 자동 적용된다.
    * @returns {Promise<void>} 폰트 로드 완료 프로미스
    * @private
@@ -73,7 +75,7 @@ export class BootScene extends Phaser.Scene {
     if (!document.fonts || !document.fonts.load) {
       return Promise.resolve();
     }
-    // 다양한 크기를 모두 로드하여 Canvas 렌더링 직전 폴백 플래시 방지.
+    // NeoDunggeunmoPro: style.css @font-face 등록 기준 (로컬 번들 우선, CDN fallback)
     const sizes = ['11px', '13px', '14px', '16px', '22px'];
     const promises = sizes.map((sz) =>
       document.fonts.load(`${sz} "NeoDunggeunmoPro"`).catch(() => null),
@@ -81,7 +83,7 @@ export class BootScene extends Phaser.Scene {
     return Promise.all(promises)
       .then(() => document.fonts.ready)
       .catch(() => {
-        console.warn('[BootScene] NeoDunggeunmoPro 폰트 로드 실패 — 폴백 폰트 사용');
+        console.warn('[BootScene] NeoDunggeunmoPro 폰트 로드 실패 — 시스템 폴백 적용');
       });
   }
 

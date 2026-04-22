@@ -9,6 +9,8 @@
  * 에셋 카탈로그 출처: kitchen-chaos/assets/ui/nineslice/manifest.json
  */
 
+import { FONT_FAMILY } from '../config.js';
+
 // ─────────────────────────────────────────
 // 에셋 키 (nineslice)
 // ─────────────────────────────────────────
@@ -135,40 +137,40 @@ export const TEXT_STYLE = Object.freeze({
     fontSize: '22px',
     fontStyle: 'bold',
     color: '#3a2818',
-    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+    fontFamily: FONT_FAMILY,
   },
   HEADING: {
     fontSize: '16px',
     fontStyle: 'bold',
     color: '#3a2818',
-    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+    fontFamily: FONT_FAMILY,
   },
   BODY: {
     fontSize: '13px',
     color: '#3a2818',
-    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+    fontFamily: FONT_FAMILY,
   },
   CAPTION: {
     fontSize: '11px',
     color: '#7a6a5a',
-    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+    fontFamily: FONT_FAMILY,
   },
   BUTTON_PRIMARY: {
     fontSize: '14px',
     fontStyle: 'bold',
     color: '#3a2818',
-    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+    fontFamily: FONT_FAMILY,
   },
   BUTTON_DANGER: {
     fontSize: '14px',
     fontStyle: 'bold',
     color: '#ffffff',
-    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+    fontFamily: FONT_FAMILY,
   },
   BUTTON_DISABLED: {
     fontSize: '14px',
     color: '#8a8a8a',
-    fontFamily: '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif',
+    fontFamily: FONT_FAMILY,
   },
 });
 

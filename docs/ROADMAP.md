@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-22
-> 기준: Phase 58 완료 + Phase 59 계획
+> 최종 업데이트: 2026-04-22 (Phase 67 완료, 출시 Polish 로드맵 진행 중)
+> 기준: Phase 67 완료 + 출시 Polish 로드맵(Phase 68~78) 계획
 
 ---
 
@@ -64,8 +64,17 @@
 | Phase 56 | TD 셰프 Named Character 개편 (7종) | ✅ 완료 |
 | Phase 57 | ChefSelectScene 가로 캐러셀 UI + 메인 메뉴 비주얼 에셋 | ✅ 완료 |
 | Phase 58 | 행상인 로그라이크 분기 선택 (분기 카드 32장 + 세이브 v24 + 게임플레이 반영) | ✅ 완료 |
+| Phase 59 | 자산 정리 및 에셋 재생성 큐잉 (Phase 59-1~4) | ✅ 완료 |
+| Phase 60 | MerchantScene 시각 폴리시 + 풀 카탈로그 생성 | ✅ 완료 |
+| Phase 61 | 메뉴 비주얼 에셋 + 포트레이트/아이콘 파이프라인 | ✅ 완료 |
+| Phase 62 | 웜톤 통합 패스 + 포트레이트 픽셀화 | ✅ 완료 |
+| Phase 63 | 타일 디테일 + 월드맵/메뉴 미세 폴리시 | ✅ 완료 |
+| Phase 64 | PixelLab 네이티브 포트레이트 8종 재발주 | ✅ 완료 |
+| Phase 65 | 시나리오 일관성 전수 수정 (21건) | ✅ 완료 |
+| Phase 66 | 개그씬 확장 (대화 106→119, 트리거 107→120) | ✅ 완료 |
+| Phase 67 | 한글 픽셀 폰트 로컬 번들 (P0-1 초성 깨짐 해결, FONT_FAMILY 상수화) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 58 완료 (2026-04-22) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21). 행상인 분기 카드 시스템: 4카테고리×8장=32장, 매 방문 3택 1 되돌릴 수 없는 선택, 배지 아이콘 4종, BranchEffects 매니저로 변이 tint·Bond 시너지·Blessing 실효·분기 레시피 주문 풀 편입(v24).
+**현재 구현 완성도**: Phase 67 완료 (2026-04-22) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21). 행상인 분기 카드 시스템: 4카테고리×8장=32장, 매 방문 3택 1 되돌릴 수 없는 선택, 배지 아이콘 4종, BranchEffects 매니저로 변이 tint·Bond 시너지·Blessing 실효·분기 레시피 주문 풀 편입(v24).
 
 ### 현재 콘텐츠 규모
 
@@ -471,3 +480,169 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 
 - **도구 콤보 시스템**: 도구 8종 간 페어 시너지 (freezer+soup_pot 등). 영향 범위가 채집 페이즈 전반이라 별도 Phase 필요.
 - **셰프 페어 편성**: 현재 채집 페이즈 셰프 1명 선택 → 2명으로 확장, 페어 보너스 도입. TD/유랑 셰프 분리 구조는 이미 반영되어 있으므로 그 위에 얹는 작업.
+
+---
+
+## 출시 Polish 로드맵 (Phase 67~78)
+
+> 기반: `.claude/specs/2026-04-22-kc-director-playtest-report.md` (디렉터 플레이테스트 리포트 24건)
+> 목표: 모바일 유료/프리미엄 스토어 경쟁력 확보. 평점 4.3+ 진입, 14일 리텐션 20% 달성.
+
+### 판정 사유
+
+| 구간 | Phase | 해결 이슈 | 상태 |
+|------|-------|----------|------|
+| **P0 출시 차단 해제** | 67~68 | P0-1~4 (한글 렌더링, 0/0 ★★★ 판정, 레이어 충돌, 씬 상태 전달) | **67 완료** / 68 진행 예정 |
+| **P1 초기 UX 안전장치** | 69~71 | P1-1~7 + 에셋 404 | 대기 |
+| **P2 품질 보강** | 72~74 | 분기 카드 수치 전수 반영, 세이브 백업, UI/카피 마감 | 대기 |
+| **P3 BM/리텐션** | 75~78 | 일일 미션, 손님 다양성, 셰프 스킨, 시즌/랭킹 | 대기 |
+
+### 페이즈 상세
+
+#### Phase 67 — 한글 픽셀 폰트 로컬 번들 (full, ui) ✅ 완료 (2026-04-22)
+
+**목표**: P0-1 해결. `pixelArt: true` × 시스템 한글 폰트 충돌로 "구매→쿠매", "판매→팔매"로 렌더되는 치명 버그를 근본 해결.
+
+- [x] NeoDunggeunmoPro woff2를 `assets/fonts/`에 로컬 번들링 (38KB, SIL OFL 1.1)
+- [x] `style.css` `@font-face src` 로컬 우선 + CDN fallback, `font-display: block`
+- [x] `index.html` `<link rel="preload">` 힌트 추가
+- [x] `js/config.js`에 `FONT_FAMILY` 상수 추가
+- [x] `js/ui/UITheme.js` 7개 + `js/scenes/GatheringScene.js` 1개 fontFamily 리터럴을 `FONT_FAMILY` 참조로 교체
+- [x] `MenuScene.js:542` `'monospace'` (쿠폰 코드)는 의도적 예외로 유지
+- [x] Playwright 17/17 PASS, AD 모드3 APPROVED (7/7 체크리스트)
+- 스펙: `.claude/specs/2026-04-22-kc-phase67-spec.md`
+
+#### Phase 68 — 판정/레이어/씬 상태 전달 긴급 수정 (full, ui)
+
+**목표**: P0-2~4 묶음 핫픽스.
+
+- ResultScene 별점 계산에 `totalServed === 0` 가드 추가 (0/0 → 0★, 만족도 0)
+- 스테이지 클리어 판정을 "HP > 0 AND 서빙 ≥ minServe" 복합 조건으로 재정의
+- DialogueScene modal lock 도입 (대화 중 결과창 입력 차단, depth 재정비)
+- 모든 씬 간 파라미터를 `SaveManager.currentRun` 단일 소스로 통일
+- 씬 init에서 필수값 누락 시 명시적 에러 → 메뉴 복귀
+
+**의존성**: Phase 67. (렌더링 복구 후 회귀 테스트 단순화)
+
+#### Phase 69 — 초반 UX 퀵픽스 묶음 (quick, ui)
+
+**목표**: P1-2, P1-4, P1-5 동시 해결.
+
+- ChefSelectScene 시작 인덱스 미미 고정 (lastSelectedChef 우선, fallback 미미)
+- 메뉴/월드맵 엔드리스 잠금 문구 통일 ("6-3 클리어 필요"로 상수화)
+- GatheringScene 도구 0개일 때 빈 상태 UI ("도구를 행상인에서 구매하세요" + 행상인 바로가기 버튼)
+
+**의존성**: Phase 67~68.
+
+#### Phase 70 — 초반 튜토리얼 안전장치 + 분기 카드 피드백 (full, ui)
+
+**목표**: P1-1, P1-3 해결.
+
+- 1-1~1-3 스테이지 진입 시 도구 자동 지급/배치 (스토리 플래그 `tutorial_auto_tools_shown`)
+- 분기 카드 선택 시 골드 테두리 + tint 애니메이션 + 확인 모달 강화
+- 출발하기 버튼 disabled 시 "분기 카드를 선택하세요" 툴팁
+
+**의존성**: Phase 68.
+
+#### Phase 71 — 체커 패턴 복구 + 에셋 404 전수 수리 (full, art+ui)
+
+**목표**: P1-6 + P2-8 해결. 출시 빌드에서 fallback 이모지 노출 제거.
+
+- Phase 63 FIX-13 체커 패턴 리그레션 조사 → 복구
+- 404 에셋 12종 조사: tileset_dessert_cafe/grand_finale/sakura_izakaya, table_lv1~lv4_waiting/seated, tower_spice_grinder/wasabi_cannon
+- 누락 에셋 재생성 또는 경로 매핑 수리
+- Playwright로 console 에러 0건 회귀 확정
+
+**의존성**: Phase 67~68.
+
+#### Phase 72 — 분기 카드 수치 전수 반영 (full, none)
+
+**목표**: P2-2 해결. "로그라이크 카드의 약속"을 지킨다.
+
+- 변이 미구현 4종 (chain/cluster/venom/aura_boost) 실효 로직 구현
+- Bond 미구현 4쌍 (yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice) 시너지 적용
+- Enemy.js `enemy_slow` 축복 ESM import 버그 수정
+- 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약 정의서 수정 또는 구현 선택
+- `tests/phase72-branch-effects.spec.js` 32장 전수 회귀
+
+**의존성**: Phase 71.
+
+#### Phase 73 — 세이브 백업 + 포트레이트 정합 (full, art)
+
+**목표**: P2-1, P2-3 해결.
+
+- SaveManager 슬롯 3개 자동 롤링 백업 + "최근 안정 세이브로 복구" 버튼 (설정 메뉴)
+- ChefSelectScene에서 SDXL 포트레이트가 일부 남아있는 현상 조사 (캐시/로딩 경로)
+- assets/portraits 전수 점검 (Phase 64 기준 파일만 유지)
+
+**의존성**: 없음.
+
+#### Phase 74 — UI/카피 마감 (full, ui)
+
+**목표**: P2-4~7 묶음.
+
+- 엔드리스 튜토리얼 "3/3" 명시적 페이지네이터 UI
+- 셰프별 실패 대사 7종 × 바리에이션 3 = 21줄 추가
+- 행상인 도구 카드 "초심자 추천/공격 중심/서포트 중심" 배지 3종
+- 업적 수령 대기 카드에 골드 glow 효과 (진행 바 숨김)
+- 상점 인테리어/직원 탭 카드 오버플로우 수정 (height 96→112)
+
+**의존성**: Phase 67~73.
+
+#### Phase 75 — 일일 미션 + 로그인 보너스 (full, ui+art)
+
+**목표**: P3-1. F2P 리텐션 핵심.
+
+- DailyMissionManager 신규 (3미션 랜덤 선정, 자정 리셋)
+- 7일 로그인 캘린더 (D+1 미미 스킨 쿠폰, D+7 미력의 정수 100)
+- 메인 메뉴 상단 "오늘의 미션" 배너
+- 세이브 v25 마이그레이션
+
+**의존성**: Phase 74.
+
+#### Phase 76 — 손님 NPC 다양성 확장 (full, art)
+
+**목표**: P3-2. 영업 씬 변주 확대.
+
+- 손님 프로필 10~15종 (취향/선호 장르/팁 성향)
+- PixelLab으로 신규 손님 스프라이트 10종 (2상태 × 8방향)
+- CustomerSpawner 프로필 기반 주문 생성
+- 특수 손님 2종 신규 (평론가, 단골)
+
+**의존성**: Phase 74.
+
+#### Phase 77 — 셰프 스킨 시스템 (full, art+ui)
+
+**목표**: P3-3. BM 슬롯 확보.
+
+- SkinManager 신규 + 세이브 v26
+- ChefSelectScene에 스킨 전환 UI
+- 미미 우선 3종 스킨 스프라이트 생성 (캐주얼/여름/할머니 기념)
+- IAP 훅 (Capacitor In-App Purchase 플러그인 도입 또는 스텁)
+- assets/skins 디렉토리 구조 정립
+
+**의존성**: Phase 75.
+
+#### Phase 78 — 글로벌 랭킹 + 시즌 패스 프레임 (full, ui)
+
+**목표**: P3-4, P3-5. 상용 경쟁력 마감.
+
+- Firebase Realtime DB 또는 Supabase 기반 엔드리스 랭킹 서버 연동
+- 친구 랭킹 뷰 (Google Play Games Services 연동 검토)
+- SeasonManager 신규 (3개월 시즌, 50단계 리워드)
+- 시즌 패스 UI (무료 트랙 + 프리미엄 트랙)
+- 한정 셰프 로테이션 — 기존 7종 중 1종 골드 스킨 매월 교체
+
+**의존성**: Phase 75~77.
+
+### 완료 후 기대치
+
+- P0/P1 완료 후(Phase 71): 스토어 제출 가능 상태. 평점 3.8~4.0 예상.
+- P2 완료 후(Phase 74): 평점 4.3+ 안정권.
+- P3 완료 후(Phase 78): 캐주얼 타이쿤 유료 TOP 50 진입 타겟.
+
+### 병렬화 가능 페이즈
+
+- 73 + 74 — 세이브 백업과 UI 카피 마감 독립 작업
+- 76 + 77 — 손님 스프라이트와 셰프 스킨 아트 독립 생성 가능
+- 엄격한 AD/QA 파이프라인 고수 시 총 12페이즈 카운트 유지, 달력 기준 6~8주 압축 가능

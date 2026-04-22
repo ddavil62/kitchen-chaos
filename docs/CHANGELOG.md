@@ -1,5 +1,57 @@
 # Changelog
 
+## [Phase 67] 2026-04-22 -- 한글 픽셀 폰트 로컬 번들 (P0-1 초성 깨짐 해결)
+
+### 개요
+
+디렉터 플레이테스트 리포트 P0-1 이슈(한글 초성 깨짐: "구매"→"쿠매", "판매"→"팔매") 근본 해결. NeoDunggeunmoPro woff2를 프로젝트에 로컬 번들링하고, CSS/JS 전반에서 폰트 참조를 단일 상수로 통일.
+
+### 추가
+
+- `assets/fonts/NeoDunggeunmoPro-Regular.woff2` — 로컬 번들 폰트 (38,144 bytes, wOF2 매직 바이트 유효)
+- `assets/fonts/OFL.txt` — SIL Open Font License 1.1 전문 (85줄)
+- `js/config.js:245` — `FONT_FAMILY` 상수: `'"NeoDunggeunmoPro", "Noto Sans KR", sans-serif'`
+- `index.html:10` — `<link rel="preload" href="assets/fonts/NeoDunggeunmoPro-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">`
+
+### 변경
+
+- `style.css` `@font-face`:
+  - `src`: CDN 단일 경로 → 로컬 경로 우선(`assets/fonts/...`) + CDN fallback 체인
+  - `font-display`: `swap` → `block` (Phaser Canvas 렌더 시점에 대체 폰트로 고정되는 문제 방지)
+- `js/ui/UITheme.js`:
+  - `import { FONT_FAMILY } from '../config.js'` 추가 (line 12)
+  - `TEXT_STYLE` 7개 프리셋의 `fontFamily` 리터럴 → `FONT_FAMILY` 상수 참조 (line 140, 146, 151, 156, 162, 168, 173)
+- `js/scenes/GatheringScene.js`:
+  - import 구조분해에 `FONT_FAMILY` 추가 (line 23)
+  - line 1416 웨이브 전환 텍스트 인라인 `fontFamily` → `FONT_FAMILY` 상수 참조
+- `js/scenes/BootScene.js`:
+  - `_preloadFonts()` JSDoc/인라인 주석을 로컬 번들 기반으로 갱신
+  - 실패 로그 메시지 구체화: "폴백 폰트 사용" → "시스템 폴백 적용"
+- **의도적 미변경**: `MenuScene.js:542` `fontFamily: 'monospace'` (쿠폰 힌트 코드 텍스트) — 모노스페이스 의도적 예외
+
+### 수치
+
+- 폰트 파일 크기: 스펙 예상 ~200KB → 실제 ~37KB (NeoDunggeunmoPro 픽셀 폰트 특성상 글리프 수 제한 + woff2 압축 효율)
+- fontFamily 하드코딩 잔존: `config.js:245` (상수 정의) + `BootScene.js:81` (`document.fonts.load()` 호출) 2곳만 존재 (적절한 용도)
+
+### 검증
+
+- Playwright 테스트 17/17 PASS (52.5초)
+- 수용 기준 10/10 충족
+- 예외 시나리오 11/11 PASS (CDN 차단 오프라인 로드, 다양한 폰트 크기, 콘솔 에러 0건 등)
+- AD 모드3 APPROVED (초성 완결성, 자간, 줄간격, 다크 배경 대비, 버튼 클리핑, 모바일 360x640, MerchantScene "구매"/"판매" 7항목 전체 PASS)
+- 시각적 검증: QA 5장 + AD3 교차 7장 = 12장 스크린샷 확인
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-22-kc-phase67-spec.md`
+- 구현 리포트: `.claude/specs/2026-04-22-kc-phase67-coder-report.md`
+- AD 모드3: `.claude/specs/2026-04-22-kc-phase67-ad3.md`
+- QA: `.claude/specs/2026-04-22-kc-phase67-qa.md`
+- 목적 정의서: `.claude/specs/2026-04-22-kc-phase67-scope.md`
+
+---
+
 ## [Phase 66] 2026-04-22 -- 개그씬 확장 (스크립트 톤 경량화)
 
 ### 개요

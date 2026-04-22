@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 66 개그씬 확장 완료)
+> 최종 업데이트: 2026-04-22 (Phase 67 한글 폰트 로컬 번들 완료)
 
 ## 프로젝트 개요
 
@@ -15,6 +15,7 @@
 | 엔진 | Phaser.js 3 |
 | 언어 | JavaScript (바닐라) |
 | 아트 | PixelLab API + SD Forge SDXL (픽셀 아트, 메뉴 비주얼) |
+| 폰트 | NeoDunggeunmoPro (로컬 번들 woff2 + CDN fallback, SIL OFL 1.1) |
 | 사운드 | Web Audio API (프로시저럴) |
 | 빌드 | Vite + Capacitor (Android) |
 | 테스트 | Playwright |
@@ -120,6 +121,15 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 67 — 한글 픽셀 폰트 로컬 번들 (2026-04-22)
+
+P0-1 한글 초성 깨짐 이슈(구매→쿠매, 판매→팔매) 근본 해결. NeoDunggeunmoPro woff2를 로컬 번들링하고, CSS `@font-face`를 로컬 우선+CDN fallback으로 교체. `FONT_FAMILY` 상수 도입으로 전 씬 fontFamily 하드코딩 제거. `font-display: block` + `<link rel="preload">` + BootScene `document.fonts.ready` 체인으로 오프라인/Android WebView 환경에서도 안정 렌더링 보장.
+
+- 신규 파일: `assets/fonts/NeoDunggeunmoPro-Regular.woff2` (38KB), `assets/fonts/OFL.txt`
+- 수정 파일: `style.css`, `index.html`, `js/config.js`, `js/ui/UITheme.js`, `js/scenes/GatheringScene.js`, `js/scenes/BootScene.js`
+- `MenuScene.js:542` `fontFamily: 'monospace'` (쿠폰 코드)는 의도적 예외로 유지
+- QA: Playwright 17/17 PASS, AD 모드3 APPROVED (7/7 체크리스트)
 
 ### Phase 66 — 개그씬 확장 (2026-04-22)
 

@@ -239,6 +239,11 @@ export const FONT_SIZE = {
   caption: '14px',
 };
 
+// ── 공용 폰트 패밀리 (Phase 67) ──
+// 모든 Phaser Text 컴포넌트의 fontFamily는 이 상수를 참조한다.
+// 인라인 리터럴 사용 금지 — 폰트 교체 시 이 한 줄만 수정한다.
+export const FONT_FAMILY = '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif';
+
 // ── 게임 규칙 상수 ──
 export const STARTING_LIVES = 15;       // 라운드 시작 생명 수 (GatheringScene, EndlessScene)
 export const FRESHNESS_WINDOW_MS = 5000; // 재료 신선도 유지 시간 (ms) (Enemy, IngredientManager)
