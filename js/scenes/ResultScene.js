@@ -35,22 +35,37 @@ export class ResultScene extends Phaser.Scene {
    * }} data
    */
   init(data) {
-    this.stageId = data.stageId || '1-1';
-    this.marketResult = data.marketResult || { totalIngredients: 0, livesRemaining: 0, livesMax: 15 };
-    this.serviceResult = data.serviceResult || null;
-    this.isMarketFailed = data.isMarketFailed || false;
+    // ── Phase 68: P0-4 stageId 단일 소스 (currentRun 폴백, 폴백 실패 시 에러) ──
+    const resolvedStageId = data?.stageId ?? SaveManager.getCurrentRun()?.stageId;
+    if (!resolvedStageId) {
+      console.error('[ResultScene] stageId 누락 — MenuScene으로 강제 복귀');
+      this._missingStageId = true;
+      return;
+    }
+    this._missingStageId = false;
+    this.stageId = resolvedStageId;
+
+    this.marketResult = data?.marketResult || { totalIngredients: 0, livesRemaining: 0, livesMax: 15 };
+    this.serviceResult = data?.serviceResult || null;
+    this.isMarketFailed = data?.isMarketFailed || false;
 
     // ── Phase 11-1: 엔드리스 결과 ──
-    this.isEndless = data.isEndless || false;
-    this.endlessWave = data.endlessWave || 0;
-    this.endlessScore = data.endlessScore || 0;
-    this.endlessMaxCombo = data.endlessMaxCombo || 0;
-    this.newBestWave = data.newBestWave || false;
-    this.newBestScore = data.newBestScore || false;
-    this.newBestCombo = data.newBestCombo || false;
+    this.isEndless = data?.isEndless || false;
+    this.endlessWave = data?.endlessWave || 0;
+    this.endlessScore = data?.endlessScore || 0;
+    this.endlessMaxCombo = data?.endlessMaxCombo || 0;
+    this.newBestWave = data?.newBestWave || false;
+    this.newBestScore = data?.newBestScore || false;
+    this.newBestCombo = data?.newBestCombo || false;
   }
 
   create() {
+    // ── Phase 68: P0-4 stageId 누락 시 즉시 메뉴로 복귀 ──
+    if (this._missingStageId) {
+      this.scene.start('MenuScene');
+      return;
+    }
+
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
@@ -215,13 +230,20 @@ export class ResultScene extends Phaser.Scene {
   /** @private */
   _createResultView() {
     const sr = this.serviceResult;
-    const satisfaction = sr ? sr.satisfaction : 0;
+
+    // ── Phase 68: P0-2 servedCount === 0 가드 ──
+    // 서빙이 한 번도 없으면 만족도/별점/보상을 모두 0으로 강제한다.
+    // satisfaction이 ServiceScene에서 100으로 초기화된 채 넘어오는 경우 방어.
+    const isServedZero = !sr || sr.servedCount === 0;
+    const satisfaction = isServedZero ? 0 : sr.satisfaction;
 
     // 별점 계산
     let stars = 0;
-    if (satisfaction >= 95) stars = 3;
-    else if (satisfaction >= 80) stars = 2;
-    else if (satisfaction >= 60) stars = 1;
+    if (!isServedZero) {
+      if (satisfaction >= 95) stars = 3;
+      else if (satisfaction >= 80) stars = 2;
+      else if (satisfaction >= 60) stars = 1;
+    }
 
     // 코인 보상 계산
     let coinReward = 0;
@@ -233,6 +255,11 @@ export class ResultScene extends Phaser.Scene {
     const prevStars = SaveManager.getStars(this.stageId);
     const isFirstClear = prevStars === 0;
     if (isFirstClear && stars > 0) coinReward += 5;
+
+    // ── Phase 68: P0-2 클리어 복합 조건 ──
+    // HP 생존 AND 서빙 1회 이상이어야 클리어로 인정한다.
+    const hpAlive = (this.marketResult.livesRemaining ?? 0) > 0;
+    const isCleared = hpAlive && !isServedZero && stars > 0;
 
     // 세이브 업데이트
     let totalCoinsEarned = 0;
@@ -264,6 +291,10 @@ export class ResultScene extends Phaser.Scene {
       // ── Phase 58-3: 축복 잔여 스테이지 차감 ──
       // 스테이지가 "클리어 완료"된 시점에 한 번만 차감. 0 이하가 되면 activeBlessing은 null로 초기화된다.
       SaveManager.decrementBlessingStages();
+    } else {
+      // ── Phase 68: P0-2 0별 케이스 — bestSatisfaction만 갱신, clearStage 미호출 ──
+      // 기존 세이브의 별점 기록은 건드리지 않는다.
+      SaveManager.updateBestSatisfaction(this.stageId, Math.round(satisfaction));
     }
 
     // 스크롤 가능한 컨테이너
@@ -400,10 +431,17 @@ export class ResultScene extends Phaser.Scene {
     NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 40, 2);
     y += 18;
 
+    // ── Phase 68: P0-3 modal lock — 버튼 그룹 ──
+    /** @type {Phaser.GameObjects.GameObject[]} 버튼 오브젝트 목록 (lock/unlock 대상) */
+    this._buttonObjects = [];
+    this._buttonsLocked = false;
+
     // ── 버튼 ──
     // Phase 13-2: 영업 성공 시 행상인 방문 버튼 (MerchantScene 경유)
-    if (stars > 0) {
+    // Phase 68: P0-2 isCleared 조건으로 교체 (hpAlive && servedCount >= 1 && stars > 0)
+    if (isCleared) {
       this._createButton(y, '\uD589\uC0C1\uC778 \uBC29\uBB38 \u25B6', 0xcc8800, () => {
+        if (this._buttonsLocked) return;
         this._fadeToScene('MerchantScene', {
           stageId: this.stageId,
           marketResult: this.marketResult,
@@ -415,19 +453,48 @@ export class ResultScene extends Phaser.Scene {
     }
 
     this._createButton(y, '\uB2E4\uC2DC \uD558\uAE30', 0xff6b35, () => {
+      if (this._buttonsLocked) return;
       this._fadeToScene('ChefSelectScene', { stageId: this.stageId });
     });
     y += 54;
 
     this._createButton(y, '\uC6D4\uB4DC\uB9F5\uC73C\uB85C', 0x444444, () => {
+      if (this._buttonsLocked) return;
       this._fadeToScene('WorldMapScene');
     });
+
+    // ── Phase 68: P0-3 StoryManager 호출 전 modal lock ──
+    // 트리거 발동 시 DialogueScene이 열리는 동안 버튼 입력을 차단한다.
+    // DialogueScene 종료(shutdown) 이벤트를 감지하여 unlock한다.
+    const unlockOnDialogueEnd = () => {
+      this._unlockButtons();
+    };
+
+    // DialogueScene shutdown 이벤트 대기 (트리거 발동 여부와 무관하게 unlock 처리)
+    const dialogueScene = this.scene.get('DialogueScene');
+    if (dialogueScene) {
+      dialogueScene.events.once('shutdown', unlockOnDialogueEnd);
+    }
+
+    // 트리거 조건 평가 전 lock
+    this._lockButtons();
 
     // ── 대화 트리거 (Phase 14-3: StoryManager 중앙화) ──
     StoryManager.checkTriggers(this, 'result_clear', {
       stageId: this.stageId,
       stars,
       isFirstClear,
+    });
+
+    // ── Phase 68: 트리거가 발동하지 않은 경우 즉시 unlock ──
+    // DialogueScene이 실제로 launch되었는지 확인 후, launch되지 않았으면 unlock.
+    this.time.delayedCall(50, () => {
+      if (!this.scene.isActive('DialogueScene')) {
+        this._unlockButtons();
+        if (dialogueScene) {
+          dialogueScene.events.off('shutdown', unlockOnDialogueEnd);
+        }
+      }
     });
   }
 
@@ -462,7 +529,7 @@ export class ResultScene extends Phaser.Scene {
     const hitArea = new Phaser.Geom.Rectangle(-BTN_W / 2, -BTN_H / 2, BTN_W, BTN_H);
     btnBg.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
-    this.add.text(GAME_WIDTH / 2, y, label, {
+    const labelText = this.add.text(GAME_WIDTH / 2, y, label, {
       fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 3,
     }).setOrigin(0.5);
@@ -470,6 +537,37 @@ export class ResultScene extends Phaser.Scene {
     btnBg.on('pointerdown', onClick);
     btnBg.on('pointerover', () => btnBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED));
     btnBg.on('pointerout', () => btnBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL));
+
+    // ── Phase 68: P0-3 버튼 오브젝트 추적 ──
+    if (this._buttonObjects) {
+      this._buttonObjects.push(btnBg, labelText);
+    }
+  }
+
+  /**
+   * 버튼 그룹을 비활성화한다. DialogueScene이 열려 있는 동안 입력을 차단한다.
+   * @private
+   */
+  _lockButtons() {
+    this._buttonsLocked = true;
+    if (this._buttonObjects) {
+      for (const obj of this._buttonObjects) {
+        obj.setAlpha(0.4);
+      }
+    }
+  }
+
+  /**
+   * 버튼 그룹을 복원한다. DialogueScene 종료 후 호출한다.
+   * @private
+   */
+  _unlockButtons() {
+    this._buttonsLocked = false;
+    if (this._buttonObjects) {
+      for (const obj of this._buttonObjects) {
+        obj.setAlpha(1);
+      }
+    }
   }
 
   /**
@@ -479,6 +577,8 @@ export class ResultScene extends Phaser.Scene {
    * @private
    */
   _fadeToScene(sceneKey, data) {
+    // ── Phase 68: P0-4 런 완료 시 currentRun 초기화 ──
+    SaveManager.clearCurrentRun();
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start(sceneKey, data);

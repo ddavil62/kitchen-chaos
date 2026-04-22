@@ -220,6 +220,10 @@ export class ServiceScene extends Phaser.Scene {
 
     this.stageId = data.stageId || '1-1';
     this.stageData = STAGES[this.stageId];
+
+    // ── Phase 68: P0-4 currentRun 갱신 ──
+    SaveManager.setCurrentRun({ stageId: this.stageId });
+
     this.serviceConfig = this.stageData?.service || {
       duration: 180, customerInterval: 6, maxCustomers: 15, customerPatience: 50,
     };
@@ -2799,7 +2803,8 @@ export class ServiceScene extends Phaser.Scene {
             goldEarned: this.totalGold,
             tipEarned: this.tipTotal,
             maxCombo: this.maxCombo,
-            satisfaction: this.satisfaction,
+            // ── Phase 68: P0-2 totalCustomers=0 시 satisfaction 0 보정 ──
+            satisfaction: this.totalCustomers === 0 ? 0 : this.satisfaction,
           },
           isMarketFailed: false,
         });

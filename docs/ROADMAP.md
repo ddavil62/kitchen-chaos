@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-22 (Phase 67 완료, 출시 Polish 로드맵 진행 중)
-> 기준: Phase 67 완료 + 출시 Polish 로드맵(Phase 68~78) 계획
+> 최종 업데이트: 2026-04-22 (Phase 68 완료, 출시 Polish 로드맵 진행 중)
+> 기준: Phase 68 완료 + 출시 Polish 로드맵(Phase 69~78) 계획
 
 ---
 
@@ -73,6 +73,7 @@
 | Phase 65 | 시나리오 일관성 전수 수정 (21건) | ✅ 완료 |
 | Phase 66 | 개그씬 확장 (대화 106→119, 트리거 107→120) | ✅ 완료 |
 | Phase 67 | 한글 픽셀 폰트 로컬 번들 (P0-1 초성 깨짐 해결, FONT_FAMILY 상수화) | ✅ 완료 |
+| Phase 68 | P0 판정/레이어/씬 상태 전달 핫픽스 (P0-2~4 해결, isCleared 복합 조건, modal lock, currentRun 단일 소스) | ✅ 완료 |
 
 **현재 구현 완성도**: Phase 67 완료 (2026-04-22) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21). 행상인 분기 카드 시스템: 4카테고리×8장=32장, 매 방문 3택 1 되돌릴 수 없는 선택, 배지 아이콘 4종, BranchEffects 매니저로 변이 tint·Bond 시너지·Blessing 실효·분기 레시피 주문 풀 편입(v24).
 
@@ -492,7 +493,7 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 
 | 구간 | Phase | 해결 이슈 | 상태 |
 |------|-------|----------|------|
-| **P0 출시 차단 해제** | 67~68 | P0-1~4 (한글 렌더링, 0/0 ★★★ 판정, 레이어 충돌, 씬 상태 전달) | **67 완료** / 68 진행 예정 |
+| **P0 출시 차단 해제** | 67~68 | P0-1~4 (한글 렌더링, 0/0 ★★★ 판정, 레이어 충돌, 씬 상태 전달) | **67~68 완료** |
 | **P1 초기 UX 안전장치** | 69~71 | P1-1~7 + 에셋 404 | 대기 |
 | **P2 품질 보강** | 72~74 | 분기 카드 수치 전수 반영, 세이브 백업, UI/카피 마감 | 대기 |
 | **P3 BM/리텐션** | 75~78 | 일일 미션, 손님 다양성, 셰프 스킨, 시즌/랭킹 | 대기 |
@@ -512,15 +513,18 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 - [x] Playwright 17/17 PASS, AD 모드3 APPROVED (7/7 체크리스트)
 - 스펙: `.claude/specs/2026-04-22-kc-phase67-spec.md`
 
-#### Phase 68 — 판정/레이어/씬 상태 전달 긴급 수정 (full, ui)
+#### Phase 68 — 판정/레이어/씬 상태 전달 긴급 수정 (full, ui) ✅ 완료 (2026-04-22)
 
 **목표**: P0-2~4 묶음 핫픽스.
 
-- ResultScene 별점 계산에 `totalServed === 0` 가드 추가 (0/0 → 0★, 만족도 0)
-- 스테이지 클리어 판정을 "HP > 0 AND 서빙 ≥ minServe" 복합 조건으로 재정의
-- DialogueScene modal lock 도입 (대화 중 결과창 입력 차단, depth 재정비)
-- 모든 씬 간 파라미터를 `SaveManager.currentRun` 단일 소스로 통일
-- 씬 init에서 필수값 누락 시 명시적 에러 → 메뉴 복귀
+- [x] ResultScene 별점 계산에 `isServedZero` 가드 추가 (servedCount=0 → 0★, 만족도 0%)
+- [x] 스테이지 클리어 판정을 `isCleared = hpAlive && !isServedZero && stars > 0` 복합 조건으로 재정의
+- [x] `_buttonObjects` 배열 + `_buttonsLocked` 플래그 기반 modal lock (DialogueScene 중 버튼 dim alpha 0.4, shutdown 이벤트 감지 + 50ms fallback unlock)
+- [x] `SaveManager._currentRun` 인메모리 단일 소스로 씬 간 stageId 전달 통일
+- [x] ResultScene init에서 stageId 누락 시 console.error + MenuScene 강제 복귀 (`|| '1-1'` 폴백 제거)
+- [x] ServiceScene `_endService()` totalCustomers=0 시 satisfaction 0 보정
+- [x] Playwright 40/40 PASS, AD 모드3 APPROVED (5/5)
+- 스펙: `.claude/specs/2026-04-22-kc-phase68-spec.md`
 
 **의존성**: Phase 67. (렌더링 복구 후 회귀 테스트 단순화)
 
@@ -532,7 +536,7 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 - 메뉴/월드맵 엔드리스 잠금 문구 통일 ("6-3 클리어 필요"로 상수화)
 - GatheringScene 도구 0개일 때 빈 상태 UI ("도구를 행상인에서 구매하세요" + 행상인 바로가기 버튼)
 
-**의존성**: Phase 67~68.
+**의존성**: Phase 68 (완료).
 
 #### Phase 70 — 초반 튜토리얼 안전장치 + 분기 카드 피드백 (full, ui)
 
@@ -553,7 +557,7 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 - 누락 에셋 재생성 또는 경로 매핑 수리
 - Playwright로 console 에러 0건 회귀 확정
 
-**의존성**: Phase 67~68.
+**의존성**: Phase 68 (완료).
 
 #### Phase 72 — 분기 카드 수치 전수 반영 (full, none)
 

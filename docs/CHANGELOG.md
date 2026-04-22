@@ -1,5 +1,68 @@
 # Changelog
 
+## [Phase 68] 2026-04-22 -- 판정/레이어/씬 상태 전달 P0 핫픽스
+
+### 개요
+
+디렉터 플레이테스트 리포트 P0-2(서빙 0회 3별 판정), P0-3(ResultScene x DialogueScene 레이어 충돌), P0-4(stageId 묵시적 폴백) 3건 동시 수정. SaveManager에 인메모리 `_currentRun` 단일 소스를 추가하고, ResultScene에 servedCount 가드 + isCleared 복합 조건 + modal lock + stageId 폴백 체인을 구현.
+
+### 추가
+
+- `SaveManager.js` — `_currentRun` 정적 필드 + `setCurrentRun()` / `getCurrentRun()` / `clearCurrentRun()` 3개 정적 메서드. 런타임 전용 인메모리, localStorage 미저장. SAVE_VERSION 24 불변.
+- `ResultScene.js` — `_buttonObjects` 배열 + `_buttonsLocked` 플래그. `_lockButtons()` (alpha 0.4) / `_unlockButtons()` (alpha 1.0) 메서드. DialogueScene `shutdown` 이벤트 감지 + 50ms fallback unlock.
+- `ResultScene.js` — `isServedZero` 가드: `!sr || sr.servedCount === 0` → satisfaction/stars/coinReward 모두 0 강제.
+- `ResultScene.js` — `isCleared` 복합 조건: `hpAlive && !isServedZero && stars > 0`. 행상인 버튼 노출 조건을 `stars > 0` → `isCleared`로 교체.
+- `ResultScene.js` — `_missingStageId` 플래그: `init()` 에서 stageId 결정 실패 시 `create()` 진입 즉시 MenuScene 복귀.
+- `tests/phase68-qa.spec.js` — Playwright QA 4개 시나리오 (P0-2 서빙 0회, P0-3 modal lock, P0-4 currentRun 폴백, P0-4 stageId 누락)
+- `tests/phase68-qa-extended.spec.js` — QA 확장 15개 시나리오 (경계값, 복합 조건, 회귀, 정적 분석)
+
+### 변경
+
+- `ServiceScene.js` — `_endService()` serviceResult 전달 시 `totalCustomers === 0`이면 satisfaction을 0으로 보정 (기존: 100으로 초기화된 채 전달)
+- `ServiceScene.js` — `init(data)` 진입 시 `SaveManager.setCurrentRun({ stageId })` 호출 추가
+- `GatheringScene.js` — `create(data)` 진입 시 `SaveManager.setCurrentRun({ stageId })` 호출 추가
+- `ResultScene.js` — `init(data)` stageId 결정 순서: `data.stageId` -> `SaveManager.getCurrentRun()?.stageId` -> error + MenuScene 복귀. 기존 `|| '1-1'` 폴백 제거
+- `ResultScene.js` — `_fadeToScene()` 에서 `SaveManager.clearCurrentRun()` 호출 추가
+- `ResultScene.js` — 0별(stars === 0) 케이스에서 `clearStage()` 미호출, `updateBestSatisfaction()`만 갱신
+- `ResultScene.js` — 각 버튼 onClick 핸들러에 `if (this._buttonsLocked) return;` 가드 추가 (disableInteractive 대체)
+
+### 수치
+
+- 별점 판정 임계값: 변경 없음 (95%/80%/60%)
+- modal lock dim: alpha 0.4 (lock), alpha 1.0 (unlock)
+- fallback unlock 지연: 50ms
+- SAVE_VERSION: 24 (불변)
+- 테스트 수: 신규 19개 (phase68-qa 4 + phase68-qa-extended 15) + 회귀 21개 (phase67 17 + 정적 분석 4) = 40개
+
+### 스펙 대비 변경
+
+- **Container 방식 -> 배열 방식**: 스펙은 `this.add.container()`로 버튼 그룹화를 권고했으나, NineSliceFactory.raw의 Container 하위 동작 미검증 리스크(스펙 리스크 항목 1)를 회피하기 위해 `this._buttonObjects = []` 배열 방식으로 구현
+- **disableInteractive 생략**: 스펙은 lock 시 `disableInteractive()` 호출을 명시했으나, hitArea 재설정 복잡성을 회피하기 위해 `_buttonsLocked` 플래그 가드로 대체. 동일 효과 달성
+
+### 알려진 이슈
+
+- `_createMarketFailedView` 경로에도 StoryManager.checkTriggers가 호출되지만 modal lock이 없음 (Phase 68 범위 외, 후속 페이즈에서 동일 패턴 적용 권장)
+- trigger.delay > 50ms인 StoryManager 트리거가 추가될 경우, 50ms fallback unlock에서 false negative 발생 가능 (현재 모든 result_clear 트리거가 delay=0이므로 실제 영향 없음)
+
+### 검증
+
+- Playwright 테스트 40/40 PASS
+- 수용 기준 5/5 충족
+- 예외 시나리오 14/14 PASS
+- AD 모드3 APPROVED (5/5 검수 포인트)
+- 시각적 검증: QA 9장 + AD3 5장 스크린샷 확인
+- vite build PASS (12.04s)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-22-kc-phase68-spec.md`
+- 목적 정의서: `.claude/specs/2026-04-22-kc-phase68-scope.md`
+- 구현 리포트: `.claude/specs/2026-04-22-kc-phase68-coder-report.md`
+- AD 모드3: `.claude/specs/2026-04-22-kc-phase68-ad3.md`
+- QA: `.claude/specs/2026-04-22-kc-phase68-qa.md`
+
+---
+
 ## [Phase 67] 2026-04-22 -- 한글 픽셀 폰트 로컬 번들 (P0-1 초성 깨짐 해결)
 
 ### 개요

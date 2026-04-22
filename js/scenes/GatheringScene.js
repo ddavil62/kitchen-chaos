@@ -62,6 +62,10 @@ export class GatheringScene extends Phaser.Scene {
     // ── 스테이지 데이터 로딩 ──
     this.stageId = data?.stageId || '1-1';
     this.stageData = STAGES[this.stageId];
+
+    // ── Phase 68: P0-4 currentRun 기록 ──
+    SaveManager.setCurrentRun({ stageId: this.stageId });
+
     this.stagePathCells = this.stageData
       ? buildPathCellsFromSegments(this.stageData.pathSegments)
       : PATH_CELLS;

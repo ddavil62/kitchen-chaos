@@ -25,6 +25,8 @@
  * Phase 58-1: v24 마이그레이션 — 행상인 분기 카드 시스템 branchCards 필드 추가
  *             (toolMutations, unlockedBranchRecipes, chefBonds, activeBlessing).
  *             분기 카드 헬퍼 메서드 9개 추가.
+ * Phase 68: currentRun 인메모리 필드 + setCurrentRun/getCurrentRun/clearCurrentRun 추가.
+ *           런타임 전용 (localStorage 저장 없음). SAVE_VERSION 불변.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
@@ -1086,6 +1088,38 @@ export class SaveManager {
     } catch {
       return { bytes: 0, kb: '0.00' };
     }
+  }
+
+  // ── Phase 68: currentRun 인메모리 단일 소스 ──
+
+  /** @type {{ stageId: string, chapterNo: number } | null} */
+  static _currentRun = null;
+
+  /**
+   * 현재 진행 중인 런 정보를 기록한다. localStorage에 저장하지 않는다.
+   * GatheringScene, ServiceScene 진입 시 호출한다.
+   * @param {{ stageId: string, chapterNo?: number }} data
+   */
+  static setCurrentRun(data) {
+    SaveManager._currentRun = {
+      stageId: data.stageId,
+      chapterNo: data.chapterNo ?? (parseInt(data.stageId?.split('-')[0], 10) || 1),
+    };
+  }
+
+  /**
+   * 현재 진행 중인 런 정보를 반환한다.
+   * @returns {{ stageId: string, chapterNo: number } | null}
+   */
+  static getCurrentRun() {
+    return SaveManager._currentRun;
+  }
+
+  /**
+   * 현재 런 정보를 초기화한다. ResultScene 정산 완료 후 호출한다.
+   */
+  static clearCurrentRun() {
+    SaveManager._currentRun = null;
   }
 
   /** 세이브 초기화 */
