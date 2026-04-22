@@ -402,13 +402,14 @@ export class ChefSelectScene extends Phaser.Scene {
    */
   _buildBottomControls() {
     // Phase 60-19: "셰프 없이 시작" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
-    const SKIP_W = 160, SKIP_H = 28;
+    // Phase 62: tint 0x444444 → 0x888888 (플레이스홀더 인지 해소), 텍스트도 승격
+    const SKIP_W = 160, SKIP_H = 30;
     const skipBtn = NineSliceFactory.raw(this, 245, 615, SKIP_W, SKIP_H, 'btn_secondary_normal');
-    skipBtn.setTint(0x444444);
+    skipBtn.setTint(0x888888);
     const skipHit = new Phaser.Geom.Rectangle(-SKIP_W / 2, -SKIP_H / 2, SKIP_W, SKIP_H);
     skipBtn.setInteractive(skipHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(245, 615, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
-      fontSize: '11px', color: '#aaaaaa',
+      fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
 
@@ -416,25 +417,27 @@ export class ChefSelectScene extends Phaser.Scene {
       this._startGame(null);
     });
     // Phase 60-19: setFillStyle → setTexture + setTint
-    skipBtn.on('pointerover', () => { skipBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); skipBtn.setTint(0x666666); });
-    skipBtn.on('pointerout', () => { skipBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); skipBtn.setTint(0x444444); });
+    skipBtn.on('pointerover', () => { skipBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); skipBtn.setTint(0xaaaaaa); });
+    skipBtn.on('pointerout', () => { skipBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); skipBtn.setTint(0x888888); });
 
     // Phase 60-19: "< 뒤로" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
-    const BACK_W = 80, BACK_H = 28;
+    // Phase 62: tint 0x444444 → 0x888888, 텍스트 10px → 13px + #ffffff + 그림자
+    const BACK_W = 84, BACK_H = 30;
     const backBtn = NineSliceFactory.raw(this, 62, 615, BACK_W, BACK_H, 'btn_secondary_normal');
-    backBtn.setTint(0x444444);
+    backBtn.setTint(0x888888);
     const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
     backBtn.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(62, 615, '< \uB4A4\uB85C', {
-      fontSize: '10px', color: '#cccccc',
+    this.add.text(62, 615, '\u2039 \uB4A4\uB85C', {
+      fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
 
     backBtn.on('pointerdown', () => {
       this._onBack();
     });
     // Phase 60-19: setFillStyle → setTexture + setTint
-    backBtn.on('pointerover', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBtn.setTint(0x666666); });
-    backBtn.on('pointerout', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBtn.setTint(0x444444); });
+    backBtn.on('pointerover', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBtn.setTint(0xaaaaaa); });
+    backBtn.on('pointerout', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBtn.setTint(0x888888); });
   }
 
   // ── 스와이프 처리 ──

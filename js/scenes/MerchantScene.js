@@ -234,18 +234,21 @@ export class MerchantScene extends Phaser.Scene {
       });
       this.listContainer.add(headerText);
 
-      // 1행 우측: 정보 (i) 버튼 (20x20)
+      // 1행 우측: 정보 (i) 버튼 (24x24)
+      // Phase 60-13: info 버튼 rectangle → NineSliceFactory.raw 'btn_secondary_normal'
+      // Phase 62: 빈 녹색 사각형처럼 보이는 문제 해소 — 크기 20→24, tint 0x224466→0x886644(웜톤),
+      //           아이콘 ⓘ 13px→16px, 색 #88ccff→#ffd56a (상위 노란색 + 그림자)
       const infoBtnX = GAME_WIDTH - MARGIN_X - 10;
       const infoBtnY = yOff + 10;
-      // Phase 60-13: info 버튼 rectangle → NineSliceFactory.raw 'btn_secondary_normal'
-      const infoBg = NineSliceFactory.raw(this, infoBtnX, infoBtnY, 20, 20, 'btn_secondary_normal');
-      infoBg.setTint(0x224466);
+      const infoBg = NineSliceFactory.raw(this, infoBtnX, infoBtnY, 24, 24, 'btn_secondary_normal');
+      infoBg.setTint(0x886644);
       const infoHit = new Phaser.Geom.Rectangle(-18, -18, 36, 36);
       infoBg.setInteractive(infoHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       if (infoBg.input) infoBg.input.cursor = 'pointer';
       this.listContainer.add(infoBg);
-      const infoTxt = this.add.text(infoBtnX, infoBtnY, '\u2139', {
-        fontSize: '13px', fontStyle: 'bold', color: '#88ccff',
+      const infoTxt = this.add.text(infoBtnX, infoBtnY, '\u24D8', {
+        fontSize: '16px', fontStyle: 'bold', color: '#ffd56a',
+        stroke: '#000000', strokeThickness: 2,
       }).setOrigin(0.5);
       this.listContainer.add(infoTxt);
       infoBg.on('pointerdown', () => {
@@ -253,8 +256,8 @@ export class MerchantScene extends Phaser.Scene {
         if ((this._lastDragDist || 0) >= 5) return;
         this._showToolInfoPopup(def, tool.level);
       });
-      infoBg.on('pointerover', () => infoBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED));
-      infoBg.on('pointerout', () => { infoBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); infoBg.setTint(0x224466); });
+      infoBg.on('pointerover', () => { infoBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); infoBg.setTint(0xaa7f55); });
+      infoBg.on('pointerout', () => { infoBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); infoBg.setTint(0x886644); });
 
       // 2행: 구매 / 판매 버튼
       const btnY = yOff + 30;
@@ -618,15 +621,16 @@ export class MerchantScene extends Phaser.Scene {
       }).setOrigin(0.5).setDepth(102);
 
     // "취소" 버튼 (Phase 60-13: rectangle → NineSliceFactory.raw 'btn_secondary_normal')
+    // Phase 62: tint 0x444444 → 0x888888
     const cancelBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2 + 60, GAME_HEIGHT / 2 + 50,
       100, 30, 'btn_secondary_normal');
-    cancelBtn.setTint(0x444444).setDepth(102);
+    cancelBtn.setTint(0x888888).setDepth(102);
     const cancelBtnHit = new Phaser.Geom.Rectangle(-50, -15, 100, 30);
     cancelBtn.setInteractive(cancelBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     if (cancelBtn.input) cancelBtn.input.cursor = 'pointer';
     const cancelTxt = this.add.text(GAME_WIDTH / 2 + 60, GAME_HEIGHT / 2 + 50,
       '\uCDE8\uC18C', {
-        fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
+        fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
         stroke: '#000', strokeThickness: 2,
       }).setOrigin(0.5).setDepth(102);
 
@@ -1224,8 +1228,9 @@ export class MerchantScene extends Phaser.Scene {
 
     // 취소 버튼 (회색) — Phase 58-2 AD3 REVISE: height 30→40, Y 보정(-25→-30)
     // Phase 60-13: rectangle → NineSliceFactory.raw 'btn_secondary_normal'
+    // Phase 62: tint 0x444444 → 0x888888
     const cancelBtn = NineSliceFactory.raw(this, cx + 60, cy + popupH / 2 - 30, 100, 40, 'btn_secondary_normal');
-    cancelBtn.setTint(0x444444).setDepth(102);
+    cancelBtn.setTint(0x888888).setDepth(102);
     const cancelBtnHit2 = new Phaser.Geom.Rectangle(-50, -20, 100, 40);
     cancelBtn.setInteractive(cancelBtnHit2, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     if (cancelBtn.input) cancelBtn.input.cursor = 'pointer';

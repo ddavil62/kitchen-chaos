@@ -31,8 +31,10 @@ export class RecipeCollectionScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     const { unlocked, total, percent } = RecipeManager.getCollectionProgress();
+    // Phase 62: #aaaaaa 저대비 → #e8d8a8 웜톤 + stroke로 제목과 시각적 정렬 강화
     this.add.text(GAME_WIDTH / 2, 58, `${unlocked}/${total} 수집 (${percent}%)`, {
-      fontSize: '12px', color: '#aaaaaa',
+      fontSize: '12px', color: '#e8d8a8',
+      stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
 
     // ── 카테고리 탭 ──

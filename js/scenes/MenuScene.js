@@ -34,10 +34,13 @@ export class MenuScene extends Phaser.Scene {
     darkPanel.setAlpha(0.5);
 
     // Phase 61: 타이틀 로고 이미지로 교체 (기존 텍스트 3줄 titleBlock 제거)
+    // Phase 62: 후광 번짐 완화를 위해 최대 폭 320 → 296 (0.925배 축소)
     const titleLogo = this.add.image(GAME_WIDTH / 2, 220, 'menu_title_logo').setOrigin(0.5);
-    // 최대 폭 320px, 초과 시 비율 유지 축소
-    if (titleLogo.width > 320) {
-      titleLogo.setDisplaySize(320, titleLogo.height * (320 / titleLogo.width));
+    const LOGO_MAX_W = 296;
+    if (titleLogo.width > LOGO_MAX_W) {
+      titleLogo.setDisplaySize(LOGO_MAX_W, titleLogo.height * (LOGO_MAX_W / titleLogo.width));
+    } else {
+      titleLogo.setScale(0.925);
     }
 
     // 부제목

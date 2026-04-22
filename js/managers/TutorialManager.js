@@ -1,18 +1,19 @@
 /**
  * @fileoverview 공용 튜토리얼 매니저. 씬 위에 단계별 힌트 오버레이를 렌더링하고 SaveManager로 완료 플래그를 저장한다.
  * Phase 11-3a: 전투/영업/상점/엔드리스 4종 튜토리얼 통합 관리.
+ * Phase 62: 파란 플랫 Rectangle(0x0000aa) → NineSliceFactory.panel('dark')로 교체하여
+ *           웜톤 갈색 테마와 통일. 본문 간섭 완화 위해 PANEL_H 60→68.
  */
 
 import { GAME_WIDTH } from '../config.js';
 import { SaveManager } from './SaveManager.js';
+import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 
 // ── 오버레이 레이아웃 상수 ──
 const OVERLAY_CX = GAME_WIDTH / 2;
-const OVERLAY_CY = 60;
+const OVERLAY_CY = 64;            // Phase 62: 60 → 64 (팝업 중심 미세 하강)
 const PANEL_W = 300;
-const PANEL_H = 60;
-const PANEL_COLOR = 0x0000aa;
-const PANEL_ALPHA = 0.85;
+const PANEL_H = 68;                // Phase 62: 60 → 68 (본문/skip 간섭 완화)
 const PANEL_DEPTH = 130;
 const TEXT_DEPTH = 131;
 
@@ -101,9 +102,10 @@ export class TutorialManager {
     const scene = this._scene;
     const text = this._steps[this._stepIndex];
 
-    // 반투명 배경 패널
-    const bg = scene.add.rectangle(OVERLAY_CX, OVERLAY_CY, PANEL_W, PANEL_H, PANEL_COLOR, PANEL_ALPHA)
-      .setDepth(PANEL_DEPTH);
+    // Phase 62: 파란 Rectangle → panel('dark') NineSlice
+    // panel()은 container 좌표계에 넣으면 위치가 이중 적용되므로 월드 좌표로 직접 추가하고 depth만 관리한다.
+    const bg = NineSliceFactory.panel(scene, OVERLAY_CX, OVERLAY_CY, PANEL_W, PANEL_H, 'dark');
+    bg.setDepth(PANEL_DEPTH);
 
     // 힌트 텍스트
     const label = scene.add.text(OVERLAY_CX, OVERLAY_CY - 10, text, {
@@ -113,16 +115,19 @@ export class TutorialManager {
       lineSpacing: 4,
       stroke: '#000000',
       strokeThickness: 2,
+      wordWrap: { width: PANEL_W - 32 },
     }).setOrigin(0.5, 0.5).setDepth(TEXT_DEPTH);
 
-    // 스킵 버튼
-    const skip = scene.add.text(OVERLAY_CX + 130, OVERLAY_CY + 20, '[\uAC74\uB108\uB6F0\uAE30]', {
+    // 스킵 버튼 — Phase 62: 살짝 밝게 + 아래로 정렬 보정
+    const skip = scene.add.text(OVERLAY_CX + 132, OVERLAY_CY + 22, '[\uAC74\uB108\uB6F0\uAE30]', {
       fontSize: '10px',
-      color: '#aaaaaa',
+      color: '#cccccc',
+      stroke: '#000000',
+      strokeThickness: 2,
     }).setOrigin(1, 0.5).setDepth(TEXT_DEPTH).setInteractive({ useHandCursor: true });
     skip.on('pointerdown', () => this.end());
 
-    // 컨테이너로 묶어 관리
-    this._container = scene.add.container(0, 0, [bg, label, skip]).setDepth(PANEL_DEPTH);
+    // Phase 62: panel은 이미 씬에 등록된 오브젝트. 개별 오브젝트로 추적하여 end()/advance()에서 destroy.
+    this._container = { destroy: () => { bg.destroy(); label.destroy(); skip.destroy(); } };
   }
 }

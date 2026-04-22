@@ -83,19 +83,20 @@ export class AchievementScene extends Phaser.Scene {
     this._setupScrollInput();
 
     // Phase 60-19: 돌아가기 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    // Phase 62: tint 0x444444 → 0x888888, 텍스트 #cccccc → #ffffff+bold
     const BACK_W = 180;
     const BACK_H = 40;
     const backBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, GAME_HEIGHT - 25, BACK_W, BACK_H, 'btn_secondary_normal');
-    backBtn.setTint(0x444444).setDepth(10);
+    backBtn.setTint(0x888888).setDepth(10);
     const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
     backBtn.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 25, '\uB3CC\uC544\uAC00\uAE30', {
-      fontSize: '16px', color: '#cccccc', stroke: '#000', strokeThickness: 2,
+      fontSize: '16px', fontStyle: 'bold', color: '#ffffff', stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(10);
     backBtn.on('pointerdown', () => this._fadeToScene('MenuScene'));
     // Phase 60-19: setFillStyle → setTexture + setTint
-    backBtn.on('pointerover', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBtn.setTint(0x666666); });
-    backBtn.on('pointerout', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBtn.setTint(0x444444); });
+    backBtn.on('pointerover', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBtn.setTint(0xaaaaaa); });
+    backBtn.on('pointerout', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBtn.setTint(0x888888); });
   }
 
   // ── 잔액 표시 ──
@@ -220,9 +221,14 @@ export class AchievementScene extends Phaser.Scene {
     }).setOrigin(0, 0.5);
     container.add(name);
 
-    // 설명
+    // 설명 — Phase 62: parchment tint 배경 위 대비 개선 (WCAG AA 미달 해소)
+    //   claimed(#1a2a1a 다크그린): 설명 밝은 녹색 계열
+    //   unlocked(#2a2200 어두운 금색): 설명 옅은 금색
+    //   default(#222222 어두운 회색): 설명 기존 연회색 유지하되 채도 상향
+    const descColor = item.claimed ? '#c8e6c8' : (item.unlocked ? '#ffe0a8' : '#d8d8d8');
     const desc = this.add.text(cardX + 48, y + 36, item.descKo, {
-      fontSize: '10px', color: '#999999',
+      fontSize: '10px', color: descColor,
+      stroke: '#000000', strokeThickness: 1,
     }).setOrigin(0, 0.5);
     container.add(desc);
 
@@ -289,9 +295,10 @@ export class AchievementScene extends Phaser.Scene {
       barFill.setTint(fillColor);
       container.add(barFill);
 
-      // 수치 텍스트
+      // 수치 텍스트 — Phase 62: 배경 외부로 이동 완화, outline 추가로 가독성 확보
       const valText = this.add.text(barX + barW / 2, barY + barH + 10, `${item.current}/${item.threshold}`, {
-        fontSize: '9px', color: '#aaaaaa',
+        fontSize: '10px', fontStyle: 'bold', color: '#ffffff',
+        stroke: '#000000', strokeThickness: 2,
       }).setOrigin(0.5, 0.5);
       container.add(valText);
     }

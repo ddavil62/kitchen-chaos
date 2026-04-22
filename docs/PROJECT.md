@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 58 완료)
+> 최종 업데이트: 2026-04-22 (Phase 62 Unified Warm-Tone Pass 완료)
 
 ## 프로젝트 개요
 
@@ -118,3 +118,17 @@
 ## 향후 계획
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
+
+## 개발 이력 (최근)
+
+### Phase 62 — Unified Warm-Tone Pass (2026-04-22)
+
+AD 리포트(`2026-04-22-kc-ad-review.md`) 기반 Quick Fix. 웜톤 갈색 테마와 충돌하는 파란색 튜토리얼 팝업, 어두운 tint 버튼, 저대비 업적 카드 텍스트를 통일. 7개 파일, 9개 이슈 해결.
+
+- **FIX-01/02**: `TutorialManager.js` 파란색 Rectangle(0x0000aa) → `NineSliceFactory.panel('dark')` 로 교체. Gathering/Service/Shop/Endless 4종 튜토리얼 팝업이 동시에 갈색화. PANEL_H 60→68, 스킵 버튼 stroke 추가.
+- **FIX-03**: `setTint(0x444444)` → `0x888888` (hover `0x666666` → `0xaaaaaa`) 업그레이드. 뒤로가기/취소/스킵 버튼 가독성 복구. 적용 파일: WorldMapScene, ChefSelectScene, AchievementScene, MerchantScene. (의도적 disabled 상태인 locked endless 표시와 inactive 탭 배경은 유지)
+- **FIX-04**: AchievementScene 설명 텍스트 `#999999` → 카드 상태별 분기(`#c8e6c8`/`#ffe0a8`/`#d8d8d8`) + stroke. 진행률 바 수치도 bold + stroke.
+- **FIX-05**: MerchantScene 도구 카드 우측 녹색 사각형 → Ⓘ (U+24D8) 웜톤 정보 아이콘(0x886644, `#ffd56a`). 크기 20×20 → 24×24.
+- **FIX-07**: MenuScene 타이틀 로고 최대 폭 320 → 296 (0.925배 축소) 로 후광 번짐 완화.
+- **FIX-09**: RecipeCollectionScene 서브카피 `#aaaaaa` → `#e8d8a8` + stroke로 제목과 시각적 정렬 강화.
+- QA 스크린샷: `tests/screenshots/phase62-after/` (6장) — 모든 변경 씬 Playwright 360x640 검증.

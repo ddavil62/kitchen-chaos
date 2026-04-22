@@ -550,16 +550,20 @@ export class WorldMapScene extends Phaser.Scene {
     NineSliceFactory.panel(this, 180, 20, 360, 40, 'dark').setDepth(50);
 
     // Phase 60-16: 뒤로가기 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
-    const BACK_W = 50;
-    const BACK_H = 30;
-    const backBg = NineSliceFactory.raw(this, 30, 20, BACK_W, BACK_H, 'btn_secondary_normal');
-    backBg.setTint(0x444444);
+    // Phase 62: tint 0x444444 → 0x888888, 텍스트 12px #cccccc → 14px #ffffff + 그림자 (플레이스홀더 인지 해소)
+    const BACK_W = 56;
+    const BACK_H = 32;
+    const backBg = NineSliceFactory.raw(this, 32, 20, BACK_W, BACK_H, 'btn_secondary_normal');
+    backBg.setTint(0x888888);
     const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
     backBg.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     backBg.setDepth(51);
-    this.add.text(30, 20, '< \uB4A4\uB85C', {
-      fontSize: '12px',
-      color: '#cccccc',
+    this.add.text(32, 20, '\u2039 \uB4A4\uB85C', {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 2,
     }).setOrigin(0.5).setDepth(52);
 
     backBg.on('pointerdown', () => {
@@ -570,8 +574,8 @@ export class WorldMapScene extends Phaser.Scene {
       });
     });
     // Phase 60-16: setFillStyle → setTexture + setTint
-    backBg.on('pointerover', () => { backBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBg.setTint(0x666666); });
-    backBg.on('pointerout', () => { backBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBg.setTint(0x444444); });
+    backBg.on('pointerover', () => { backBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBg.setTint(0xaaaaaa); });
+    backBg.on('pointerout', () => { backBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBg.setTint(0x888888); });
 
     // 총 별점 (Phase 24-2: 그룹별 필터)
     const { current, max } = SaveManager.getTotalStars(this._currentGroup);
