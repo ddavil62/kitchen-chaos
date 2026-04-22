@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 70 초반 UX 안전장치 완료)
+> 최종 업데이트: 2026-04-23 (Phase 71 체커 패턴 복구 + 에셋 404 전수 수리 완료)
 
 ## 프로젝트 개요
 
@@ -42,7 +42,7 @@
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 34개 업적, 해금 판정/보상(골드/코인/정수), 카테고리 탭 UI |
-| 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated 에셋 로드, portrait 9종 (arjun 포함) |
+| 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated(lv0~lv4) 에셋 로드, 타일셋 15종+타워 8종 preload, portrait 9종 (arjun 포함) |
 | 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰 |
 | 데이터 | stageData.js / gameData.js / recipeData.js / merchantBranchData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 292종(일반 284+분기 8), 분기 카드 32장 |
 
@@ -110,7 +110,9 @@
 - enemy_charge_impact는 VFX/경고 텍스트만 구현 (Tower HP 시스템 미도입). 타워 내구도 도입 시 별도 페이즈에서 검토
 - 신규 생성 metadata.json 8건(macaron_knight, sugar_specter, sushi_ninja, tempura_monk, queen_of_taste, sake_oni, yuki_chef, lao_chef)의 id 필드가 "unknown". 향후 PixelLab 재생성 시 업데이트 필요
 - mini_dumpling metadata 92x92 vs 실제 PNG 36x36 불일치 (분열 소환 적 의도적 소형, SpriteLoader 스케일 처리)
-- portrait/스프라이트 텍스처가 Phaser에 로드되지 않아 이모지 fallback으로 동작 중 (Vite 경로 매핑 이슈, Phase 56부터 지속)
+- portrait/스프라이트 텍스처가 Phaser에 로드되지 않아 이모지 fallback으로 동작 중 (Vite 경로 매핑 이슈, Phase 56부터 지속). 단, 타일셋/테이블/타워 에셋 404는 Phase 71에서 전수 해결 완료
+- `assets/sprites/towers/` 하위에 원본 32x32 타워 파일이 잔존 (SpriteLoader가 `assets/towers/` 경로만 참조하므로 기능 영향 없음, 디스크 정리 권장)
+- 타일셋 15종을 BootScene에서 전부 preload하나 GatheringScene에서 맵 렌더링에 사용하지 않음 (프로그래매틱 체커 패턴 사용). 향후 타일셋 기반 테마별 맵 렌더링 전환 시 활용 가능
 - ~~portrait 8종이 SDXL 애니메 일러스트로 생성되어 픽셀 UI와 스타일 충돌~~ → **Phase 64에서 PixelLab 네이티브 128px 반신 포트레이트로 교체 완료 (2026-04-22)**
 - 분기 카드 중 일부 변이(chain/cluster/venom/aura_boost)와 Bond(yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice)는 플래그만 저장되고 소비처 로직 미구현 상태 (tint 시각 효과는 정상, 실제 전투 수치 반영은 부분적). 후속 Quick Fix로 보완 예정
 - `Enemy.js`의 `enemy_slow` 축복 처리가 `require()` 호출로 작성되어 ESM 환경에서 조용히 실패. `bles_enemy_slow` 카드는 실효 미반영 (후속 수정 필요)
@@ -121,6 +123,15 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 71 — 체커 패턴 복구 + 에셋 404 전수 수리 (2026-04-23)
+
+P1-6(GatheringScene 체커 2톤 패턴 리그레션), P2-8(13개 에셋 404 이모지 fallback) 해결. GatheringScene `_drawMap()` depth 0→1 상향 + 체커 색상 대비 강화. 타일셋 3종 신규 생성, 테이블 waiting/seated 8종 신규 생성(AD2 REVISE 후 재생성), 타워 2종 경로 수정+48x48 표준화.
+
+- 수정 파일: GatheringScene.js
+- 신규 에셋: tilesets 3종, service/table 8종, towers 2종 (총 13종)
+- QA: Playwright 62/62 PASS (회귀 28 + 신규 29 + verify 5), AD 모드2/3 APPROVED
+- 스펙: `.claude/specs/2026-04-22-kc-phase71-spec.md`
 
 ### Phase 70 — 초반 튜토리얼 안전장치 + 분기 카드 피드백 강화 (2026-04-22)
 

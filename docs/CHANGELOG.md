@@ -1,5 +1,81 @@
 # Changelog
 
+## [Phase 71] 2026-04-23 -- 체커 패턴 복구 + 에셋 404 전수 수리
+
+### 개요
+
+디렉터 플레이테스트 리포트 P1-6(GatheringScene 체커 2톤 패턴 리그레션), P2-8(13개 에셋 404로 이모지 fallback 노출) 2건 해결. GatheringScene `_drawMap()` depth 상향 + 색상 대비 강화로 체커 패턴을 복구하고, 타일셋 3종 신규 생성 + 테이블 8종 신규 생성 + 타워 2종 경로 수정 및 48x48 표준화로 에셋 404를 전수 해소.
+
+### 추가
+
+- `kitchen-chaos/assets/tilesets/dessert_cafe.png` — 128x128 4x4 타일 스프라이트시트, 파스텔 핑크/크림/라벤더 팔레트, 9 고유색, SD Forge 생성
+- `kitchen-chaos/assets/tilesets/grand_finale.png` — 128x128 4x4 타일 스프라이트시트, 다크 골드/딥 버건디/블랙 팔레트, 11 고유색, SD Forge 생성
+- `kitchen-chaos/assets/tilesets/sakura_izakaya.png` — 128x128 4x4 타일 스프라이트시트, 베이지 나무/갈색/연분홍 팔레트, 10 고유색, SD Forge 생성
+- `kitchen-chaos/assets/service/table_lv1_waiting.png` — 64x64 투명 배경, 냅킨 장식 테이블 + 대기 손님
+- `kitchen-chaos/assets/service/table_lv1_seated.png` — 64x64 투명 배경, lv0 캐릭터 오버레이 합성 (AD2 REVISE 후 재생성, significant_px 918)
+- `kitchen-chaos/assets/service/table_lv2_waiting.png` — 64x64 투명 배경, 테이블보 + 꽃병 테이블 + 대기 손님
+- `kitchen-chaos/assets/service/table_lv2_seated.png` — 64x64 투명 배경, lv0 캐릭터 오버레이 합성 (significant_px 971)
+- `kitchen-chaos/assets/service/table_lv3_waiting.png` — 64x64 투명 배경, 고급 식기 + 캔들 홀더 테이블 + 대기 손님
+- `kitchen-chaos/assets/service/table_lv3_seated.png` — 64x64 투명 배경, lv0 캐릭터 오버레이 합성 (significant_px 969)
+- `kitchen-chaos/assets/service/table_lv4_waiting.png` — 64x64 투명 배경, 은식기 + 와인잔 + 캔들 프리미엄 테이블 + 대기 손님
+- `kitchen-chaos/assets/service/table_lv4_seated.png` — 64x64 투명 배경, lv0 캐릭터 오버레이 합성 (significant_px 967)
+- `kitchen-chaos/assets/towers/spice_grinder/tower.png` — `assets/sprites/towers/`에서 올바른 경로로 복사 후 32x32→48x48 nearest-neighbor 업스케일+중앙 크롭 (49 고유색)
+- `kitchen-chaos/assets/towers/wasabi_cannon/tower.png` — `assets/sprites/towers/`에서 올바른 경로로 복사 후 32x32→48x48 nearest-neighbor 업스케일+중앙 크롭 (77 고유색)
+- `kitchen-chaos/tests/phase71-verify.spec.js` — Coder 검증 테스트 5건 (에셋 404, 체커 패턴, 타워/타일셋/테이블 텍스처 로드)
+- `kitchen-chaos/tests/phase71-qa.spec.js` — QA 테스트 29건 (정상 22 + 예외 3 + 시각 4)
+
+### 변경
+
+- `kitchen-chaos/js/scenes/GatheringScene.js` — `_drawMap()` 체커 패턴 수정:
+  - `gfx.setDepth(0)` → `gfx.setDepth(1)`: 배경 rect(depth=0) 위에 확실히 렌더링되도록 상향
+  - 경로 체커 색상: `0xc8a46e`/`0xbd9862` (명도차 ~11) → `0xd4b078`/`0xaa8040` (명도차 ~36)
+  - 비경로 체커 색상: `0x2d5a1b`/`0x285216` (명도차 ~5) → `0x2d5a1b`/`0x1a3510` (명도차 ~19)
+
+### 수치
+
+- 체커 패턴 경로 색상 대비: 명도차 11 → 36 (3.3배 증가)
+- 체커 패턴 비경로 색상 대비: 명도차 5 → 19 (3.8배 증가)
+- 체커 그래픽 depth: 0 → 1
+- 타일셋 해상도: 128x128 (32x32 프레임 x 16프레임)
+- 테이블 해상도: 64x64 (투명 배경 64~69%)
+- 타워 해상도: 32x32 → 48x48 (기존 타워 표준에 맞춤)
+- table seated vs waiting diff: 6.6% (1차) → 14.7~25.5% (재생성 후, lv0 기준 25.5% 수준 달성)
+- Playwright 테스트: 62건 (Phase 70 회귀 28 + Phase 71 QA 29 + verify 5)
+
+### 스펙 대비 변경
+
+- 없음. 스펙의 가설 A(색상 대비 미미) + 가설 B(depth 충돌) 동시 적용 옵션 채택.
+- AD 모드2 1차 REVISE (seated 구분성 FAIL + 타워 해상도 FAIL) → 6종 재생성 후 2차 APPROVED.
+- 타일셋 JSON 메타파일 미생성 (SpriteLoader가 `scene.load.spritesheet()` 만 사용, JSON 불필요).
+
+### 알려진 이슈
+
+- `assets/sprites/towers/` 하위에 원본 32x32 타워 파일 잔존. SpriteLoader는 `assets/towers/` 경로만 참조하므로 기능 영향 없음. 디스크 정리 권장.
+- 타일셋 15종이 BootScene에서 전부 preload되나 GatheringScene에서 실제 맵 렌더링에 사용되지 않음 (프로그래매틱 체커 패턴 사용). 향후 타일셋 기반 맵 렌더링 전환 시 활용 가능.
+- 신규 타일셋 3종이 RGB 모드(기존 spice_palace는 RGBA). 타일셋은 불투명이므로 기능 영향 없음.
+- 신규 타일셋 3종에 #000000 격자선 사용 (기존 spice_palace는 색상 경계). 스타일 차이 있으나 기능 영향 없음.
+
+### 검증
+
+- Playwright 62/62 PASS (Phase 70 회귀 28 + Phase 71 QA 29 + verify 5)
+- AD 모드2: 1차 REVISE (FAIL 3건) → 6종 재생성 → 2차 APPROVED
+- AD 모드3: APPROVED (체커 패턴 시인성, 에셋 로드 무결성, 시각 일관성 확인)
+- console error: favicon.ico 외 0건
+- 수용 기준 6/6 충족
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-22-kc-phase71-spec.md`
+- 목적 정의서: `.claude/specs/2026-04-22-kc-phase71-scope.md`
+- Coder 리포트: `.claude/specs/2026-04-22-kc-phase71-coder-report.md`
+- Coder REVISE 리포트: `.claude/specs/2026-04-22-kc-phase71-coder-revise.md`
+- AD 모드2 (1차): `.claude/specs/2026-04-22-kc-phase71-ad2.md`
+- AD 모드2 (2차): `.claude/specs/2026-04-22-kc-phase71-ad2-v2.md`
+- AD 모드3: `.claude/specs/2026-04-22-kc-phase71-ad3.md`
+- QA: `.claude/specs/2026-04-22-kc-phase71-qa.md`
+
+---
+
 ## [Phase 70] 2026-04-22 -- 초반 튜토리얼 안전장치 + 분기 카드 피드백 강화
 
 ### 개요
