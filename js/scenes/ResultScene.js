@@ -72,10 +72,11 @@ export class ResultScene extends Phaser.Scene {
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_result');
 
-    // Phase 60-18: 배경 rectangle → NineSliceFactory.panel 'dark' + 상태별 tint
-    const bgTint = this.isEndless ? 0x8844cc : (this.isMarketFailed ? 0xcc4444 : 0x44cc44);
-    const bgPanel = NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
-    bgPanel.setTint(bgTint);
+    // Phase 68-hotfix: Phase 60-18의 밝은 틴트(0x44cc44/0xcc4444/0x8844cc)가 9-slice
+    // 스트레치 타일 경계를 형광 블록으로 가시화하던 회귀를 수정.
+    // 전체화면 panel_dark는 틴트 없이 natural 렌더(다른 씬과 동일). 상태 표현은
+    // 타이틀 색상/별/배지가 이미 담당하므로 배경 틴트는 불필요.
+    NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
 
     if (this.isEndless) {
       this._createEndlessResultView();
