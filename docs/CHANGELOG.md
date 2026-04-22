@@ -1,5 +1,95 @@
 # Changelog
 
+## [Phase 73] 2026-04-23 -- 세이브 백업 + 포트레이트 정합
+
+### 개요
+
+디렉터 플레이테스트 리포트 P2-1(세이브 백업) + P2-3(포트레이트 정합) 해결. SaveManager에 3슬롯 롤링 백업 시스템을 추가하고, MenuScene 설정 패널에 복구 UI를 구현. assets/portraits/ 전수 점검으로 미사용 SDXL 후보군(candidates/ 31파일) + 아카이브(_archive/ 89파일) 총 120파일을 삭제하고 정식 8종만 유지.
+
+### 추가
+
+- `kitchen-chaos/tests/phase73-save-backup.spec.js` -- Coder 작성, 세이브 백업 롤링 + 복구 UI = 13건
+- `kitchen-chaos/tests/phase73-portrait-integrity.spec.js` -- Coder 작성, 포트레이트 정합 = 4건
+- `kitchen-chaos/tests/phase73-qa.spec.js` -- QA 작성, 예외 시나리오 22건 (경계값, 상태 전이, 동시성, UI/UX, 파일시스템, 코드 무결성)
+
+### 변경
+
+- `kitchen-chaos/js/managers/SaveManager.js` (+88 lines)
+  - `BACKUP_KEYS` 상수 추가: `kitchenChaosTycoon_backup_1` / `_backup_2` / `_backup_3`
+  - `save()` 메서드: 메인 저장 전 롤링 백업 삽입 (slot2->slot3, slot1->slot2, main->slot1)
+  - 각 백업 단계 독립 try-catch (quota 초과 시 메인 저장 무영향)
+  - 백업 구조: `{ version: number, timestamp: number, data: object }`
+  - 메인 세이브 비어있으면 백업 미생성 (existingMain 체크)
+  - 신규 `getBackups()` 정적 메서드: 슬롯 3개 상태 반환 (null = 비어있음)
+  - 신규 `restoreBackup(slot)` 정적 메서드: 슬롯 1~3 복원, 성공 true / 실패 false
+
+- `kitchen-chaos/js/scenes/MenuScene.js` (+242/-4 lines)
+  - `_openSettingsPanel()`: panelH 268 -> 316 (복구 버튼용 48px 확장)
+  - 쿠폰 버튼 y좌표: 408 -> 456 (하향 이동)
+  - 신규 세이브 복구 버튼 (y=408, 240x36px, tint 0x553322, 레이블 "세이브 복구")
+  - 신규 `_openBackupListModal()`: depth=1200, 280x200px, 3슬롯 렌더 (타임스탬프 YYYY-MM-DD HH:mm + version 표시, 빈 슬롯은 "(없음)" 회색 #555555)
+  - 신규 `_openRestoreConfirmModal(slot)`: depth=1300, 260x160px, 경고 텍스트 + 복구(tint 0x993333)/취소(tint 0x333333) 버튼
+  - `_closeSettingsPanel()`: _backupListContainer + _restoreConfirmContainer cleanup 추가
+  - 복구 버튼 더블클릭 방지: re-entry guard 구현
+
+### 삭제
+
+- `kitchen-chaos/assets/portraits/candidates/` -- 31파일 삭제 (루트 19 + mage/ 12)
+  - SDXL 후보군 PNG 19개 (portrait_*_chromakey_raw.png, portrait_*_v4_raw.png)
+  - mage/ 폴더: PNG 10개 + Python gen 스크립트 2개 (gen_v9.py, gen_v10.py)
+- `kitchen-chaos/assets/portraits/_archive/` -- 89파일 삭제
+  - 히스토리 버전 PNG (portrait_*_pre_*.png, portrait_*_v1_chromakey.png 등)
+  - 하위 폴더 7개 (2026-04-21-portrait-flatten, pre_phase64_* 등) 및 내용물
+
+### 변경 없음 (점검 후 확인)
+
+- `kitchen-chaos/js/scenes/ChefSelectScene.js` -- CHEF_PORTRAIT_MAP 7셰프(poco 제외) 정상 동작, candidates/_archive 참조 없음
+- `kitchen-chaos/js/utils/SpriteLoader.js` -- PORTRAIT_IDS 8종, _loadPortraits 경로 정상, 변경 불필요
+- `SAVE_VERSION` -- 24 유지 (백업은 별도 키, 마이그레이션 불필요)
+
+### 수치
+
+- 백업 슬롯 수: 3개 (FIFO 롤링)
+- 백업 키: `kitchenChaosTycoon_backup_1`, `_backup_2`, `_backup_3`
+- 설정 패널 panelH: 268 -> 316 (+48px)
+- 쿠폰 버튼 y: 408 -> 456 (+48px)
+- 복구 버튼 y: 408, 크기 240x36px
+- 포트레이트 정식 파일: 8종 (mimi/rin/mage/yuki/lao/andre/arjun/poco), 전종 512x512 RGBA 투명 배경
+- 삭제 파일 총 수: 120개 (candidates 31 + _archive 89)
+
+### 스펙 대비 변경
+
+- 없음. 모든 구현이 스펙 문서를 정확히 따름.
+
+### 알려진 이슈
+
+- **LOW**: `restoreBackup(NaN)` 호출 시 guard가 통과되지만 결과적으로 false를 반환하여 안전. `typeof slot !== 'number' || !Number.isInteger(slot)` guard 추가 권장 (QA 소견).
+- **LOW**: 백업 목록 모달 overlay(depth 1200)가 설정 패널 X 버튼(depth 1000)을 가려 직접 클릭 불가. 의도된 동작(모달 먼저 닫아야 함)이지만 사용자 혼란 가능 (QA 소견).
+- **BUG-01 (MEDIUM, 미해결)**: mimi+salt Bond-only 미작동 (Phase 58-3 pre-existing, Phase 72에서 발견). 후속 페이즈에서 수정 권장.
+
+### 검증
+
+- Playwright 130/130 PASS
+  - Phase 73 Coder: 17/17 (save-backup 13 + portrait-integrity 4)
+  - Phase 73 QA: 22/22 (예외 시나리오)
+  - Phase 70 회귀: 28/28
+  - Phase 71 회귀: 29/29 (S1-01 flaky 1건 재시도 통과)
+  - Phase 72 회귀: 34/34
+- 콘솔 에러: 0건
+- AD 모드1: APPROVED (정식 8종 스타일 일관성 확인, candidates/_archive 전체 삭제 승인)
+- AD 모드2: APPROVED (삭제 후 잔존 8종 정량 검증 -- 전종 512x512 RGBA, 4코너 alpha=0, 고유색 63~137)
+- 시각적 검증: 스크린샷 4건 캡처 (설정 패널, 빈 백업 모달, 채워진 백업 모달, 복구 확인 모달)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase73-spec.md`
+- 코더 리포트: `.claude/specs/2026-04-23-kc-phase73-coder-report.md`
+- QA: `.claude/specs/2026-04-23-kc-phase73-qa.md`
+- AD 모드1: `.claude/specs/2026-04-23-kc-phase73-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-23-kc-phase73-ad2.md`
+
+---
+
 ## [Phase 72] 2026-04-23 -- 분기 카드 수치 전수 반영
 
 ### 개요

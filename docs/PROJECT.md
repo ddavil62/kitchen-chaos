@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (Phase 72 분기 카드 수치 전수 반영 완료)
+> 최종 업데이트: 2026-04-23 (Phase 73 세이브 백업 + 포트레이트 정합 완료)
 
 ## 프로젝트 개요
 
@@ -36,14 +36,14 @@
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결, modal lock (DialogueScene 오버레이 시 버튼 비활성), isCleared 복합 조건 |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 119종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 120항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v24, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients/endless통계/branchCards 헬퍼, `_currentRun` 인메모리 단일 소스 (씬 간 stageId 전달) |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v24, 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients/endless통계/branchCards 헬퍼, `_currentRun` 인메모리 단일 소스 (씬 간 stageId 전달) |
 | 쿠폰 | CouponRegistry.js | 쿠폰 레지스트리, redeemCoupon() API, 일반 3종+DEV 치트 5종, 사용 이력 localStorage 관리 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 34개 업적, 해금 판정/보상(골드/코인/정수), 카테고리 탭 UI |
 | 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated(lv0~lv4) 에셋 로드, 타일셋 15종+타워 8종 preload, portrait 9종 (arjun 포함) |
-| 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰 |
+| 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰/세이브 복구 |
 | 데이터 | stageData.js / gameData.js / recipeData.js / merchantBranchData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 292종(일반 284+분기 8), 분기 카드 32장 |
 
 ### 게임 루프
@@ -87,6 +87,7 @@
 | 쿠폰 코드 시스템 | 설정 메뉴 쿠폰 입력 UI, 일반 쿠폰 3종(프로덕션), DEV 치트 5종(트리쉐이킹), giftIngredients 세이브 v20 | 완료 |
 | 메뉴 비주얼 에셋 | MenuScene에 배경 이미지(menu_bg), 타이틀 로고(menu_title_logo), 미미 스프라이트, 앱 아이콘(app_icon_512) 도입. 장식 원 제거, panel dark alpha 0.5 | 완료 |
 | 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 8종 전수 실효(tint+전투 수치) + Bond 8쌍 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭·적 둔화) + 분기 레시피 반복 등장(chaos_ramen 3회/spice_bomb 2회) | 완료 |
+| 세이브 백업 | 3슬롯 롤링 백업(backup_1~3), 설정 패널 복구 버튼 + 백업 목록 모달 + 확인 모달, quota 초과 시 메인 저장 보호 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -117,6 +118,7 @@
 - ~~분기 카드 변이/Bond 미구현~~ → **Phase 72에서 변이 4종(chain/cluster/venom/aura_boost) + Bond 4쌍 전수 실효 구현 완료 (2026-04-23)**
 - ~~enemy_slow ESM import 버그~~ → **Phase 72 회귀 검증 결과 기존 코드 정상 동작 확인 (2026-04-23)**
 - ~~분기 레시피 반복 규약 불일치~~ → **Phase 72에서 chaos_ramen 3회/spice_bomb 2회 카운트 감산 구현 완료 (2026-04-23)**
+- ~~assets/portraits/에 candidates/(31파일) + _archive/(89파일) 미사용 SDXL 후보군/아카이브 잔존~~ → **Phase 73에서 전수 삭제, 정식 8종만 유지 (2026-04-23)**
 - mimi+salt Bond가 salt 변이 없이 단독 사용 시 미작동 (Phase 58-3 pre-existing 구조 결함: `_applyMutationToTower()`에서 변이 없으면 `_applyBondToTower()` 호출이 차단됨). 다른 3쌍 Bond는 BranchEffects API 직접 조회라 영향 없음. 후속 페이즈에서 수정 권장
 
 ## 향후 계획
@@ -124,6 +126,16 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 73 — 세이브 백업 + 포트레이트 정합 (2026-04-23)
+
+P2-1, P2-3 해결. SaveManager에 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API 추가. MenuScene 설정 패널에 복구 버튼 + 백업 목록 모달 + 확인 모달 구현. assets/portraits/ 전수 점검: candidates/(31파일) + _archive/(89파일) 삭제, 정식 8종만 유지.
+
+- 수정 파일: SaveManager.js (+88), MenuScene.js (+242/-4)
+- 삭제: assets/portraits/candidates/ (31파일), assets/portraits/_archive/ (89파일)
+- 신규 테스트: phase73-save-backup.spec.js (13건), phase73-portrait-integrity.spec.js (4건), phase73-qa.spec.js (22건)
+- QA: Playwright 130/130 PASS (Phase 73 39 + Phase 70~72 회귀 91), 콘솔 에러 0건
+- 스펙: `.claude/specs/2026-04-23-kc-phase73-spec.md`
 
 ### Phase 72 — 분기 카드 수치 전수 반영 (2026-04-23)
 
