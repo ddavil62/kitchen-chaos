@@ -40,12 +40,6 @@ export class MenuScene extends Phaser.Scene {
       titleLogo.setDisplaySize(320, titleLogo.height * (320 / titleLogo.width));
     }
 
-    // Phase 61: 미미 스프라이트 - 컨셉 A "주방을 지키는 셰프" 시각화
-    const mimiSprite = this.add.image(GAME_WIDTH - 52, 200, 'mimi_menu')
-      .setOrigin(0.5)
-      .setDisplaySize(80, 80);
-    this.textures.get('mimi_menu').setFilter(Phaser.Textures.FilterMode.NEAREST);
-
     // 부제목
     this.add.text(GAME_WIDTH / 2, 320, '주방을 지켜라!', {
       fontSize: '18px',
