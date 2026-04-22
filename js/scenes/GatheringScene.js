@@ -586,7 +586,13 @@ export class GatheringScene extends Phaser.Scene {
       return def.category === this._activeTowerCategory && owned > 0;
     });
 
-    if (toolIds.length === 0) return;
+    // Phase 69 (P1-5): 도구 0개 빈 상태 UI.
+    // 디렉터 플레이테스트에서 "탭을 눌러도 침묵" 이슈가 보고되어 빈 상태 안내 추가.
+    // 행상인 바로가기 버튼은 라운드 포기 모달 필요 → 후속 페이즈로 분리.
+    if (toolIds.length === 0) {
+      this._renderEmptyToolState();
+      return;
+    }
 
     const btnWidth = GAME_WIDTH / toolIds.length;
     const btnY = TOWER_BAR_Y + 16 + 17; // 버튼 영역 중심
@@ -686,6 +692,34 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
+   * Phase 69 (P1-5): 현재 카테고리에 보유 도구가 0개일 때 빈 상태 안내 렌더링.
+   * 이전에는 탭을 눌러도 아무 반응이 없어 "깨진 느낌"을 주었다.
+   * 행상인 방문 시 구매 가능하다는 가이드 텍스트를 표시한다.
+   * @private
+   */
+  _renderEmptyToolState() {
+    const cx = GAME_WIDTH / 2;
+    const primaryY = TOWER_BAR_Y + 24;
+    const secondaryY = TOWER_BAR_Y + 42;
+
+    const primary = this.add.text(cx, primaryY, '도구를 행상인에서 구매하세요', {
+      fontFamily: FONT_FAMILY,
+      fontSize: '12px',
+      color: '#ffd700',
+    }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
+
+    const secondary = this.add.text(cx, secondaryY, '라운드 종료 후 행상인이 방문합니다', {
+      fontFamily: FONT_FAMILY,
+      fontSize: '10px',
+      color: '#aaaaaa',
+    }).setOrigin(0.5).setDepth(102).setScrollFactor(0);
+
+    // 재렌더링 시 destroy될 수 있도록 _towerBarButtons에 등록.
+    const container = this.add.container(0, 0, [primary, secondary]).setDepth(100).setScrollFactor(0, 0, true);
+    this._towerBarButtons.push({ container, bg: null, id: '_empty' });
+  }
+
+  /**
    * 버프 레시피 발동 (인벤토리에서 재료 소비).
    * @param {object} recipe - BUFF_RECIPES 항목
    * @private
@@ -742,6 +776,9 @@ export class GatheringScene extends Phaser.Scene {
   _updateTowerBarSelection() {
     // Phase 60-20: setFillStyle → setTint (NineSlice Container)
     this._towerBarButtons.forEach(btn => {
+      // Phase 69 (P1-5): 빈 상태 placeholder는 bg 없음 → 스킵.
+      if (!btn.bg) return;
+
       const inventory = ToolManager.getToolInventory();
       const owned = inventory[btn.id]?.count || 0;
       const deployed = this.deployedCounts[btn.id] || 0;

@@ -107,9 +107,14 @@ export class ChefSelectScene extends Phaser.Scene {
       locked: isChefLocked(id, this._save),
     }));
 
-    // ── 초기 인덱스 결정 (이전 선택 셰프 → 0) ──
+    // ── 초기 인덱스 결정 (Phase 69 P1-2: lastSelectedChef 우선, fallback 미미) ──
+    // 디렉터 플레이테스트에서 "첫 카드가 미미가 아닌 메이지로 표시" 회귀가 관찰되어
+    // 방어적 폴백을 명시화. 잘못된 ID가 세이브에 남아있거나 CHEF_ORDER가 재편될 때도
+    // 주인공 미미로 안전 복귀한다.
+    const DEFAULT_CHEF_ID = 'mimi_chef';
+    const defaultIdx = CHEF_ORDER.indexOf(DEFAULT_CHEF_ID);
+    this._currentIndex = defaultIdx >= 0 ? defaultIdx : 0;
     const previousChef = ChefManager.getSelectedChef();
-    this._currentIndex = 0;
     if (previousChef) {
       const idx = CHEF_ORDER.indexOf(previousChef);
       if (idx >= 0) this._currentIndex = idx;

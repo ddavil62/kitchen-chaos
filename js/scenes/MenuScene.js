@@ -11,7 +11,7 @@
 import Phaser from 'phaser';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { NS_KEYS } from '../ui/UITheme.js';
-import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION, ENDLESS_LOCK_LABEL } from '../config.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
@@ -165,9 +165,11 @@ export class MenuScene extends Phaser.Scene {
     const endlessHit = new Phaser.Geom.Rectangle(-ENDLESS_W / 2, -ENDLESS_H / 2, ENDLESS_W, ENDLESS_H);
     endlessBtn.setInteractive(endlessHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: isEndlessUnlocked });
 
+    // Phase 69 (P1-4): 잠금 문구를 config 상수로 통일 (WorldMapScene과 일치).
+    // 과거 "6-3 클리어 필요"로 잘못 표기된 회귀를 수정. 실제 해금은 24-6에서 발생.
     const endlessLabel = isEndlessUnlocked
       ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC'
-      : '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (6-3 \uD074\uB9AC\uC5B4 \uD544\uC694)';
+      : ENDLESS_LOCK_LABEL;
     // Phase 63 FIX-16: 잠김 라벨 #666666 → #888888 (대비 +1)
     const endlessLabelColor = isEndlessUnlocked ? '#cc88ff' : '#888888';
 

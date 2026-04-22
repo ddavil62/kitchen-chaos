@@ -12,7 +12,7 @@
 import Phaser from 'phaser';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { NS_KEYS } from '../ui/UITheme.js';
-import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION, ENDLESS_LOCK_LABEL } from '../config.js';
 import { STAGES } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
@@ -642,10 +642,11 @@ export class WorldMapScene extends Phaser.Scene {
       }
     } else {
       // Phase 60-16: 잠금 엔드리스 rect → NineSliceFactory.panel 'dark' + setTint
+      // Phase 69 (P1-4): 문구를 config 상수로 통일 (MenuScene과 일치).
       NineSliceFactory.panel(this, 180, 575, 200, 36, 'dark').setTint(0x444444);
-      this.add.text(180, 575, '\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (24-6 \uD074\uB9AC\uC5B4 \uD544\uC694)', {
+      this.add.text(180, 575, ENDLESS_LOCK_LABEL, {
         fontSize: '12px',
-        color: '#666666',
+        color: '#888888', // Phase 69: #666666 → #888888 (잠금 라벨 대비 개선, MenuScene과 일치)
       }).setOrigin(0.5);
     }
 
