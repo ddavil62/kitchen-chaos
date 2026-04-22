@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 68 P0 핫픽스 완료)
+> 최종 업데이트: 2026-04-22 (Phase 70 초반 UX 안전장치 완료)
 
 ## 프로젝트 개요
 
@@ -27,8 +27,8 @@
 | 모듈 | 파일 | 역할 |
 |------|------|------|
 | 재료 채집 | GatheringScene.js | 도구 배치/회수/재배치, 적 AI, 재료 드롭, 보스 재료 드롭, 웨이브 진행 |
-| 도구 관리 | ToolManager.js | 영구 도구 인벤토리 (구매/판매/업그레이드/스탯 조회) |
-| 행상인 | MerchantScene.js | 2탭 UI (도구 구매/분기 선택), 도구 구매·판매·업그레이드 + 되돌릴 수 없는 3택 1 분기 카드 |
+| 도구 관리 | ToolManager.js | 영구 도구 인벤토리 (구매/판매/업그레이드/스탯 조회/자동 지급) |
+| 행상인 | MerchantScene.js | 2탭 UI (도구 구매/분기 선택), 도구 구매·판매·업그레이드 + 되돌릴 수 없는 3택 1 분기 카드, 분기 탭 피드백(tint 플래시/출발 disabled/descKo 모달) |
 | 분기 효과 | BranchEffects.js + merchantBranchData.js | 분기 카드 32장 정의(mutation/recipe/bond/blessing × 8), 게임플레이 씬에서 배수·시너지·tint 조회하는 경량 어댑터 |
 | 월드맵 | WorldMapScene.js | 24챕터 3그룹 탭(1~6/7~15/16~24장), 9노드 3x3 맵, 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js + EndlessMissionManager.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입, 미력 폭풍 이벤트, 정화 임무 4종, 통계 트래킹(폭풍/임무/무결) |
@@ -68,7 +68,7 @@
 | VFX | 파티클, 스크린 효과, 플로팅 텍스트 | 완료 |
 | 엔드리스 모드 | 무한 웨이브 TD, 데일리 스페셜, 로컬 랭킹, 미력 폭풍의 눈 이벤트(15웨이브 배수), 정화 임무 4종, 유랑 미력사 8% 등장, 웨이브 구간별 배경 테마 전환 | 완료 |
 | 월드맵 UI | 24챕터 3그룹 탭(1~6/7~15/16~24장), 9노드 3x3 맵, 스테이지 패널, 진행률 HUD, 엔드리스 섹션 | 완료 |
-| 튜토리얼 개선 | 영업/상점/엔드리스 안내, 개별 플래그 | 완료 |
+| 튜토리얼 개선 | 영업/상점/엔드리스 안내, 1-1~1-3 자동 도구 지급, 개별 플래그 | 완료 |
 | UI/UX 폴리시 | 씬 전환, 버튼 스타일, 터치 피드백 통일 | 완료 |
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
@@ -122,70 +122,32 @@
 
 ## 개발 이력 (최근)
 
+### Phase 70 — 초반 튜토리얼 안전장치 + 분기 카드 피드백 강화 (2026-04-22)
+
+P1-1(도구 0개 즉시 패배), P1-3(분기 카드 피드백 부재) 2건 해결. ToolManager에 `grantTool()` 메서드를 추가하고, GatheringScene 1-1~1-3 진입 시 도구 자동 지급/배치 구현. MerchantScene 분기 탭에 골드 tint 플래시, 출발 버튼 disabled 제어, descKo 확인 모달을 추가.
+
+- 수정 파일: ToolManager.js, GatheringScene.js, MerchantScene.js
+- 신규 파일: tests/phase70-qa.spec.js (28건)
+- QA: Playwright 28/28 PASS, AD 모드3 APPROVED (2차, 1차 REVISE 2건 수정 반영)
+- 스펙: `.claude/specs/2026-04-22-kc-phase70-spec.md`
+
 ### Phase 68 — P0 판정/레이어/씬 상태 전달 핫픽스 (2026-04-22)
 
-P0-2(서빙 0회 3별 판정), P0-3(ResultScene x DialogueScene 레이어 충돌), P0-4(stageId 묵시적 폴백) 3건 수정. ServiceScene/ResultScene에 servedCount 이중 가드, `isCleared` 복합 조건 도입. ResultScene에 `_buttonObjects` 배열 기반 modal lock 구현. `SaveManager._currentRun` 인메모리 단일 소스로 씬 간 stageId 전달 신뢰성 확보.
+P0-2~4 3건 수정. `isCleared` 복합 조건, modal lock, `_currentRun` 인메모리 단일 소스 도입.
 
-- 수정 파일: SaveManager.js, GatheringScene.js, ServiceScene.js, ResultScene.js
-- 신규 파일: tests/phase68-qa.spec.js (4건), tests/phase68-qa-extended.spec.js (15건)
-- QA: Playwright 40/40 PASS (신규 19 + 회귀 21), AD 모드3 APPROVED (5/5)
+- QA: Playwright 40/40 PASS, AD 모드3 APPROVED (5/5)
 - 스펙: `.claude/specs/2026-04-22-kc-phase68-spec.md`
 
 ### Phase 67 — 한글 픽셀 폰트 로컬 번들 (2026-04-22)
 
-P0-1 한글 초성 깨짐 이슈(구매→쿠매, 판매→팔매) 근본 해결. NeoDunggeunmoPro woff2를 로컬 번들링하고, CSS `@font-face`를 로컬 우선+CDN fallback으로 교체. `FONT_FAMILY` 상수 도입으로 전 씬 fontFamily 하드코딩 제거. `font-display: block` + `<link rel="preload">` + BootScene `document.fonts.ready` 체인으로 오프라인/Android WebView 환경에서도 안정 렌더링 보장.
+P0-1 한글 초성 깨짐 근본 해결. NeoDunggeunmoPro woff2 로컬 번들 + `FONT_FAMILY` 상수 도입.
 
-- 신규 파일: `assets/fonts/NeoDunggeunmoPro-Regular.woff2` (38KB), `assets/fonts/OFL.txt`
-- 수정 파일: `style.css`, `index.html`, `js/config.js`, `js/ui/UITheme.js`, `js/scenes/GatheringScene.js`, `js/scenes/BootScene.js`
-- `MenuScene.js:542` `fontFamily: 'monospace'` (쿠폰 코드)는 의도적 예외로 유지
-- QA: Playwright 17/17 PASS, AD 모드3 APPROVED (7/7 체크리스트)
+- QA: Playwright 17/17 PASS, AD 모드3 APPROVED (7/7)
 
 ### Phase 66 — 개그씬 확장 (2026-04-22)
 
-스크립트 톤 경량화를 위해 dialogueData.js/storyData.js에 개그씬을 대폭 추가. 기존 대사 교체 없이 추가만 수행, 미디엄 강도(픽 웃음 수준).
+대화 스크립트 106→119종, 트리거 107→120항목. 개그씬 대폭 추가.
 
-- **team_side 10종 신규**: 1~5, 7, 9, 11~13장 누락 챕터 전수 커버 (merchant_enter 트리거)
-- **chapter_intro 14종 보강**: 도착 리액션 개그 1~5줄 삽입 (금지 구간 7개 미변경)
-- **service_event 3종 보강**: happy_hour/food_review/kitchen_accident에 2~3줄 추가
-- **gathering_enter 막간극 3종 신규**: gag_midstage_7/10/13 (7-4, 10-4, 13-4)
-- **캐릭터 성격 개그 8건**: 메이지 논문 폭주, 유키 건조, 앙드레 와인 비유, 아르준 향신료 열거
-- **수치**: 대화 키 106 -> 119개, 트리거 107 -> 120개, dialogueData.js +296줄, storyData.js +26줄
-- QA: Playwright 21/21 PASS, vite build PASS
-- 스펙: `.claude/specs/2026-04-22-kc-gag-expansion-spec.md`
-
-### Phase 65 — 시나리오 일관성 전수 수정 (2026-04-22)
-
-시나리오 리뷰에서 발견된 21건 이슈(P0 5건, P1 9건, P2 7건)를 7페이즈(A~F, GH)로 전수 수정. 대사 텍스트 전용 작업, 에셋/UI 변경 없음.
-
-- **대상 파일**: `dialogueData.js` (1828줄), `STORY.md`, `portraits/index.html`
-- **P0 해결**: 라오 첫 등장 호쾌 톤 복구, 리넘버링 잔존 4건 치환, 미미 말투 통일 (존댓말/반말 49건), 메이지 22장 briefing 삽입, 유키 대표 대사 교체
-- **P1 해결**: 아르준 ??? 예고 17건, 린 이탈 briefing, 포코 할머니 회상, 누아르-여왕 거울상, 여왕 텔레파시, 포코 gag 분산, 아르준 향신료 비유 3건, info-dump 분할
-- **P2 해결**: STORY.md 포코 이모지, (한숨) 지문 다양화, 엘 디아블로 루차도르 색채, 메이지 내면 동기
-- QA: Playwright 22/22 PASS, vite build PASS
-- 스펙: `.claude/specs/2026-04-22-kc-scenario-fix-spec.md`
-
-### Phase 64 — PixelLab Native Portraits (2026-04-22)
-
-AD 리포트 FIX-10 완전 해결. Phase 62-2의 임시 픽셀화를 **네이티브 픽셀아트 반신 포트레이트**로 교체.
-
-- **접근 방식**: PixelLab `create_map_object` (풀바디 create_character 대신 단일 정적 이미지). 128×128 native → 4× nearest 업샘플 → 512×512 저장.
-- **대상 8종**: mimi/rin/mage/yuki/lao/andre/arjun/poco. 각 캐릭 설명(헤어/의상/표정/무드)과 `side` 뷰 파라미터로 반신 흉상 프레임 고정.
-- **비용**: 캐릭당 1 gen × 8 = 총 8 generations (pro 모드 160~320 gen 대비 95% 절감).
-- **스타일 일관성**: chef_sprite 92px와 동일한 픽셀 그리드 감각 + `single color outline` + `basic shading` + `medium detail` 로 16-bit JRPG 톤 통일.
-- **원본 백업**: `assets/portraits/_archive/pre_phase64_20260422_130420/` 에 Phase 62-2 픽셀화 버전 보관.
-- QA 스크린샷: `tests/screenshots/phase64-after/` (chefselect_mimi/rin/mage/yuki, merchant_poco — 5장).
-- 스펙: `.claude/specs/2026-04-22-kc-phase64-portrait-spec.md`.
-
-### Phase 63 — Tile Detail & Minor Polish (2026-04-22)
-
-AD 리포트 M-P2 × 2 + L-P3 × 3 = 5건 해결. 코드 변경만 (에셋 신규 생성 없음).
-
-- **FIX-12 WorldMap 챕터 노드 식별성**: 배경 원 반지름 40 → 46, 아이콘 24×24 → 34×34, 번호 라벨 y+18 → y+22, 별점 y+30 → y+36, 자물쇠/체크 위치 (x+18,y-22) → (x+22,y-26), 히트 영역 44 → 50.
-- **FIX-13 GatheringScene 타일 디테일**: 플랫 컬러 다이아몬드 → 체커 패턴 2톤. 경로 셀 0xc8a46e/0xbd9862, 비경로 0x2d5a1b/0x285216.
-- **FIX-14 ServiceScene 바닥/테이블 대비**: 홀 배경 0xC8A07A → 0xB08862 (한 단계 어둡게), tileSprite alpha 0.35 → 0.5로 텍스처 디테일 강화.
-- **FIX-15 SpriteLoader 폴백 매핑**: `ENEMY_WALK_MISSING` 상수 추가. sugar_fairy.south-east → east, wok_phantom.south-west → west. 콘솔 404 13건 제거. 애니메이션 등록 시 누락 키를 폴백 프레임으로 복제.
-- **FIX-16 MenuScene 엔드리스 배너 대비**: 잠김 tint 0x444444 → 0x555555, 라벨 색 #666666 → #888888 (대비 +1 스텝).
-- QA 스크린샷: `tests/screenshots/phase63-after/` 4장.
-- 콘솔 에러: sugar_fairy/wok_phantom walk 404 13건 → 0건. 나머지 tower/tileset/table 404는 Phase 64+ 별도 스코프.
+- QA: Playwright 21/21 PASS
 
 이전 이력은 [CHANGELOG.md](CHANGELOG.md) 참조.

@@ -1,5 +1,68 @@
 # Changelog
 
+## [Phase 70] 2026-04-22 -- 초반 튜토리얼 안전장치 + 분기 카드 피드백 강화
+
+### 개요
+
+디렉터 플레이테스트 리포트 P1-1(1-1~1-3 도구 0개 즉시 패배), P1-3(분기 카드 피드백 부재) 2건 해결. ToolManager에 `grantTool()` 메서드를 추가하고, GatheringScene 1-1~1-3 진입 시 도구 자동 지급/배치를 구현. MerchantScene 분기 탭에 골드 tint 플래시, 출발 버튼 disabled 제어, descKo 확인 모달을 추가.
+
+### 추가
+
+- `ToolManager.js` — `static grantTool(toolId)`: 골드 차감 없이 해당 도구 count를 1 증가. maxCount 초과 시 return false.
+- `GatheringScene.js` — `_checkAutoToolGrant()`: `create()` 직후 호출. TUTORIAL_STAGES `['1-1','1-2','1-3']` 판별 → storyFlags 중복 체크 → hasAnyTool 체크 → grantTool('pan') → SAFE_CELLS 안전 셀 탐색(스테이지별 3개 후보, `stagePathCells.has()` 검증) → `_placeTower()` → storyFlags 기록.
+- `GatheringScene.js` — `_showAutoToolNotice()`: HUD 하단(Y=HUD_HEIGHT/2)에 "도구가 없어 프라이팬을 지급했습니다!" 텍스트. fontSize 14px, color #ffcc44, stroke #000 strokeThickness 2, depth 200. 2000ms 후 400ms fadeOut + destroy.
+- `GatheringScene.js` — SAFE_CELLS 상수: `'1-1': [{col:0,row:0},{col:0,row:1},{col:2,row:0}]`, `'1-2': [{col:1,row:0},{col:3,row:0},{col:0,row:0}]`, `'1-3': [{col:0,row:0},{col:1,row:0},{col:3,row:0}]`.
+- `MerchantScene.js` — `_updateDepartButtonState()`: 분기 탭+카드 미선택 → disabled(tint 0x666666), 그 외 → 활성(tint 0x22aa44).
+- `MerchantScene.js` — `_showDepartToast()`: DEPART_BTN_Y-40에 "분기 카드를 선택하세요" 표시. fontSize 13px, color #ffcc88. 1500ms 후 400ms fadeOut. `_departToastActive` 플래그로 연타 방지.
+- `tests/phase70-qa.spec.js` — Playwright QA 28개 시나리오 (자동 도구 지급 8 + 분기 카드 3 + 출발 disabled 6 + console error 3 + 엣지케이스 4 + 시각 검증 4)
+
+### 변경
+
+- `MerchantScene.js` — `_createTabBar()`: 분기 탭 pointerdown 핸들러에 골드 tint 플래시 추가 (`_setActiveTab` 먼저 호출 → `setColor('#ffcc44')` 덮어쓰기 → 150ms delayed `setColor('#ffcc88')` 복원)
+- `MerchantScene.js` — `_setActiveTab()`: 마지막에 `_updateDepartButtonState()` 호출 추가
+- `MerchantScene.js` — `_createDepartButton()`: `this._departBtn = btn`, `this._departDisabled = false` 참조 보존 추가
+- `MerchantScene.js` — `_onDepart()`: 선두에 `if (this._departDisabled) { _showDepartToast(); return; }` 가드 추가
+- `MerchantScene.js` — `_showBranchConfirmPopup()`: popupH 170→200 (일반), 190→220 (blessing). msgText 아래 구분선(dividerH) + descKo 텍스트 추가 (fontSize 11px, color #aaaaaa, wordWrap 270). blessing replaceText Y -55→-62 (okBtn과 5px gap 확보)
+- `MerchantScene.js` — `_applyBranchCard()`: `_branchCardSelected = true` 직후 `_updateDepartButtonState()` 호출 추가
+
+### 수치
+
+- SAFE_CELLS: 스테이지별 후보 셀 3개씩, 경로 충돌 방지
+- tint 플래시: #ffcc44 → 150ms → #ffcc88 (활성 탭 색상)
+- disabled 버튼 tint: 0x666666 (비활성), 0x22aa44 (활성)
+- 자동 도구 알림: 2000ms 표시 + 400ms fadeOut
+- 출발 토스트: 1500ms 표시 + 400ms fadeOut
+- popupH: 일반 200, blessing 220
+- blessing replaceText Y: cy + popupH/2 - 62 (기존 -55)
+- SAVE_VERSION: 24 (불변)
+- 테스트 수: 28개
+
+### 스펙 대비 변경
+
+- 없음. 모든 요구사항(A-1~A-4, B-1~B-6) 스펙대로 구현.
+- AD 모드3 1차 REVISE 2건(tint 플래시 실행 순서, blessing replaceText 겹침) 수정 반영 후 2차 APPROVED.
+
+### 알려진 이슈
+
+- `_defaultTools()`의 pan 초기값이 `count: 4`이므로 완전 신규 세이브에서는 이미 pan 4개 보유. 실제 도구 0개 상태는 사용자가 모든 도구를 판매한 경우에만 발생.
+- 자동 배치된 프라이팬이 튜토리얼 2단계(도구 배치 완료)를 트리거할 수 있음 (스펙에서 의도된 동작으로 명시).
+
+### 검증
+
+- Playwright 28/28 PASS (1차 서버 타이밍 이슈 해결 후 재실행)
+- AD 모드3: 1차 REVISE(2건) → 수정 후 2차 APPROVED
+- console error 0건
+- 수용 기준 11/11 충족
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-22-kc-phase70-spec.md`
+- Coder 리포트: `.claude/specs/2026-04-22-kc-phase70-coder-report.md`
+- QA: `.claude/specs/2026-04-22-kc-phase70-qa.md`
+- AD 모드3: `.claude/specs/2026-04-22-kc-phase70-ad3.md`
+
+---
+
 ## [Phase 68] 2026-04-22 -- 판정/레이어/씬 상태 전달 P0 핫픽스
 
 ### 개요
