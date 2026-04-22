@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-22 (Phase 63 Tile Detail & Minor Polish 완료)
+> 최종 업데이트: 2026-04-22 (Phase 64 PixelLab Native Portraits 완료)
 
 ## 프로젝트 개요
 
@@ -110,7 +110,7 @@
 - 신규 생성 metadata.json 8건(macaron_knight, sugar_specter, sushi_ninja, tempura_monk, queen_of_taste, sake_oni, yuki_chef, lao_chef)의 id 필드가 "unknown". 향후 PixelLab 재생성 시 업데이트 필요
 - mini_dumpling metadata 92x92 vs 실제 PNG 36x36 불일치 (분열 소환 적 의도적 소형, SpriteLoader 스케일 처리)
 - portrait/스프라이트 텍스처가 Phaser에 로드되지 않아 이모지 fallback으로 동작 중 (Vite 경로 매핑 이슈, Phase 56부터 지속)
-- portrait 8종이 SDXL 애니메 일러스트로 생성되어 픽셀 UI와 스타일 충돌 → Phase 62-2에서 nearest-neighbor 픽셀화(96px 가상 해상도)로 **단기 해소**. 장기적으로 Phase 64 PixelLab pro 재발주 예정
+- ~~portrait 8종이 SDXL 애니메 일러스트로 생성되어 픽셀 UI와 스타일 충돌~~ → **Phase 64에서 PixelLab 네이티브 128px 반신 포트레이트로 교체 완료 (2026-04-22)**
 - 분기 카드 중 일부 변이(chain/cluster/venom/aura_boost)와 Bond(yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice)는 플래그만 저장되고 소비처 로직 미구현 상태 (tint 시각 효과는 정상, 실제 전투 수치 반영은 부분적). 후속 Quick Fix로 보완 예정
 - `Enemy.js`의 `enemy_slow` 축복 처리가 `require()` 호출로 작성되어 ESM 환경에서 조용히 실패. `bles_enemy_slow` 카드는 실효 미반영 (후속 수정 필요)
 - 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약은 현재 단순 1회 소비로 통일됨 (카드 descKo의 수치와 실제 동작 불일치, 후속 밸런스 조정 예정)
@@ -120,6 +120,18 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 64 — PixelLab Native Portraits (2026-04-22)
+
+AD 리포트 FIX-10 완전 해결. Phase 62-2의 임시 픽셀화를 **네이티브 픽셀아트 반신 포트레이트**로 교체.
+
+- **접근 방식**: PixelLab `create_map_object` (풀바디 create_character 대신 단일 정적 이미지). 128×128 native → 4× nearest 업샘플 → 512×512 저장.
+- **대상 8종**: mimi/rin/mage/yuki/lao/andre/arjun/poco. 각 캐릭 설명(헤어/의상/표정/무드)과 `side` 뷰 파라미터로 반신 흉상 프레임 고정.
+- **비용**: 캐릭당 1 gen × 8 = 총 8 generations (pro 모드 160~320 gen 대비 95% 절감).
+- **스타일 일관성**: chef_sprite 92px와 동일한 픽셀 그리드 감각 + `single color outline` + `basic shading` + `medium detail` 로 16-bit JRPG 톤 통일.
+- **원본 백업**: `assets/portraits/_archive/pre_phase64_20260422_130420/` 에 Phase 62-2 픽셀화 버전 보관.
+- QA 스크린샷: `tests/screenshots/phase64-after/` (chefselect_mimi/rin/mage/yuki, merchant_poco — 5장).
+- 스펙: `.claude/specs/2026-04-22-kc-phase64-portrait-spec.md`.
 
 ### Phase 63 — Tile Detail & Minor Polish (2026-04-22)
 
