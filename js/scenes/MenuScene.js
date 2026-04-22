@@ -6,6 +6,7 @@
  * Phase 11-3b: fadeIn 300ms 통일, 도감 버튼 Secondary 팔레트 적용.
  * Phase 11-3d: 하단 버전 표기(APP_VERSION) 추가.
  * Phase 61: 메뉴 비주얼 에셋 적용 (배경 이미지 + 타이틀 로고 이미지).
+ * Phase 73: 설정 패널에 세이브 복구 버튼 + 백업 목록/확인 모달 추가.
  */
 
 import Phaser from 'phaser';
@@ -264,9 +265,9 @@ export class MenuScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;   // 180
     const cy = GAME_HEIGHT / 2;  // 320
 
-    // 패널 크기/위치 (Phase 54: panelH 268, 쿠폰 버튼 추가, AD3 여백 보정)
+    // 패널 크기/위치 (Phase 54: panelH 268 → Phase 73: panelH 316, 복구 버튼 추가)
     const panelW = 280;
-    const panelH = 268;
+    const panelH = 316;
     const panelX = cx - panelW / 2;  // 40
     const panelY = 170;
 
@@ -339,16 +340,42 @@ export class MenuScene extends Phaser.Scene {
     // ── 음소거 토글 (y=360) ──
     this._createMuteToggle(container, 360, settings.muted);
 
+    // ── Phase 73: 세이브 복구 버튼 (y=408) ──
+    const RESTORE_BTN_W = 240;
+    const RESTORE_BTN_H = 36;
+    const restoreBg = NineSliceFactory.raw(this, cx, 408, RESTORE_BTN_W, RESTORE_BTN_H, 'btn_secondary_normal');
+    restoreBg.setTint(0x553322);
+    const restoreHit = new Phaser.Geom.Rectangle(-RESTORE_BTN_W / 2, -RESTORE_BTN_H / 2, RESTORE_BTN_W, RESTORE_BTN_H);
+    restoreBg.setInteractive(restoreHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    container.add(restoreBg);
+
+    const restoreLabel = this.add.text(cx, 408, '\u21BA \uC138\uC774\uBE0C \uBCF5\uAD6C', {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      color: '#cc8855',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(restoreLabel);
+
+    restoreBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._openBackupListModal();
+    });
+    restoreBg.on('pointerover', () => { restoreBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); restoreBg.setTint(0x775533); });
+    restoreBg.on('pointerout', () => { restoreBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); restoreBg.setTint(0x553322); });
+
     // Phase 60-15: 쿠폰 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
+    // Phase 73: y=408 → y=456 (복구 버튼 추가로 48px 하향 이동)
     const COUPON_BTN_W = 240;
     const COUPON_BTN_H = 36;
-    const couponBg = NineSliceFactory.raw(this, cx, 408, COUPON_BTN_W, COUPON_BTN_H, 'btn_secondary_normal');
+    const couponBg = NineSliceFactory.raw(this, cx, 456, COUPON_BTN_W, COUPON_BTN_H, 'btn_secondary_normal');
     couponBg.setTint(0x1a3366);
     const couponHit = new Phaser.Geom.Rectangle(-COUPON_BTN_W / 2, -COUPON_BTN_H / 2, COUPON_BTN_W, COUPON_BTN_H);
     couponBg.setInteractive(couponHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     container.add(couponBg);
 
-    const couponLabel = this.add.text(cx, 408, '\uD83C\uDF9F \uCFE0\uD3F0 \uC785\uB825', {
+    const couponLabel = this.add.text(cx, 456, '\uD83C\uDF9F \uCFE0\uD3F0 \uC785\uB825', {
       fontSize: '14px',
       fontStyle: 'bold',
       color: '#88ccff',
@@ -374,12 +401,223 @@ export class MenuScene extends Phaser.Scene {
   _closeSettingsPanel() {
     // 쿠폰 모달이 열려있으면 먼저 닫기
     this._closeCouponModal();
+    // Phase 73: 백업 관련 모달이 열려있으면 먼저 닫기
+    if (this._restoreConfirmContainer) {
+      this._restoreConfirmContainer.destroy();
+      this._restoreConfirmContainer = null;
+    }
+    if (this._backupListContainer) {
+      this._backupListContainer.destroy();
+      this._backupListContainer = null;
+    }
     if (this._settingsContainer) {
       this._settingsContainer.destroy();
       this._settingsContainer = null;
     }
     // 드래그 상태 정리
     this._activeDrag = null;
+  }
+
+  // ── 세이브 복구 모달 (Phase 73) ──────────────────────────────────
+
+  /**
+   * 백업 목록 모달을 생성한다.
+   * SaveManager.getBackups()로 슬롯 3개의 상태를 표시한다.
+   * @private
+   */
+  _openBackupListModal() {
+    if (this._backupListContainer) return;
+
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+    const modalW = 280;
+    const modalH = 200;
+
+    const container = this.add.container(0, 0).setDepth(1200);
+    this._backupListContainer = container;
+
+    // 반투명 오버레이
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+      .setInteractive();
+    container.add(overlay);
+
+    // 패널 배경
+    const panelBg = NineSliceFactory.panel(this, cx, cy, modalW, modalH, 'dark');
+    container.add(panelBg);
+
+    // 타이틀
+    const title = this.add.text(cx, cy - 75, '\u21BA \uC138\uC774\uBE0C \uBCF5\uAD6C', {
+      fontSize: '16px',
+      fontStyle: 'bold',
+      color: '#88ccff',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(title);
+
+    // 닫기 버튼
+    const closeBtn = this.add.text(cx + modalW / 2 - 15, cy - modalH / 2 + 15, '\u2715', {
+      fontSize: '18px',
+      fontStyle: 'bold',
+      color: '#ff6666',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    closeBtn.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      if (this._backupListContainer) {
+        this._backupListContainer.destroy();
+        this._backupListContainer = null;
+      }
+    });
+    closeBtn.on('pointerover', () => closeBtn.setColor('#ff0000'));
+    closeBtn.on('pointerout', () => closeBtn.setColor('#ff6666'));
+    container.add(closeBtn);
+
+    // 백업 목록 렌더링
+    const backups = SaveManager.getBackups();
+    const ROW_START_Y = cy - 35;
+    const ROW_GAP = 36;
+
+    for (let i = 0; i < 3; i++) {
+      const rowY = ROW_START_Y + i * ROW_GAP;
+      const backup = backups[i];
+
+      if (backup) {
+        // 타임스탬프 포맷: YYYY-MM-DD HH:mm
+        const d = new Date(backup.timestamp);
+        const pad = (n) => String(n).padStart(2, '0');
+        const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        const label = `\uC2AC\uB86F ${i + 1} \u2014 ${dateStr} (v${backup.version})`;
+
+        const rowText = this.add.text(cx, rowY, label, {
+          fontSize: '12px',
+          color: '#88ffaa',
+          stroke: '#000000',
+          strokeThickness: 1,
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+        rowText.on('pointerover', () => rowText.setColor('#ccffcc'));
+        rowText.on('pointerout', () => rowText.setColor('#88ffaa'));
+        rowText.on('pointerdown', () => {
+          SoundManager.playSFX('sfx_ui_tap');
+          this._openRestoreConfirmModal(i + 1);
+        });
+        container.add(rowText);
+      } else {
+        const emptyText = this.add.text(cx, rowY, `\uC2AC\uB86F ${i + 1} \u2014 (\uC5C6\uC74C)`, {
+          fontSize: '12px',
+          color: '#555555',
+        }).setOrigin(0.5);
+        container.add(emptyText);
+      }
+    }
+
+    // 오버레이 클릭으로 닫기 (모달 영역 외부)
+    overlay.on('pointerdown', (pointer) => {
+      const mx = cx - modalW / 2;
+      const my = cy - modalH / 2;
+      if (pointer.x >= mx && pointer.x <= mx + modalW &&
+          pointer.y >= my && pointer.y <= my + modalH) return;
+      SoundManager.playSFX('sfx_ui_tap');
+      if (this._backupListContainer) {
+        this._backupListContainer.destroy();
+        this._backupListContainer = null;
+      }
+    });
+  }
+
+  /**
+   * 세이브 복구 확인 모달을 생성한다.
+   * @param {number} slot - 복구할 백업 슬롯 번호 (1~3)
+   * @private
+   */
+  _openRestoreConfirmModal(slot) {
+    if (this._restoreConfirmContainer) {
+      this._restoreConfirmContainer.destroy();
+      this._restoreConfirmContainer = null;
+    }
+
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+    const modalW = 260;
+    const modalH = 160;
+
+    const container = this.add.container(0, 0).setDepth(1300);
+    this._restoreConfirmContainer = container;
+
+    // 반투명 오버레이
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+      .setInteractive();
+    container.add(overlay);
+
+    // 패널 배경
+    const panelBg = NineSliceFactory.panel(this, cx, cy, modalW, modalH, 'dark');
+    container.add(panelBg);
+
+    // 경고 텍스트
+    const warnText = this.add.text(cx, cy - 30, '\uC774 \uC138\uC774\uBE0C\uB85C \uBCF5\uAD6C\uD558\uBA74\n\uD604\uC7AC \uC9C4\uD589\uC774 \uB36E\uC5B4\uC494\uC6CC\uC9D1\uB2C8\uB2E4.', {
+      fontSize: '13px',
+      color: '#ffaa66',
+      align: 'center',
+      stroke: '#000000',
+      strokeThickness: 1,
+    }).setOrigin(0.5);
+    container.add(warnText);
+
+    // 복구 버튼
+    const CONFIRM_W = 120;
+    const CONFIRM_H = 36;
+    const confirmBg = NineSliceFactory.raw(this, cx - 35, cy + 40, CONFIRM_W, CONFIRM_H, 'btn_primary_normal');
+    confirmBg.setTint(0x993333);
+    const confirmHit = new Phaser.Geom.Rectangle(-CONFIRM_W / 2, -CONFIRM_H / 2, CONFIRM_W, CONFIRM_H);
+    confirmBg.setInteractive(confirmHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    container.add(confirmBg);
+
+    const confirmLabel = this.add.text(cx - 35, cy + 40, '\uBCF5\uAD6C', {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      color: '#ff8888',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(confirmLabel);
+
+    confirmBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      SaveManager.restoreBackup(slot);
+      window.location.reload();
+    });
+    confirmBg.on('pointerover', () => { confirmBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); confirmBg.setTint(0xbb4444); });
+    confirmBg.on('pointerout', () => { confirmBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); confirmBg.setTint(0x993333); });
+
+    // 취소 버튼
+    const CANCEL_W = 100;
+    const CANCEL_H = 36;
+    const cancelBg = NineSliceFactory.raw(this, cx + 55, cy + 40, CANCEL_W, CANCEL_H, 'btn_secondary_normal');
+    cancelBg.setTint(0x333333);
+    const cancelHit = new Phaser.Geom.Rectangle(-CANCEL_W / 2, -CANCEL_H / 2, CANCEL_W, CANCEL_H);
+    cancelBg.setInteractive(cancelHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    container.add(cancelBg);
+
+    const cancelLabel = this.add.text(cx + 55, cy + 40, '\uCDE8\uC18C', {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      color: '#aaaaaa',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(cancelLabel);
+
+    cancelBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      if (this._restoreConfirmContainer) {
+        this._restoreConfirmContainer.destroy();
+        this._restoreConfirmContainer = null;
+      }
+    });
+    cancelBg.on('pointerover', () => { cancelBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); cancelBg.setTint(0x555555); });
+    cancelBg.on('pointerout', () => { cancelBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); cancelBg.setTint(0x333333); });
   }
 
   // ── 쿠폰 모달 (Phase 54) ──────────────────────────────────────

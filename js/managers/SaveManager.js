@@ -27,12 +27,21 @@
  *             분기 카드 헬퍼 메서드 9개 추가.
  * Phase 68: currentRun 인메모리 필드 + setCurrentRun/getCurrentRun/clearCurrentRun 추가.
  *           런타임 전용 (localStorage 저장 없음). SAVE_VERSION 불변.
+ * Phase 73: 세이브 백업 롤링 시스템 추가 (슬롯 3개 자동 순환).
+ *           getBackups, restoreBackup 정적 메서드 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
 const SAVE_VERSION = 24;
+
+// ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
+const BACKUP_KEYS = [
+  'kitchenChaosTycoon_backup_1',
+  'kitchenChaosTycoon_backup_2',
+  'kitchenChaosTycoon_backup_3',
+];
 
 /** 기본 세이브 데이터 */
 function createDefault() {
@@ -165,10 +174,89 @@ export class SaveManager {
 
   /** @param {object} data */
   static save(data) {
+    // ── Phase 73: 메인 저장 전에 롤링 백업 수행 ──
+    // 순서: slot2→slot3, slot1→slot2, 현재 메인→slot1
+    // 각 단계를 독립 try-catch로 감싸 quota 초과 시에도 메인 저장에 영향 없음
+    try {
+      const existingMain = localStorage.getItem(SAVE_KEY);
+      if (existingMain) {
+        // slot2 → slot3
+        try {
+          const s2 = localStorage.getItem(BACKUP_KEYS[1]);
+          if (s2) localStorage.setItem(BACKUP_KEYS[2], s2);
+        } catch { /* quota 초과 시 slot3 쓰기 포기 */ }
+
+        // slot1 → slot2
+        try {
+          const s1 = localStorage.getItem(BACKUP_KEYS[0]);
+          if (s1) localStorage.setItem(BACKUP_KEYS[1], s1);
+        } catch { /* quota 초과 시 slot2 쓰기 포기 */ }
+
+        // 현재 메인 → slot1
+        try {
+          const mainData = JSON.parse(existingMain);
+          localStorage.setItem(BACKUP_KEYS[0], JSON.stringify({
+            version: mainData.version ?? SAVE_VERSION,
+            timestamp: Date.now(),
+            data: mainData,
+          }));
+        } catch { /* quota 초과 시 slot1 쓰기 포기 */ }
+      }
+    } catch { /* 백업 전체 실패 — 메인 저장은 아래에서 계속 */ }
+
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     } catch {
       // localStorage 쓰기 실패 시 무시
+    }
+  }
+
+  // ── Phase 73: 세이브 백업 조회/복구 ──
+
+  /**
+   * 백업 슬롯 3개의 데이터를 조회한다.
+   * @returns {Array<{slot: number, version: number, timestamp: number, data: object}|null>}
+   *          3원소 배열. null = 해당 슬롯 비어있음.
+   */
+  static getBackups() {
+    const result = [];
+    for (let i = 0; i < BACKUP_KEYS.length; i++) {
+      try {
+        const raw = localStorage.getItem(BACKUP_KEYS[i]);
+        if (!raw) {
+          result.push(null);
+          continue;
+        }
+        const parsed = JSON.parse(raw);
+        result.push({
+          slot: i + 1,
+          version: parsed.version ?? 0,
+          timestamp: parsed.timestamp ?? 0,
+          data: parsed.data ?? {},
+        });
+      } catch {
+        result.push(null);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * 지정 슬롯의 백업 데이터를 메인 세이브에 복원한다.
+   * @param {number} slot - 1~3 (1-indexed)
+   * @returns {boolean} 성공 여부
+   */
+  static restoreBackup(slot) {
+    if (slot < 1 || slot > 3) return false;
+    try {
+      const raw = localStorage.getItem(BACKUP_KEYS[slot - 1]);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (!parsed.data) return false;
+      localStorage.setItem(SAVE_KEY, JSON.stringify(parsed.data));
+      return true;
+    } catch {
+      return false;
     }
   }
 
