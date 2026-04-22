@@ -194,6 +194,9 @@ export class GatheringScene extends Phaser.Scene {
     // ── 대화 트리거 (Phase 14-3: StoryManager 중앙화) ──
     StoryManager.checkTriggers(this, 'gathering_enter', { stageId: this.stageId });
 
+    // ── Phase 70: 튜토리얼 스테이지 도구 자동 지급 ──
+    this._checkAutoToolGrant();
+
     // ── DEV 전용 치트 핸들러 등록 (Phase 54) ──
     if (import.meta.env.DEV) {
       const scene = this;
@@ -227,6 +230,77 @@ export class GatheringScene extends Phaser.Scene {
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this.shutdown, this);
+  }
+
+  // ── Phase 70: 튜토리얼 자동 도구 지급 ──────────────────────────
+
+  /**
+   * 튜토리얼 스테이지(1-1~1-3) 진입 시 도구가 0개이면 프라이팬을 자동 지급·배치한다.
+   * storyFlags.tutorial_auto_tools_shown 플래그로 중복 지급을 방지한다.
+   * @private
+   */
+  _checkAutoToolGrant() {
+    const TUTORIAL_STAGES = ['1-1', '1-2', '1-3'];
+    if (!TUTORIAL_STAGES.includes(this.stageId)) return;
+
+    // 중복 지급 방지
+    const data = SaveManager.load();
+    const flags = data.storyProgress?.storyFlags;
+    if (flags && flags.tutorial_auto_tools_shown === true) return;
+
+    // 이미 도구를 보유하고 있으면 지급 불필요
+    if (ToolManager.hasAnyTool()) return;
+
+    // 프라이팬 1개 무료 지급
+    ToolManager.grantTool('pan');
+
+    // 스테이지별 안전 셀 후보 (경로 인접 비경로 셀)
+    const SAFE_CELLS = {
+      '1-1': [{ col: 0, row: 0 }, { col: 0, row: 1 }, { col: 2, row: 0 }],
+      '1-2': [{ col: 1, row: 0 }, { col: 3, row: 0 }, { col: 0, row: 0 }],
+      '1-3': [{ col: 0, row: 0 }, { col: 1, row: 0 }, { col: 3, row: 0 }],
+    };
+    const candidates = SAFE_CELLS[this.stageId] || [];
+    const cell = candidates.find(c =>
+      !this.stagePathCells.has(`${c.col},${c.row}`) &&
+      !this.towers.getChildren().some(t => t._cellKey === `${c.col},${c.row}`)
+    );
+    if (cell) {
+      this._placeTower(cell.col, cell.row, 'pan');
+    }
+
+    // storyFlags에 플래그 기록 (동적 추가, v24 유지)
+    const saveData = SaveManager.load();
+    if (!saveData.storyProgress) saveData.storyProgress = {};
+    if (!saveData.storyProgress.storyFlags || Array.isArray(saveData.storyProgress.storyFlags)) {
+      saveData.storyProgress.storyFlags = {};
+    }
+    saveData.storyProgress.storyFlags.tutorial_auto_tools_shown = true;
+    SaveManager.save(saveData);
+
+    // 알림 표시
+    this._showAutoToolNotice();
+  }
+
+  /**
+   * 자동 도구 지급 알림을 HUD 상단에 2초간 표시한다.
+   * @private
+   */
+  _showAutoToolNotice() {
+    const noticeText = this.add.text(GAME_WIDTH / 2, HUD_HEIGHT / 2,
+      '도구가 없어 프라이팬을 지급했습니다!', {
+        fontSize: '14px', color: '#ffcc44',
+        stroke: '#000000', strokeThickness: 2,
+      }).setOrigin(0.5).setDepth(200);
+
+    this.time.delayedCall(2000, () => {
+      this.tweens.add({
+        targets: noticeText,
+        alpha: 0,
+        duration: 400,
+        onComplete: () => noticeText.destroy(),
+      });
+    });
   }
 
   // ── 아이소메트릭 맵 그리기 ─────────────────────────────────────

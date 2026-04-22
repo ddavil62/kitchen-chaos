@@ -203,6 +203,25 @@ export class ToolManager {
   }
 
   /**
+   * 골드 차감 없이 도구를 1개 지급한다.
+   * 튜토리얼 자동 도구 지급 등에 사용된다.
+   * @param {string} toolId - 지급할 도구 ID
+   * @returns {boolean} 지급 성공 여부 (maxCount 초과 시 false)
+   */
+  static grantTool(toolId) {
+    const def = TOOL_DEFS[toolId];
+    if (!def) return false;
+    const data = SaveManager.load();
+    if (!data.tools) data.tools = ToolManager._defaultTools();
+    const tool = data.tools[toolId];
+    if (!tool) return false;
+    if (tool.count >= def.maxCount) return false;
+    tool.count++;
+    SaveManager.save(data);
+    return true;
+  }
+
+  /**
    * 기본 도구 데이터 생성 (스타터 키트 포함).
    * @returns {Object}
    * @private

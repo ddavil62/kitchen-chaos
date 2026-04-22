@@ -560,7 +560,15 @@ export class MerchantScene extends Phaser.Scene {
 
     btn.on('pointerdown', () => this._onDepart());
     btn.on('pointerover', () => btn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED));
-    btn.on('pointerout', () => { btn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); btn.setTint(0x22aa44); });
+    btn.on('pointerout', () => {
+      btn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL);
+      // Phase 70: disabled 상태에 따라 tint 분기
+      btn.setTint(this._departDisabled ? 0x666666 : 0x22aa44);
+    });
+
+    // Phase 70: 출발 버튼 참조 보존 + disabled 플래그 초기화
+    this._departBtn = btn;
+    this._departDisabled = false;
   }
 
   // ── 출발 처리 ─────────────────────────────────────────────────────
@@ -572,6 +580,11 @@ export class MerchantScene extends Phaser.Scene {
    * @private
    */
   _onDepart() {
+    // Phase 70: 분기 탭 활성 + 카드 미선택 시 토스트 표시
+    if (this._departDisabled) {
+      this._showDepartToast();
+      return;
+    }
     if (this.isEndless && this.endlessReturnData) {
       this._fadeToScene('EndlessScene', this.endlessReturnData);
     } else {
@@ -924,7 +937,18 @@ export class MerchantScene extends Phaser.Scene {
 
     // 클릭 핸들러
     this._tabToolsBg.on('pointerdown', () => this._setActiveTab('tools'));
-    this._tabBranchBg.on('pointerdown', () => this._setActiveTab('branch'));
+    this._tabBranchBg.on('pointerdown', () => {
+      // Phase 70: 골드 tint 플래시 (0.15초)
+      this._tabBranchText.setColor('#ffcc44');
+      this.time.delayedCall(150, () => {
+        if (this._activeTab === 'branch') {
+          this._tabBranchText.setColor('#ffcc88'); // 활성 탭 색상 유지
+        } else {
+          this._tabBranchText.setColor('#888888');
+        }
+      });
+      this._setActiveTab('branch');
+    });
   }
 
   /**
@@ -950,6 +974,9 @@ export class MerchantScene extends Phaser.Scene {
     if (this._branchTabElements) {
       this._branchTabElements.forEach(el => el.setVisible(!isTools));
     }
+
+    // Phase 70: 분기 탭 활성 + 카드 미선택 시 출발 버튼 disabled 제어
+    this._updateDepartButtonState();
   }
 
   // ── 분기 카드 영역 (Phase 58-2) ────────────────────────────────────
@@ -1181,8 +1208,8 @@ export class MerchantScene extends Phaser.Scene {
     const activeBless = SaveManager.getActiveBlessing();
     const isReplacingBlessing = cardDef.category === 'blessing' && !!activeBless;
 
-    // 팝업 높이: 기본 160, 축복 교체 문구 포함 시 180
-    const popupH = isReplacingBlessing ? 190 : 170;
+    // Phase 70: descKo 영역 추가로 popupH 30px 증가
+    const popupH = isReplacingBlessing ? 220 : 200;
 
     // 오버레이
     const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
@@ -1202,6 +1229,15 @@ export class MerchantScene extends Phaser.Scene {
     const msgBody = `${cardDef.titleKo}\u0028\uC744\u0029\u002F\u0028\uB97C\u0029 \uC120\uD0DD\uD569\uB2C8\uB2E4.\n\uC774 \uC120\uD0DD\uC740 \uCDE8\uC18C\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.`;
     const msgText = this.add.text(cx, cy - popupH / 2 + 52, msgBody, {
       fontSize: '13px', color: '#ffcccc', align: 'center', lineSpacing: 4,
+      wordWrap: { width: 270 },
+    }).setOrigin(0.5, 0).setDepth(102);
+
+    // Phase 70: descKo 구분선 + 효과 설명 텍스트
+    const dividerY = cy - popupH / 2 + 90;
+    const descDivider = NineSliceFactory.dividerH(this, cx, dividerY, 270, 1);
+    descDivider.setDepth(102);
+    const descText = this.add.text(cx, dividerY + 8, cardDef.descKo || '', {
+      fontSize: '11px', color: '#aaaaaa', align: 'center', lineSpacing: 3,
       wordWrap: { width: 270 },
     }).setOrigin(0.5, 0).setDepth(102);
 
@@ -1244,6 +1280,9 @@ export class MerchantScene extends Phaser.Scene {
       popupBg.destroy();
       warnText.destroy();
       msgText.destroy();
+      // Phase 70: descKo 구분선 + 텍스트 파괴
+      descDivider.destroy();
+      descText.destroy();
       if (replaceText) replaceText.destroy();
       okBtn.destroy(); okTxt.destroy();
       cancelBtn.destroy(); cancelTxt.destroy();
@@ -1297,6 +1336,9 @@ export class MerchantScene extends Phaser.Scene {
     this._branchCardSelected = true;
     this._branchSelectedCardId = cardDef.id;
 
+    // Phase 70: 카드 선택 완료 후 출발 버튼 활성화
+    this._updateDepartButtonState();
+
     // 분기 탭 UI 재렌더 (기존 요소 파괴 후 재생성)
     this._rebuildBranchTab();
   }
@@ -1316,6 +1358,49 @@ export class MerchantScene extends Phaser.Scene {
     if (this._branchTabElements) {
       this._branchTabElements.forEach(el => el.setVisible(isBranch));
     }
+  }
+
+  // ── Phase 70: 출발 버튼 disabled 제어 ──────────────────────────────
+
+  /**
+   * 분기 탭 활성 + 카드 미선택 시 출발 버튼을 disabled(회색)로,
+   * 그 외에는 활성(녹색)으로 설정한다.
+   * @private
+   */
+  _updateDepartButtonState() {
+    const shouldDisable = this._activeTab === 'branch' && !this._branchCardSelected;
+    this._departDisabled = shouldDisable;
+    if (this._departBtn) {
+      this._departBtn.setTint(shouldDisable ? 0x666666 : 0x22aa44);
+    }
+  }
+
+  /**
+   * disabled 상태의 출발 버튼 클릭 시 "분기 카드를 선택하세요" 토스트를 1.5초간 표시한다.
+   * 동시 2개 이상 생성을 방지한다.
+   * @private
+   */
+  _showDepartToast() {
+    if (this._departToastActive) return;
+    this._departToastActive = true;
+
+    const toastText = this.add.text(GAME_WIDTH / 2, DEPART_BTN_Y - 40,
+      '\uBD84\uAE30 \uCE74\uB4DC\uB97C \uC120\uD0DD\uD558\uC138\uC694', {
+        fontSize: '13px', color: '#ffcc88',
+        stroke: '#000', strokeThickness: 2,
+      }).setOrigin(0.5).setDepth(200);
+
+    this.time.delayedCall(1500, () => {
+      this.tweens.add({
+        targets: toastText,
+        alpha: 0,
+        duration: 400,
+        onComplete: () => {
+          toastText.destroy();
+          this._departToastActive = false;
+        },
+      });
+    });
   }
 
   // ── 유틸리티 ───────────────────────────────────────────────────────
