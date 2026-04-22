@@ -312,12 +312,12 @@ export class GatheringScene extends Phaser.Scene {
    */
   _drawMap() {
     const gfx = this.add.graphics();
-    gfx.setDepth(0);
+    gfx.setDepth(1);  // Phase 71: 배경 rect(depth=0) 위에 확실히 렌더
     const cols = this.stageData?.gridCols || GRID_COLS;
     const rows = this.stageData?.gridRows || GRID_ROWS;
 
     // Phase 63 FIX-13: 플랫 컬러 → 체커 패턴 + 명도 변주로 디테일 강화.
-    // 경로 셀 2톤 (0xc8a46e / 0xbd9862), 비경로 풀 셀 2톤 (0x2d5a1b / 0x285216)
+    // Phase 71: 색상 대비 강화 — 경로 0xd4b078/0xaa8040(명도차 36), 비경로 0x2d5a1b/0x1a3510(명도차 19)
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const d = cellDiamond(col, row);
@@ -326,9 +326,9 @@ export class GatheringScene extends Phaser.Scene {
 
         let fillColor;
         if (onPath) {
-          fillColor = isCheckerAlt ? 0xbd9862 : 0xc8a46e;
+          fillColor = isCheckerAlt ? 0xaa8040 : 0xd4b078;
         } else {
-          fillColor = isCheckerAlt ? 0x285216 : 0x2d5a1b;
+          fillColor = isCheckerAlt ? 0x1a3510 : 0x2d5a1b;
         }
         gfx.fillStyle(fillColor);
         gfx.fillPoints([d.top, d.right, d.bottom, d.left], true);
