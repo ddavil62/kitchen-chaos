@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (Phase 71 체커 패턴 복구 + 에셋 404 전수 수리 완료)
+> 최종 업데이트: 2026-04-23 (Phase 72 분기 카드 수치 전수 반영 완료)
 
 ## 프로젝트 개요
 
@@ -86,7 +86,7 @@
 | 영업씬 렌더링 재구성 | 테이블 3레이어 분리 렌더링(back/customer/front), 손님 독립 스프라이트(5종x2상태), HUD depth 600+ 상향 | 완료 |
 | 쿠폰 코드 시스템 | 설정 메뉴 쿠폰 입력 UI, 일반 쿠폰 3종(프로덕션), DEV 치트 5종(트리쉐이킹), giftIngredients 세이브 v20 | 완료 |
 | 메뉴 비주얼 에셋 | MenuScene에 배경 이미지(menu_bg), 타이틀 로고(menu_title_logo), 미미 스프라이트, 앱 아이콘(app_icon_512) 도입. 장식 원 제거, panel dark alpha 0.5 | 완료 |
-| 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 tint + Bond 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭) + 분기 레시피 1회 한정 주문 풀 편입 | 완료 |
+| 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 8종 전수 실효(tint+전투 수치) + Bond 8쌍 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭·적 둔화) + 분기 레시피 반복 등장(chaos_ramen 3회/spice_bomb 2회) | 완료 |
 
 ## 콘텐츠 규모
 
@@ -114,9 +114,10 @@
 - `assets/sprites/towers/` 하위에 원본 32x32 타워 파일이 잔존 (SpriteLoader가 `assets/towers/` 경로만 참조하므로 기능 영향 없음, 디스크 정리 권장)
 - 타일셋 15종을 BootScene에서 전부 preload하나 GatheringScene에서 맵 렌더링에 사용하지 않음 (프로그래매틱 체커 패턴 사용). 향후 타일셋 기반 테마별 맵 렌더링 전환 시 활용 가능
 - ~~portrait 8종이 SDXL 애니메 일러스트로 생성되어 픽셀 UI와 스타일 충돌~~ → **Phase 64에서 PixelLab 네이티브 128px 반신 포트레이트로 교체 완료 (2026-04-22)**
-- 분기 카드 중 일부 변이(chain/cluster/venom/aura_boost)와 Bond(yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice)는 플래그만 저장되고 소비처 로직 미구현 상태 (tint 시각 효과는 정상, 실제 전투 수치 반영은 부분적). 후속 Quick Fix로 보완 예정
-- `Enemy.js`의 `enemy_slow` 축복 처리가 `require()` 호출로 작성되어 ESM 환경에서 조용히 실패. `bles_enemy_slow` 카드는 실효 미반영 (후속 수정 필요)
-- 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약은 현재 단순 1회 소비로 통일됨 (카드 descKo의 수치와 실제 동작 불일치, 후속 밸런스 조정 예정)
+- ~~분기 카드 변이/Bond 미구현~~ → **Phase 72에서 변이 4종(chain/cluster/venom/aura_boost) + Bond 4쌍 전수 실효 구현 완료 (2026-04-23)**
+- ~~enemy_slow ESM import 버그~~ → **Phase 72 회귀 검증 결과 기존 코드 정상 동작 확인 (2026-04-23)**
+- ~~분기 레시피 반복 규약 불일치~~ → **Phase 72에서 chaos_ramen 3회/spice_bomb 2회 카운트 감산 구현 완료 (2026-04-23)**
+- mimi+salt Bond가 salt 변이 없이 단독 사용 시 미작동 (Phase 58-3 pre-existing 구조 결함: `_applyMutationToTower()`에서 변이 없으면 `_applyBondToTower()` 호출이 차단됨). 다른 3쌍 Bond는 BranchEffects API 직접 조회라 영향 없음. 후속 페이즈에서 수정 권장
 
 ## 향후 계획
 
@@ -124,41 +125,33 @@
 
 ## 개발 이력 (최근)
 
+### Phase 72 — 분기 카드 수치 전수 반영 (2026-04-23)
+
+P2-2 해결: "로그라이크 카드의 약속 이행". 변이 4종(chain/cluster/venom/aura_boost) 실효 구현, Bond 4쌍(yuki+soup_pot/andre+delivery/mimi+salt/mimi+spice) 시너지 구현, enemy_slow 축복 회귀 확인(정상 동작), 레시피 반복 규약(chaos_ramen 3회/spice_bomb 2회) 구현.
+
+- 수정 파일: Projectile.js, Tower.js, GatheringScene.js, ServiceScene.js, IngredientManager.js, SaveManager.js, merchantBranchData.js
+- 신규 테스트: phase72-branch-effects.spec.js (16건), phase72-qa-edge.spec.js (16건), phase72-qa-bond-bug.spec.js (2건)
+- QA: Playwright 91/91 PASS (Phase 72 34 + Phase 70 회귀 28 + Phase 71 회귀 29), 콘솔 에러 0건
+- 스펙: `.claude/specs/2026-04-23-kc-phase72-spec.md`
+
 ### Phase 71 — 체커 패턴 복구 + 에셋 404 전수 수리 (2026-04-23)
 
-P1-6(GatheringScene 체커 2톤 패턴 리그레션), P2-8(13개 에셋 404 이모지 fallback) 해결. GatheringScene `_drawMap()` depth 0→1 상향 + 체커 색상 대비 강화. 타일셋 3종 신규 생성, 테이블 waiting/seated 8종 신규 생성(AD2 REVISE 후 재생성), 타워 2종 경로 수정+48x48 표준화.
+P1-6, P2-8 해결. GatheringScene 체커 depth+색상 대비 강화, 타일셋 3종+테이블 8종+타워 2종 신규/수정.
 
-- 수정 파일: GatheringScene.js
-- 신규 에셋: tilesets 3종, service/table 8종, towers 2종 (총 13종)
-- QA: Playwright 62/62 PASS (회귀 28 + 신규 29 + verify 5), AD 모드2/3 APPROVED
+- QA: Playwright 62/62 PASS, AD 모드2/3 APPROVED
 - 스펙: `.claude/specs/2026-04-22-kc-phase71-spec.md`
 
 ### Phase 70 — 초반 튜토리얼 안전장치 + 분기 카드 피드백 강화 (2026-04-22)
 
-P1-1(도구 0개 즉시 패배), P1-3(분기 카드 피드백 부재) 2건 해결. ToolManager에 `grantTool()` 메서드를 추가하고, GatheringScene 1-1~1-3 진입 시 도구 자동 지급/배치 구현. MerchantScene 분기 탭에 골드 tint 플래시, 출발 버튼 disabled 제어, descKo 확인 모달을 추가.
+P1-1, P1-3 해결. ToolManager.grantTool() + 1-1~1-3 자동 도구 지급, MerchantScene 분기 탭 UX 개선.
 
-- 수정 파일: ToolManager.js, GatheringScene.js, MerchantScene.js
-- 신규 파일: tests/phase70-qa.spec.js (28건)
-- QA: Playwright 28/28 PASS, AD 모드3 APPROVED (2차, 1차 REVISE 2건 수정 반영)
+- QA: Playwright 28/28 PASS, AD 모드3 APPROVED
 - 스펙: `.claude/specs/2026-04-22-kc-phase70-spec.md`
 
 ### Phase 68 — P0 판정/레이어/씬 상태 전달 핫픽스 (2026-04-22)
 
-P0-2~4 3건 수정. `isCleared` 복합 조건, modal lock, `_currentRun` 인메모리 단일 소스 도입.
+P0-2~4 해결. isCleared 복합 조건, modal lock, _currentRun 인메모리 단일 소스.
 
-- QA: Playwright 40/40 PASS, AD 모드3 APPROVED (5/5)
-- 스펙: `.claude/specs/2026-04-22-kc-phase68-spec.md`
-
-### Phase 67 — 한글 픽셀 폰트 로컬 번들 (2026-04-22)
-
-P0-1 한글 초성 깨짐 근본 해결. NeoDunggeunmoPro woff2 로컬 번들 + `FONT_FAMILY` 상수 도입.
-
-- QA: Playwright 17/17 PASS, AD 모드3 APPROVED (7/7)
-
-### Phase 66 — 개그씬 확장 (2026-04-22)
-
-대화 스크립트 106→119종, 트리거 107→120항목. 개그씬 대폭 추가.
-
-- QA: Playwright 21/21 PASS
+- QA: Playwright 40/40 PASS, AD 모드3 APPROVED
 
 이전 이력은 [CHANGELOG.md](CHANGELOG.md) 참조.

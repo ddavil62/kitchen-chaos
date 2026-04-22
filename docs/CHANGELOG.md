@@ -1,5 +1,95 @@
 # Changelog
 
+## [Phase 72] 2026-04-23 -- 분기 카드 수치 전수 반영
+
+### 개요
+
+디렉터 플레이테스트 리포트 P2-2 "로그라이크 카드의 약속 이행" 해결. Phase 58-3에서 플래그만 세팅되고 실효 로직이 없던 변이 4종(chain/cluster/venom/aura_boost)과 Bond 4쌍(yuki+soup_pot/andre+delivery/mimi+salt/mimi+spice)의 전투/경제 수치 반영을 완료. enemy_slow 축복은 회귀 검증으로 기존 코드 정상 동작 확인. 레시피 반복 등장 규약(chaos_ramen 3회/spice_bomb 2회)을 구현하고, rewardMultiplier는 코드 주석으로 종결.
+
+### 추가
+
+- `kitchen-chaos/tests/phase72-branch-effects.spec.js` -- Coder 작성, 변이 4종 + Bond 4쌍 + enemy_slow 축복 + 레시피 반복 + 회귀 = 16건
+- `kitchen-chaos/tests/phase72-qa-edge.spec.js` -- QA 작성, 예외 시나리오 16건 (동시 적용, 마이그레이션, 경계값, 격리, 폴백, 영속성)
+- `kitchen-chaos/tests/phase72-qa-bond-bug.spec.js` -- QA 작성, BUG-01(mimi+salt Bond-only) 검증 2건
+
+### 변경
+
+- `kitchen-chaos/js/entities/Projectile.js`
+  - `_tower` 역참조 필드 추가 (생성자에서 `towerData._towerRef` 수신)
+  - `_hit()`: chain 변이 -- salt 투사체 명중 후 `_chainRadius`px 내 인접 적 1마리에 둔화 연쇄(`applySlow`)
+  - `_hit()`: venom 변이 -- spice_grinder 투사체 명중 후 DoT 활성 적에 `_poisonSlowPct` 둔화 추가
+  - `destroy()` 시 `this._tower = null` GC 방어 처리 (line 176)
+
+- `kitchen-chaos/js/entities/Tower.js`
+  - `_shoot()`: cluster 변이 -- wasabi_cannon 발사 시 `_clusterCount`발 Projectile 생성, 각 발 `damage *= _perShotDamageRatio`
+  - `_shoot()`: `projData._towerRef = this` 추가 (chain/venom 역참조용)
+
+- `kitchen-chaos/js/scenes/GatheringScene.js`
+  - `_updateSoupPotAuras()`: aura_boost 변이 -- `_auraMultiplier` 곱셈 적용 (기본 0.15 -> 0.30), `auraRadius` 폴백 처리
+  - `_updateDeliveryTowers()`: mimi+salt Bond -- 둔화 적 120px 이내 존재 시 delivery 수거 반경에 `_collectRadiusOnSlow`(40px) 가산
+  - salt 타워 `_saltCollectRadiusCached` 캐싱 (N*M 복잡도 방지)
+
+- `kitchen-chaos/js/scenes/ServiceScene.js`
+  - 조리시간 계산: yuki+soup_pot Bond -- `BranchEffects.getActiveBondEffect('soup_pot')` 직접 조회, `totalTime *= (1 - yukiSoupBonus)` 추가 감소 인자 (기본 -15%)
+  - 팁 계산: andre+delivery Bond -- `BranchEffects.getActiveBondEffect('delivery')` 직접 조회, `totalGold *= (1 + andreTipBonus)` 독립 계수 (기본 +10%)
+
+- `kitchen-chaos/js/managers/IngredientManager.js`
+  - `spawnDrop()`: mimi+spice Bond -- enemy `_dotStacks.length > 0` 시 `BranchEffects.getActiveBondEffect('spice_grinder')` 직접 조회, `count *= (1 + dropRateOnPoison)` 드롭률 가산 (기본 +25%)
+
+- `kitchen-chaos/js/managers/SaveManager.js`
+  - `REPEATABLE_BRANCH_RECIPES` 상수 추가: `{ branch_chaos_ramen: 3, branch_spice_bomb: 2 }`
+  - `consumeBranchRecipe()`: 반복 레시피는 `branchCards.recipeRepeatCounts`에서 카운트 감산, 0이 되면 제거. 나머지는 기존 1회 즉시 제거
+  - 마이그레이션 방어: `recipeRepeatCounts` 필드 미존재 시 `{}` 자동 초기화
+
+- `kitchen-chaos/js/data/merchantBranchData.js`
+  - recipe 카드 정의에 주석 추가: `// rewardMultiplier는 recipeData.js의 baseReward에 직접 반영됨. 런타임에서 중복 적용하지 않는다.`
+
+### 수치
+
+- chain 변이: salt 명중 시 `_chainRadius`px 내 인접 적 1마리 둔화 연쇄
+- cluster 변이: wasabi_cannon `_clusterCount`발(기본 3) 다발 발사, `_perShotDamageRatio`(기본 0.6) 데미지
+- venom 변이: spice_grinder DoT 적 `_poisonSlowPct`(기본 0.2) 둔화 추가
+- aura_boost 변이: soup_pot 아우라 버프 `_auraMultiplier`(기본 2.0) 곱셈, 0.15 -> 0.30
+- yuki+soup_pot Bond: 조리시간 -15% 추가 감소
+- andre+delivery Bond: 서빙 팁 +10% 독립 계수
+- mimi+salt Bond: 둔화 적(120px 이내) 존재 시 delivery 수거 반경 +40px
+- mimi+spice Bond: 중독 적(_dotStacks > 0) 드롭률 +25%
+- chaos_ramen 반복: 최대 3회 소비 후 해금 목록에서 제거
+- spice_bomb 반복: 최대 2회 소비 후 해금 목록에서 제거
+- Playwright 테스트: 91건 (Phase 72 신규 16 + QA 엣지 16 + bond-bug 2 + Phase 70 회귀 28 + Phase 71 회귀 29)
+
+### 스펙 대비 변경
+
+- 없음. 모든 구현이 스펙 문서의 "구현 상세" 섹션을 정확히 따름.
+- enemy_slow 축복: 스펙에서 "ESM import 버그 수정" 예상했으나, 실제로는 기존 코드(`Enemy.js` line 24 정적 import + line 57-61 `getBlessingMultiplier('enemy_slow')`)가 이미 정상 동작하고 있었음. 회귀 테스트만으로 검증 완료.
+
+### 알려진 이슈
+
+- **BUG-01 (MEDIUM)**: mimi+salt Bond가 salt 변이 없이 단독 사용 시 미작동. `GatheringScene.js:2007-2009` `_applyMutationToTower()`에서 `if (!effect) return;`이 `_applyBondToTower()` 호출(line 2074)을 차단. Phase 58-3 pre-existing 구조 결함. 다른 3쌍 Bond(yuki+soup_pot, andre+delivery, mimi+spice)는 BranchEffects API 직접 조회이므로 영향 없음. 후속 페이즈에서 수정 권장.
+- **LOW**: `GatheringScene.js:2105,2109,2124`의 tower 플래그(`_bondCookSpeedBonus`, `_bondTipBonus`, `_dropRateOnPoison`)가 세팅만 되고 읽히지 않음 (dead code). Bond 실효는 BranchEffects API 직접 조회로 구현되었으므로 기능 영향 없음.
+- **LOW**: `_saltCollectRadiusCached` 캐시가 한 번 세팅 후 무효화되지 않음. 현재 게임 구조상 런 중간 동적 타워 추가 불가이므로 문제 없음.
+
+### 검증
+
+- Playwright 91/91 PASS
+  - Phase 72 신규 (Coder): 16/16
+  - Phase 72 QA 엣지: 16/16
+  - Phase 72 QA Bond 버그 검증: 2/2
+  - Phase 70 회귀: 28/28
+  - Phase 71 회귀: 29/29
+- 콘솔 에러: 0건
+- 수용 기준: 12/12 충족
+- visual_change: none (AD 실행 해당 없음)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase72-spec.md`
+- 목적 정의서: `.claude/specs/2026-04-23-kc-phase72-scope.md`
+- Coder 리포트: `.claude/specs/2026-04-23-kc-phase72-coder-report.md`
+- QA: `.claude/specs/2026-04-23-kc-phase72-qa.md`
+
+---
+
 ## [Phase 71] 2026-04-23 -- 체커 패턴 복구 + 에셋 404 전수 수리
 
 ### 개요

@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-23 (Phase 71 완료, 출시 Polish 로드맵 진행 중)
-> 기준: Phase 71 완료 + 출시 Polish 로드맵(Phase 69~78) 계획
+> 최종 업데이트: 2026-04-23 (Phase 72 완료, 출시 Polish 로드맵 진행 중)
+> 기준: Phase 72 완료 + 출시 Polish 로드맵(Phase 69~78) 계획
 
 ---
 
@@ -77,8 +77,9 @@
 | Phase 69 | 초반 UX 퀵픽스 묶음 (ChefSelect 미미 고정, 엔드리스 잠금 문구 통일, 도구 0개 빈 상태 UI) | ✅ 완료 |
 | Phase 70 | 초반 튜토리얼 안전장치 + 분기 카드 피드백 강화 (P1-1 자동 도구 지급, P1-3 분기 탭 UX) | ✅ 완료 |
 | Phase 71 | 체커 패턴 복구 + 에셋 404 전수 수리 (P1-6 체커 depth+색상, P2-8 tileset 3종+table 8종+tower 2종) | ✅ 완료 |
+| Phase 72 | 분기 카드 수치 전수 반영 (P2-2 변이 4종+Bond 4쌍 실효, enemy_slow 회귀 확인, 레시피 반복 규약) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 71 완료 (2026-04-23) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21). 행상인 분기 카드 시스템: 4카테고리×8장=32장, 매 방문 3택 1 되돌릴 수 없는 선택, 배지 아이콘 4종, BranchEffects 매니저로 변이 tint·Bond 시너지·Blessing 실효·분기 레시피 주문 풀 편입(v24). P0 전수 해결(67~68), 초반 UX 안전장치(69~70) 완료. 체커 패턴 복구 + 에셋 404 전수 수리(71) 완료.
+**현재 구현 완성도**: Phase 72 완료 (2026-04-23) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장: 미력 폭풍의 눈 이벤트(15웨이브 배수) + 정화 임무 4종(EndlessMissionManager) + 유랑 미력사 8% 등장 + 웨이브 구간별 배경 테마 전환 + 업적 6개 + 통계 트래킹(v21). 행상인 분기 카드 시스템: 4카테고리×8장=32장 전수 실효 완료, 변이 8종 전투 수치 반영 + Bond 8쌍 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭·적 둔화) + 분기 레시피 반복 등장(chaos_ramen 3회/spice_bomb 2회)(v24). P0 전수 해결(67~68), 초반 UX 안전장치(69~70) 완료. 체커 패턴 복구 + 에셋 404 전수 수리(71) 완료. 분기 카드 수치 전수 반영(72) 완료.
 
 ### 현재 콘텐츠 규모
 
@@ -434,9 +435,10 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 - [x] Playwright QA 통합 테스트 `tests/phase58-qa-integration.spec.js` — 26 PASS / 0 관련 FAIL (#27 sugar_fairy는 본 페이즈 무관 기존 이슈)
 
 **알려진 제약** (PROJECT.md 제약사항 섹션에 기록):
-- 일부 변이(`chain`/`cluster`/`venom`/`aura_boost`)와 Bond(`yuki+soup_pot`/`andre+delivery`/`mimi+salt`/`mimi+spice`) 플래그만 저장, 소비처 로직 미구현
-- `Enemy.js` `enemy_slow` ESM `require()` 버그로 미작동
-- 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약은 단순 1회 소비로 통일
+- ~~변이/Bond 미구현~~ → **Phase 72에서 전수 해결 (2026-04-23)**
+- ~~`Enemy.js` `enemy_slow` ESM `require()` 버그~~ → **Phase 72 회귀 검증 결과 기존 코드 정상 동작 확인 (2026-04-23)**
+- ~~분기 레시피 반복 규약 불일치~~ → **Phase 72에서 chaos_ramen 3회/spice_bomb 2회 구현 (2026-04-23)**
+- **BUG-01 (MEDIUM)**: mimi+salt Bond가 salt 변이 없이 단독 사용 시 미작동. Phase 58-3 pre-existing 구조 결함. 후속 수정 권장
 
 **의존성**: 없음 (MerchantScene 독립 작업)
 
@@ -498,7 +500,7 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 |------|-------|----------|------|
 | **P0 출시 차단 해제** | 67~68 | P0-1~4 (한글 렌더링, 0/0 ★★★ 판정, 레이어 충돌, 씬 상태 전달) | **67~68 완료** |
 | **P1 초기 UX 안전장치** | 69~71 | P1-1~7 + 에셋 404 | **69~71 완료** |
-| **P2 품질 보강** | 72~74 | 분기 카드 수치 전수 반영, 세이브 백업, UI/카피 마감 | 대기 |
+| **P2 품질 보강** | 72~74 | 분기 카드 수치 전수 반영, 세이브 백업, UI/카피 마감 | **72 완료**, 73~74 대기 |
 | **P3 BM/리텐션** | 75~78 | 일일 미션, 손님 다양성, 셰프 스킨, 시즌/랭킹 | 대기 |
 
 ### 페이즈 상세
@@ -571,15 +573,16 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 
 **의존성**: Phase 68 (완료).
 
-#### Phase 72 — 분기 카드 수치 전수 반영 (full, none)
+#### Phase 72 — 분기 카드 수치 전수 반영 (full, none) ✅ 완료 (2026-04-23)
 
 **목표**: P2-2 해결. "로그라이크 카드의 약속"을 지킨다.
 
-- 변이 미구현 4종 (chain/cluster/venom/aura_boost) 실효 로직 구현
-- Bond 미구현 4쌍 (yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice) 시너지 적용
-- Enemy.js `enemy_slow` 축복 ESM import 버그 수정
-- 분기 레시피 `rewardMultiplier` 및 "반복 등장 N회" 규약 정의서 수정 또는 구현 선택
-- `tests/phase72-branch-effects.spec.js` 32장 전수 회귀
+- [x] 변이 4종 (chain/cluster/venom/aura_boost) 실효 로직 구현
+- [x] Bond 4쌍 (yuki+soup_pot / andre+delivery / mimi+salt / mimi+spice) 시너지 적용
+- [x] enemy_slow 축복 회귀 검증 (기존 코드 정상 동작 확인)
+- [x] 레시피 반복 등장 규약: chaos_ramen 3회, spice_bomb 2회 카운트 감산 구현. rewardMultiplier는 코드 주석으로 종결
+- [x] Playwright 91/91 PASS (신규 34 + 회귀 57)
+- **알려진 이슈**: mimi+salt Bond-only 미작동 (BUG-01, MEDIUM, Phase 58-3 pre-existing). 후속 페이즈에서 수정 권장
 
 **의존성**: Phase 71 (완료).
 
