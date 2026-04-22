@@ -78,10 +78,11 @@ export class EndlessScene extends GatheringScene {
       }
       this._tutorial._active = false;
     }
+    // Phase 74: N/3 접두어 제거 — TutorialManager 페이지네이터가 담당 (P2-4)
     this._tutorial = new TutorialManager(this, 'endless', [
-      '1/3 \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC!\n\uC6E8\uC774\uBE0C\uAC00 \uB05D\uC5C6\uC774 \uC774\uC5B4\uC9D1\uB2C8\uB2E4.',
-      '2/3 5\uC6E8\uC774\uBE0C\uB9C8\uB2E4\n\uC624\uB298\uC758 \uC2A4\uD398\uC15C \uB808\uC2DC\uD53C\uB85C \uC601\uC5C5!',
-      '3/3 \uCD5C\uB300\uD55C \uC624\uB798 \uBC84\uD600\n\uB7AD\uD0B9\uC5D0 \uC774\uB984\uC744 \uC62C\uB9AC\uC138\uC694!',
+      '\uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC!\n\uC6E8\uC774\uBE0C\uAC00 \uB05D\uC5C6\uC774 \uC774\uC5B4\uC9D1\uB2C8\uB2E4.',
+      '5\uC6E8\uC774\uBE0C\uB9C8\uB2E4\n\uC624\uB298\uC758 \uC2A4\uD398\uC15C \uB808\uC2DC\uD53C\uB85C \uC601\uC5C5!',
+      '\uCD5C\uB300\uD55C \uC624\uB798 \uBC84\uD600\n\uB7AD\uD0B9\uC5D0 \uC774\uB984\uC744 \uC62C\uB9AC\uC138\uC694!',
     ]);
     // 타이머 기반 자동 진행: 2초 후 시작, 3초 간격 진행
     this.time.delayedCall(2000, () => {

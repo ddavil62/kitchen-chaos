@@ -202,10 +202,25 @@ export class AchievementScene extends Phaser.Scene {
     const cardX = 8;
 
     // Phase 60-19: 카드 배경 rect → NineSliceFactory.panel 'parchment' + setTint
+    // Phase 74: 수령 대기(unlocked && !claimed) 상태는 glow_selected 텍스처로 교체 (P2-7)
+    const isClaiming = item.unlocked && !item.claimed;
     const bgColor = item.claimed ? 0x1a2a1a : (item.unlocked ? 0x2a2200 : 0x222222);
-    const bg = NineSliceFactory.panel(this, cardX + cardW / 2, y + CARD_HEIGHT / 2, cardW, CARD_HEIGHT, 'parchment');
-    bg.setTint(bgColor);
+    const bgTexture = isClaiming ? 'panel_glow_selected' : 'parchment';
+    const bg = NineSliceFactory.panel(this, cardX + cardW / 2, y + CARD_HEIGHT / 2, cardW, CARD_HEIGHT, bgTexture);
+    if (!isClaiming) bg.setTint(bgColor);
     container.add(bg);
+
+    // Phase 74: 수령 대기 카드 골드 glow alpha 펄스 (P2-7)
+    if (isClaiming) {
+      this.tweens.add({
+        targets: bg,
+        alpha: { from: 0.7, to: 1.0 },
+        duration: 1200,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
 
     // 아이콘
     const icon = this.add.text(cardX + 24, y + CARD_HEIGHT / 2, item.icon, {

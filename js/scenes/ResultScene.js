@@ -21,6 +21,53 @@ import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
 
+// ── Phase 74: 셰프별 장보기 실패 대사 (P2-5) ──
+// 셰프 ID → 바리에이션 3줄 배열. 매 호출 시 Math.floor(Math.random() * 3)으로 선택.
+const CHEF_FAIL_LINES = {
+  mimi_chef: [
+    '으... 재료가 하나도 없어. 오늘은 쉬어야 할 것 같아.',
+    '할머니한테 뭐라고 말하지... 내가 너무 약했나봐.',
+    '괜찮아, 다음엔 꼭 해낼 거야. 포기는 미력사의 길이 아니야!',
+  ],
+  rin_chef: [
+    '흥, 이런 결과라니. 다음엔 두 배로 집중해야겠어.',
+    '재료가 없으면 불꽃도 소용없지... 다시 준비하자.',
+    '이 정도에 꺾이는 린이 아니야. 다시 가자!',
+  ],
+  mage_chef: [
+    '빙결 주문도 재료가 없으면 무용지물이군요...',
+    '이론상으론 완벽했는데. 실전에서 변수가 많았네요.',
+    '냉정하게 분석해야 해요. 다음엔 더 효율적으로.',
+  ],
+  yuki_chef: [
+    '눈... 눈이 너무 많이 왔나봐요. 길을 잃었어요.',
+    '으으, 이런 실수라니. 유키가 부끄러워요.',
+    '괜찮아요! 눈은 쌓이고 또 쌓이거든요. 다시 해봐요!',
+  ],
+  lao_chef: [
+    '재료 없인 요리도 없지. 당연한 이치야.',
+    '이 결과... 묵묵히 받아들이겠어. 다음엔 더 잘 할 거야.',
+    '향신료 없이 이 싸움은 무의미했다. 채비를 다시 하자.',
+  ],
+  andre_chef: [
+    'Mon Dieu... 재료가 없으니 셰프도 무용지물이군.',
+    '프랑스 요리는 재료가 생명이야. 오늘은 패배를 인정하지.',
+    '프로는 실패에서 배우는 법. 다음 판에선 완벽하게!',
+  ],
+  arjun_chef: [
+    '마살라가 없으니... 오늘 주방엔 향기가 없겠군요.',
+    '모든 재료가 신의 선물이에요. 오늘은 신이 시련을 주셨나봐요.',
+    '좌절하지 마세요. 인내는 최고의 향신료입니다!',
+  ],
+};
+
+/** 알 수 없는 셰프 ID 폴백 대사 */
+const CHEF_FAIL_FALLBACK = [
+  '재료를 모으지 못해 오늘 영업을 할 수 없습니다...',
+  '다음엔 더 열심히 해봅시다!',
+  '힘내세요, 다시 도전!',
+];
+
 export class ResultScene extends Phaser.Scene {
   constructor() {
     super({ key: 'ResultScene' });
@@ -193,9 +240,13 @@ export class ResultScene extends Phaser.Scene {
     }).setOrigin(0.5);
     y += 60;
 
-    // 설명
-    this.add.text(GAME_WIDTH / 2, y, '재료를 모으지 못해\n오늘 영업을 할 수 없습니다...', {
-      fontSize: '16px', color: '#cccccc', align: 'center', lineSpacing: 6,
+    // Phase 74: 셰프별 실패 대사 (P2-5)
+    const chefId = SaveManager.load()?.selectedChef ?? '';
+    const lines = CHEF_FAIL_LINES[chefId] || CHEF_FAIL_FALLBACK;
+    const failLine = lines[Math.floor(Math.random() * lines.length)];
+    this.add.text(GAME_WIDTH / 2, y, failLine, {
+      fontSize: '15px', color: '#ffccaa', align: 'center', lineSpacing: 6,
+      wordWrap: { width: GAME_WIDTH - 40 },
     }).setOrigin(0.5);
     y += 60;
 

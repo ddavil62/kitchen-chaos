@@ -13,7 +13,7 @@ import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 const OVERLAY_CX = GAME_WIDTH / 2;
 const OVERLAY_CY = 64;            // Phase 62: 60 → 64 (팝업 중심 미세 하강)
 const PANEL_W = 300;
-const PANEL_H = 68;                // Phase 62: 60 → 68 (본문/skip 간섭 완화)
+const PANEL_H = 80;                // Phase 74: 68 → 80 (페이지네이터 도트 행 추가, P2-4)
 const PANEL_DEPTH = 130;
 const TEXT_DEPTH = 131;
 
@@ -107,8 +107,8 @@ export class TutorialManager {
     const bg = NineSliceFactory.panel(scene, OVERLAY_CX, OVERLAY_CY, PANEL_W, PANEL_H, 'dark');
     bg.setDepth(PANEL_DEPTH);
 
-    // 힌트 텍스트
-    const label = scene.add.text(OVERLAY_CX, OVERLAY_CY - 10, text, {
+    // 힌트 텍스트 — Phase 74: y-offset 상향 (-10 → -14, 도트 공간 확보)
+    const label = scene.add.text(OVERLAY_CX, OVERLAY_CY - 14, text, {
       fontSize: '13px',
       color: '#ffffff',
       align: 'center',
@@ -127,7 +127,23 @@ export class TutorialManager {
     }).setOrigin(1, 0.5).setDepth(TEXT_DEPTH).setInteractive({ useHandCursor: true });
     skip.on('pointerdown', () => this.end());
 
+    // Phase 74: 페이지네이터 도트 인디케이터 추가 (P2-4)
+    const pageObjects = [];
+    const dotCount = this._steps.length;
+    const dotGap = 14;
+    const startX = OVERLAY_CX - (dotCount - 1) * (dotGap / 2);
+    for (let i = 0; i < dotCount; i++) {
+      const isActive = (i === this._stepIndex);
+      const dot = scene.add.text(startX + i * dotGap, OVERLAY_CY + 28, isActive ? '\u25CF' : '\u25CB', {
+        fontSize: '10px',
+        color: isActive ? '#ffdd88' : '#888888',
+        stroke: '#000000',
+        strokeThickness: 1,
+      }).setOrigin(0.5, 0.5).setDepth(TEXT_DEPTH);
+      pageObjects.push(dot);
+    }
+
     // Phase 62: panel은 이미 씬에 등록된 오브젝트. 개별 오브젝트로 추적하여 end()/advance()에서 destroy.
-    this._container = { destroy: () => { bg.destroy(); label.destroy(); skip.destroy(); } };
+    this._container = { destroy: () => { bg.destroy(); label.destroy(); skip.destroy(); pageObjects.forEach(d => d.destroy()); } };
   }
 }

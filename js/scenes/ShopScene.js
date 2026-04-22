@@ -595,7 +595,7 @@ export class ShopScene extends Phaser.Scene {
    */
   _renderInteriorShop() {
     const startY = 90;
-    const cardH = 90;
+    const cardH = 112; // Phase 74: P1-7/P2-4 오버플로우 수정 (90→112)
     const coins = SaveManager.getCoins();
 
     // 섹션 헤더
@@ -662,7 +662,7 @@ export class ShopScene extends Phaser.Scene {
       if (!isMax) {
         const canBuy = coins >= cost;
         const btnX = GAME_WIDTH - 55;
-        const btnY2 = y + 62;
+        const btnY2 = y + 74; // Phase 74: cardH 112 대응 (62→74)
 
         // Phase 60-14: 인테리어 업그레이드 버튼 rectangle → NineSliceFactory.button 'primary'
         const btn = NineSliceFactory.button(
@@ -682,9 +682,9 @@ export class ShopScene extends Phaser.Scene {
         );
         this._contentContainer.add(btn);
 
-        // 다음 효과 미리보기
+        // 다음 효과 미리보기 — Phase 74: cardH 112 대응 (65→80)
         this._contentContainer.add(
-          this.add.text(20, y + 65, `→ Lv.${level + 1}: ${def.desc} +${def.effectPcts[level + 1]}%`, {
+          this.add.text(20, y + 80, `→ Lv.${level + 1}: ${def.desc} +${def.effectPcts[level + 1]}%`, {
             fontSize: '9px', color: '#888888',
           })
         );
@@ -701,7 +701,7 @@ export class ShopScene extends Phaser.Scene {
    */
   _renderStaffShop() {
     const startY = 90;
-    const cardH = 90;
+    const cardH = 112; // Phase 74: P1-7/P2-4 오버플로우 수정 (90→112)
     const coins = SaveManager.getCoins();
 
     // 섹션 헤더
@@ -750,7 +750,7 @@ export class ShopScene extends Phaser.Scene {
         if (staffType.purchaseType === 'coin') {
           const canBuy = coins >= staffType.price;
           const btnX = GAME_WIDTH - 55;
-          const btnY = y + 55;
+          const btnY = y + 72; // Phase 74: cardH 112 대응 (55→72)
 
           // Phase 60-14: 직원 구매 버튼 rectangle → NineSliceFactory.button 'primary'
           const btn = NineSliceFactory.button(
@@ -770,9 +770,9 @@ export class ShopScene extends Phaser.Scene {
           );
           this._contentContainer.add(btn);
 
-          // 가격 설명
+          // 가격 설명 — Phase 74: cardH 112 대응 (52→55)
           this._contentContainer.add(
-            this.add.text(20, y + 52, `\uC601\uAD6C \uD574\uAE08 \u2014 ${staffType.price}\uCF54\uC778`, {
+            this.add.text(20, y + 55, `\uC601\uAD6C \uD574\uAE08 \u2014 ${staffType.price}\uCF54\uC778`, {
               fontSize: '10px', color: '#888888',
             })
           );

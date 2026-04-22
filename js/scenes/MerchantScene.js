@@ -72,6 +72,26 @@ const TOOL_ICONS = {
   spice_grinder: '\uD83D\uDFE0',   // 향신료 그라인더 (주황 원)
 };
 
+// ── Phase 74: 도구 배지 분류 (P2-6) ──
+/** 도구 ID → 배지 레이블 (한국어) */
+const TOOL_BADGE_LABEL = {
+  pan:            '초심자 추천',
+  salt:           '초심자 추천',
+  grill:          '공격 중심',
+  delivery:       '서포트 중심',
+  freezer:        '공격 중심',
+  soup_pot:       '서포트 중심',
+  wasabi_cannon:  '공격 중심',
+  spice_grinder:  '공격 중심',
+};
+
+/** 배지 레이블 → tint 색상 */
+const TOOL_BADGE_TINT = {
+  '초심자 추천': 0x22aa44,
+  '공격 중심':   0xcc4422,
+  '서포트 중심': 0x2255cc,
+};
+
 /** 도구 표시 순서 */
 const TOOL_ORDER = ['pan', 'salt', 'grill', 'delivery', 'freezer', 'soup_pot', 'wasabi_cannon', 'spice_grinder'];
 
@@ -258,6 +278,22 @@ export class MerchantScene extends Phaser.Scene {
       });
       infoBg.on('pointerover', () => { infoBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); infoBg.setTint(0xaa7f55); });
       infoBg.on('pointerout', () => { infoBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); infoBg.setTint(0x886644); });
+
+      // Phase 74: 추천 배지 (P2-6)
+      const badgeLabel = TOOL_BADGE_LABEL[toolId];
+      if (badgeLabel) {
+        const badgeTint = TOOL_BADGE_TINT[badgeLabel] || 0x555555;
+        const badgeX = GAME_WIDTH - MARGIN_X - 36;
+        const badgeY = yOff + ITEM_HEIGHT - 20;
+        const badgeBg = NineSliceFactory.raw(this, badgeX, badgeY, 72, 18, 'btn_secondary_normal');
+        badgeBg.setTint(badgeTint);
+        this.listContainer.add(badgeBg);
+        const badgeTxt = this.add.text(badgeX, badgeY, badgeLabel, {
+          fontSize: '9px', fontStyle: 'bold', color: '#ffffff',
+          stroke: '#000000', strokeThickness: 1,
+        }).setOrigin(0.5);
+        this.listContainer.add(badgeTxt);
+      }
 
       // 2행: 구매 / 판매 버튼
       const btnY = yOff + 30;
