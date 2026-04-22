@@ -131,6 +131,7 @@ export const BRANCH_CARDS = [
   },
 
   // ── 레시피 해금(Recipe) 8장 — 특수 고수익 메뉴 ──
+  // rewardMultiplier는 recipeData.js의 baseReward에 직접 반영됨. 런타임에서 중복 적용하지 않는다.
   {
     id: 'rec_dragon_feast',
     category: 'recipe',

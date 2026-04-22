@@ -66,6 +66,14 @@ export class IngredientManager {
       count = Math.max(1, Math.round(count * dropRateMult));
     }
 
+    // ── Phase 72: mimi+spice Bond — 중독 적 재료 드롭률 가산 ──
+    if (enemy._dotStacks?.length > 0) {
+      const dropRateOnPoison = BranchEffects.getActiveBondEffect('spice_grinder')?.value || 0;
+      if (dropRateOnPoison > 0) {
+        count = Math.max(1, Math.round(count * (1 + dropRateOnPoison)));
+      }
+    }
+
     this._createDrop(enemy.x, enemy.y, type, count, enemy.isFresh);
   }
 

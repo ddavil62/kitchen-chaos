@@ -49,6 +49,9 @@ export class Projectile extends Phaser.GameObjects.Arc {
     this.dotDamage = towerData.dotDamage || 0;
     this.dotDuration = towerData.dotDuration || 0;
 
+    // ── Phase 72: 타워 역참조 (chain/venom 변이 플래그 조회용) ──
+    this._tower = towerData._towerRef || null;
+
     this.active = true;
   }
 
@@ -128,11 +131,36 @@ export class Projectile extends Phaser.GameObjects.Arc {
     // ── spice_grinder: DoT 적용 ──
     if (this.dotDamage && this._isTargetValid()) {
       this.target.applyDot(this.dotDamage, this.dotDuration);
+
+      // ── Phase 72: venom 변이 — DoT 적용 후 독 둔화 추가 (spice_grinder 전용) ──
+      if (this.towerType === 'spice_grinder' && this._tower?._poisonSlowPct > 0 && this._isTargetValid()) {
+        this.target.applySlow(1 - this._tower._poisonSlowPct, this.dotDuration || 2000);
+      }
     }
 
     // ── 기존 상태이상: 둔화 (salt 등, splashRadius가 없는 경우만) ──
     if (this.slowFactor && !this.splashRadius && this._isTargetValid()) {
       this.target.applySlow(this.slowFactor, this.slowDuration);
+
+      // ── Phase 72: chain 변이 — 인접 적에게 둔화 연쇄 (salt 전용) ──
+      if (this.towerType === 'salt' && this._tower?._chainCount > 0 && this.scene?.enemies) {
+        const chainRadius = this._tower._chainRadius || 40;
+        const hitX = this.target.x;
+        const hitY = this.target.y;
+        let closest = null;
+        let closestDist = Infinity;
+        this.scene.enemies.getChildren().forEach(enemy => {
+          if (!enemy.active || enemy.isDead || enemy === this.target) return;
+          const dist = Phaser.Math.Distance.Between(hitX, hitY, enemy.x, enemy.y);
+          if (dist <= chainRadius && dist < closestDist) {
+            closestDist = dist;
+            closest = enemy;
+          }
+        });
+        if (closest) {
+          closest.applySlow(this.slowFactor, this.slowDuration);
+        }
+      }
     }
 
     // ── 기존 상태이상: 화상 (grill) ──
@@ -145,6 +173,7 @@ export class Projectile extends Phaser.GameObjects.Arc {
       this.target.applyFreeze(this.freezeDuration);
     }
 
+    this._tower = null;
     this.destroy();
   }
 }

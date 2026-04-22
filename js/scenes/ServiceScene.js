@@ -2336,8 +2336,10 @@ export class ServiceScene extends Phaser.Scene {
     const wanderingCookReduce = this._buffCookTimeReduce || 0;
     // Phase 58-3: 축복 'cook_speed' — 조리시간 감소 비율 (예: 0.2 → -20%)
     const blessingCookSpeed = BranchEffects.getBlessingMultiplier('cook_speed');
+    // Phase 72: yuki+soup_pot Bond — 조리시간 추가 감소 (soup_pot _bondCookSpeedBonus 최댓값)
+    const yukiSoupBonus = BranchEffects.getActiveBondEffect('soup_pot')?.value || 0;
     // precision_cut(유키 serviceSkill): 남은 카운트가 있으면 즉시 조리
-    let totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus) * (1 - wanderingCookReduce) * (1 - blessingCookSpeed);
+    let totalTime = recipe.cookTime * cookTimeBonus * (1 - kitchenBonus) * (1 - wanderingCookReduce) * (1 - blessingCookSpeed) * (1 - yukiSoupBonus);
     if (this._precisionCutRemaining > 0) {
       totalTime = 0;
       this._precisionCutRemaining--;
@@ -2475,9 +2477,12 @@ export class ServiceScene extends Phaser.Scene {
       ? (1 + this._yokoChainReward)
       : 1.0;
 
+    // ── Phase 72: andre+delivery Bond — 팁 보너스 (독립 계수) ──
+    const andreTipBonus = BranchEffects.getActiveBondEffect('delivery')?.value || 0;
+
     // 골드 = 기본보상 * 테이블팁 * 인테리어팁 * 서빙등급 * 콤보 * 유형배율
     //       * 그릴 * 스페셜 * 고급레시피 (← 스토리 셰프/인테리어 버프)
-    //       * earlyMult * vipBonus * gourmetBonus * yokoProtectBonus (← 유랑 미력사 버프, 독립 계수 곱셈)
+    //       * earlyMult * vipBonus * gourmetBonus * yokoProtectBonus * andreTipBonus (← 유랑 미력사+Bond 버프, 독립 계수 곱셈)
     // 스토리 셰프 버프(ChefManager)와 미력사 버프는 독립 슬롯으로 분리되어 중첩 적용된다.
     // 참고: docs/CHEF_SKILL_REDESIGN.md 2-4절
     const baseGold = cust.baseReward;
@@ -2495,6 +2500,7 @@ export class ServiceScene extends Phaser.Scene {
       * vipBonus         // [Phase 51-3] 로살리오 VIP 보너스
       * gourmetBonus     // [Phase 51-3] 레이라 미식가 보너스
       * yokoProtectBonus // [Phase 51-3] 요코 퇴장 방지 보너스
+      * (1 + andreTipBonus) // [Phase 72] 앙드레+배달봇 Bond 팁 보너스
     );
 
     // 요코 연쇄 서빙 카운터 처리

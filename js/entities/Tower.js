@@ -236,8 +236,22 @@ export class Tower extends Phaser.GameObjects.Container {
       projData.freezeDuration = Math.round(projData.freezeDuration * ccBonus);
     }
 
-    const proj = new Projectile(this.scene, this.x, this.y, target, projData);
-    this.projectileGroup.add(proj);
+    // ── Phase 72: 타워 역참조 전달 (chain/venom 변이 플래그 조회용) ──
+    projData._towerRef = this;
+
+    // ── Phase 72: cluster 변이 — wasabi_cannon 다발 발사 ──
+    if (this._clusterCount > 1 && this.data_.id === 'wasabi_cannon') {
+      const baseDamage = projData.damage;
+      for (let i = 0; i < this._clusterCount; i++) {
+        const clusterProjData = { ...projData };
+        clusterProjData.damage = Math.round(baseDamage * (this._perShotDamageRatio || 1.0));
+        const proj = new Projectile(this.scene, this.x, this.y, target, clusterProjData);
+        this.projectileGroup.add(proj);
+      }
+    } else {
+      const proj = new Projectile(this.scene, this.x, this.y, target, projData);
+      this.projectileGroup.add(proj);
+    }
 
     this.scene.tweens.add({
       targets: this, alpha: 0.6,

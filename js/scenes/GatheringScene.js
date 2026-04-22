@@ -2152,6 +2152,21 @@ export class GatheringScene extends Phaser.Scene {
       if (tower._collectTimer < effectiveInterval) return;
       tower._collectTimer = 0;
 
+      // ── Phase 72: mimi+salt Bond — 둔화 적 근처에서 수거 범위 확장 ──
+      // salt 타워 중 _collectRadiusOnSlow 플래그가 양수인 타워가 있는지 캐시
+      let saltCollectBonus = 0;
+      if (!this._saltCollectRadiusCached) {
+        this.towers.getChildren().forEach(t => {
+          if (t.active && t.data_?.id === 'salt' && t._collectRadiusOnSlow > 0) {
+            saltCollectBonus = Math.max(saltCollectBonus, t._collectRadiusOnSlow);
+          }
+        });
+        this._saltCollectRadiusCache = saltCollectBonus;
+        this._saltCollectRadiusCached = true;
+      } else {
+        saltCollectBonus = this._saltCollectRadiusCache || 0;
+      }
+
       const drops = this.ingredientManager.drops;
       for (let i = drops.length - 1; i >= 0; i--) {
         const drop = drops[i];
@@ -2159,7 +2174,23 @@ export class GatheringScene extends Phaser.Scene {
         const dist = Phaser.Math.Distance.Between(
           tower.x, tower.y, drop.container.x, drop.container.y
         );
-        const collectRange = (tower.data_.collectRadius || 110) * ChefManager.getCollectRangeBonus();
+        let collectRange = (tower.data_.collectRadius || 110) * ChefManager.getCollectRangeBonus();
+
+        // Phase 72: 둔화 적이 드롭 근처에 있으면 수거 범위 가산
+        if (saltCollectBonus > 0 && this.enemies) {
+          const hasSlowedEnemy = this.enemies.getChildren().some(enemy => {
+            if (!enemy.active || enemy.isDead) return false;
+            if (enemy.slowFactor >= 1.0) return false;
+            const eDist = Phaser.Math.Distance.Between(
+              drop.container.x, drop.container.y, enemy.x, enemy.y
+            );
+            return eDist <= 120; // 드롭 주변 120px 이내
+          });
+          if (hasSlowedEnemy) {
+            collectRange += saltCollectBonus;
+          }
+        }
+
         if (dist <= collectRange) {
           this.ingredientManager._collectDrop(drop);
           break;
@@ -2623,8 +2654,10 @@ export class GatheringScene extends Phaser.Scene {
       if (tower._auraTimer < (tower.data_.auraInterval || 3000)) return;
       tower._auraTimer = 0;
 
-      const range = tower.data_.range || 120;
-      const effect = tower.data_.auraEffect || 0.15;
+      const range = tower.data_.auraRadius || tower.data_.range || 120;
+      // Phase 72: aura_boost 변이 — _auraMultiplier가 있으면 아우라 효과에 곱함
+      const baseEffect = tower.data_.auraEffect || 0.15;
+      const effect = baseEffect * (tower._auraMultiplier || 1.0);
 
       this.towers.getChildren().forEach(other => {
         if (!other.active || other === tower) return;

@@ -954,19 +954,51 @@ export class SaveManager {
   }
 
   /**
-   * 분기 레시피 1회 한정 사용 처리.
-   * 영업 종료 시 해당 영업에서 사용된 분기 레시피를 해금 목록에서 제거한다.
-   * (카드 설명에 따라 반복 등장이 가능해도 "이번 영업 한정"이라는 공통 규약 하에
-   *  현재 구현은 단순 제거만 수행한다.)
+   * 반복 등장 가능 분기 레시피 상수.
+   * recipeId → 최대 등장 횟수 (이 값이 0이 되면 해금 목록에서 제거).
+   * @type {{ [recipeId: string]: number }}
+   */
+  static REPEATABLE_BRANCH_RECIPES = {
+    branch_chaos_ramen: 3,
+    branch_spice_bomb: 2,
+  };
+
+  /**
+   * 분기 레시피 소비 처리.
+   * 반복 등장 레시피(chaos_ramen 3회, spice_bomb 2회)는 카운트를 감산하고,
+   * 카운트가 0이 되면 해금 목록에서 제거한다.
+   * 나머지 레시피는 기존과 동일하게 즉시 제거한다.
    * @param {string} recipeId
-   * @returns {boolean} 실제 제거 여부
+   * @returns {boolean} 실제 소비(감산 또는 제거) 여부
    */
   static consumeBranchRecipe(recipeId) {
     const data = SaveManager.load();
     if (!data.branchCards || !Array.isArray(data.branchCards.unlockedBranchRecipes)) return false;
     const idx = data.branchCards.unlockedBranchRecipes.indexOf(recipeId);
     if (idx === -1) return false;
-    data.branchCards.unlockedBranchRecipes.splice(idx, 1);
+
+    // recipeRepeatCounts 필드 초기화 방어
+    if (!data.branchCards.recipeRepeatCounts) {
+      data.branchCards.recipeRepeatCounts = {};
+    }
+
+    const maxCount = SaveManager.REPEATABLE_BRANCH_RECIPES[recipeId];
+    if (maxCount) {
+      // 반복 등장 레시피: 카운트 감산
+      if (data.branchCards.recipeRepeatCounts[recipeId] === undefined) {
+        data.branchCards.recipeRepeatCounts[recipeId] = maxCount;
+      }
+      data.branchCards.recipeRepeatCounts[recipeId]--;
+      if (data.branchCards.recipeRepeatCounts[recipeId] <= 0) {
+        // 카운트 소진 → 해금 목록에서 제거
+        data.branchCards.unlockedBranchRecipes.splice(idx, 1);
+        delete data.branchCards.recipeRepeatCounts[recipeId];
+      }
+    } else {
+      // 일반 레시피: 즉시 제거 (1회 소비)
+      data.branchCards.unlockedBranchRecipes.splice(idx, 1);
+    }
+
     SaveManager.save(data);
     return true;
   }
@@ -1398,6 +1430,11 @@ export class SaveManager {
       if (!data.branchCards.chefBonds)             data.branchCards.chefBonds = [];
       if (data.branchCards.activeBlessing === undefined) data.branchCards.activeBlessing = null;
       data.version = 24;
+    }
+
+    // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)
+    if (data.branchCards && !data.branchCards.recipeRepeatCounts) {
+      data.branchCards.recipeRepeatCounts = {};
     }
 
     return data;
