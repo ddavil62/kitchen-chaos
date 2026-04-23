@@ -51,6 +51,24 @@ const CUSTOMER_CYCLE_UP = [
   CustomerState.LEAVE,
 ];
 
+// ── 에셋 소스 모드 (Phase B 실 에셋 전환 토글) ──
+// 'dummy': PIL placeholder (tavern_dummy/ 폴더 사용)
+// 'real':  실 픽셀아트 에셋 (tavern/ 폴더 사용)
+const ASSET_MODE = 'real'; // Phase B-1 실 에셋 전환
+
+// ── 실 에셋 텍스처 키 매핑 (dummy -> real) ──
+// _placeImageOrRect에서 ASSET_MODE === 'real'일 때 우선 시도할 키
+const REAL_KEY_MAP = Object.freeze({
+  'tavern_dummy_counter_v12':          'tavern_counter_v12',
+  'tavern_dummy_table_vertical_v12':   'tavern_table_vertical_v12',
+  'tavern_dummy_bench_vertical_l_v12': 'tavern_bench_vertical_l_v12',
+  'tavern_dummy_bench_vertical_r_v12': 'tavern_bench_vertical_r_v12',
+  'tavern_dummy_entrance_v12':         'tavern_entrance_v12',
+  'tavern_dummy_customer_seated_down': 'tavern_customer_normal_seated_right',
+  'tavern_dummy_customer_seated_up':   'tavern_customer_normal_seated_left',
+  'tavern_dummy_chef_idle_side':       'tavern_chef_mimi_idle_side',
+});
+
 // V12 술통 위치 (카운터 좌측 하단 주방 내)
 const BARREL_POSITIONS = [
   { x: 20, y: 160 },
@@ -85,6 +103,26 @@ export class TavernServiceScene extends Phaser.Scene {
 
     for (const name of dummies) {
       this.load.image(`tavern_dummy_${name}`, `${dummyPath}${name}.png`);
+    }
+
+    // ── Phase B-1: 실 에셋 로드 (ASSET_MODE === 'real') ──
+    if (ASSET_MODE === 'real') {
+      const realPath = 'assets/tavern/';
+      const realAssets = [
+        // 가구 5종
+        'counter_v12',           // 40x100px
+        'table_vertical_v12',    // 44x72px
+        'bench_vertical_l_v12',  // 14x76px
+        'bench_vertical_r_v12',  // 14x76px
+        'entrance_v12',          // 32x40px
+        // 캐릭터 3종
+        'customer_normal_seated_right',  // 16x22px
+        'customer_normal_seated_left',   // 16x22px
+        'chef_mimi_idle_side',           // 16x24px
+      ];
+      for (const name of realAssets) {
+        this.load.image(`tavern_${name}`, `${realPath}${name}.png`);
+      }
     }
   }
 
@@ -131,6 +169,7 @@ export class TavernServiceScene extends Phaser.Scene {
       };
       window.__ChefState = ChefState;
       window.__CustomerState = CustomerState;
+      window.__tavernAssetMode = ASSET_MODE; // Phase B-1 테스트용
     }
   }
 
@@ -280,7 +319,8 @@ export class TavernServiceScene extends Phaser.Scene {
 
   /**
    * 이미지 텍스처가 있으면 이미지를, 없으면 대체 색상 사각형을 배치한다.
-   * @param {string} textureKey - Phaser 텍스처 키
+   * ASSET_MODE === 'real'일 때 실 에셋 키를 우선 시도하고, 없으면 더미 키 → 사각형 순으로 fallback.
+   * @param {string} textureKey - Phaser 텍스처 키 (tavern_dummy_* 형식)
    * @param {number} x - x 좌표
    * @param {number} y - y 좌표
    * @param {number} w - 가로 크기
@@ -290,6 +330,14 @@ export class TavernServiceScene extends Phaser.Scene {
    * @private
    */
   _placeImageOrRect(textureKey, x, y, w, h, fallbackColor) {
+    // Phase B-1: 실 에셋 키 우선 시도
+    if (ASSET_MODE === 'real') {
+      const realKey = REAL_KEY_MAP[textureKey];
+      if (realKey && this.textures.exists(realKey)) {
+        return this.add.image(x, y, realKey).setOrigin(0, 0).setDisplaySize(w, h);
+      }
+    }
+    // fallback: 더미 에셋
     if (this.textures.exists(textureKey)) {
       return this.add.image(x, y, textureKey).setOrigin(0, 0).setDisplaySize(w, h);
     }

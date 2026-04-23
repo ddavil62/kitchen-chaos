@@ -88,8 +88,10 @@ test.describe('Gate: 카운터 V12', () => {
       // 카운터는 counter_v12 텍스처 또는 갈색 사각형
       // _placeImageOrRect로 배치됨: x=COUNTER_ANCHOR.x - COUNTER_W/2 = 100-20=80, y=90
       // Image인 경우 origin(0,0) 기준이므로 x=80, y=90
+      // Phase B-1: ASSET_MODE='real'이면 tavern_counter_v12, 아니면 tavern_dummy_counter_v12
+      const counterKeys = ['tavern_counter_v12', 'tavern_dummy_counter_v12'];
       for (const child of children) {
-        if (child.texture && child.texture.key === 'tavern_dummy_counter_v12') {
+        if (child.texture && counterKeys.includes(child.texture.key)) {
           return {
             x: child.x,
             y: child.y,
@@ -152,8 +154,10 @@ test.describe('Gate: 입구', () => {
     const result = await page.evaluate(() => {
       const scene = window.__game.scene.getScene('TavernServiceScene');
       const children = scene.children.list;
+      // Phase B-1: ASSET_MODE='real'이면 tavern_entrance_v12, 아니면 tavern_dummy_entrance_v12
+      const entranceKeys = ['tavern_entrance_v12', 'tavern_dummy_entrance_v12'];
       for (const child of children) {
-        if (child.texture && child.texture.key === 'tavern_dummy_entrance_v12') {
+        if (child.texture && entranceKeys.includes(child.texture.key)) {
           return {
             x: child.x,
             y: child.y,
