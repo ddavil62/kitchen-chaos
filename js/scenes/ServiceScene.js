@@ -44,6 +44,7 @@ import { SpriteLoader } from '../managers/SpriteLoader.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { WANDERING_CHEFS, getWanderingChefById } from '../data/wanderingChefData.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
+import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -2517,6 +2518,8 @@ export class ServiceScene extends Phaser.Scene {
 
     this.totalGold += totalGold;
     this.servedCount++;
+    // ── Phase 75B: 일일 미션 -- 주문 완료 진행도 ──
+    try { DailyMissionManager.recordProgress('orders_complete', 1); } catch { /* noop */ }
     SoundManager.playSFX('sfx_serve');
 
     // 팁 추적 (기본 보상 초과분이 팁)
@@ -2758,6 +2761,8 @@ export class ServiceScene extends Phaser.Scene {
     const earnedGold = this.totalGold + this.tipTotal;
     if (earnedGold > 0) {
       ToolManager.addGold(earnedGold);
+      // ── Phase 75B: 일일 미션 -- 골드 획득 진행도 ──
+      try { DailyMissionManager.recordProgress('gold_earn', earnedGold); } catch { /* noop */ }
 
       // ── 업적: 누적 골드 카운터 + 체크 (Phase 42) ──
       AchievementManager.increment('total_gold_earned', earnedGold);

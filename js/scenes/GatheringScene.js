@@ -39,6 +39,7 @@ import { ToolManager } from '../managers/ToolManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
+import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 
 export class GatheringScene extends Phaser.Scene {
   constructor() {
@@ -65,6 +66,8 @@ export class GatheringScene extends Phaser.Scene {
 
     // ── Phase 68: P0-4 currentRun 기록 ──
     SaveManager.setCurrentRun({ stageId: this.stageId });
+    // ── Phase 75B: 일일 미션 -- 장보기 진행 ──
+    try { DailyMissionManager.recordProgress('gather_run', 1); } catch { /* noop */ }
 
     this.stagePathCells = this.stageData
       ? buildPathCellsFromSegments(this.stageData.pathSegments)

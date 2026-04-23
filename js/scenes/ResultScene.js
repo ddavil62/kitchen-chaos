@@ -20,6 +20,7 @@ import { SoundManager } from '../managers/SoundManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
+import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 
 // ── Phase 74: 셰프별 장보기 실패 대사 (P2-5) ──
 // 셰프 ID → 바리에이션 3줄 배열. 매 호출 시 Math.floor(Math.random() * 3)으로 선택.
@@ -328,6 +329,17 @@ export class ResultScene extends Phaser.Scene {
       AchievementManager.check(this, 'chapter_cleared', parseInt(this.stageId.split('-')[0]));
       AchievementManager.check(this, 'three_star_count', 0);
       AchievementManager.check(this, 'recipe_unlocked', 0);
+
+      // ── Phase 75B: 일일 미션 -- 스테이지 클리어 ──
+      try { DailyMissionManager.recordProgress('stage_clear', 1); } catch { /* noop */ }
+      // ── Phase 75B: 일일 미션 -- 별 3개 클리어 ──
+      if (stars === 3) {
+        try { DailyMissionManager.recordProgress('three_star', 1); } catch { /* noop */ }
+      }
+      // ── Phase 75B: 일일 미션 -- 만족도 95% 이상 ──
+      if (satisfaction >= 95) {
+        try { DailyMissionManager.recordProgress('perfect_satisfaction', 1); } catch { /* noop */ }
+      }
 
       // ── Phase 58-3: 축복 'exp_gain' — 클리어 코인 +value 적용 ──
       // 활성 축복이 'exp_gain'일 때만 value(고정 +N)를 추가 지급한다. 없으면 0.

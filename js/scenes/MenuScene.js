@@ -7,6 +7,8 @@
  * Phase 11-3d: 하단 버전 표기(APP_VERSION) 추가.
  * Phase 61: 메뉴 비주얼 에셋 적용 (배경 이미지 + 타이틀 로고 이미지).
  * Phase 73: 설정 패널에 세이브 복구 버튼 + 백업 목록/확인 모달 추가.
+ * Phase 75B: "오늘의 미션" 배너 + 미션/캘린더 통합 팝업 모달 추가.
+ *            기존 요소 y좌표 +60px 하향 조정.
  */
 
 import Phaser from 'phaser';
@@ -17,6 +19,8 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { redeemCoupon, getCheatCodeHints } from '../managers/CouponRegistry.js';
+import { DailyMissionManager } from '../managers/DailyMissionManager.js';
+import { LoginBonusManager, LOGIN_REWARDS } from '../managers/LoginBonusManager.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -24,6 +28,10 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create() {
+    // ── Phase 75B: 일일 미션/로그인 보너스 리셋 체크 (fadeIn 전에 실행) ──
+    DailyMissionManager.checkAndReset();
+    LoginBonusManager.checkAndGrantDaily();
+
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_menu');
 
@@ -34,9 +42,13 @@ export class MenuScene extends Phaser.Scene {
     const darkPanel = NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
     darkPanel.setAlpha(0.5);
 
+    // ── Phase 75B: "오늘의 미션" 배너 (y=30~60 영역) ──
+    this._createMissionBanner();
+
     // Phase 61: 타이틀 로고 이미지로 교체 (기존 텍스트 3줄 titleBlock 제거)
     // Phase 62: 후광 번짐 완화를 위해 최대 폭 320 → 296 (0.925배 축소)
-    const titleLogo = this.add.image(GAME_WIDTH / 2, 220, 'menu_title_logo').setOrigin(0.5);
+    // Phase 75B: y=220 → y=280 (+60px 하향)
+    const titleLogo = this.add.image(GAME_WIDTH / 2, 280, 'menu_title_logo').setOrigin(0.5);
     const LOGO_MAX_W = 296;
     if (titleLogo.width > LOGO_MAX_W) {
       titleLogo.setDisplaySize(LOGO_MAX_W, titleLogo.height * (LOGO_MAX_W / titleLogo.width));
@@ -44,21 +56,22 @@ export class MenuScene extends Phaser.Scene {
       titleLogo.setScale(0.925);
     }
 
-    // 부제목
-    this.add.text(GAME_WIDTH / 2, 320, '주방을 지켜라!', {
+    // 부제목 (Phase 75B: y=320 → y=380)
+    this.add.text(GAME_WIDTH / 2, 380, '\uC8FC\uBC29\uC744 \uC9C0\uCF1C\uB77C!', {
       fontSize: '18px',
       color: '#cccccc',
     }).setOrigin(0.5);
 
     // Phase 60-15: 게임 시작 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    // Phase 75B: y=390 → y=450
     const BTN_START_W = 200;
     const BTN_START_H = 60;
-    const btn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 390, BTN_START_W, BTN_START_H, 'btn_primary_normal');
+    const btn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 450, BTN_START_W, BTN_START_H, 'btn_primary_normal');
     btn.setTint(0xff6b35);
     const btnHit = new Phaser.Geom.Rectangle(-BTN_START_W / 2, -BTN_START_H / 2, BTN_START_W, BTN_START_H);
     btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
-    this.add.text(GAME_WIDTH / 2, 390, '\u25B6 \uAC8C\uC784 \uC2DC\uC791', {
+    this.add.text(GAME_WIDTH / 2, 450, '\u25B6 \uAC8C\uC784 \uC2DC\uC791', {
       fontSize: '22px',
       fontStyle: 'bold',
       color: '#ffffff',
@@ -89,13 +102,14 @@ export class MenuScene extends Phaser.Scene {
     });
 
     // Phase 60-15: 상점 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    // Phase 75B: y=450 → y=510
     const SHOP_W = 160;
     const SHOP_H = 40;
-    const shopBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 450, SHOP_W, SHOP_H, 'btn_primary_normal');
+    const shopBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 510, SHOP_W, SHOP_H, 'btn_primary_normal');
     shopBtn.setTint(0x886600);
     const shopHit = new Phaser.Geom.Rectangle(-SHOP_W / 2, -SHOP_H / 2, SHOP_W, SHOP_H);
     shopBtn.setInteractive(shopHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 450, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
+    this.add.text(GAME_WIDTH / 2, 510, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
       fontSize: '16px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -110,13 +124,14 @@ export class MenuScene extends Phaser.Scene {
     shopBtn.on('pointerout', () => { shopBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); shopBtn.setTint(0x886600); });
 
     // Phase 60-15: 도감 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    // Phase 75B: y=496 → y=556
     const BOOK_W = 160;
     const BOOK_H = 36;
-    const bookBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 496, BOOK_W, BOOK_H, 'btn_primary_normal');
+    const bookBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 556, BOOK_W, BOOK_H, 'btn_primary_normal');
     bookBtn.setTint(0x886600);
     const bookHit = new Phaser.Geom.Rectangle(-BOOK_W / 2, -BOOK_H / 2, BOOK_W, BOOK_H);
     bookBtn.setInteractive(bookHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 496, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
+    this.add.text(GAME_WIDTH / 2, 556, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -131,13 +146,14 @@ export class MenuScene extends Phaser.Scene {
     bookBtn.on('pointerout', () => { bookBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); bookBtn.setTint(0x886600); });
 
     // Phase 60-15: 업적 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    // Phase 75B: y=534 → y=594
     const ACHIEVE_W = 160;
     const ACHIEVE_H = 36;
-    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 534, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
+    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 594, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
     achieveBtn.setTint(0x886600);
     const achieveHit = new Phaser.Geom.Rectangle(-ACHIEVE_W / 2, -ACHIEVE_H / 2, ACHIEVE_W, ACHIEVE_H);
     achieveBtn.setInteractive(achieveHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 534, '\uD83C\uDFC6 \uC5C5\uC801', {
+    this.add.text(GAME_WIDTH / 2, 594, '\uD83C\uDFC6 \uC5C5\uC801', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -153,13 +169,14 @@ export class MenuScene extends Phaser.Scene {
 
     // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570 -> 578) ──
     // Phase 63 FIX-16: 잠김 상태 tint 0x444444→0x555555, 라벨 색 #666666→#888888로 대비 +1
+    // Phase 75B: y=578 → y=638 (GAME_HEIGHT=640이므로 경계 근접, AD3 검수 대상)
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
     // Phase 60-15: 엔드리스 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
     const ENDLESS_W = 180;
     const ENDLESS_H = 40;
-    const ENDLESS_Y = 578;
+    const ENDLESS_Y = 638;
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x555555;
     const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, ENDLESS_Y, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
     endlessBtn.setTint(endlessColor);
@@ -167,7 +184,6 @@ export class MenuScene extends Phaser.Scene {
     endlessBtn.setInteractive(endlessHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: isEndlessUnlocked });
 
     // Phase 69 (P1-4): 잠금 문구를 config 상수로 통일 (WorldMapScene과 일치).
-    // 과거 "6-3 클리어 필요"로 잘못 표기된 회귀를 수정. 실제 해금은 24-6에서 발생.
     const endlessLabel = isEndlessUnlocked
       ? '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC'
       : ENDLESS_LOCK_LABEL;
@@ -191,24 +207,19 @@ export class MenuScene extends Phaser.Scene {
       endlessBtn.on('pointerout', () => { endlessBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); endlessBtn.setTint(0x6622cc); });
     }
 
-    // 엔드리스 베스트 기록 표시 (Phase 42: y 574 -> 593 -> 602 -> 607)
-    if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
-      this.add.text(GAME_WIDTH / 2, 607, `\uD83C\uDFC6 \uCD5C\uACE0 \uC6E8\uC774\uBE0C ${endlessRecord.bestWave}  \uC810\uC218 ${endlessRecord.bestScore}`, {
-        fontSize: '11px', color: '#aa88cc',
-      }).setOrigin(0.5);
-    }
-
-    // 평판 + 수집률 (Phase 42: y 598 -> 610 -> 618 -> 620)
+    // 엔드리스 베스트 기록, 평판+수집률, 버전 표기는 배너 추가로 하단 초과 위험
+    // Phase 75B: 엔드리스 기록 y=607→667 (GAME_HEIGHT 초과 위험으로 숨김 처리 — AD3 검수 후 조정)
+    // 하단 정보를 한 줄로 압축하여 y=630에 배치
     const { current, max } = SaveManager.getTotalStars();
     const { unlocked, total, percent } = RecipeManager.getCollectionProgress();
-    this.add.text(GAME_WIDTH / 2, 620, `\u2B50 ${current}/${max}    \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`, {
-      fontSize: '12px', color: '#aaaaaa',
-    }).setOrigin(0.5);
 
-    // ── 버전 표기 (Phase 61 AD3: 634 -> 630, 하단 여백 5px 확보) ──
-    this.add.text(GAME_WIDTH / 2, 630, `v${APP_VERSION}`, {
-      fontSize: '10px',
-      color: '#555555',
+    // 엔드리스 베스트 기록 + 평판 + 수집률을 한줄로 통합 (GAME_HEIGHT=640 제한)
+    let bottomInfo = `\u2B50 ${current}/${max}  \uD83D\uDCD6 ${unlocked}/${total} (${percent}%)`;
+    if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
+      bottomInfo = `\u221E W${endlessRecord.bestWave}  ` + bottomInfo;
+    }
+    this.add.text(GAME_WIDTH / 2, 630, bottomInfo, {
+      fontSize: '10px', color: '#888888',
     }).setOrigin(0.5);
 
     // ── 설정 버튼 (Phase 10-6) ──
@@ -218,13 +229,388 @@ export class MenuScene extends Phaser.Scene {
     this.cameras.main.fadeIn(300, 0, 0, 0);
   }
 
+  // ── Phase 75B: 오늘의 미션 배너 ──────────────────────────────────
+
+  /**
+   * 메뉴 상단에 "오늘의 미션" 배너를 생성한다.
+   * NineSlice 패널에 미션 달성 상태를 표시하며, 탭 시 통합 팝업을 연다.
+   * @private
+   */
+  _createMissionBanner() {
+    const BANNER_W = GAME_WIDTH - 20;
+    const BANNER_H = 44;
+    const BANNER_Y = 50;
+
+    const bannerBg = NineSliceFactory.raw(this, GAME_WIDTH / 2, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
+    bannerBg.setTint(0xcc6600);
+
+    // 미션 달성 상태 표시
+    const missions = DailyMissionManager.getTodayMissions();
+    const starStr = missions.map((m) => m.completed ? '\u2605' : '\u2606').join('');
+    const bannerText = `\uD83D\uDCCB \uC624\uB298\uC758 \uBBF8\uC158  ${starStr}`;
+
+    this.add.text(GAME_WIDTH / 2, BANNER_Y, bannerText, {
+      fontSize: '13px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    // 상호작용
+    const bannerHit = new Phaser.Geom.Rectangle(-BANNER_W / 2, -BANNER_H / 2, BANNER_W, BANNER_H);
+    bannerBg.setInteractive(bannerHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    bannerBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._openDailyMissionModal();
+    });
+    bannerBg.on('pointerover', () => bannerBg.setTint(0xdd7700));
+    bannerBg.on('pointerout', () => bannerBg.setTint(0xcc6600));
+  }
+
+  // ── Phase 75B: 미션/캘린더 통합 팝업 ──────────────────────────────
+
+  /**
+   * 미션/캘린더 통합 팝업 모달을 연다.
+   * 탭 전환으로 "오늘의 미션" / "로그인 보너스" 뷰를 전환한다.
+   * @private
+   */
+  _openDailyMissionModal() {
+    if (this._missionModalContainer) return;
+
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+    const MODAL_W = 300;
+    const MODAL_H = 440;
+
+    const container = this.add.container(0, 0).setDepth(1100);
+    this._missionModalContainer = container;
+
+    // 반투명 오버레이
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.7)
+      .setInteractive();
+    container.add(overlay);
+
+    // 패널 배경
+    const panelBg = NineSliceFactory.panel(this, cx, cy, MODAL_W, MODAL_H, 'dark');
+    container.add(panelBg);
+
+    // 닫기 버튼
+    const closeBtn = this.add.text(cx + MODAL_W / 2 - 18, cy - MODAL_H / 2 + 18, '\u2715', {
+      fontSize: '20px', fontStyle: 'bold', color: '#ff6666',
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    closeBtn.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._closeMissionModal();
+    });
+    closeBtn.on('pointerover', () => closeBtn.setColor('#ff0000'));
+    closeBtn.on('pointerout', () => closeBtn.setColor('#ff6666'));
+    container.add(closeBtn);
+
+    // 오버레이 클릭으로 닫기 (모달 영역 외부)
+    overlay.on('pointerdown', (pointer) => {
+      const mx = cx - MODAL_W / 2;
+      const my = cy - MODAL_H / 2;
+      if (pointer.x >= mx && pointer.x <= mx + MODAL_W &&
+          pointer.y >= my && pointer.y <= my + MODAL_H) return;
+      SoundManager.playSFX('sfx_ui_tap');
+      this._closeMissionModal();
+    });
+
+    // ── 탭 버튼 ──
+    const TAB_Y = cy - MODAL_H / 2 + 36;
+    const TAB_W = 130;
+    const TAB_H = 28;
+
+    // 컨텐츠 컨테이너 (탭 전환용)
+    this._missionTabContent = this.add.container(0, 0);
+    container.add(this._missionTabContent);
+
+    // 미션 탭
+    const missionTabBg = NineSliceFactory.raw(this, cx - 70, TAB_Y, TAB_W, TAB_H, 'tab_active');
+    const missionTabText = this.add.text(cx - 70, TAB_Y, '\uC624\uB298\uC758 \uBBF8\uC158', {
+      fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 1,
+    }).setOrigin(0.5);
+    container.add(missionTabBg);
+    container.add(missionTabText);
+
+    // 캘린더 탭
+    const calendarTabBg = NineSliceFactory.raw(this, cx + 70, TAB_Y, TAB_W, TAB_H, 'tab_inactive');
+    const calendarTabText = this.add.text(cx + 70, TAB_Y, '\uB85C\uADF8\uC778 \uBCF4\uB108\uC2A4', {
+      fontSize: '12px', fontStyle: 'bold', color: '#aaaaaa',
+      stroke: '#000', strokeThickness: 1,
+    }).setOrigin(0.5);
+    container.add(calendarTabBg);
+    container.add(calendarTabText);
+
+    // 탭 상호작용
+    const missionTabHit = new Phaser.Geom.Rectangle(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H);
+    missionTabBg.setInteractive(missionTabHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    const calendarTabHit = new Phaser.Geom.Rectangle(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H);
+    calendarTabBg.setInteractive(calendarTabHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+
+    const showMissionTab = () => {
+      missionTabBg.setTexture('ui_ns_tab_active');
+      missionTabText.setColor('#ffffff');
+      calendarTabBg.setTexture('ui_ns_tab_inactive');
+      calendarTabText.setColor('#aaaaaa');
+      this._renderMissionTabContent(cx, cy, MODAL_W, MODAL_H);
+    };
+
+    const showCalendarTab = () => {
+      calendarTabBg.setTexture('ui_ns_tab_active');
+      calendarTabText.setColor('#ffffff');
+      missionTabBg.setTexture('ui_ns_tab_inactive');
+      missionTabText.setColor('#aaaaaa');
+      this._renderCalendarTabContent(cx, cy, MODAL_W, MODAL_H);
+    };
+
+    missionTabBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      showMissionTab();
+    });
+    calendarTabBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      showCalendarTab();
+    });
+
+    // 기본 탭: 미션
+    showMissionTab();
+  }
+
+  /**
+   * 미션 탭 컨텐츠를 렌더링한다.
+   * @param {number} cx - 모달 중심 X
+   * @param {number} cy - 모달 중심 Y
+   * @param {number} modalW - 모달 너비
+   * @param {number} modalH - 모달 높이
+   * @private
+   */
+  _renderMissionTabContent(cx, cy, modalW, modalH) {
+    if (!this._missionTabContent) return;
+    this._missionTabContent.removeAll(true);
+
+    const missions = DailyMissionManager.getTodayMissions();
+    const startY = cy - modalH / 2 + 75;
+
+    // 미션 아이콘 텍스처 매핑
+    const ICON_MAP = {
+      stage_clear: 'mission_icon_clear_stage',
+      gold_earn: 'mission_icon_gold',
+      orders_complete: 'mission_icon_serve',
+      perfect_satisfaction: 'mission_icon_satisfaction',
+      endless_wave: 'mission_icon_endless',
+      gather_run: 'mission_icon_recipe',
+      three_star: 'mission_icon_three_star',
+    };
+
+    if (missions.length === 0) {
+      const noMission = this.add.text(cx, startY + 60, '\uBBF8\uC158\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.\n\uB0B4\uC77C \uB2E4\uC2DC \uD655\uC778\uD574\uC8FC\uC138\uC694!', {
+        fontSize: '14px', color: '#888888', align: 'center',
+      }).setOrigin(0.5);
+      this._missionTabContent.add(noMission);
+      return;
+    }
+
+    for (let i = 0; i < missions.length; i++) {
+      const m = missions[i];
+      const rowY = startY + i * 100;
+
+      // 카드 배경
+      const cardBg = NineSliceFactory.panel(this, cx, rowY + 30, modalW - 30, 85, 'dark');
+      cardBg.setAlpha(0.6);
+      this._missionTabContent.add(cardBg);
+
+      // 아이콘
+      const iconKey = ICON_MAP[m.type] || 'mission_icon_clear_stage';
+      const icon = this.add.image(cx - modalW / 2 + 40, rowY + 20, iconKey).setOrigin(0.5);
+      icon.setDisplaySize(28, 28);
+      this._missionTabContent.add(icon);
+
+      // 미션 설명
+      const desc = this.add.text(cx - modalW / 2 + 65, rowY + 10, m.descKo, {
+        fontSize: '13px', fontStyle: 'bold', color: m.completed ? '#88ff88' : '#ffffff',
+        stroke: '#000', strokeThickness: 1,
+      }).setOrigin(0, 0.5);
+      this._missionTabContent.add(desc);
+
+      // 보상 텍스트
+      const rewardLabel = this._getRewardLabel(m.reward);
+      const rewardText = this.add.text(cx - modalW / 2 + 65, rowY + 28, `\uBCF4\uC0C1: ${rewardLabel}`, {
+        fontSize: '11px', color: '#ffcc44',
+      }).setOrigin(0, 0.5);
+      this._missionTabContent.add(rewardText);
+
+      // 진행 바 (텍스트 형식)
+      const progressVal = Math.min(m.progress, m.target);
+      const progressStr = m.completed
+        ? '\u2714 \uC644\uB8CC!'
+        : `${progressVal} / ${m.target}`;
+      const progressColor = m.completed ? '#88ff88' : '#cccccc';
+      const progressText = this.add.text(cx - modalW / 2 + 65, rowY + 46, progressStr, {
+        fontSize: '12px', color: progressColor,
+      }).setOrigin(0, 0.5);
+      this._missionTabContent.add(progressText);
+
+      // 진행 바 그래픽
+      const barX = cx + 30;
+      const barY = rowY + 46;
+      const barW = 80;
+      const barH = 8;
+      const barBgGfx = this.add.rectangle(barX, barY, barW, barH, 0x333333).setOrigin(0, 0.5);
+      this._missionTabContent.add(barBgGfx);
+      const fillRatio = m.target > 0 ? Math.min(1, progressVal / m.target) : 0;
+      if (fillRatio > 0) {
+        const fillGfx = this.add.rectangle(barX, barY, barW * fillRatio, barH, m.completed ? 0x88ff88 : 0xffcc44).setOrigin(0, 0.5);
+        this._missionTabContent.add(fillGfx);
+      }
+    }
+  }
+
+  /**
+   * 캘린더 탭 컨텐츠를 렌더링한다.
+   * @param {number} cx - 모달 중심 X
+   * @param {number} cy - 모달 중심 Y
+   * @param {number} modalW - 모달 너비
+   * @param {number} modalH - 모달 높이
+   * @private
+   */
+  _renderCalendarTabContent(cx, cy, modalW, modalH) {
+    if (!this._missionTabContent) return;
+    this._missionTabContent.removeAll(true);
+
+    const state = LoginBonusManager.getLoginBonusState();
+    const startY = cy - modalH / 2 + 80;
+
+    // 타이틀
+    const title = this.add.text(cx, startY, `\uC5F0\uC18D \uB85C\uADF8\uC778: ${state.loginStreak}\uC77C\uCC28`, {
+      fontSize: '15px', fontStyle: 'bold', color: '#ffdd88',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    this._missionTabContent.add(title);
+
+    // 7일 슬롯 배열 (2행 구성: 상단 4개, 하단 3개)
+    const SLOT_SIZE = 32;
+    const SLOT_GAP = 8;
+    const SLOTS_PER_ROW_TOP = 4;
+    const SLOTS_PER_ROW_BOTTOM = 3;
+
+    // 상단 4슬롯
+    const topRowW = SLOTS_PER_ROW_TOP * (SLOT_SIZE + SLOT_GAP) - SLOT_GAP;
+    const topStartX = cx - topRowW / 2 + SLOT_SIZE / 2;
+    const row1Y = startY + 50;
+
+    for (let day = 1; day <= 4; day++) {
+      const slotX = topStartX + (day - 1) * (SLOT_SIZE + SLOT_GAP);
+      this._renderCalendarSlot(slotX, row1Y, day, state, SLOT_SIZE);
+    }
+
+    // 하단 3슬롯
+    const bottomRowW = SLOTS_PER_ROW_BOTTOM * (SLOT_SIZE + SLOT_GAP) - SLOT_GAP;
+    const bottomStartX = cx - bottomRowW / 2 + SLOT_SIZE / 2;
+    const row2Y = row1Y + SLOT_SIZE + SLOT_GAP + 30;
+
+    for (let day = 5; day <= 7; day++) {
+      const slotX = bottomStartX + (day - 5) * (SLOT_SIZE + SLOT_GAP);
+      this._renderCalendarSlot(slotX, row2Y, day, state, SLOT_SIZE);
+    }
+
+    // 보상 목록 (각 날짜별 보상 텍스트)
+    const listStartY = row2Y + SLOT_SIZE / 2 + 30;
+    for (let i = 0; i < LOGIN_REWARDS.length; i++) {
+      const r = LOGIN_REWARDS[i];
+      const isClaimed = state.claimedDays.includes(r.day);
+      const isToday = state.loginStreak === r.day || (state.loginStreak === 0 && r.day === 1);
+      const color = isClaimed ? '#88ff88' : isToday ? '#ffdd88' : '#888888';
+      const prefix = isClaimed ? '\u2714' : isToday ? '\u25B6' : '\u25CB';
+
+      const rowText = this.add.text(cx, listStartY + i * 22, `${prefix} D${r.day}: ${r.descKo}`, {
+        fontSize: '12px', color,
+        stroke: '#000', strokeThickness: 1,
+      }).setOrigin(0.5);
+      this._missionTabContent.add(rowText);
+    }
+  }
+
+  /**
+   * 캘린더 슬롯 하나를 렌더링한다.
+   * @param {number} x - 슬롯 중심 X
+   * @param {number} y - 슬롯 중심 Y
+   * @param {number} day - 날짜 번호 (1~7)
+   * @param {object} state - 로그인 보너스 상태
+   * @param {number} size - 슬롯 크기
+   * @private
+   */
+  _renderCalendarSlot(x, y, day, state, size) {
+    const isClaimed = state.claimedDays.includes(day);
+    const isToday = (state.loginStreak === day) ||
+                    (state.loginStreak === 0 && day === 1 && state.lastLoginDate !== DailyMissionManager._getDateKey());
+
+    let textureKey;
+    if (isClaimed) {
+      textureKey = 'calendar_slot_claimed';
+    } else if (isToday) {
+      textureKey = 'calendar_slot_today';
+    } else {
+      textureKey = 'calendar_slot_locked';
+    }
+
+    const slotImg = this.add.image(x, y, textureKey).setOrigin(0.5);
+    slotImg.setDisplaySize(size, size);
+    this._missionTabContent.add(slotImg);
+
+    // 날짜 번호
+    const dayLabel = this.add.text(x, y + size / 2 + 8, `D${day}`, {
+      fontSize: '10px', color: isClaimed ? '#88ff88' : '#cccccc',
+      stroke: '#000', strokeThickness: 1,
+    }).setOrigin(0.5);
+    this._missionTabContent.add(dayLabel);
+  }
+
+  /**
+   * 보상 라벨 텍스트를 반환한다.
+   * @param {{type: string, amount: number}} reward
+   * @returns {string}
+   * @private
+   */
+  _getRewardLabel(reward) {
+    switch (reward.type) {
+      case 'gold': return `\uACE8\uB4DC +${reward.amount}`;
+      case 'kitchenCoins': return `\uC8FC\uBC29 \uCF54\uC778 +${reward.amount}`;
+      case 'mireukEssence': return `\uBBF8\uB825\uC758 \uC815\uC218 +${reward.amount}`;
+      default: return `${reward.type} +${reward.amount}`;
+    }
+  }
+
+  /**
+   * 미션/캘린더 모달을 닫는다.
+   * @private
+   */
+  _closeMissionModal() {
+    if (this._missionTabContent) {
+      this._missionTabContent.removeAll(true);
+      this._missionTabContent = null;
+    }
+    if (this._missionModalContainer) {
+      this._missionModalContainer.destroy();
+      this._missionModalContainer = null;
+    }
+  }
+
   // ── 하드웨어 백버튼 (Phase 12) ──────────────────────────────────
 
   /**
    * 하드웨어 뒤로가기 핸들러.
-   * 설정 패널이 열려있으면 닫고, 아니면 앱을 종료한다.
+   * 설정 패널이나 미션 모달이 열려있으면 닫고, 아니면 앱을 종료한다.
    */
   _onBack() {
+    // Phase 75B: 미션 모달이 열려있으면 먼저 닫기
+    if (this._missionModalContainer) {
+      this._closeMissionModal();
+      return;
+    }
     // 설정 패널이 열려있으면 닫기, 아니면 아무 동작 없음 (앱 종료 금지)
     if (this._settingsContainer) {
       this._closeSettingsPanel();

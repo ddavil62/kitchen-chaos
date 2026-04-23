@@ -9,6 +9,7 @@
  * Phase 12: 앱 백그라운드/포그라운드 전환 시 오디오 일시정지/재개.
  * Phase 60-2: NeoDunggeunmoPro 한글 픽셀 폰트 Font Loading API 프리로드.
  * Phase 61: 메뉴 비주얼 에셋(menu_bg, menu_title_logo) preload 추가.
+ * Phase 75B: 미션/캘린더 아이콘 10종 preload 추가.
  */
 
 import Phaser from 'phaser';
@@ -61,6 +62,18 @@ export class BootScene extends Phaser.Scene {
     this.load.image('menu_bg', 'assets/ui/menu_bg.png');
     this.load.image('menu_title_logo', 'assets/ui/menu_title_logo.png');
     this.load.image('mimi_menu', 'assets/chefs/mimi_chef/rotations/south.png');
+
+    // ── 미션/캘린더 아이콘 로드 (Phase 75B) ──
+    const MISSION_ROOT = 'assets/sprites/ui/missions';
+    const MISSION_ICONS = [
+      'mission_icon_clear_stage', 'mission_icon_gold', 'mission_icon_serve',
+      'mission_icon_recipe', 'mission_icon_endless', 'mission_icon_satisfaction',
+      'mission_icon_three_star', 'calendar_slot_locked', 'calendar_slot_claimed',
+      'calendar_slot_today',
+    ];
+    for (const name of MISSION_ICONS) {
+      this.load.image(name, `${MISSION_ROOT}/${name}.png`);
+    }
   }
 
   /**

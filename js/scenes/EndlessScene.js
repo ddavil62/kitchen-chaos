@@ -20,6 +20,7 @@ import { Enemy } from '../entities/Enemy.js';
 import { GAME_WIDTH, STARTING_LIVES } from '../config.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { TutorialManager } from '../managers/TutorialManager.js';
+import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 
 export class EndlessScene extends GatheringScene {
   constructor() {
@@ -269,6 +270,8 @@ export class EndlessScene extends GatheringScene {
     // ── Phase 55-4: noLeak streak 갱신 (임무 reset 전에 판정) ──
     const waveNoLeak = !this._waveLifeLeaked;
     SaveManager.updateEndlessNoLeakStreak(waveNoLeak);
+    // ── Phase 75B: 일일 미션 -- 엔드리스 웨이브 도달 (최댓값 갱신) ──
+    try { DailyMissionManager.recordProgress('endless_wave', this.endlessWave); } catch { /* noop */ }
 
     // ── Phase 55-3: 미력 폭풍 보상 ──
     if (this._isStormWave) {

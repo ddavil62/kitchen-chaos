@@ -29,12 +29,13 @@
  *           런타임 전용 (localStorage 저장 없음). SAVE_VERSION 불변.
  * Phase 73: 세이브 백업 롤링 시스템 추가 (슬롯 3개 자동 순환).
  *           getBackups, restoreBackup 정적 메서드 추가.
+ * Phase 75B: v25 마이그레이션 — dailyMissions, loginBonus, mimiSkinCoupons 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 24;
+const SAVE_VERSION = 25;
 
 // ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
 const BACKUP_KEYS = [
@@ -147,6 +148,20 @@ function createDefault() {
       missionSuccessCount: 0,     // 누적 정화 임무 성공 횟수
       noLeakStreak: 0,            // 현재 라이프 손실 없이 연속 클리어 중인 웨이브 수
     },
+    // ── Phase 75B 추가: 일일 미션 + 로그인 보너스 ──
+    dailyMissions: {
+      dateKey: '',
+      selected: [],
+      progress: {},
+      completed: {},
+      claimed: {},
+    },
+    loginBonus: {
+      loginStreak: 0,
+      lastLoginDate: '',
+      claimedDays: [],
+    },
+    mimiSkinCoupons: 0,  // Phase 77 SkinManager 의존 전까지 카운터만 보관
     // ── Phase 58-1 추가: 분기 카드 시스템 ──
     branchCards: {
       toolMutations: {},          // { [toolId]: mutationId } — 변이된 도구 맵 (도구당 1개, 되돌릴 수 없음)
@@ -1518,6 +1533,18 @@ export class SaveManager {
       if (!data.branchCards.chefBonds)             data.branchCards.chefBonds = [];
       if (data.branchCards.activeBlessing === undefined) data.branchCards.activeBlessing = null;
       data.version = 24;
+    }
+
+    // v24 → v25: 일일 미션 + 로그인 보너스 추가 (Phase 75B)
+    if (data.version < 25) {
+      data.dailyMissions = data.dailyMissions || {
+        dateKey: '', selected: [], progress: {}, completed: {}, claimed: {},
+      };
+      data.loginBonus = data.loginBonus || {
+        loginStreak: 0, lastLoginDate: '', claimedDays: [],
+      };
+      data.mimiSkinCoupons = data.mimiSkinCoupons ?? 0;
+      data.version = 25;
     }
 
     // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)
