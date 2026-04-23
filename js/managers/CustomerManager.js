@@ -1,9 +1,11 @@
 /**
  * @fileoverview 손님 매니저.
  * RestaurantScene 소속. 웨이브별 손님 생성, 인내심 타이머, 서빙 처리, 콤보 시스템을 관리한다.
+ * Phase 76: vip boolean → profileId 통합, tipStyle 기반 팁 등급 조정.
  */
 
 import { WAVE_CUSTOMERS, SERVING_RECIPE_MAP } from '../data/gameData.js';
+import { getCustomerProfile } from '../data/customerProfileData.js';
 
 export class CustomerManager {
   /**
@@ -45,12 +47,17 @@ export class CustomerManager {
 
   /**
    * 손님을 빈 슬롯에 추가하거나 대기열에 넣는다.
+   * Phase 76: vip boolean 제거, profileId 기반으로 생성.
    * @param {object} custData
    * @private
    */
   _addCustomer(custData) {
     const recipe = SERVING_RECIPE_MAP[custData.dish];
     if (!recipe) return;
+
+    // Phase 76: profileId 기반 프로필 조회 (하위 호환: vip:true → profileId:'vip')
+    const profileId = custData.profileId || (custData.vip ? 'vip' : 'normal');
+    const profile = getCustomerProfile(profileId);
 
     const customer = {
       dish: custData.dish,
@@ -59,7 +66,9 @@ export class CustomerManager {
       maxPatience: custData.patience,
       baseReward: custData.baseReward,
       tipMultiplier: custData.tipMultiplier,
-      vip: custData.vip || false,
+      profileId: profileId,
+      patienceMult: profile.patienceMult,
+      tipStyle: profile.tipStyle,
     };
 
     const emptySlot = this.slots.indexOf(null);
@@ -76,6 +85,7 @@ export class CustomerManager {
    * 손님에게 서빙 시도.
    * Phase 3: 재료 확인/소비는 RestaurantScene._onServeRecipe에서 조리 시작 시 처리.
    * 여기서는 완성된 요리(readyDishes)로만 서빙한다.
+   * Phase 76: tipStyle 기반 팁 등급 조정, profileId 기반 VIP 배율.
    * @param {number} slotIndex - 0~2
    * @returns {{ success: boolean, totalGold?: number, baseReward?: number, tip?: number, comboBonus?: number }}
    */
@@ -94,12 +104,17 @@ export class CustomerManager {
       tipGrade = 0.7;                     // 불만
     }
 
+    // Phase 76: tipStyle 기반 팁 등급 조정
+    const tipStyle = customer.tipStyle || 'standard';
+    if (tipStyle === 'generous') tipGrade *= 1.2;
+    if (tipStyle === 'stingy')   tipGrade *= 0.8;
+
     // 콤보 보너스
     this.comboCount++;
     const comboMult = this.getComboMultiplier();
 
-    // VIP는 보상 2배
-    const vipMult = customer.vip ? 2.0 : 1.0;
+    // Phase 76: VIP는 보상 2배 (profileId 기반)
+    const vipMult = (customer.profileId === 'vip') ? 2.0 : 1.0;
     const baseReward = customer.baseReward;
     const tip = Math.floor(baseReward * (tipGrade - 1));
     const comboBonus = Math.floor(baseReward * tipGrade * (comboMult - 1));
@@ -117,6 +132,7 @@ export class CustomerManager {
       comboBonus,
       comboCount: this.comboCount,
       patienceRatio,
+      profileId: customer.profileId,  // Phase 76: 프로필 ID 전달
     });
 
     // 대기열에서 다음 손님 배치

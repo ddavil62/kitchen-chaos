@@ -1,5 +1,92 @@
 # Changelog
 
+## [Phase 76] 2026-04-23 -- 손님 NPC 다양성 확장 (P3-2 영업 씬 변주 확대)
+
+### 개요
+
+기존 6종 단순 타입 시스템(normal/vip/gourmet/rushed/group/mireuk_traveler)을 10종 프로필 시스템으로 전환. 각 프로필이 인내심 배율(patienceMult), 팁 성향(tipStyle), 선호 장르(preferredGenre) 등 고유 속성을 갖는다. 신규 특수 손님 2종: 평론가(critic)는 서빙 patienceRatio 누적 → 평균 0.7 미만 시 다음 영업 골드 -10% 패널티, 단골(regular)은 5회 서빙 누적 시 팁 x1.2 버프. 신규 5종 PixelLab 스프라이트 10장 생성. SaveManager v25->v26.
+
+### 추가
+
+- `kitchen-chaos/js/data/customerProfileData.js` -- 신규 데이터 파일
+  - 10종 프로필 정의: normal(1.0/standard), vip(0.7/generous), gourmet(1.0/generous/high_tier), rushed(0.4/stingy), group(1.2/standard), critic(1.3/stingy/high_tier), regular(1.1/generous), student(0.9/stingy), traveler(1.4/standard/regional), business(0.6/generous)
+  - `CUSTOMER_PROFILES` 배열 + `CUSTOMER_PROFILE_MAP` Map + `getCustomerProfile(profileId)` export (null/undefined 입력 시 normal 폴백)
+  - 속성: id, nameKo, patienceMult, tipStyle, preferredGenre, spriteKey, icon, description (8개)
+
+- `kitchen-chaos/assets/service/` -- 신규 스프라이트 10장 (PixelLab 생성, 92x92 RGBA, 투명 배경)
+  - `customer_critic_waiting.png`, `customer_critic_seated.png` (네이비 정장, 안경, 수첩)
+  - `customer_regular_waiting.png`, `customer_regular_seated.png` (베이지 스웨터, 가방)
+  - `customer_student_waiting.png`, `customer_student_seated.png` (파란 교복, 배낭)
+  - `customer_traveler_waiting.png`, `customer_traveler_seated.png` (카키 재킷, 모자)
+  - `customer_business_waiting.png`, `customer_business_seated.png` (네이비 슈트, 서류가방)
+
+### 변경
+
+- `kitchen-chaos/js/managers/CustomerManager.js`
+  - `_addCustomer()`: `customer.vip` boolean → `customer.profileId` 통합. `getCustomerProfile(profileId)` 조회하여 patienceMult/tipStyle 적용
+  - `serve()`: tipStyle 기반 팁 등급 (generous x1.2, stingy x0.8). `vipMult` 분기를 `profileId === 'vip'`로 교체
+  - 하위 호환 폴백: `custData.vip ? 'vip' : 'normal'`
+
+- `kitchen-chaos/js/data/gameData.js`
+  - WAVE_CUSTOMERS의 `vip:true` / `customerType` 필드를 `profileId` 통합으로 일괄 교체
+
+- `kitchen-chaos/js/scenes/ServiceScene.js`
+  - `_determineCustomerType()` → `_determineProfileId()` 리팩토링
+  - SPECIAL_CUSTOMER_RATES 확장 (장1: 0.28, 장2: 0.47, 장3: 0.58 확률 합)
+  - `criticScores[]` 배열: 평론가 서빙마다 patienceRatio push, 영업 종료 시 평균 < 0.7 → `setCriticPenaltyActive(true)`
+  - `_regularServedCount`: 단골 서빙 시 ++, 5회 이상 시 tipGrade x1.2
+  - `_endService()`: `criticPenaltyApplied` 시 totalGold x0.9 적용 후 플래그 소비
+  - CUSTOMER_TYPE_ICONS에 critic/regular/student/traveler/business 5종 추가
+  - `customerType: profileId` 하위 호환 필드 유지
+
+- `kitchen-chaos/js/managers/SaveManager.js`
+  - SAVE_DATA_VERSION 25 → 26
+  - `createDefault()`: `regularCustomerProgress: 0`, `criticPenaltyActive: false` 추가
+  - `_migrate()`: v25→v26 블록 (기본값 삽입)
+  - 헬퍼 4개: `getRegularCustomerProgress()`, `setRegularCustomerProgress(count)`, `isCriticPenaltyActive()`, `setCriticPenaltyActive(active)`
+
+- `kitchen-chaos/js/managers/SpriteLoader.js`
+  - `CUSTOMER_TYPES` 배열 5종→10종 확장 (critic/regular/student/traveler/business 추가)
+  - `_loadServiceAssets()`: 10종 x base+waiting+seated = 30키 preload
+  - @fileoverview 주석 업데이트
+
+- `kitchen-chaos/js/ui/CustomerZoneUI.js`
+  - 신규 5종 스프라이트 `displayHeight=64` 스케일 흡수 (92x92 원본 → 64px 렌더)
+
+### 스펙 대비 변경
+
+- 스프라이트 크기: 스펙 64x80 → 실제 92x92 (PixelLab 자동 확장). CustomerZoneUI displayHeight=64 스케일 흡수로 기능 영향 없음
+- ResultScene 평론가 혹평/단골 알림 텍스트: 스펙에서 ResultScene `_createResultView()`에 텍스트 삽입 요구 → Coder가 "ResultScene 변경 없이 처리"로 판단, ServiceScene에서 다음 영업 시작 시 패널티 적용. 패널티 로직 자체는 정상 동작하나 ResultScene에 시각 피드백 부재
+- SaveManager 헬퍼 메서드명: 스펙 `getRegularProgress`/`getCriticPenalty` → 실제 `getRegularCustomerProgress`/`isCriticPenaltyActive` (더 명시적 네이밍)
+- 패널티 소비 타이밍: 스펙 ResultScene→ServiceScene 소비 → 실제 ServiceScene._endService()→다음 ServiceScene.create() 소비 (결과 동일)
+
+### 알려진 이슈
+
+- **KNOWN-1 (MEDIUM)**: ResultScene 평론가 혹평 텍스트 + 단골 달성 알림이 ResultScene에 미구현. 데이터(criticAvgScore, regularAchieved)는 ServiceScene에서 계산하지만 ResultScene에서 수신/표시하는 코드 없음. 플레이어가 "왜 다음 영업 골드가 줄었는지" 알 수 없음. 후속 Phase에서 ResultScene UI 보강 시 함께 처리 권장.
+- **KNOWN-2 (LOW)**: ServiceScene CUSTOMER_PATIENCE_MULT 상수와 customerProfileData.js patienceMult 속성 중복 정의. 현재 값 동기화됨. 향후 한쪽만 수정 시 불일치 위험. customerProfileData에서 가져오도록 통합 권장.
+- **KNOWN-3 (LOW)**: CUSTOMER_PROFILE_MAP import 후 미사용 (ServiceScene.js:49). 미사용 import 제거 권장.
+- **KNOWN-4 (LOW)**: setRegularProgress() 음수 입력 방어 없음. 실제 게임 흐름에서 발생 가능성 극히 낮음 (++ 연산만 사용).
+- **AD2 WARN**: student_seated 포즈 표현 약함 (waiting과 거의 동일, lower_delta +81). critic/business 네이비 슈트 색 유사 (소품으로 구별). 기능 영향 없음.
+
+### 검증
+
+- QA: **PASS** (2026-04-23)
+  - 수용 기준 7/7 전수 충족
+  - Playwright 28/28 PASS (정상 21 + 예외 4 + UI 안정성 2 + 시각 1)
+  - 시각적 검증 스크린샷 확인 (메뉴 로딩 + 스프라이트 10장 직접 확인)
+  - 콘솔 에러 0건
+  - 예외 시나리오 6건 PASS/WARN (음수 방어 WARN 허용)
+- AD2: **APPROVED** -- FAIL 0건, WARN 4건 허용 (캔버스 92x92, traveler/business 외곽선 색, student seated 포즈, critic/business 색 유사)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase76-spec.md`
+- 코더 리포트: `.claude/specs/2026-04-23-kc-phase76-coder-report.md`
+- AD2: `.claude/specs/2026-04-23-kc-phase76-ad2.md`
+- QA: `.claude/specs/2026-04-23-kc-phase76-qa.md`
+
+---
+
 ## [Phase 75B] 2026-04-23 -- 일일 미션 + 로그인 보너스 (P3-1 F2P 리텐션)
 
 ### 개요

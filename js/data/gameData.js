@@ -1762,13 +1762,13 @@ export const WAVE_CUSTOMERS = [
     customers: [
       { dish: 'cheese_fondue', patience: 35000, baseReward: 65, tipMultiplier: 1.5 },
       { dish: 'spicy_stir_fry', patience: 28000, baseReward: 50, tipMultiplier: 1.3 },
-      { dish: 'mixed_platter', patience: 28000, baseReward: 70, tipMultiplier: 1.5, vip: true },
+      { dish: 'mixed_platter', patience: 28000, baseReward: 70, tipMultiplier: 1.5, profileId: 'vip' },
     ],
   },
   {
     wave: 7,
     customers: [
-      { dish: 'seafood_pasta', patience: 25000, baseReward: 60, tipMultiplier: 1.5, vip: true },
+      { dish: 'seafood_pasta', patience: 25000, baseReward: 60, tipMultiplier: 1.5, profileId: 'vip' },
       { dish: 'cheese_fondue', patience: 30000, baseReward: 65, tipMultiplier: 1.3 },
       { dish: 'steak_plate', patience: 22000, baseReward: 55, tipMultiplier: 1.3 },
     ],
@@ -1776,8 +1776,8 @@ export const WAVE_CUSTOMERS = [
   {
     wave: 8,
     customers: [
-      { dish: 'cheese_fondue', patience: 28000, baseReward: 70, tipMultiplier: 1.5, vip: true },
-      { dish: 'mixed_platter', patience: 25000, baseReward: 75, tipMultiplier: 1.5, vip: true },
+      { dish: 'cheese_fondue', patience: 28000, baseReward: 70, tipMultiplier: 1.5, profileId: 'vip' },
+      { dish: 'mixed_platter', patience: 25000, baseReward: 75, tipMultiplier: 1.5, profileId: 'vip' },
       { dish: 'seafood_pasta', patience: 22000, baseReward: 60, tipMultiplier: 1.3 },
     ],
   },

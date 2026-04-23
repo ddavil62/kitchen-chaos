@@ -12,6 +12,7 @@
  * Phase 51-4: 챕터별 홀 바닥·뒷벽 키 헬퍼 추가, tileSprite 전환, 하단 바 색조 통일.
  * Phase 51-1: mireuk_traveler 특수 손님 타입 추가, 미력의 정수 드롭 로직, HUD 보유량 표시.
  * Phase 51-2: 유랑 미력사 패시브 스킬 적용 (_applyWanderingChefSkills), 인내심/조리시간 버프.
+ * Phase 76: 손님 NPC 10종 프로필 시스템 (기존 5종 + 신규 5종). 평론가/단골 특수 로직.
  * 손님 입장 -> 주문 -> 레시피 선택 -> 조리 -> 서빙 -> 골드 획득.
  *
  * 화면 구성 (360x640):
@@ -45,6 +46,7 @@ import { AchievementManager } from '../managers/AchievementManager.js';
 import { WANDERING_CHEFS, getWanderingChefById } from '../data/wanderingChefData.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
+import { getCustomerProfile, CUSTOMER_PROFILE_MAP } from '../data/customerProfileData.js';
 
 // ── 레이아웃 상수 ──
 const HUD_Y = 0;
@@ -114,7 +116,7 @@ const LIGHTING_TIP_BONUS = [0, 0.08, 0.16, 0.25, 0.35, 0.50];
 
 // ── 특수 손님 설정 (Phase 8-5) ──
 
-/** 손님 유형별 아이콘 */
+/** 손님 유형별 아이콘 (Phase 76: 신규 5종 추가) */
 const CUSTOMER_TYPE_ICONS = {
   normal: '\uD83D\uDE0A',   // 😊
   vip: '\uD83D\uDC51',      // 👑
@@ -122,9 +124,14 @@ const CUSTOMER_TYPE_ICONS = {
   rushed: '\uD83D\uDE30',   // 😰
   group: '\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67\u200D\uD83D\uDC66', // 👨‍👩‍👧‍👦
   mireuk_traveler: '\uD83D\uDCAE', // 💠 (이모지 폴백)
+  critic:   '\uD83D\uDCDD', // 📝
+  regular:  '\uD83C\uDFE0', // 🏠
+  student:  '\uD83C\uDF92', // 🎒
+  traveler: '\uD83E\uDDF3', // 🧳
+  business: '\uD83D\uDCBC', // 💼
 };
 
-/** 손님 유형별 인내심 배율 */
+/** 손님 유형별 인내심 배율 (Phase 76: 신규 5종 추가, customerProfileData와 동기) */
 const CUSTOMER_PATIENCE_MULT = {
   normal: 1.0,
   vip: 0.7,
@@ -132,9 +139,14 @@ const CUSTOMER_PATIENCE_MULT = {
   rushed: 0.4,
   group: 1.2,
   mireuk_traveler: 1.5,   // 여유로운 여행자. 급하지 않음.
+  critic:   1.3,           // 평론가: 여유 있게 관찰
+  regular:  1.1,           // 단골: 약간 여유
+  student:  0.9,           // 학생: 약간 촉박
+  traveler: 1.4,           // 여행객: 매우 여유
+  business: 0.6,           // 비즈니스맨: 급함
 };
 
-/** 손님 유형별 보상 배율 */
+/** 손님 유형별 보상 배율 (Phase 76: 신규 5종 추가) */
 const CUSTOMER_REWARD_MULT = {
   normal: 1.0,
   vip: 1.8,
@@ -142,6 +154,11 @@ const CUSTOMER_REWARD_MULT = {
   rushed: 2.5,
   group: 2.0,
   mireuk_traveler: 0.8,   // 여행자는 돈이 없다. 골드 보상 낮음, 대신 정수 드롭.
+  critic:   1.5,           // 평론가: 중간 보상, 혹평 패널티 리스크
+  regular:  1.0,           // 단골: 기본 보상 (5회 누적 시 팁 버프)
+  student:  0.7,           // 학생: 저예산
+  traveler: 1.2,           // 여행객: 약간 후함
+  business: 1.6,           // 비즈니스맨: 후한 보상
 };
 
 /**
@@ -149,10 +166,11 @@ const CUSTOMER_REWARD_MULT = {
  * 키: 장 번호(1~3), 값: { type: 확률 }
  * 확률은 순서대로 적용 (앞 유형에 해당되면 뒤 유형은 스킵)
  */
+/** Phase 76: 신규 5종 출현 확률 추가 */
 const SPECIAL_CUSTOMER_RATES = {
-  1: { vip: 0.10, gourmet: 0, rushed: 0, group: 0 },
-  2: { vip: 0.15, gourmet: 0.05, rushed: 0.05, group: 0 },
-  3: { vip: 0.15, gourmet: 0.10, rushed: 0.08, group: 0.05 },
+  1: { vip: 0.08, gourmet: 0, rushed: 0, group: 0,    critic: 0,    regular: 0.05, student: 0.10, traveler: 0.05, business: 0    },
+  2: { vip: 0.10, gourmet: 0.05, rushed: 0.05, group: 0, critic: 0.03, regular: 0.08, student: 0.08, traveler: 0.05, business: 0.03 },
+  3: { vip: 0.10, gourmet: 0.08, rushed: 0.06, group: 0.04, critic: 0.05, regular: 0.08, student: 0.06, traveler: 0.06, business: 0.05 },
 };
 
 // ── 영업 이벤트 설정 (Phase 8-5) ──
@@ -310,6 +328,20 @@ export class ServiceScene extends Phaser.Scene {
     this.chapter = parseInt(this.stageId.split('-')[0], 10) || 1;
     /** 장별 특수 손님 출현 확률 테이블 */
     this.specialRates = SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[1];
+
+    // ── Phase 76: 평론가/단골 추적 상태 ──
+    /** @type {number[]} 평론가 patienceRatio 누적 배열 */
+    this.criticScores = [];
+    /** @type {number} 단골 서빙 누적 횟수 (영구 저장) */
+    this._regularServedCount = SaveManager.getRegularProgress();
+
+    // ── Phase 76: 평론가 혹평 패널티 소비 (전 영업에서 설정된 경우) ──
+    if (SaveManager.getCriticPenalty()) {
+      this._criticPenaltyApplied = true;
+      SaveManager.setCriticPenalty(false); // 1회 소비 후 해제
+    } else {
+      this._criticPenaltyApplied = false;
+    }
 
     // ── Phase 8-6: 셰프 영업 액티브 스킬 상태 ──
     /** 스킬 쿨다운 남은 시간 (ms) */
@@ -588,7 +620,7 @@ export class ServiceScene extends Phaser.Scene {
     this._mireukSpawned = true;
 
     // 레시피 선택: 상위 30% 등급 (tier >= 3) 우선, 없으면 전체 풀
-    const recipe = this._pickRecipeForType('mireuk_traveler');
+    const recipe = this._pickRecipeForProfile('mireuk_traveler');
     if (!recipe) return;
 
     // 인내심 계산 (기존 공식 동일, typeMult = 1.5 적용)
@@ -609,8 +641,8 @@ export class ServiceScene extends Phaser.Scene {
       maxPatience: totalPatience,
       baseReward: recipe.baseReward,
       tipMultiplier: 1.5,
-      vip: false,
-      customerType: 'mireuk_traveler',
+      profileId: 'mireuk_traveler',       // Phase 76: profileId 단일 필드
+      customerType: 'mireuk_traveler',    // 하위 호환
       tableIdx: tableIdx,
       groupPairIdx: -1,
     };
@@ -1099,8 +1131,11 @@ export class ServiceScene extends Phaser.Scene {
         const custSpriteKey = `customer_${custType}_${state}`;
         const fallbackKey   = `customer_${custType}`;
         if (SpriteLoader.hasTexture(this, custSpriteKey)) {
-          const w = (custType === 'group') ? 52 : 40;
-          const h = (custType === 'group') ? 70 : 56;
+          // Phase 76: 신규 5종은 92×92px이므로 displayHeight=64로 강제 스케일
+          const NEW_PROFILE_IDS = ['critic', 'regular', 'student', 'traveler', 'business'];
+          const isNewProfile = NEW_PROFILE_IDS.includes(custType);
+          const w = (custType === 'group') ? 52 : (isNewProfile ? 56 : 40);
+          const h = (custType === 'group') ? 70 : (isNewProfile ? 64 : 56);
           customerImg.setTexture(custSpriteKey).setDisplaySize(w, h).setVisible(true);
           custIconText.setVisible(false);
         } else if (SpriteLoader.hasTexture(this, fallbackKey)) {
@@ -1844,8 +1879,8 @@ export class ServiceScene extends Phaser.Scene {
     }
     if (emptyIndices.length === 0) return; // 만석
 
-    // ── Phase 8-5: 손님 유형 결정 ──
-    let customerType = this._determineCustomerType(emptyIndices);
+    // ── Phase 8-5 / Phase 76: 손님 프로필 결정 ──
+    let customerType = this._determineProfileId(emptyIndices);
 
     // 단체 손님: 빈 테이블 2개 이상 필요
     if (customerType === 'group' && emptyIndices.length < 2) {
@@ -1864,13 +1899,14 @@ export class ServiceScene extends Phaser.Scene {
   }
 
   /**
-   * 손님 유형 결정 (장별 확률 기반).
+   * 손님 프로필 결정 (장별 확률 기반).
+   * Phase 76: _determineCustomerType에서 리네임. 10종 프로필 지원.
    * 맛집 리뷰 이벤트 활성 시 VIP 강제.
    * @param {number[]} emptyIndices - 빈 테이블 인덱스 목록
-   * @returns {string} customerType
+   * @returns {string} profileId
    * @private
    */
-  _determineCustomerType(emptyIndices) {
+  _determineProfileId(emptyIndices) {
     // 맛집 리뷰 이벤트: 남은 VIP 강제 카운트가 있으면 VIP
     if (this.foodReviewRemaining > 0) {
       return 'vip';
@@ -1879,31 +1915,47 @@ export class ServiceScene extends Phaser.Scene {
     const roll = Math.random();
     let threshold = 0;
 
-    // 순서: vip → gourmet → rushed → group
-    threshold += this.specialRates.vip;
+    // 판정 순서: critic → vip → gourmet → rushed → business → group → regular → student → traveler → normal
+    threshold += this.specialRates.critic || 0;
+    if (roll < threshold) return 'critic';
+
+    threshold += this.specialRates.vip || 0;
     if (roll < threshold) return 'vip';
 
-    threshold += this.specialRates.gourmet;
+    threshold += this.specialRates.gourmet || 0;
     if (roll < threshold) return 'gourmet';
 
-    threshold += this.specialRates.rushed;
+    threshold += this.specialRates.rushed || 0;
     if (roll < threshold) return 'rushed';
 
-    threshold += this.specialRates.group;
+    threshold += this.specialRates.business || 0;
+    if (roll < threshold) return 'business';
+
+    threshold += this.specialRates.group || 0;
     if (roll < threshold && emptyIndices.length >= 2) return 'group';
+
+    threshold += this.specialRates.regular || 0;
+    if (roll < threshold) return 'regular';
+
+    threshold += this.specialRates.student || 0;
+    if (roll < threshold) return 'student';
+
+    threshold += this.specialRates.traveler || 0;
+    if (roll < threshold) return 'traveler';
 
     return 'normal';
   }
 
   /**
-   * 단일 손님 스폰 (일반/VIP/미식가/급한).
+   * 단일 손님 스폰 (프로필 기반).
+   * Phase 76: customerType 매개변수를 profileId로 명칭 변경. 프로필 데이터 참조.
    * @param {number} tableIdx - 배정할 테이블 인덱스
-   * @param {string} customerType - 손님 유형
+   * @param {string} profileId - 손님 프로필 ID
    * @private
    */
-  _spawnSingleCustomer(tableIdx, customerType) {
+  _spawnSingleCustomer(tableIdx, profileId) {
     // 레시피 풀 결정
-    const recipe = this._pickRecipeForType(customerType);
+    const recipe = this._pickRecipeForProfile(profileId);
     if (!recipe) return;
 
     // ── 인내심 계산: 기본 * 셰프 * (1 + 테이블 + 인테리어) * 유형 배율 * 이벤트 ──
@@ -1914,7 +1966,7 @@ export class ServiceScene extends Phaser.Scene {
     const basePat = this.serviceConfig.customerPatience * 1000; // ms
     // Phase 51-2: 유랑 미력사 인내심 버프 반영 (this._patienceMults 사용)
     const patienceTable = this._patienceMults || CUSTOMER_PATIENCE_MULT;
-    const typeMult = patienceTable[customerType] || 1.0;
+    const typeMult = patienceTable[profileId] || 1.0;
 
     // 비 오는 날 이벤트: 인내심 +50%
     const eventPatienceMult = (this.activeEvent && this.activeEvent.type === 'rainy_day') ? 1.5 : 1.0;
@@ -1931,8 +1983,8 @@ export class ServiceScene extends Phaser.Scene {
       maxPatience: totalPatience,
       baseReward: recipe.baseReward,
       tipMultiplier: 1.5,
-      vip: customerType === 'vip',
-      customerType: customerType,
+      profileId: profileId,                 // Phase 76: profileId 단일 필드
+      customerType: profileId,              // 하위 호환을 위해 동시 유지
       tableIdx: tableIdx,
       groupPairIdx: -1, // 단체가 아니면 -1
     };
@@ -1948,7 +2000,7 @@ export class ServiceScene extends Phaser.Scene {
     this.totalCustomers++;
 
     // 맛집 리뷰 VIP 카운트 감소
-    if (this.foodReviewRemaining > 0 && customerType === 'vip') {
+    if (this.foodReviewRemaining > 0 && profileId === 'vip') {
       this.foodReviewRemaining--;
       if (this.foodReviewRemaining <= 0) {
         this._endEvent();
@@ -1970,11 +2022,11 @@ export class ServiceScene extends Phaser.Scene {
     const idx2 = emptyIndices[1];
 
     // 각각 다른 레시피 주문
-    const recipe1 = this._pickRecipeForType('group');
-    let recipe2 = this._pickRecipeForType('group');
+    const recipe1 = this._pickRecipeForProfile('group');
+    let recipe2 = this._pickRecipeForProfile('group');
     // 가능하면 다른 레시피 (3번까지 시도)
     for (let attempt = 0; attempt < 3 && recipe2 && recipe2.id === recipe1.id; attempt++) {
-      recipe2 = this._pickRecipeForType('group');
+      recipe2 = this._pickRecipeForProfile('group');
     }
     if (!recipe1 || !recipe2) return;
 
@@ -2001,8 +2053,8 @@ export class ServiceScene extends Phaser.Scene {
       maxPatience: totalPatience,
       baseReward: recipe.baseReward,
       tipMultiplier: 1.5,
-      vip: false,
-      customerType: 'group',
+      profileId: 'group',           // Phase 76: profileId 단일 필드
+      customerType: 'group',        // 하위 호환
       tableIdx: tableIdx,
       groupPairIdx: pairIdx,
       groupServed: false,      // 이 좌석의 서빙 완료 여부
@@ -2037,34 +2089,48 @@ export class ServiceScene extends Phaser.Scene {
   }
 
   /**
-   * 손님 유형에 맞는 레시피 선택.
-   * 미식가: tier >= 3인 레시피만.
-   * @param {string} customerType
+   * 손님 프로필에 맞는 레시피 선택.
+   * Phase 76: _pickRecipeForType에서 리네임. 신규 프로필 분기 추가.
+   * @param {string} profileId - 손님 프로필 ID
    * @returns {object|null}
    * @private
    */
-  _pickRecipeForType(customerType) {
+  _pickRecipeForProfile(profileId) {
     // Phase 12: 재고로 만들 수 있는 레시피만 주문 (솔드아웃 처리)
     const craftable = this.availableRecipes.filter(r =>
       this.inventoryManager.hasEnough(r.ingredients)
     );
     if (craftable.length === 0) return null;
 
-    if (customerType === 'gourmet') {
-      // 미식가: 만들 수 있는 것 중 ★★★ 이상 우선
+    // 미식가 / 평론가: 만들 수 있는 것 중 ★★★ 이상 우선
+    if (profileId === 'gourmet' || profileId === 'critic') {
       const highTier = craftable.filter(r => r.tier >= 3);
       const pool = highTier.length > 0 ? highTier : craftable;
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
     // Phase 51-1: 미력 나그네 — 상위 30% 등급(tier >= 3) 우선
-    if (customerType === 'mireuk_traveler') {
+    if (profileId === 'mireuk_traveler') {
       const highTier = craftable.filter(r => r.tier >= 3);
       const pool = highTier.length > 0 ? highTier : craftable;
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    // 일반/VIP/급한/단체: 만들 수 있는 레시피에서 랜덤 선택
+    // 여행객: 지역 특산 (tier >= 3) 우선 (gourmet과 동일 처리, 후속 장르 필터 미반영)
+    if (profileId === 'traveler') {
+      const highTier = craftable.filter(r => r.tier >= 3);
+      const pool = highTier.length > 0 ? highTier : craftable;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    // 학생: 저예산 특성, tier <= 2 우선
+    if (profileId === 'student') {
+      const lowTier = craftable.filter(r => r.tier <= 2);
+      const pool = lowTier.length > 0 ? lowTier : craftable;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    // 일반/VIP/급한/단체/단골/비즈니스맨: 만들 수 있는 레시피에서 랜덤 선택
     return craftable[Math.floor(Math.random() * craftable.length)];
   }
 
@@ -2397,6 +2463,7 @@ export class ServiceScene extends Phaser.Scene {
    * 서빙 로직 (수동/자동 공통).
    * Phase 8-4: 서빙 완료 후 세척 대기시간 시작.
    * Phase 8-5: 특수 손님 보상 배율, 미식가 만족도 보너스, 단체 부분 서빙.
+   * Phase 76: tipStyle 기반 팁 조정, 평론가/단골 추적.
    * @param {number} tableIdx - 테이블 인덱스
    * @param {number} slotIdx - 조리 슬롯 인덱스
    * @param {boolean} [isAutoServe=false] - 자동 서빙 여부 (아이콘 애니메이션용)
@@ -2418,6 +2485,30 @@ export class ServiceScene extends Phaser.Scene {
       tipGrade = 1.0;
     } else {
       tipGrade = 0.7;
+    }
+
+    // Phase 76: tipStyle 기반 팁 등급 조정 (프로필 데이터 참조)
+    const custProfile = cust.profileId ? getCustomerProfile(cust.profileId) : null;
+    const tipStyle = custProfile?.tipStyle || 'standard';
+    if (tipStyle === 'generous') tipGrade *= 1.2;
+    if (tipStyle === 'stingy')   tipGrade *= 0.8;
+
+    // Phase 76: 단골 5회 달성 시 팁 ×1.2 버프
+    if (cust.profileId === 'regular' || cust.customerType === 'regular') {
+      if (this._regularServedCount >= 5) {
+        tipGrade *= 1.2;
+      }
+    }
+
+    // Phase 76: 평론가 patienceRatio 누적
+    if (cust.profileId === 'critic' || cust.customerType === 'critic') {
+      this.criticScores.push(patienceRatio);
+    }
+
+    // Phase 76: 단골 서빙 누적 카운트
+    if (cust.profileId === 'regular' || cust.customerType === 'regular') {
+      this._regularServedCount++;
+      SaveManager.setRegularProgress(this._regularServedCount);
     }
 
     // 콤보 보너스
@@ -2750,6 +2841,20 @@ export class ServiceScene extends Phaser.Scene {
       this.totalGold = Math.floor(this.totalGold * 0.5);
     }
 
+    // ── Phase 76: 평론가 혹평 패널티 소비 (전 영업에서 설정된 것) ──
+    if (this._criticPenaltyApplied) {
+      this.totalGold = Math.floor(this.totalGold * 0.9);
+      this._criticPenaltyApplied = false;
+    }
+
+    // ── Phase 76: 이번 영업 평론가 점수 집계 → 혹평 패널티 설정 ──
+    const criticAvgScore = this.criticScores.length > 0
+      ? this.criticScores.reduce((a, b) => a + b, 0) / this.criticScores.length
+      : null;
+    if (criticAvgScore !== null && criticAvgScore < 0.7) {
+      SaveManager.setCriticPenalty(true);
+    }
+
     // ── Phase 58-3: 축복 'gold_gain' — 영업 수입(매출+팁)에 배수 적용 ──
     const goldMultiplier = BranchEffects.getBlessingMultiplier('gold_gain'); // 기본 1.0
     if (goldMultiplier !== 1.0) {
@@ -2816,6 +2921,9 @@ export class ServiceScene extends Phaser.Scene {
             maxCombo: this.maxCombo,
             // ── Phase 68: P0-2 totalCustomers=0 시 satisfaction 0 보정 ──
             satisfaction: this.totalCustomers === 0 ? 0 : this.satisfaction,
+            // ── Phase 76: 평론가/단골 결과 ──
+            criticAvgScore: criticAvgScore,             // null이면 평론가 미등장
+            regularAchieved: this._regularServedCount >= 5,
           },
           isMarketFailed: false,
         });

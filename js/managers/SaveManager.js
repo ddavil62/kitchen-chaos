@@ -30,12 +30,14 @@
  * Phase 73: 세이브 백업 롤링 시스템 추가 (슬롯 3개 자동 순환).
  *           getBackups, restoreBackup 정적 메서드 추가.
  * Phase 75B: v25 마이그레이션 — dailyMissions, loginBonus, mimiSkinCoupons 추가.
+ * Phase 76: v26 마이그레이션 — 손님 프로필 시스템 (regularCustomerProgress, criticPenaltyActive).
+ *           getRegularProgress, setRegularProgress, getCriticPenalty, setCriticPenalty 헬퍼 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 25;
+const SAVE_VERSION = 26;
 
 // ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
 const BACKUP_KEYS = [
@@ -162,6 +164,9 @@ function createDefault() {
       claimedDays: [],
     },
     mimiSkinCoupons: 0,  // Phase 77 SkinManager 의존 전까지 카운터만 보관
+    // ── Phase 76 추가: 손님 프로필 시스템 ──
+    regularCustomerProgress: 0,   // 단골 서빙 누적 횟수 (5회 달성 시 팁 +20% 버프)
+    criticPenaltyActive: false,   // 평론가 혹평 패널티 (다음 영업 골드 -10%)
     // ── Phase 58-1 추가: 분기 카드 시스템 ──
     branchCards: {
       toolMutations: {},          // { [toolId]: mutationId } — 변이된 도구 맵 (도구당 1개, 되돌릴 수 없음)
@@ -1257,6 +1262,46 @@ export class SaveManager {
     SaveManager._currentRun = null;
   }
 
+  // ── Phase 76: 손님 프로필 시스템 헬퍼 ──
+
+  /**
+   * 단골 서빙 누적 횟수 조회.
+   * @returns {number}
+   */
+  static getRegularProgress() {
+    const data = SaveManager.load();
+    return data.regularCustomerProgress ?? 0;
+  }
+
+  /**
+   * 단골 서빙 누적 횟수 저장.
+   * @param {number} count
+   */
+  static setRegularProgress(count) {
+    const data = SaveManager.load();
+    data.regularCustomerProgress = count;
+    SaveManager.save(data);
+  }
+
+  /**
+   * 평론가 혹평 패널티 활성 여부 조회.
+   * @returns {boolean}
+   */
+  static getCriticPenalty() {
+    const data = SaveManager.load();
+    return data.criticPenaltyActive ?? false;
+  }
+
+  /**
+   * 평론가 혹평 패널티 설정/해제.
+   * @param {boolean} active
+   */
+  static setCriticPenalty(active) {
+    const data = SaveManager.load();
+    data.criticPenaltyActive = active;
+    SaveManager.save(data);
+  }
+
   /** 세이브 초기화 */
   static reset() {
     localStorage.removeItem(SAVE_KEY);
@@ -1545,6 +1590,13 @@ export class SaveManager {
       };
       data.mimiSkinCoupons = data.mimiSkinCoupons ?? 0;
       data.version = 25;
+    }
+
+    // v25 → v26: 손님 프로필 시스템 추가 (Phase 76)
+    if (data.version < 26) {
+      data.regularCustomerProgress = data.regularCustomerProgress ?? 0;
+      data.criticPenaltyActive = data.criticPenaltyActive ?? false;
+      data.version = 26;
     }
 
     // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)

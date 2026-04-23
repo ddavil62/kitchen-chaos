@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (Phase 75B 일일 미션 + 로그인 보너스)
+> 최종 업데이트: 2026-04-23 (Phase 76 손님 NPC 다양성 확장)
 
 ## 프로젝트 개요
 
@@ -32,19 +32,20 @@
 | 분기 효과 | BranchEffects.js + merchantBranchData.js + chefUnlockHelper.js | 분기 카드 32장 정의(mutation/recipe/bond/blessing × 8), 게임플레이 씬에서 배수·시너지·tint 조회하는 경량 어댑터, `getEligiblePool(category, branchCardsState, progressState)` 선행 해금 필터(셰프·도구·챕터/시즌), 셰프 해금 판별 헬퍼 공용화 |
 | 월드맵 | WorldMapScene.js | 24챕터 3그룹 탭(1~6/7~15/16~24장), 9노드 3x3 맵, 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js + EndlessMissionManager.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입, 미력 폭풍 이벤트, 정화 임무 4종, 통계 트래킹(폭풍/임무/무결) |
-| 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (3레이어 분리 렌더링+depth sorting+홀 데코), 챕터별 홀 배경 (바닥 8종 tileSprite+뒷벽 8종), 엔드리스 웨이브 구간별 배경 테마 전환, 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
+| 손님 프로필 | customerProfileData.js | 10종 프로필 정의 (normal/vip/gourmet/rushed/group/critic/regular/student/traveler/business), patienceMult/tipStyle/preferredGenre 속성, getCustomerProfile() 조회 |
+| 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (3레이어 분리 렌더링+depth sorting+홀 데코), 챕터별 홀 배경 (바닥 8종 tileSprite+뒷벽 8종), 엔드리스 웨이브 구간별 배경 테마 전환, 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원), 10종 프로필 기반 손님 스폰/평론가 점수 집계/단골 추적 |
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결, modal lock (DialogueScene 오버레이 시 버튼 비활성), isCleared 복합 조건, 셰프별 장보기 실패 대사 (7셰프 x 3 바리에이션) |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 119종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 120항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 일일 미션 | DailyMissionManager.js | DAILY_MISSION_POOL 10종에서 매일 3개 랜덤 선정, 자정 리셋, 진행도 추적, 보상 자동 지급 |
 | 로그인 보너스 | LoginBonusManager.js | 7일 연속 로그인 캘린더, streak 관리, D1~D7 보상 지급 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v25, 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API, dailyMissions/loginBonus/mimiSkinCoupons 필드, `_currentRun` 인메모리 단일 소스 (씬 간 stageId 전달) |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v26, 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API, dailyMissions/loginBonus/mimiSkinCoupons/regularCustomerProgress/criticPenaltyActive 필드, `_currentRun` 인메모리 단일 소스 (씬 간 stageId 전달) |
 | 쿠폰 | CouponRegistry.js | 쿠폰 레지스트리, redeemCoupon() API, 일반 3종+DEV 치트 5종, 사용 이력 localStorage 관리 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 34개 업적, 해금 판정/보상(골드/코인/정수), 카테고리 탭 UI |
-| 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated(lv0~lv4) 에셋 로드, 타일셋 15종+타워 8종 preload, portrait 9종 (arjun 포함) |
+| 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated(10종 프로필) 에셋 로드, 타일셋 15종+타워 8종 preload, portrait 9종 (arjun 포함) |
 | 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰/세이브 복구 + 오늘의 미션 배너 + 미션/캘린더 통합 모달 |
 | 데이터 | stageData.js / gameData.js / recipeData.js / merchantBranchData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 292종(일반 284+분기 8), 분기 카드 32장 |
 
@@ -65,7 +66,7 @@
 | 레시피 | 284종, 5등급, 도감 | 완료 |
 | 셰프 시스템 | 7종 Named 셰프 (미미/린/메이지/유키/라오/앙드레/아르준), 전원 패시브+액티브 스킬, 챕터 기반 잠금 해제, 가로 캐러셀 UI (260x380px 카드, 스와이프/화살표 전환, 순환 탐색) | 완료 |
 | 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원), 인테리어/직원 탭 cardH 112 오버플로우 수정 완료 | 완료 |
-| 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
+| 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 10종 프로필 손님(평론가·단골 특수 메커니즘), 이벤트 | 완료 |
 | 사운드 | SFX 20종 + BGM 5종, 설정 UI | 완료 |
 | VFX | 파티클, 스크린 효과, 플로팅 텍스트 | 완료 |
 | 엔드리스 모드 | 무한 웨이브 TD, 데일리 스페셜, 로컬 랭킹, 미력 폭풍의 눈 이벤트(15웨이브 배수), 정화 임무 4종, 유랑 미력사 8% 등장, 웨이브 구간별 배경 테마 전환 | 완료 |
@@ -105,7 +106,8 @@
 | 셰프 | 7종 Named (미미/린/메이지/유키/라오/앙드레/아르준, 전원 패시브+액티브 스킬) |
 | 업적 | 34개 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 6) |
 | 분기 카드 | 32장 (변이 8 / 레시피 8 / 인연 8 / 축복 8) |
-| 세이브 버전 | v25 |
+| 손님 프로필 | 10종 (normal/vip/gourmet/rushed/group/critic/regular/student/traveler/business) |
+| 세이브 버전 | v26 |
 
 ## 알려진 제약사항
 
@@ -128,6 +130,8 @@
 - MenuScene._renderCalendarSlot()에서 DailyMissionManager._getDateKey() private 메서드 직접 호출 (캡슐화 위반, 기능 동작에 영향 없음)
 - 미미 스킨 쿠폰(mimiSkinCoupons)은 카운터만 저장, 교환/사용 UI 미구현 (Phase 77 SkinManager 의존)
 - 자정 리셋은 클라이언트 로컬 Date 기반, 기기 시간 조작에 취약 (Phase 78 서버 검증 예정)
+- ResultScene에 평론가 혹평/단골 달성 알림 텍스트 미구현 (Phase 76 QA MEDIUM 이슈, 패널티 로직 자체는 ServiceScene에서 정상 동작, 플레이어 시각 피드백 부재). 후속 Phase에서 ResultScene UI 보강 시 함께 처리 권장
+- ServiceScene CUSTOMER_PATIENCE_MULT 상수와 customerProfileData.js patienceMult 중복 정의 (현재 값 동기화됨, 향후 통합 권장)
 
 ## 향후 계획
 
@@ -135,13 +139,21 @@
 
 ## 개발 이력 (최근)
 
+### Phase 76 — 손님 NPC 다양성 확장 (2026-04-23)
+
+P3-2 영업 씬 변주 확대. 기존 6종 단순 타입(normal/vip/gourmet/rushed/group/mireuk_traveler)에서 10종 프로필 시스템으로 전환. customerProfileData.js 신규 (10종 프로필 정의 + getCustomerProfile()). 평론가(critic) patienceRatio 집계 → 평균 0.7 미만 시 다음 영업 골드 -10% 패널티. 단골(regular) 5회 서빙 누적 시 팁 x1.2 버프. 신규 5종 PixelLab 스프라이트 10장 (92x92, displayHeight=64 스케일 흡수). SaveManager v25->v26 (regularCustomerProgress, criticPenaltyActive).
+
+- 신규 파일: customerProfileData.js, assets/service/ 손님 스프라이트 10장
+- 수정 파일: CustomerManager.js, ServiceScene.js, SaveManager.js, SpriteLoader.js, CustomerZoneUI.js, gameData.js
+- QA: PASS (Playwright 28/28 PASS, 수용 기준 7/7 충족)
+- KNOWN: ResultScene 평론가 혹평/단골 알림 텍스트 미구현 (후속 Phase 권장)
+- 스펙: `.claude/specs/2026-04-23-kc-phase76-spec.md`
+
 ### Phase 75B — 일일 미션 + 로그인 보너스 (2026-04-23)
 
-P3-1 F2P 리텐션 핵심 기능. DailyMissionManager(10종 풀에서 매일 3개 랜덤 선정, 자정 리셋, 진행도 추적, 보상 자동 지급)와 LoginBonusManager(7일 연속 로그인 캘린더, D1 미미 스킨 쿠폰, D7 미력의 정수 100)를 신규 구현. MenuScene 상단에 "오늘의 미션" 배너 + 미션/캘린더 탭 전환 통합 팝업 모달 추가. 6개 씬(Service/Result/Endless/Gathering/Menu)에 이벤트 훅 연결(전부 try-catch 이중 래핑). SaveManager v24->v25 마이그레이션. 미션 아이콘 7종 + 캘린더 슬롯 3종 에셋(PIL 절차 생성, 32x32 PNG).
+P3-1 F2P 리텐션 핵심 기능. DailyMissionManager + LoginBonusManager 신규. MenuScene 배너 + 모달. SaveManager v24->v25.
 
-- 신규 파일: DailyMissionManager.js, LoginBonusManager.js, assets/sprites/ui/missions/ (10종 PNG)
-- 수정 파일: SaveManager.js, MenuScene.js, BootScene.js, ServiceScene.js, ResultScene.js, EndlessScene.js, GatheringScene.js
-- QA: PASS (Playwright 16/16 non-timeout PASS, 수용 기준 9/9 충족, 스크린샷 8종 확인)
+- QA: PASS (Playwright 16/16, 수용 기준 9/9)
 - 스펙: `.claude/specs/2026-04-23-kc-phase75B-spec.md`
 
 ### Phase 75 — 행상인 분기 카드 풀 선행 해금 체크 (2026-04-23)

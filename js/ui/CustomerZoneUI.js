@@ -122,7 +122,8 @@ export class CustomerZoneUI {
     slot.customer = customer;
 
     slot.emptyText.setVisible(false);
-    const vipTag = customer.vip ? ' ⭐VIP' : '';
+    // Phase 76: vip boolean → profileId 기반 태그 표시
+    const vipTag = (customer.profileId === 'vip') ? ' \u2B50VIP' : '';
     slot.dishText.setText(`${customer.recipe.icon} ${customer.recipe.nameKo}${vipTag}`);
     slot.dishText.setVisible(true);
     slot.gaugeBg.setVisible(true);

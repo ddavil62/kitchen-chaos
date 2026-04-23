@@ -24,6 +24,7 @@
  * Phase 47-1: death 애니메이션 프레임 로드 + Phaser anim 등록 시스템 추가.
  * Phase 47-2: 보스 13종 death 애니메이션 프레임 로드 + Phaser anim 등록 시스템 추가.
  * Phase 51-4: 챕터별 홀 바닥 타일 8종 + 뒷벽 8종 추가 로드 (SERVICE_ROOT/floor_hall_*.png, wall_back_*.png).
+ * Phase 76: 손님 프로필 10종(기존 5종 + 신규 5종) × 2상태 preload로 확장.
  *
  * 키 컨벤션:
  *   적:     enemy_{id}     (예: enemy_carrot_goblin)
@@ -309,8 +310,11 @@ const SERVICE_ROOT = '/sprites/service';
 // ── 테이블 등급 수 ──
 const TABLE_GRADE_COUNT = 5; // Lv0 ~ Lv4
 
-// ── 손님 유형 목록 ──
-const CUSTOMER_TYPE_IDS = ['normal', 'vip', 'gourmet', 'rushed', 'group'];
+// ── 손님 프로필 ID 목록 (Phase 76: 10종 확장) ──
+const CUSTOMER_PROFILE_IDS = [
+  'normal', 'vip', 'gourmet', 'rushed', 'group',            // 기존 5종
+  'critic', 'regular', 'student', 'traveler', 'business',   // 신규 5종 (Phase 76)
+];
 
 export class SpriteLoader {
   /**
@@ -738,15 +742,15 @@ export class SpriteLoader {
       scene.load.image(`table_lv${lv}_waiting`, `${SERVICE_ROOT}/table_lv${lv}_waiting.png`);
       scene.load.image(`table_lv${lv}_seated`,  `${SERVICE_ROOT}/table_lv${lv}_seated.png`);
     }
-    // 손님 유형별
-    for (const type of CUSTOMER_TYPE_IDS) {
-      scene.load.image(`customer_${type}`, `${SERVICE_ROOT}/customer_${type}.png`);
+    // 손님 프로필별 정지 이미지 (레거시 키, 폴백용 유지)
+    for (const id of CUSTOMER_PROFILE_IDS) {
+      scene.load.image(`customer_${id}`, `${SERVICE_ROOT}/customer_${id}.png`);
     }
-    // Phase 52: 손님 독립 스프라이트 (waiting/seated 2상태)
+    // Phase 52+: 손님 독립 스프라이트 (waiting/seated 2상태) — Phase 76: 10종 × 2상태 = 20키
     const CUST_STATES = ['waiting', 'seated'];
-    for (const type of CUSTOMER_TYPE_IDS) {
+    for (const id of CUSTOMER_PROFILE_IDS) {
       for (const state of CUST_STATES) {
-        scene.load.image(`customer_${type}_${state}`, `${SERVICE_ROOT}/customer_${type}_${state}.png`);
+        scene.load.image(`customer_${id}_${state}`, `${SERVICE_ROOT}/customer_${id}_${state}.png`);
       }
     }
     // 홀 바닥 + 카운터

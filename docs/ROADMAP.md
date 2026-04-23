@@ -1,7 +1,7 @@
 # Kitchen Chaos Tycoon — 장기 로드맵
 
-> 최종 업데이트: 2026-04-23 (Phase 75B 일일 미션 + 로그인 보너스 완료, P3 BM/리텐션 트랙 진행 중)
-> 기준: Phase 75B 완료 + 출시 Polish 로드맵(Phase 69~78) 계획
+> 최종 업데이트: 2026-04-23 (Phase 76 손님 NPC 다양성 확장 완료, P3 BM/리텐션 트랙 진행 중)
+> 기준: Phase 76 완료 + 출시 Polish 로드맵(Phase 69~78) 계획
 > 참고: 기존 Phase 75 "일일 미션 + 로그인 보너스"는 Phase 75B로 이관 완료. Phase 75는 "행상인 분기 카드 풀 선행 해금 체크" 버그 수정(P2 트랙).
 
 ---
@@ -83,8 +83,9 @@
 | Phase 74 | UI/카피 마감 (P2-4~7 튜토리얼 페이지네이터, 셰프 실패 대사, 도구 배지, 업적 glow, ShopScene cardH 수정) | ✅ 완료 |
 | Phase 75 | 행상인 분기 카드 풀 선행 해금 체크 (fix, bond 셰프 해금 필터 / mutation 도구 보유 필터 / recipe minChapter·requiresSeason 스키마, chefUnlockHelper.js 공용화) | ✅ 완료 |
 | Phase 75B | 일일 미션 + 로그인 보너스 (P3-1, DailyMissionManager 10종/3선정, LoginBonusManager 7일 캘린더, 메뉴 배너+모달, 세이브 v25, 에셋 10종) | ✅ 완료 |
+| Phase 76 | 손님 NPC 다양성 확장 (P3-2, 10종 프로필 시스템, 평론가/단골 메커니즘, 신규 5종 PixelLab 스프라이트, 세이브 v26) | ✅ 완료 |
 
-**현재 구현 완성도**: Phase 75B 완료 (2026-04-23) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종). 엔드리스 확장 완성(미력 폭풍+정화 임무+테마 전환+업적+통계). 행상인 분기 카드 32장 전수 실효+선행 해금 체크 완료(v24). P0~P2 전수 완료(67~75). **P3 BM/리텐션 트랙 진입**: 일일 미션(DailyMissionManager 10종/3선정) + 7일 로그인 보너스(LoginBonusManager) + 메뉴 배너/모달 + 세이브 v25(75B) 완료.
+**현재 구현 완성도**: Phase 76 완료 (2026-04-23) — 1~24장 캠페인 전 스테이지 구현(placeholder 0개), 적 57종+보스 13종, 레시피 292종(일반 284+분기 8), 재료 32종, 셰프 7종 Named 전원 스킬 완성, 업적 34개. 전 캐릭터 64px chibi 아트 통일 완결. walk+death 애니메이션 시스템(ENEMY_IDS 42종 + 보스 13종 전종 등록). 미력의 정수+유랑 미력사 시스템 완성. 영업씬 3레이어 렌더링+챕터별 배경 완성(바닥 8종+뒷벽 8종)+10종 프로필 손님(평론가·단골 메커니즘). 엔드리스 확장 완성(미력 폭풍+정화 임무+테마 전환+업적+통계). 행상인 분기 카드 32장 전수 실효+선행 해금 체크 완료(v24). P0~P2 전수 완료(67~75). **P3 BM/리텐션 트랙 진행 중**: 일일 미션+로그인 보너스(75B) + 손님 NPC 다양성 확장(76, 세이브 v26) 완료. 77~78 대기.
 
 ### 현재 콘텐츠 규모
 
@@ -98,11 +99,12 @@
 | 셰프 | 7종 Named (미미/린/메이지/유키/라오/앙드레/아르준, 전원 패시브+액티브 스킬 구현 완료) |
 | 업적 | 34개 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 6) |
 | 분기 카드 | 32장 (변이 8 / 레시피 8 / 인연 8 / 축복 8) |
-| 신규 UI 에셋 | branch_badge 4종 + missions 아이콘 7종 + 캘린더 슬롯 3종 (32×32) |
+| 손님 프로필 | 10종 (normal/vip/gourmet/rushed/group/critic/regular/student/traveler/business) |
+| 신규 UI 에셋 | branch_badge 4종 + missions 아이콘 7종 + 캘린더 슬롯 3종 (32×32) + 손님 스프라이트 10장 (92×92) |
 | 신규 매니저 | BranchEffects.js, DailyMissionManager.js, LoginBonusManager.js |
 | 대화 스크립트 | ~106종 |
 | 스토리 트리거 | ~111항목 (triggerPoint 8종) |
-| 세이브 버전 | v25 |
+| 세이브 버전 | v26 |
 
 ### 게임 루프
 
@@ -506,7 +508,7 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 | **P0 출시 차단 해제** | 67~68 | P0-1~4 (한글 렌더링, 0/0 ★★★ 판정, 레이어 충돌, 씬 상태 전달) | **67~68 완료** |
 | **P1 초기 UX 안전장치** | 69~71 | P1-1~7 + 에셋 404 | **69~71 완료** |
 | **P2 품질 보강** | 72~74 | 분기 카드 수치 전수 반영, 세이브 백업+포트레이트 정합, UI/카피 마감, 행상인 분기 해금 필터(75 fix) | **72~75(fix) 전수 완료** |
-| **P3 BM/리텐션** | 75B~78 | 일일 미션, 손님 다양성, 셰프 스킨, 시즌/랭킹 | **75B 완료**, 76~78 대기 |
+| **P3 BM/리텐션** | 75B~78 | 일일 미션, 손님 다양성, 셰프 스킨, 시즌/랭킹 | **75B~76 완료**, 77~78 대기 |
 
 ### 페이즈 상세
 
@@ -658,22 +660,27 @@ Phase 57까지 **콘텐츠 물량**(스테이지 143 / 레시피 284 / 적 57 / 
 
 **의존성**: Phase 74 (완료).
 
-#### Phase 76 — 손님 NPC 다양성 확장 (full, art)
+#### Phase 76 — 손님 NPC 다양성 확장 (full, art) ✅ 완료 (2026-04-23)
 
 **목표**: P3-2. 영업 씬 변주 확대.
 
-- 손님 프로필 10~15종 (취향/선호 장르/팁 성향)
-- PixelLab으로 신규 손님 스프라이트 10종 (2상태 × 8방향)
-- CustomerSpawner 프로필 기반 주문 생성
-- 특수 손님 2종 신규 (평론가, 단골)
+- [x] customerProfileData.js 신규 — 10종 프로필 정의 (normal/vip/gourmet/rushed/group + critic/regular/student/traveler/business), patienceMult/tipStyle/preferredGenre/spriteKey 속성, getCustomerProfile() 조회
+- [x] CustomerManager profileId 기반 손님 생성, vip:true 하위 호환 폴백, tipStyle 기반 팁 등급 (generous x1.2 / stingy x0.8)
+- [x] ServiceScene 평론가 점수 집계 (criticScores 누적 → 평균 0.7 미만 시 다음 영업 골드 -10% 패널티), 단골 서빙 카운트 (5회 누적 시 팁 x1.2 버프)
+- [x] 신규 5종 PixelLab 스프라이트 10장 (critic/regular/student/traveler/business x waiting/seated, 92x92 RGBA, displayHeight=64 스케일 흡수)
+- [x] SpriteLoader CUSTOMER_TYPES 10종 확장, 20키 preload
+- [x] SaveManager v25->v26 마이그레이션 (regularCustomerProgress: 0, criticPenaltyActive: false)
+- [x] QA PASS (Playwright 28/28, AC 7/7), AD2 APPROVED (WARN 4건 허용)
+- **KNOWN**: ResultScene 평론가 혹평/단골 알림 텍스트 미구현 (패널티 로직 자체는 정상 동작, 후속 Phase에서 ResultScene UI 보강 시 처리 권장)
+- 스펙: `.claude/specs/2026-04-23-kc-phase76-spec.md`
 
-**의존성**: Phase 74.
+**의존성**: Phase 75B (완료).
 
 #### Phase 77 — 셰프 스킨 시스템 (full, art+ui)
 
 **목표**: P3-3. BM 슬롯 확보.
 
-- SkinManager 신규 + 세이브 v26
+- SkinManager 신규 + 세이브 v27
 - ChefSelectScene에 스킨 전환 UI
 - 미미 우선 3종 스킨 스프라이트 생성 (캐주얼/여름/할머니 기념)
 - IAP 훅 (Capacitor In-App Purchase 플러그인 도입 또는 스텁)
