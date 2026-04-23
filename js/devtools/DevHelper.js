@@ -217,4 +217,28 @@ window.__kc = {
   },
 };
 
+// ── ?scene=tavern URL 파라미터 처리 (Phase A) ──
+// BootScene 완료 후 TavernServiceScene으로 자동 전환.
+// 프로덕션에서는 DevHelper 전체가 트리-쉐이킹 제거되므로 개발 환경 전용.
+try {
+  const _urlParams = new URLSearchParams(window.location.search);
+  if (_urlParams.get('scene') === 'tavern') {
+    const _waitForBoot = setInterval(() => {
+      const game = window.__game;
+      if (!game || !game.scene) return;
+      const boot = game.scene.getScene('BootScene');
+      // BootScene._bootComplete가 true가 되면 전환 트리거
+      if (boot && boot._bootComplete) {
+        clearInterval(_waitForBoot);
+        // MenuScene이 이미 시작되었을 수 있으므로 stop 후 전환
+        if (game.scene.isActive('MenuScene')) {
+          game.scene.stop('MenuScene');
+        }
+        game.scene.start('TavernServiceScene');
+        console.log('🍳 ?scene=tavern → TavernServiceScene 전환 완료');
+      }
+    }, 100);
+  }
+} catch { /* URL 파싱 실패 무시 */ }
+
 console.log('🍳 Dev Tools 활성화 — __kc.help() 로 사용법 확인');
