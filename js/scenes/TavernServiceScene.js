@@ -1,6 +1,7 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase A 골격.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase A-bis V12.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
+ * V12: 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
  *
  * 기존 ServiceScene.js와 완전 독립. import/참조/코드 복사 없음.
  * 공용 import(Phaser, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY)만 사용.
@@ -14,10 +15,10 @@ import { GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY } from '../config.js';
 import {
   TAVERN_LAYOUT,
   COUNTER_ANCHOR, COUNTER_W, COUNTER_H,
-  BARREL_ANCHORS, DOOR_ANCHOR,
+  DOOR_ANCHOR,
   CHEF_IDLE_ANCHORS, TABLE_SET_ANCHORS,
-  BENCH_SLOTS, BENCH_W, BENCH_CONFIG,
-  BENCH_TOP_OFFSET_Y, BENCH_BOT_OFFSET_Y,
+  BENCH_SLOTS, BENCH_CONFIG,
+  BENCH_LEFT_OFFSET_X, BENCH_RIGHT_OFFSET_X,
   createSeatingState, occupySlot, vacateSlot, findFreeSlot, getSlotWorldPos,
 } from '../data/tavernLayoutData.js';
 import {
@@ -50,6 +51,12 @@ const CUSTOMER_CYCLE_UP = [
   CustomerState.LEAVE,
 ];
 
+// V12 술통 위치 (카운터 좌측 하단 주방 내)
+const BARREL_POSITIONS = [
+  { x: 20, y: 160 },
+  { x: 50, y: 160 },
+];
+
 export class TavernServiceScene extends Phaser.Scene {
   constructor() {
     super({ key: 'TavernServiceScene' });
@@ -60,13 +67,22 @@ export class TavernServiceScene extends Phaser.Scene {
   preload() {
     // PIL 더미 이미지 로드 시도. 파일이 없으면 Graphics로 대체.
     const dummyPath = 'assets/tavern_dummy/';
+
+    // V12 에셋 키 (V10 키 bench_long_lv0, table_long_lv0, counter_topdown, door_frame 제거)
     const dummies = [
-      'bench_long_lv0', 'table_long_lv0', 'counter_topdown',
-      'barrel', 'door_frame', 'wall_decor_painting',
+      // 공통 유지
+      'barrel', 'wall_decor_painting',
       'chef_idle_side', 'customer_walk_r',
       'customer_seated_down', 'customer_seated_up',
       'floor_wood_tile', 'wall_horizontal',
+      // V12 신규
+      'counter_v12',           // 40x100px
+      'table_vertical_v12',    // 44x72px
+      'bench_vertical_l_v12',  // 14x76px (facing-right)
+      'bench_vertical_r_v12',  // 14x76px (facing-left)
+      'entrance_v12',          // 32x40px
     ];
+
     for (const name of dummies) {
       this.load.image(`tavern_dummy_${name}`, `${dummyPath}${name}.png`);
     }
@@ -111,6 +127,7 @@ export class TavernServiceScene extends Phaser.Scene {
       window.__tavernLayout = {
         occupySlot, vacateSlot, findFreeSlot, getSlotWorldPos,
         createSeatingState,
+        TABLE_SET_ANCHORS,   // SC-1 테스트용 추가
       };
       window.__ChefState = ChefState;
       window.__CustomerState = CustomerState;
@@ -192,53 +209,72 @@ export class TavernServiceScene extends Phaser.Scene {
     g.setDepth(0);
   }
 
-  // ── A1: 가구 앵커 배치 ──
+  // ── A1: 가구 앵커 배치 (V12 4분면) ──
 
   /**
-   * 가구(카운터, 테이블 세트, 술통, 입구)를 앵커 좌표에 배치한다.
+   * 가구(카운터, 4 quad 테이블 세트, 술통, 입구)를 앵커 좌표에 배치한다.
    * @private
    */
   _buildFurniture() {
-    // 카운터
-    this._placeImageOrRect('tavern_dummy_counter_topdown',
-      COUNTER_ANCHOR.x, COUNTER_ANCHOR.y, COUNTER_W, COUNTER_H, 0x8b6440);
+    // ── 카운터 V12 (40x100) ──
+    // setOrigin(0,0): 좌상단 기준
+    // COUNTER_ANCHOR = { x: 100, y: 90 } -> left = 100 - 40/2 = 80
+    this._placeImageOrRect(
+      'tavern_dummy_counter_v12',
+      COUNTER_ANCHOR.x - COUNTER_W / 2, COUNTER_ANCHOR.y,
+      COUNTER_W, COUNTER_H, 0x8b6440,
+    );
 
-    // 술통
-    for (const anchor of BARREL_ANCHORS) {
-      this._placeImageOrRect('tavern_dummy_barrel',
-        anchor.x, anchor.y, 32, 40, 0x6b4420);
+    // ── 술통 (주방 내 소품) ──
+    for (const pos of BARREL_POSITIONS) {
+      this._placeImageOrRect('tavern_dummy_barrel', pos.x, pos.y, 32, 40, 0x6b4420);
     }
 
-    // 입구 프레임
-    this._placeImageOrRect('tavern_dummy_door_frame',
-      DOOR_ANCHOR.x, DOOR_ANCHOR.y, 64, 48, 0x9b7850);
+    // ── 입구 V12 (32x40, 좌하단) ──
+    // DOOR_ANCHOR = { x: 60, y: 480 } -> left = 60 - 16 = 44
+    this._placeImageOrRect(
+      'tavern_dummy_entrance_v12',
+      DOOR_ANCHOR.x - 16, DOOR_ANCHOR.y,
+      32, 40, 0x9b7850,
+    );
 
-    // 3개 테이블 세트 (벤치-top, 테이블, 벤치-bot)
-    for (const anchor of TABLE_SET_ANCHORS) {
-      const halfBench = BENCH_W / 2;
+    // ── 4 quad 루프 ──
+    for (const quad of TABLE_SET_ANCHORS) {
+      const qx = quad.quadLeft;
+      const qy = quad.quadTop;
 
-      // 벤치-top (테이블 위쪽) — AD 모드3 REVISE: -30 -> -34 (gap=0px)
-      this._placeImageOrRect('tavern_dummy_bench_long_lv0',
-        anchor.x - halfBench, anchor.y - 34, BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030);
+      // 세로 벤치-l (left=8, top=18, 14x76)
+      this._placeImageOrRect(
+        'tavern_dummy_bench_vertical_l_v12',
+        qx + BENCH_CONFIG.BENCH_L_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
+        BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
+      );
 
-      // 테이블
-      this._placeImageOrRect('tavern_dummy_table_long_lv0',
-        anchor.x - halfBench, anchor.y - 20, BENCH_CONFIG.TABLE_W, BENCH_CONFIG.TABLE_H, 0x5a3820);
+      // 세로 테이블-v (left=30, top=10, 44x72)
+      this._placeImageOrRect(
+        'tavern_dummy_table_vertical_v12',
+        qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.TABLE_TOP,
+        BENCH_CONFIG.TABLE_W, BENCH_CONFIG.TABLE_H, 0x5a3820,
+      );
 
-      // 벤치-bot (테이블 아래쪽)
-      this._placeImageOrRect('tavern_dummy_bench_long_lv0',
-        anchor.x - halfBench, anchor.y + 22, BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030);
+      // 세로 벤치-r (left=78, top=18, 14x76)
+      this._placeImageOrRect(
+        'tavern_dummy_bench_vertical_r_v12',
+        qx + BENCH_CONFIG.BENCH_R_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
+        BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
+      );
     }
 
-    // 벽 장식 (그림 3개)
+    // ── 벽 장식 ──
     const decorPositions = [
       { x: 80, y: 30 },
       { x: 200, y: 30 },
       { x: 280, y: 30 },
     ];
     for (const pos of decorPositions) {
-      this._placeImageOrRect('tavern_dummy_wall_decor_painting',
-        pos.x, pos.y, 32, 28, 0xaa8855);
+      this._placeImageOrRect(
+        'tavern_dummy_wall_decor_painting', pos.x, pos.y, 32, 28, 0xaa8855,
+      );
     }
   }
 
@@ -260,7 +296,7 @@ export class TavernServiceScene extends Phaser.Scene {
     return this.add.rectangle(x + w / 2, y + h / 2, w, h, fallbackColor).setAlpha(0.8);
   }
 
-  // ── A2: 벤치 슬롯 표시 ──
+  // ── A2: 벤치 슬롯 표시 (V12 좌/우) ──
 
   /**
    * BENCH_SLOTS 기반으로 각 슬롯 위치에 시각적 인디케이터를 표시한다.
@@ -270,81 +306,87 @@ export class TavernServiceScene extends Phaser.Scene {
     const slotSize = 4;
 
     for (const set of this._seatingState) {
-      // 위쪽 (top) 벤치 슬롯
-      for (const slot of set.top) {
-        // 노란 점
-        const dot = this.add.rectangle(slot.worldX, slot.worldY, slotSize, slotSize, 0xffdd00);
+      // 좌측 벤치 슬롯 (facing-right)
+      for (const slot of set.left) {
+        const dot = this.add.rectangle(
+          slot.worldX, slot.worldY, slotSize, slotSize, 0xffdd00,
+        );
         dot.setDepth(slot.worldY);
-
-        // 슬롯 번호 텍스트
-        this.add.text(slot.worldX + 3, slot.worldY - 8, `${slot.slotIdx}`, {
-          fontSize: '8px',
-          fontFamily: FONT_FAMILY,
-          color: '#ffdd00',
+        this.add.text(slot.worldX + 3, slot.worldY - 8, `L${slot.slotIdx}`, {
+          fontSize: '8px', fontFamily: FONT_FAMILY, color: '#ffdd00',
         }).setOrigin(0, 0.5).setDepth(9000);
       }
 
-      // 아래쪽 (bot) 벤치 슬롯
-      for (const slot of set.bot) {
-        const dot = this.add.rectangle(slot.worldX, slot.worldY, slotSize, slotSize, 0xff8800);
+      // 우측 벤치 슬롯 (facing-left)
+      for (const slot of set.right) {
+        const dot = this.add.rectangle(
+          slot.worldX, slot.worldY, slotSize, slotSize, 0xff8800,
+        );
         dot.setDepth(slot.worldY);
-
-        this.add.text(slot.worldX + 3, slot.worldY - 8, `${slot.slotIdx}`, {
-          fontSize: '8px',
-          fontFamily: FONT_FAMILY,
-          color: '#ff8800',
+        this.add.text(slot.worldX + 3, slot.worldY - 8, `R${slot.slotIdx}`, {
+          fontSize: '8px', fontFamily: FONT_FAMILY, color: '#ff8800',
         }).setOrigin(0, 0.5).setDepth(9000);
       }
     }
   }
 
-  // ── A3: 셰프 배치 ──
+  // ── A3: 셰프 배치 (V12: 2명) ──
 
   /**
-   * 셰프 1명을 카운터 idle 위치에 배치한다.
-   * 탭하면 상태 순환.
+   * 셰프를 카운터 idle 위치에 배치한다.
+   * 셰프-0만 인터랙티브 (탭 상태 순환).
    * @private
    */
   _buildChef() {
-    const anchor = CHEF_IDLE_ANCHORS[0];
-    const color = CHEF_STATE_COLORS[ChefState.IDLE_SIDE];
+    this._chefs = [];
 
-    /** @type {string} 현재 셰프 상태 */
-    this._chefState = ChefState.IDLE_SIDE;
+    CHEF_IDLE_ANCHORS.forEach((anchor, idx) => {
+      const chefState = ChefState.IDLE_SIDE;
+      const color = CHEF_STATE_COLORS[chefState];
 
-    // 32x48 컬러 블록 (발끝 앵커: setOrigin(0.5, 1))
-    /** @type {Phaser.GameObjects.Rectangle} */
-    this._chefSprite = this.add.rectangle(anchor.x, anchor.y, 32, 48, color)
-      .setOrigin(0.5, 1)
-      .setInteractive()
-      .setDepth(anchor.y);
+      const sprite = this.add.rectangle(anchor.x, anchor.y, 32, 48, color)
+        .setOrigin(0.5, 1)
+        .setDepth(anchor.y);
 
-    // 셰프 라벨
-    this._chefLabel = this.add.text(anchor.x, anchor.y - 52, 'CHEF', {
-      fontSize: '8px',
-      fontFamily: FONT_FAMILY,
-      color: '#4488ff',
-      backgroundColor: '#00000088',
-      padding: { x: 2, y: 1 },
-    }).setOrigin(0.5, 1).setDepth(9000);
+      // 셰프-0만 인터랙티브 (탭 상태 순환)
+      if (idx === 0) {
+        sprite.setInteractive();
 
-    // 상태 텍스트
-    this._chefStateText = this.add.text(anchor.x, anchor.y + 4, this._chefState, {
-      fontSize: '7px',
-      fontFamily: FONT_FAMILY,
-      color: '#ffffff',
-      backgroundColor: '#00000088',
-      padding: { x: 2, y: 1 },
-    }).setOrigin(0.5, 0).setDepth(9000);
+        /** @type {string} 현재 셰프 상태 */
+        this._chefState = chefState;
 
-    // 탭 이벤트: 상태 순환
-    this._chefSprite.on('pointerdown', () => {
-      const idx = CHEF_CYCLE.indexOf(this._chefState);
-      const nextIdx = (idx + 1) % CHEF_CYCLE.length;
-      this._chefState = CHEF_CYCLE[nextIdx];
-      this._chefSprite.fillColor = CHEF_STATE_COLORS[this._chefState];
-      this._chefStateText.setText(this._chefState);
-      this._updateDebugHUD();
+        /** @type {Phaser.GameObjects.Rectangle} */
+        this._chefSprite = sprite;
+
+        // 셰프 라벨
+        this._chefLabel = this.add.text(anchor.x, anchor.y - 52, 'CHEF', {
+          fontSize: '8px',
+          fontFamily: FONT_FAMILY,
+          color: '#4488ff',
+          backgroundColor: '#00000088',
+          padding: { x: 2, y: 1 },
+        }).setOrigin(0.5, 1).setDepth(9000);
+
+        // 상태 텍스트
+        this._chefStateText = this.add.text(anchor.x, anchor.y + 4, chefState, {
+          fontSize: '7px',
+          fontFamily: FONT_FAMILY,
+          color: '#ffffff',
+          backgroundColor: '#00000088',
+          padding: { x: 2, y: 1 },
+        }).setOrigin(0.5, 0).setDepth(9000);
+
+        // 탭 이벤트: 상태 순환
+        sprite.on('pointerdown', () => {
+          const nextIdx = (CHEF_CYCLE.indexOf(this._chefState) + 1) % CHEF_CYCLE.length;
+          this._chefState = CHEF_CYCLE[nextIdx];
+          sprite.fillColor = CHEF_STATE_COLORS[this._chefState];
+          this._chefStateText.setText(this._chefState);
+          this._updateDebugHUD();
+        });
+      }
+
+      this._chefs.push({ sprite, state: chefState, anchor });
     });
   }
 
@@ -478,7 +520,7 @@ export class TavernServiceScene extends Phaser.Scene {
   _buildDebugHUD() {
     const occupiedCount = this._getOccupiedCount();
     const totalSlots = this._seatingState.reduce(
-      (acc, set) => acc + set.top.length + set.bot.length, 0,
+      (acc, set) => acc + set.left.length + set.right.length, 0,
     );
 
     /** @type {Phaser.GameObjects.Text} */
@@ -502,7 +544,7 @@ export class TavernServiceScene extends Phaser.Scene {
     if (!this._debugText) return;
     const occupied = this._getOccupiedCount();
     const total = this._seatingState.reduce(
-      (acc, set) => acc + set.top.length + set.bot.length, 0,
+      (acc, set) => acc + set.left.length + set.right.length, 0,
     );
     this._debugText.setText(this._debugString(occupied, total));
   }
@@ -532,10 +574,10 @@ export class TavernServiceScene extends Phaser.Scene {
   _getOccupiedCount() {
     let count = 0;
     for (const set of this._seatingState) {
-      for (const slot of set.top) {
+      for (const slot of set.left) {
         if (slot.occupiedBy !== null) count++;
       }
-      for (const slot of set.bot) {
+      for (const slot of set.right) {
         if (slot.occupiedBy !== null) count++;
       }
     }

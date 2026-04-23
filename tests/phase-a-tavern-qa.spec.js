@@ -1,6 +1,7 @@
 /**
- * @fileoverview Phase A 태번 영업씬 QA 테스트.
+ * @fileoverview Phase A-bis 태번 영업씬 QA 테스트 (V12 마이그레이션).
  * ?scene=tavern URL 파라미터로 TavernServiceScene 진입 및 A1~A4 검증.
+ * V12: 4분면(quad) 세로 테이블, 24석(4quad x 좌3+우3).
  */
 import { test, expect } from '@playwright/test';
 
@@ -42,15 +43,41 @@ test('A1: TAVERN_LAYOUT 상수가 HUD_H=32, WALL_H=24, CTRL_H=80을 포함한다
   expect(layout.CTRL_H).toBe(80);
 });
 
-// ── A2: 좌석 슬롯 수 검증 ──
+// ── SC-1: TABLE_SET_ANCHORS 4엔트리 검증 ──
 
-test('A2: lv0 벤치 기준 전체 좌석 수가 24석(3세트x위아래x4슬롯)이다', async ({ page }) => {
+test('SC-1: TABLE_SET_ANCHORS가 4개 quad 절대 좌표를 포함한다', async ({ page }) => {
+  await waitForTavernScene(page);
+  const anchors = await page.evaluate(() => {
+    return window.__tavernLayout.TABLE_SET_ANCHORS;
+  });
+  expect(anchors).toHaveLength(4);
+  // tl
+  expect(anchors[0].quadLeft).toBe(130);
+  expect(anchors[0].quadTop).toBe(90);
+  expect(anchors[0].key).toBe('tl');
+  // tr
+  expect(anchors[1].quadLeft).toBe(250);
+  expect(anchors[1].quadTop).toBe(90);
+  expect(anchors[1].key).toBe('tr');
+  // bl
+  expect(anchors[2].quadLeft).toBe(130);
+  expect(anchors[2].quadTop).toBe(250);
+  expect(anchors[2].key).toBe('bl');
+  // br
+  expect(anchors[3].quadLeft).toBe(250);
+  expect(anchors[3].quadTop).toBe(250);
+  expect(anchors[3].key).toBe('br');
+});
+
+// ── SC-2: 좌석 슬롯 수 검증 (V12: 4quad x 좌3+우3 = 24석) ──
+
+test('SC-2: createSeatingState() 결과 4quad x 6슬롯 = 24석이다', async ({ page }) => {
   await waitForTavernScene(page);
   const totalSlots = await page.evaluate(() => {
     const scene = window.__game.scene.getScene('TavernServiceScene');
     if (!scene) return 0;
     return scene._seatingState.reduce(
-      (acc, set) => acc + set.top.length + set.bot.length, 0,
+      (acc, set) => acc + set.left.length + set.right.length, 0,
     );
   });
   expect(totalSlots).toBe(24);
@@ -62,10 +89,10 @@ test('A2: occupySlot이 슬롯을 점유하고 vacateSlot이 해제한다', asyn
   await waitForTavernScene(page);
   const result = await page.evaluate(() => {
     const { occupySlot, vacateSlot } = window.__tavernLayout;
-    const r1 = occupySlot(0, 'top', 0, 'customer-001');
-    const r2 = occupySlot(0, 'top', 0, 'customer-002');
-    vacateSlot(0, 'top', 0);
-    const r3 = occupySlot(0, 'top', 0, 'customer-002');
+    const r1 = occupySlot(0, 'left', 0, 'customer-001');
+    const r2 = occupySlot(0, 'left', 0, 'customer-002');
+    vacateSlot(0, 'left', 0);
+    const r3 = occupySlot(0, 'left', 0, 'customer-002');
     return { r1, r2, r3 };
   });
   expect(result.r1).toBe(true);
@@ -144,6 +171,32 @@ test('A4: TavernServiceScene에 _back/_front 레이어 분리 코드가 없다',
   expect(source).not.toContain('_back');
   expect(source).not.toContain('_front');
   expect(source).not.toContain('_occupied');
+});
+
+// ── V12 통로 폭 검증 ──
+
+test('V12: 세로 통로 20px 확보 (quad.tr.left - quad.tl.right = 20)', async ({ page }) => {
+  await waitForTavernScene(page);
+  const gap = await page.evaluate(() => {
+    const anchors = window.__tavernLayout.TABLE_SET_ANCHORS;
+    const tl = anchors.find(a => a.key === 'tl');
+    const tr = anchors.find(a => a.key === 'tr');
+    // tl right = tl.quadLeft + 100, tr left = tr.quadLeft
+    return tr.quadLeft - (tl.quadLeft + 100);
+  });
+  expect(gap).toBe(20);
+});
+
+test('V12: 가로 통로 40px 확보 (quad.bl.top - quad.tl.bottom = 40)', async ({ page }) => {
+  await waitForTavernScene(page);
+  const gap = await page.evaluate(() => {
+    const anchors = window.__tavernLayout.TABLE_SET_ANCHORS;
+    const tl = anchors.find(a => a.key === 'tl');
+    const bl = anchors.find(a => a.key === 'bl');
+    // tl bottom = tl.quadTop + 120, bl top = bl.quadTop
+    return bl.quadTop - (tl.quadTop + 120);
+  });
+  expect(gap).toBe(40);
 });
 
 // ── 스크린샷 캡처 ──

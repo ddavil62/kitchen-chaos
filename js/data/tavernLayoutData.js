@@ -1,7 +1,8 @@
 /**
  * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 레이아웃 상수 및 좌석 슬롯 데이터.
- * Phase A: 360x640 캔버스 기준 영역 구획, 가구 앵커 좌표, 벤치 슬롯 모델 정의.
- * V10 시안(travellers-style-mockup.html)의 CSS 수치를 Phaser 절대 좌표로 변환.
+ * Phase A-bis: 360x640 캔버스 기준 영역 구획, 가구 앵커 좌표, 벤치 슬롯 모델 정의.
+ * V12 시안(travellers-v12-mockup.html)의 CSS 수치를 Phaser 절대 좌표로 변환.
+ * 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
  *
  * 기존 ServiceScene.js의 레이아웃 상수(HALL_Y, COOK_Y 등)와 완전 독립.
  * import/참조 금지.
@@ -39,106 +40,121 @@ export const TAVERN_LAYOUT = Object.freeze({
   DINING_W:  224,         // 다이닝홀 폭 (128 ~ 352px, 전체 2/3)
 });
 
-// ── A1: 가구 앵커 좌표 ──
+// ── V12: 가구 앵커 좌표 ──
 
-/** 주방 카운터 앵커. setOrigin(0.5, 0) 기준 상단 중앙 */
-export const COUNTER_ANCHOR = Object.freeze({ x: 64, y: 56 });
-export const COUNTER_W = 112;
-export const COUNTER_H = 52;
+/** 주방 카운터 앵커. V12: 40x100px, setOrigin(0.5,0) 기준 상단 중앙. left=80이므로 x=80+20=100 */
+export const COUNTER_ANCHOR = Object.freeze({ x: 100, y: 90 });
+export const COUNTER_W = 40;
+export const COUNTER_H = 100;
 
-/** 술통 장식 앵커 (카운터 좌측 하단) */
-export const BARREL_ANCHORS = Object.freeze([
-  Object.freeze({ x: 28, y: 156 }),
-  Object.freeze({ x: 60, y: 156 }),
-]);
+/** 입구 V12: 32x40px, 좌하단. left=44, x=44+16=60, top=480 */
+export const DOOR_ANCHOR = Object.freeze({ x: 60, y: 480 });
 
-/** 입구 프레임 (우측 상단, 벽 아래) */
-export const DOOR_ANCHOR = Object.freeze({ x: 316, y: 56 });
-
-/** 셰프 발끝 앵커 (카운터 뒤쪽, idle 위치) */
+/** 셰프 발끝 앵커 (카운터 범위 내, idle 위치). V12: 셰프-1 top=100, 셰프-2 top=148 */
 export const CHEF_IDLE_ANCHORS = Object.freeze([
-  Object.freeze({ x: 72, y: 48 }),
-  Object.freeze({ x: 112, y: 48 }),
+  Object.freeze({ x: 40, y: 100 }),
+  Object.freeze({ x: 40, y: 148 }),
 ]);
 
 /**
- * 3개 테이블 세트 앵커.
- * V10 CSS: t1 top:200, t2 top:320, t3 top:440 (room 내부 기준).
- * Phaser 절대 y = V10 top + 32 (room.top=32).
- * @type {ReadonlyArray<{x: number, y: number}>}
+ * V12 4분면 quad 좌상단 절대 좌표.
+ * 다이닝홀 x: 120~360(240px) = 좌측여백10+quad100+통로20+quad100+우측여백10
+ * quad.tl left=130, quad.tr left=250 (세로 통로 20px: 250-230=20)
+ * quad.tl top=90,  quad.bl top=250  (가로 통로 40px: 250-210=40)
+ * quad 크기: 100x120
+ *
+ * @type {ReadonlyArray<{quadLeft: number, quadTop: number, key: string}>}
  */
 export const TABLE_SET_ANCHORS = Object.freeze([
-  Object.freeze({ x: 168, y: 232 }),  // 세트 1 (상단)
-  Object.freeze({ x: 168, y: 352 }),  // 세트 2 (중간)
-  Object.freeze({ x: 168, y: 472 }),  // 세트 3 (하단)
+  Object.freeze({ quadLeft: 130, quadTop:  90, key: 'tl' }),  // 좌상단
+  Object.freeze({ quadLeft: 250, quadTop:  90, key: 'tr' }),  // 우상단
+  Object.freeze({ quadLeft: 130, quadTop: 250, key: 'bl' }),  // 좌하단
+  Object.freeze({ quadLeft: 250, quadTop: 250, key: 'br' }),  // 우하단
 ]);
 
-// ── A2: 벤치 슬롯 구성 상수 ──
-
-/** 벤치 너비 (lv0 기준) */
-export const BENCH_W = 192;
-
-/** 벤치-top y 오프셋: 테이블 세트 앵커 대비 위쪽 벤치 캐릭터 발 y 오프셋 — AD 모드3 REVISE: -38 -> -26 */
-export const BENCH_TOP_OFFSET_Y = -26;
-
-/** 벤치-bot y 오프셋: 테이블 세트 앵커 대비 아래쪽 벤치 캐릭터 발 y 오프셋 */
-export const BENCH_BOT_OFFSET_Y = 38;
+// ── V12: 벤치 슬롯 구성 상수 ──
 
 /**
- * 벤치 슬롯 레벨별 x 오프셋 정의.
- * BENCH_SLOTS[level].slotOffsets[i].dx = 벤치 좌측 경계 기준 x 오프셋.
+ * V12 세로 벤치 슬롯 정의.
+ * BENCH_SLOTS[level].slotOffsets[i].dy = quad 상단 기준 세로 오프셋.
+ *
+ * quad 내부 좌표계:
+ *   bench-l: left=8, top=18, 14x76
+ *   bench-r: left=78, top=18, 14x76
+ *   손님 슬롯 top: 20 / 47 / 74 (AD 검수 권장값)
+ *
+ * lv0 = 3슬롯(bench 내 손님 3명)
+ * lv3 = 4슬롯 (미래 확장, Phase B+에서 확정)
+ * lv4 = 5슬롯 (미래 확장)
+ *
  * @type {Object}
  */
 export const BENCH_SLOTS = Object.freeze({
   lv0: Object.freeze({
     slotOffsets: Object.freeze([
-      Object.freeze({ dx: 32 }),   // 슬롯 0
-      Object.freeze({ dx: 72 }),   // 슬롯 1
-      Object.freeze({ dx: 112 }),  // 슬롯 2
-      Object.freeze({ dx: 160 }),  // 슬롯 3
+      Object.freeze({ dy:  20 }),  // 슬롯 0 (손님 cust-1: top=20)
+      Object.freeze({ dy:  47 }),  // 슬롯 1 (손님 cust-2: top=47)
+      Object.freeze({ dy:  74 }),  // 슬롯 2 (손님 cust-3: top=74)
     ]),
   }),
   lv3: Object.freeze({
     slotOffsets: Object.freeze([
-      Object.freeze({ dx: 24 }),
-      Object.freeze({ dx: 56 }),
-      Object.freeze({ dx: 88 }),
-      Object.freeze({ dx: 120 }),
-      Object.freeze({ dx: 152 }),
+      Object.freeze({ dy: 14 }),
+      Object.freeze({ dy: 34 }),
+      Object.freeze({ dy: 54 }),
+      Object.freeze({ dy: 74 }),
     ]),
   }),
   lv4: Object.freeze({
     slotOffsets: Object.freeze([
-      Object.freeze({ dx: 20 }),
-      Object.freeze({ dx: 52 }),
-      Object.freeze({ dx: 84 }),
-      Object.freeze({ dx: 116 }),
-      Object.freeze({ dx: 148 }),
-      Object.freeze({ dx: 180 }),
+      Object.freeze({ dy: 10 }),
+      Object.freeze({ dy: 28 }),
+      Object.freeze({ dy: 46 }),
+      Object.freeze({ dy: 64 }),
+      Object.freeze({ dy: 82 }),
     ]),
   }),
 });
 
 /**
- * 벤치 구성 참조 (테이블 높이 등).
+ * V12 벤치/테이블 구성 참조.
  * @type {Object}
  */
 export const BENCH_CONFIG = Object.freeze({
-  BENCH_H: 14,     // 벤치 높이 (px)
-  TABLE_W: 192,    // 테이블 너비 (px)
-  TABLE_H: 40,     // 테이블 높이 (px)
+  // quad 컨테이너 크기
+  QUAD_W:    100,  // px
+  QUAD_H:    120,  // px
+  // 세로 벤치 크기 (V12)
+  BENCH_L_LEFT:   8,  // bench-l: quad 내 left
+  BENCH_L_TOP:   18,  // bench-l: quad 내 top
+  BENCH_W:       14,  // bench 너비 (14px, L/R 동일)
+  BENCH_H:       76,  // bench 높이 (14x76, 6석 수용)
+  BENCH_R_LEFT:  78,  // bench-r: quad 내 left
+  // 세로 테이블 크기 (V12)
+  TABLE_LEFT:    30,  // table-v: quad 내 left
+  TABLE_TOP:     10,  // table-v: quad 내 top
+  TABLE_W:       44,  // table-v 너비 (44x72)
+  TABLE_H:       72,  // table-v 높이
+  // 통로 간격
+  AISLE_V:       20,  // 세로 통로 (quad.tl 우측 ~ quad.tr 좌측)
+  AISLE_H:       40,  // 가로 통로 (quad.tl 하단 ~ quad.bl 상단)
 });
 
-// ── A2: 좌석 런타임 상태 관리 ──
+/** 좌측 벤치 손님 x 오프셋 (quad 좌상단 기준). 손님 x = quadLeft + BENCH_LEFT_OFFSET_X */
+export const BENCH_LEFT_OFFSET_X  =  7;  // bench-l left(8) - 1px = 7 (손님 왼쪽 끝 정렬)
+
+/** 우측 벤치 손님 x 오프셋 (quad 좌상단 기준). 손님 x = quadLeft + BENCH_RIGHT_OFFSET_X */
+export const BENCH_RIGHT_OFFSET_X = 77;  // bench-r left(78) - 1px = 77
+
+// ── V12: 좌석 런타임 상태 관리 ──
 
 /** @type {Array|null} 현재 좌석 상태 (씬에서 초기화) */
 let _seatingState = null;
 
 /**
- * 좌석 슬롯 런타임 상태를 생성한다.
- * 3개 테이블 세트 x 위/아래 벤치 x slotCount개 슬롯.
+ * 좌석 슬롯 런타임 상태를 생성한다. V12: 4 quad x 좌우 벤치 x 3슬롯 = 24석.
  * @param {string} [benchLevel='lv0'] - 벤치 레벨 키
- * @returns {Array<Object>} 좌석 상태 배열
+ * @returns {Array<Object>} 좌석 상태 배열 (4엔트리)
  */
 export function createSeatingState(benchLevel = 'lv0') {
   const config = BENCH_SLOTS[benchLevel];
@@ -147,25 +163,29 @@ export function createSeatingState(benchLevel = 'lv0') {
     return [];
   }
 
-  _seatingState = TABLE_SET_ANCHORS.map((anchor, tableSetIdx) => ({
-    tableSetIdx,
-    anchor: { ...anchor },
-    top: config.slotOffsets.map((offset, slotIdx) => ({
+  _seatingState = TABLE_SET_ANCHORS.map((quad, quadIdx) => ({
+    quadIdx,
+    quadLeft: quad.quadLeft,
+    quadTop:  quad.quadTop,
+    key:      quad.key,
+    // 좌측 벤치 슬롯 (facing-right: 테이블 방향 향함)
+    left: config.slotOffsets.map((offset, slotIdx) => ({
       slotIdx,
-      side: 'top',
-      facingDown: true,
-      facingUp: false,
-      worldX: anchor.x - BENCH_W / 2 + offset.dx,
-      worldY: anchor.y + BENCH_TOP_OFFSET_Y,
+      side: 'left',
+      facingRight: true,
+      facingLeft:  false,
+      worldX: quad.quadLeft + BENCH_LEFT_OFFSET_X,
+      worldY: quad.quadTop  + offset.dy,
       occupiedBy: null,
     })),
-    bot: config.slotOffsets.map((offset, slotIdx) => ({
+    // 우측 벤치 슬롯 (facing-left: 테이블 방향 향함)
+    right: config.slotOffsets.map((offset, slotIdx) => ({
       slotIdx,
-      side: 'bot',
-      facingDown: false,
-      facingUp: true,
-      worldX: anchor.x - BENCH_W / 2 + offset.dx,
-      worldY: anchor.y + BENCH_BOT_OFFSET_Y,
+      side: 'right',
+      facingRight: false,
+      facingLeft:  true,
+      worldX: quad.quadLeft + BENCH_RIGHT_OFFSET_X,
+      worldY: quad.quadTop  + offset.dy,
       occupiedBy: null,
     })),
   }));
@@ -175,8 +195,8 @@ export function createSeatingState(benchLevel = 'lv0') {
 
 /**
  * 슬롯을 점유한다.
- * @param {number} tableSetIdx - 테이블 세트 인덱스 (0~2)
- * @param {'top'|'bot'} side - 벤치 위치
+ * @param {number} tableSetIdx - 테이블 세트(quad) 인덱스 (0~3)
+ * @param {'left'|'right'} side - 벤치 위치
  * @param {number} slotIdx - 슬롯 인덱스
  * @param {string} customerId - 손님 ID
  * @returns {boolean} 점유 성공 여부
@@ -195,8 +215,8 @@ export function occupySlot(tableSetIdx, side, slotIdx, customerId) {
 
 /**
  * 슬롯 점유를 해제한다.
- * @param {number} tableSetIdx - 테이블 세트 인덱스
- * @param {'top'|'bot'} side - 벤치 위치
+ * @param {number} tableSetIdx - 테이블 세트(quad) 인덱스
+ * @param {'left'|'right'} side - 벤치 위치
  * @param {number} slotIdx - 슬롯 인덱스
  */
 export function vacateSlot(tableSetIdx, side, slotIdx) {
@@ -215,11 +235,11 @@ export function vacateSlot(tableSetIdx, side, slotIdx) {
 export function findFreeSlot() {
   if (!_seatingState) return null;
   for (const set of _seatingState) {
-    for (const side of ['top', 'bot']) {
+    for (const side of ['left', 'right']) {
       for (const slot of set[side]) {
         if (slot.occupiedBy === null) {
           return {
-            tableSetIdx: set.tableSetIdx,
+            tableSetIdx: set.quadIdx,
             side,
             slotIdx: slot.slotIdx,
           };
@@ -232,8 +252,8 @@ export function findFreeSlot() {
 
 /**
  * 해당 슬롯의 Phaser 절대 좌표를 반환한다.
- * @param {number} tableSetIdx - 테이블 세트 인덱스
- * @param {'top'|'bot'} side - 벤치 위치
+ * @param {number} tableSetIdx - 테이블 세트(quad) 인덱스
+ * @param {'left'|'right'} side - 벤치 위치
  * @param {number} slotIdx - 슬롯 인덱스
  * @returns {{ x: number, y: number }|null}
  */

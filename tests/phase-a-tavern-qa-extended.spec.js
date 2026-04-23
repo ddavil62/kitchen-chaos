@@ -1,6 +1,7 @@
 /**
- * @fileoverview Phase A 태번 영업씬 확장 QA 테스트.
- * 정상 케이스(Coder 14개 테스트 보완) + 엣지케이스 + 깊이정렬 집중 검증.
+ * @fileoverview Phase A-bis 태번 영업씬 확장 QA 테스트 (V12 마이그레이션).
+ * 정상 케이스(Coder 테스트 보완) + 엣지케이스 + 깊이정렬 집중 검증.
+ * V12: 4분면(quad) 세로 테이블, 24석(4quad x 좌3+우3).
  */
 import { test, expect } from '@playwright/test';
 
@@ -84,7 +85,7 @@ test.describe('Gate 1: 절대 준수 사항', () => {
   });
 });
 
-// ── 게이트 2: 스펙 준수 (성공 기준 4개) ──
+// ── 게이트 2: 스펙 준수 (성공 기준) ──
 
 test.describe('Gate 2-A1: 레이아웃 영역 상수', () => {
   test('?scene=tavern 파라미터로 TavernServiceScene에 진입된다', async ({ page }) => {
@@ -131,61 +132,61 @@ test.describe('Gate 2-A1: 레이아웃 영역 상수', () => {
   });
 });
 
-test.describe('Gate 2-A2: 좌석 슬롯 데이터 모델', () => {
+test.describe('Gate 2-A2: 좌석 슬롯 데이터 모델 (V12)', () => {
   test('lv0 벤치 기준 전체 24석', async ({ page }) => {
     await waitForTavernScene(page);
     const total = await page.evaluate(() => {
       const scene = window.__game.scene.getScene('TavernServiceScene');
       return scene._seatingState.reduce(
-        (acc, set) => acc + set.top.length + set.bot.length, 0,
+        (acc, set) => acc + set.left.length + set.right.length, 0,
       );
     });
     expect(total).toBe(24);
   });
 
-  test('각 테이블 세트가 top 4슬롯 + bot 4슬롯 = 8석', async ({ page }) => {
+  test('각 quad가 left 3슬롯 + right 3슬롯 = 6석', async ({ page }) => {
     await waitForTavernScene(page);
     const setCounts = await page.evaluate(() => {
       const scene = window.__game.scene.getScene('TavernServiceScene');
       return scene._seatingState.map(s => ({
-        top: s.top.length,
-        bot: s.bot.length,
+        left: s.left.length,
+        right: s.right.length,
       }));
     });
     for (const sc of setCounts) {
-      expect(sc.top).toBe(4);
-      expect(sc.bot).toBe(4);
+      expect(sc.left).toBe(3);
+      expect(sc.right).toBe(3);
     }
   });
 
-  test('top 슬롯은 facingDown=true, bot 슬롯은 facingUp=true', async ({ page }) => {
+  test('left 슬롯은 facingRight=true, right 슬롯은 facingLeft=true', async ({ page }) => {
     await waitForTavernScene(page);
     const flags = await page.evaluate(() => {
       const scene = window.__game.scene.getScene('TavernServiceScene');
-      const result = { topFacingDown: true, botFacingUp: true };
+      const result = { leftFacingRight: true, rightFacingLeft: true };
       for (const set of scene._seatingState) {
-        for (const slot of set.top) {
-          if (!slot.facingDown || slot.facingUp) result.topFacingDown = false;
+        for (const slot of set.left) {
+          if (!slot.facingRight || slot.facingLeft) result.leftFacingRight = false;
         }
-        for (const slot of set.bot) {
-          if (slot.facingDown || !slot.facingUp) result.botFacingUp = false;
+        for (const slot of set.right) {
+          if (slot.facingRight || !slot.facingLeft) result.rightFacingLeft = false;
         }
       }
       return result;
     });
-    expect(flags.topFacingDown).toBe(true);
-    expect(flags.botFacingUp).toBe(true);
+    expect(flags.leftFacingRight).toBe(true);
+    expect(flags.rightFacingLeft).toBe(true);
   });
 
   test('occupySlot 성공 시 true, 이미 점유 시 false', async ({ page }) => {
     await waitForTavernScene(page);
     const result = await page.evaluate(() => {
       const { occupySlot, vacateSlot } = window.__tavernLayout;
-      const r1 = occupySlot(0, 'top', 0, 'c1');
-      const r2 = occupySlot(0, 'top', 0, 'c2');
-      vacateSlot(0, 'top', 0);
-      const r3 = occupySlot(0, 'top', 0, 'c2');
-      vacateSlot(0, 'top', 0);
+      const r1 = occupySlot(0, 'left', 0, 'c1');
+      const r2 = occupySlot(0, 'left', 0, 'c2');
+      vacateSlot(0, 'left', 0);
+      const r3 = occupySlot(0, 'left', 0, 'c2');
+      vacateSlot(0, 'left', 0);
       return { r1, r2, r3 };
     });
     expect(result.r1).toBe(true);
@@ -205,17 +206,19 @@ test.describe('Gate 2-A2: 좌석 슬롯 데이터 모델', () => {
     expect(result).toHaveProperty('slotIdx');
   });
 
-  test('getSlotWorldPos가 올바른 좌표를 반환한다', async ({ page }) => {
+  test('getSlotWorldPos가 올바른 V12 좌표를 반환한다', async ({ page }) => {
     await waitForTavernScene(page);
     const pos = await page.evaluate(() => {
       const { getSlotWorldPos } = window.__tavernLayout;
-      return getSlotWorldPos(0, 'top', 0);
+      return getSlotWorldPos(0, 'left', 0);
     });
     expect(pos).not.toBeNull();
     expect(typeof pos.x).toBe('number');
     expect(typeof pos.y).toBe('number');
-    // y좌표: TABLE_SET_ANCHORS[0].y(232) + BENCH_TOP_OFFSET_Y(-26) = 206
-    expect(pos.y).toBe(206);
+    // V12: quadLeft=130 + BENCH_LEFT_OFFSET_X=7 = 137
+    expect(pos.x).toBe(137);
+    // V12: quadTop=90 + slotOffsets[0].dy=20 = 110
+    expect(pos.y).toBe(110);
   });
 });
 
@@ -362,9 +365,9 @@ test.describe('Gate 3: 엣지케이스', () => {
     await waitForTavernScene(page);
     const result = await page.evaluate(() => {
       const { occupySlot, vacateSlot } = window.__tavernLayout;
-      occupySlot(1, 'bot', 2, 'x1');
-      const dup = occupySlot(1, 'bot', 2, 'x2');
-      vacateSlot(1, 'bot', 2);
+      occupySlot(1, 'right', 2, 'x1');
+      const dup = occupySlot(1, 'right', 2, 'x2');
+      vacateSlot(1, 'right', 2);
       return dup;
     });
     expect(result).toBe(false);
@@ -375,8 +378,8 @@ test.describe('Gate 3: 엣지케이스', () => {
     const noError = await page.evaluate(() => {
       try {
         const { vacateSlot } = window.__tavernLayout;
-        vacateSlot(0, 'top', 3); // 점유 안 된 슬롯
-        vacateSlot(2, 'bot', 0); // 점유 안 된 슬롯
+        vacateSlot(0, 'left', 2); // 점유 안 된 슬롯
+        vacateSlot(2, 'right', 0); // 점유 안 된 슬롯
         return true;
       } catch {
         return false;
@@ -390,7 +393,7 @@ test.describe('Gate 3: 엣지케이스', () => {
     const result = await page.evaluate(() => {
       try {
         const { occupySlot } = window.__tavernLayout;
-        return occupySlot(99, 'top', 0, 'bad');
+        return occupySlot(99, 'left', 0, 'bad');
       } catch {
         return 'ERROR';
       }
@@ -416,7 +419,7 @@ test.describe('Gate 3: 엣지케이스', () => {
     const result = await page.evaluate(() => {
       try {
         const { occupySlot } = window.__tavernLayout;
-        return occupySlot(0, 'top', 99, 'bad');
+        return occupySlot(0, 'left', 99, 'bad');
       } catch {
         return 'ERROR';
       }
@@ -430,9 +433,9 @@ test.describe('Gate 3: 엣지케이스', () => {
       try {
         const { getSlotWorldPos } = window.__tavernLayout;
         return {
-          bad1: getSlotWorldPos(99, 'top', 0),
+          bad1: getSlotWorldPos(99, 'left', 0),
           bad2: getSlotWorldPos(0, 'xxx', 0),
-          bad3: getSlotWorldPos(0, 'top', 99),
+          bad3: getSlotWorldPos(0, 'left', 99),
         };
       } catch {
         return 'ERROR';
@@ -448,19 +451,19 @@ test.describe('Gate 3: 엣지케이스', () => {
     await waitForTavernScene(page);
     const result = await page.evaluate(() => {
       const { occupySlot, findFreeSlot, vacateSlot } = window.__tavernLayout;
-      // 24개 슬롯 전부 점유
-      for (let t = 0; t < 3; t++) {
-        for (const side of ['top', 'bot']) {
-          for (let s = 0; s < 4; s++) {
+      // 24개 슬롯 전부 점유 (V12: 4 quad x left/right x 3슬롯)
+      for (let t = 0; t < 4; t++) {
+        for (const side of ['left', 'right']) {
+          for (let s = 0; s < 3; s++) {
             occupySlot(t, side, s, `fill-${t}-${side}-${s}`);
           }
         }
       }
       const freeAfterFull = findFreeSlot();
       // 정리: 전부 해제
-      for (let t = 0; t < 3; t++) {
-        for (const side of ['top', 'bot']) {
-          for (let s = 0; s < 4; s++) {
+      for (let t = 0; t < 4; t++) {
+        for (const side of ['left', 'right']) {
+          for (let s = 0; s < 3; s++) {
             vacateSlot(t, side, s);
           }
         }
@@ -476,10 +479,10 @@ test.describe('Gate 3: 엣지케이스', () => {
       try {
         const { occupySlot, vacateSlot } = window.__tavernLayout;
         const scene = window.__game.scene.getScene('TavernServiceScene');
-        // 24개 슬롯 전부 점유
-        for (let t = 0; t < 3; t++) {
-          for (const side of ['top', 'bot']) {
-            for (let s = 0; s < 4; s++) {
+        // 24개 슬롯 전부 점유 (V12: 4 quad x left/right x 3슬롯)
+        for (let t = 0; t < 4; t++) {
+          for (const side of ['left', 'right']) {
+            for (let s = 0; s < 3; s++) {
               occupySlot(t, side, s, `block-${t}-${side}-${s}`);
             }
           }
@@ -491,9 +494,9 @@ test.describe('Gate 3: 엣지케이스', () => {
         // 크래시 없이 여기까지 도달하면 성공
 
         // 정리: 전부 해제
-        for (let t = 0; t < 3; t++) {
-          for (const side of ['top', 'bot']) {
-            for (let s = 0; s < 4; s++) {
+        for (let t = 0; t < 4; t++) {
+          for (const side of ['left', 'right']) {
+            for (let s = 0; s < 3; s++) {
               vacateSlot(t, side, s);
             }
           }
@@ -587,7 +590,7 @@ test.describe('Gate 3: 엣지케이스', () => {
 // ── 게이트 4: 시각 검증 ──
 
 test.describe('Gate 4: 시각 검증', () => {
-  test('전체 레이아웃 스크린샷 (REVISE 반영 후)', async ({ page }) => {
+  test('전체 레이아웃 스크린샷 (V12)', async ({ page }) => {
     await waitForTavernScene(page);
     await page.waitForTimeout(1500);
     await page.screenshot({
@@ -596,13 +599,13 @@ test.describe('Gate 4: 시각 검증', () => {
     });
   });
 
-  test('테이블 세트 1 상세 캡처 (bench-top gap 검증)', async ({ page }) => {
+  test('좌상 quad 상세 캡처 (V12 bench-table 간격 검증)', async ({ page }) => {
     await waitForTavernScene(page);
     await page.waitForTimeout(1000);
-    // 세트 1 영역: y=232 앵커 기준, 벤치-top(y-34=198) ~ 벤치-bot(y+22+14=268)
+    // quad.tl: left=130, top=90, 100x120
     await page.screenshot({
-      path: 'tests/screenshots/phase-a-qa-table-set1-detail.png',
-      clip: { x: 60, y: 180, width: 260, height: 110 },
+      path: 'tests/screenshots/phase-a-qa-quad-tl-detail.png',
+      clip: { x: 120, y: 80, width: 130, height: 140 },
     });
   });
 
@@ -612,7 +615,7 @@ test.describe('Gate 4: 시각 검증', () => {
     // 셰프 idle 상태
     await page.screenshot({
       path: 'tests/screenshots/phase-a-qa-chef-idle.png',
-      clip: { x: 120, y: 0, width: 100, height: 160 },
+      clip: { x: 0, y: 50, width: 130, height: 160 },
     });
     // cook으로 전환
     await page.evaluate(() => {
@@ -622,7 +625,7 @@ test.describe('Gate 4: 시각 검증', () => {
     await page.waitForTimeout(300);
     await page.screenshot({
       path: 'tests/screenshots/phase-a-qa-chef-cook.png',
-      clip: { x: 120, y: 0, width: 100, height: 160 },
+      clip: { x: 0, y: 50, width: 130, height: 160 },
     });
   });
 
