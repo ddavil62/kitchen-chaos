@@ -12,7 +12,14 @@
  *
  * UI 반영은 Phase 58-2, 실제 효과 적용 로직은 Phase 58-3에서 각각 처리한다.
  * 본 파일은 데이터 스키마와 카드 선정 알고리즘까지만 책임진다.
+ *
+ * Phase 75: 선행 해금 체크 추가.
+ *   - bond 카드는 셰프 해금 조건(chefUnlockHelper.isChefUnlocked) 통과 시에만 풀에 포함
+ *   - mutation 카드는 해당 도구 보유(count >= 1) 시에만 풀에 포함
+ *   - recipe 카드는 선택 스키마(minChapter / requiresSeason) 기반 전제조건 필터 적용
  */
+
+import { isChefUnlocked } from './chefUnlockHelper.js';
 
 // ── 카테고리 상수 ──
 
@@ -51,6 +58,9 @@ export const BRANCH_CATEGORY_META = Object.freeze({
  *   // recipe 전용
  *   recipeId?: string,
  *   rewardMultiplier?: number,
+ *   // recipe 전제조건 (Phase 75, 선택 필드 — 미설정 시 조건 없음으로 취급)
+ *   minChapter?: number,       // 이 챕터 이상이어야 풀에 포함 (예: 15)
+ *   requiresSeason?: 2 | 3,   // 해당 시즌이 해금되어야 풀에 포함
  *
  *   // bond 전용
  *   chefId?: string,
@@ -369,34 +379,58 @@ function fisherYatesShuffle(arr) {
 }
 
 /**
- * 세이브 상태 기반 카테고리별 적용 가능 카드 풀을 반환한다.
+ * 세이브 상태 및 진행 상태 기반 카테고리별 적용 가능 카드 풀을 반환한다.
  *
- * 제외 규칙:
- *   - mutation : `branchCards.toolMutations`에 이미 변이가 적용된 `targetToolId`는 제외
- *   - recipe   : `branchCards.unlockedBranchRecipes`에 이미 해금된 `recipeId`는 제외
- *   - bond     : `branchCards.chefBonds`에 이미 해금된 카드 `id`는 제외
+ * 제외 규칙 (Phase 75 확장):
+ *   - mutation : 이미 변이 적용된 도구 제외 + 해당 도구 미보유(count < 1) 카드 제외
+ *   - recipe   : 이미 해금된 recipeId 제외 + `minChapter` / `requiresSeason` 전제조건 미충족 제외
+ *   - bond     : 이미 해금된 카드 id 제외 + `isChefUnlocked(chefId, progressState) === false` 카드 제외
  *   - blessing : 제외 조건 없음 (활성 축복이 있어도 새 축복을 뽑을 수 있음, 갱신 규칙)
  *
- * @param {'mutation'|'recipe'|'bond'|'blessing'} category
- * @param {object} branchCardsState - SaveManager.branchCards
+ * @param {'mutation'|'recipe'|'bond'|'blessing'} category - 카드 카테고리
+ * @param {object} branchCardsState - SaveManager.branchCards 스냅샷 (toolMutations, unlockedBranchRecipes, chefBonds)
+ * @param {{ currentChapter?: number, season2Unlocked?: boolean, season3Unlocked?: boolean, tools?: object }} [progressState]
+ *   진행 상태. 누락 시 전 필드 기본값(챕터1, 시즌 미해금, 도구 없음)으로 필터링한다.
  * @returns {Array<object>} 적용 가능한 카드 배열
  */
-export function getEligiblePool(category, branchCardsState) {
+export function getEligiblePool(category, branchCardsState, progressState) {
   const state = branchCardsState || {};
   const toolMutations      = state.toolMutations      || {};
   const unlockedRecipes    = state.unlockedBranchRecipes || [];
   const chefBonds          = state.chefBonds          || [];
 
+  // Phase 75: 진행 상태 기본값 보간 (null/undefined 안전)
+  const ps    = progressState || {};
+  const ch    = ps.currentChapter || 1;
+  const tools = ps.tools || {};
+
   const pool = getBranchCardsByCategory(category);
 
   switch (category) {
     case 'mutation':
-      // 이미 해당 도구에 변이가 있으면 제외
-      return pool.filter(c => !toolMutations[c.targetToolId]);
+      return pool.filter(c =>
+        // 이미 해당 도구에 변이가 있으면 제외
+        !toolMutations[c.targetToolId] &&
+        // Phase 75: 해당 도구 미보유(count < 1) 시 제외
+        (tools[c.targetToolId]?.count ?? 0) >= 1
+      );
     case 'recipe':
-      return pool.filter(c => !unlockedRecipes.includes(c.recipeId));
+      return pool.filter(c => {
+        if (unlockedRecipes.includes(c.recipeId)) return false;
+        // Phase 75: minChapter 전제조건 (필드 미설정이면 통과)
+        if (c.minChapter !== undefined && ch < c.minChapter) return false;
+        // Phase 75: requiresSeason 전제조건 (필드 미설정이면 통과)
+        if (c.requiresSeason === 2 && !ps.season2Unlocked) return false;
+        if (c.requiresSeason === 3 && !ps.season3Unlocked) return false;
+        return true;
+      });
     case 'bond':
-      return pool.filter(c => !chefBonds.includes(c.id));
+      return pool.filter(c =>
+        // 이미 해금된 bond는 제외
+        !chefBonds.includes(c.id) &&
+        // Phase 75: 셰프 해금 조건 미충족 시 제외
+        isChefUnlocked(c.chefId, ps)
+      );
     case 'blessing':
     default:
       return pool.slice();
@@ -412,16 +446,18 @@ export function getEligiblePool(category, branchCardsState) {
  *   3. 풀이 비어 있는 카테고리는 건너뛰고 다음 카테고리로 보충
  *   4. 최대 3장까지 채워지면 종료. 총 풀이 부족하면 3장 미만으로 반환 가능.
  *
- * @param {object} branchCardsState - SaveManager.branchCards
+ * @param {object} branchCardsState - SaveManager.branchCards 스냅샷
+ * @param {{ currentChapter?: number, season2Unlocked?: boolean, season3Unlocked?: boolean, tools?: object }} [progressState]
+ *   진행 상태 스냅샷 (Phase 75). 미전달 시 엄격 필터링(초기값) 상태에서 동작.
  * @returns {Array<object>} 최대 3장. 총 카드 풀이 부족하면 그만큼 반환.
  */
-export function selectBranchCards(branchCardsState) {
+export function selectBranchCards(branchCardsState, progressState) {
   const shuffledCategories = fisherYatesShuffle(BRANCH_CATEGORIES);
   const selected = [];
 
   for (const category of shuffledCategories) {
     if (selected.length >= 3) break;
-    const pool = getEligiblePool(category, branchCardsState);
+    const pool = getEligiblePool(category, branchCardsState, progressState);
     if (pool.length === 0) continue;
     const pick = pool[Math.floor(Math.random() * pool.length)];
     selected.push(pick);

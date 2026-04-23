@@ -165,8 +165,18 @@ test.describe('성공 기준 2: 카드 데이터 충분성 + 카테고리 분산
       const emptyState = {
         toolMutations: {}, unlockedBranchRecipes: [], chefBonds: [], activeBlessing: null,
       };
+      // Phase 75: selectBranchCards에 progressState 추가, 완전 해금 상태로 기존 의도(3장·3카테고리) 복원
+      const fullyUnlocked = {
+        currentChapter: 99,
+        season2Unlocked: true,
+        season3Unlocked: true,
+        tools: {
+          pan: { count: 1 }, salt: { count: 1 }, grill: { count: 1 }, delivery: { count: 1 },
+          freezer: { count: 1 }, soup_pot: { count: 1 }, wasabi_cannon: { count: 1 }, spice_grinder: { count: 1 },
+        },
+      };
       for (let i = 0; i < 10; i++) {
-        const picks = d.selectBranchCards(emptyState);
+        const picks = d.selectBranchCards(emptyState, fullyUnlocked);
         results.push({
           count: picks.length,
           cats: picks.map(c => c.category),
@@ -681,7 +691,17 @@ test.describe('엣지 케이스', () => {
     const pool = await page.evaluate(async () => {
       const d = await import('/js/data/merchantBranchData.js');
       const s = await import('/js/managers/SaveManager.js');
-      const pool = d.getEligiblePool('mutation', s.SaveManager.load().branchCards);
+      // Phase 75: getEligiblePool에 progressState 추가, 완전 해금 상태로 기존 기대값(7) 복원
+      const fullyUnlocked = {
+        currentChapter: 99,
+        season2Unlocked: true,
+        season3Unlocked: true,
+        tools: {
+          pan: { count: 1 }, salt: { count: 1 }, grill: { count: 1 }, delivery: { count: 1 },
+          freezer: { count: 1 }, soup_pot: { count: 1 }, wasabi_cannon: { count: 1 }, spice_grinder: { count: 1 },
+        },
+      };
+      const pool = d.getEligiblePool('mutation', s.SaveManager.load().branchCards, fullyUnlocked);
       return {
         size: pool.length,
         ids: pool.map(p => p.id),
@@ -705,7 +725,17 @@ test.describe('엣지 케이스', () => {
     const pool = await page.evaluate(async () => {
       const d = await import('/js/data/merchantBranchData.js');
       const s = await import('/js/managers/SaveManager.js');
-      const pool = d.getEligiblePool('bond', s.SaveManager.load().branchCards);
+      // Phase 75: getEligiblePool에 progressState 추가, 완전 해금 상태로 기존 기대값(7) 복원
+      const fullyUnlocked = {
+        currentChapter: 99,
+        season2Unlocked: true,
+        season3Unlocked: true,
+        tools: {
+          pan: { count: 1 }, salt: { count: 1 }, grill: { count: 1 }, delivery: { count: 1 },
+          freezer: { count: 1 }, soup_pot: { count: 1 }, wasabi_cannon: { count: 1 }, spice_grinder: { count: 1 },
+        },
+      };
+      const pool = d.getEligiblePool('bond', s.SaveManager.load().branchCards, fullyUnlocked);
       return { size: pool.length, ids: pool.map(p => p.id) };
     });
 
@@ -725,7 +755,17 @@ test.describe('엣지 케이스', () => {
     const pool = await page.evaluate(async () => {
       const d = await import('/js/data/merchantBranchData.js');
       const s = await import('/js/managers/SaveManager.js');
-      const pool = d.getEligiblePool('blessing', s.SaveManager.load().branchCards);
+      // Phase 75: getEligiblePool에 progressState 추가 (blessing은 필터 변경 없지만 시그니처 일관성 유지)
+      const fullyUnlocked = {
+        currentChapter: 99,
+        season2Unlocked: true,
+        season3Unlocked: true,
+        tools: {
+          pan: { count: 1 }, salt: { count: 1 }, grill: { count: 1 }, delivery: { count: 1 },
+          freezer: { count: 1 }, soup_pot: { count: 1 }, wasabi_cannon: { count: 1 }, spice_grinder: { count: 1 },
+        },
+      };
+      const pool = d.getEligiblePool('blessing', s.SaveManager.load().branchCards, fullyUnlocked);
       return { size: pool.length };
     });
 
@@ -809,7 +849,17 @@ test.describe('엣지 케이스', () => {
     const pool = await page.evaluate(async () => {
       const d = await import('/js/data/merchantBranchData.js');
       const s = await import('/js/managers/SaveManager.js');
-      return d.getEligiblePool('mutation', s.SaveManager.load().branchCards).length;
+      // Phase 75: getEligiblePool에 progressState 추가, 완전 해금 상태여도 toolMutations가 꽉 차 있어 0장 유지
+      const fullyUnlocked = {
+        currentChapter: 99,
+        season2Unlocked: true,
+        season3Unlocked: true,
+        tools: {
+          pan: { count: 1 }, salt: { count: 1 }, grill: { count: 1 }, delivery: { count: 1 },
+          freezer: { count: 1 }, soup_pot: { count: 1 }, wasabi_cannon: { count: 1 }, spice_grinder: { count: 1 },
+        },
+      };
+      return d.getEligiblePool('mutation', s.SaveManager.load().branchCards, fullyUnlocked).length;
     });
 
     expect(pool).toBe(0);
@@ -819,10 +869,20 @@ test.describe('엣지 케이스', () => {
       const d = await import('/js/data/merchantBranchData.js');
       const s = await import('/js/managers/SaveManager.js');
       const state = s.SaveManager.load().branchCards;
+      // Phase 75: selectBranchCards에 progressState 추가, 완전 해금 상태로 기존 의도(mutation 제외 보충 로직) 유지
+      const fullyUnlocked = {
+        currentChapter: 99,
+        season2Unlocked: true,
+        season3Unlocked: true,
+        tools: {
+          pan: { count: 1 }, salt: { count: 1 }, grill: { count: 1 }, delivery: { count: 1 },
+          freezer: { count: 1 }, soup_pot: { count: 1 }, wasabi_cannon: { count: 1 }, spice_grinder: { count: 1 },
+        },
+      };
       // 여러 번 호출해 결과 수집
       const results = [];
       for (let i = 0; i < 5; i++) {
-        const r = d.selectBranchCards(state);
+        const r = d.selectBranchCards(state, fullyUnlocked);
         results.push(r.map(c => c.category));
       }
       return results;

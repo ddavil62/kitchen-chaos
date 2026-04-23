@@ -280,12 +280,15 @@ export class MerchantScene extends Phaser.Scene {
       infoBg.on('pointerout', () => { infoBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); infoBg.setTint(0x886644); });
 
       // Phase 74: 추천 배지 (P2-6)
+      // AD3 REVISE: 카드 우하단(yOff+ITEM_HEIGHT-20)이 업그레이드 버튼과 겹쳐서
+      //              헤더 라인(infoBtn 좌측)으로 이동. 이름 라인 우측에 깔끔하게 정렬.
       const badgeLabel = TOOL_BADGE_LABEL[toolId];
       if (badgeLabel) {
         const badgeTint = TOOL_BADGE_TINT[badgeLabel] || 0x555555;
-        const badgeX = GAME_WIDTH - MARGIN_X - 36;
-        const badgeY = yOff + ITEM_HEIGHT - 20;
-        const badgeBg = NineSliceFactory.raw(this, badgeX, badgeY, 72, 18, 'btn_secondary_normal');
+        const badgeW = 64;
+        const badgeX = infoBtnX - (24 / 2) - (badgeW / 2) - 4; // info 버튼 좌측, 4px 간격
+        const badgeY = infoBtnY; // info 버튼과 동일 라인(헤더)
+        const badgeBg = NineSliceFactory.raw(this, badgeX, badgeY, badgeW, 18, 'btn_secondary_normal');
         badgeBg.setTint(badgeTint);
         this.listContainer.add(badgeBg);
         const badgeTxt = this.add.text(badgeX, badgeY, badgeLabel, {
@@ -1045,13 +1048,22 @@ export class MerchantScene extends Phaser.Scene {
     } else {
       // 신규 방문 시에만 카드 선정. 동일 씬 내 탭 전환마다 재선정되지 않도록 캐시.
       if (!this._branchCardDefs) {
-        const state = {
+        // Phase 75: 선행 해금 체크를 위해 진행 상태도 함께 전달.
+        // SaveManager.load()는 한 번만 호출하고 여러 필드를 꺼낸다.
+        const saveData = SaveManager.load();
+        const branchCardsState = {
           toolMutations: SaveManager.getToolMutations(),
           unlockedBranchRecipes: SaveManager.getUnlockedBranchRecipes(),
           chefBonds: SaveManager.getChefBonds(),
           activeBlessing: SaveManager.getActiveBlessing(),
         };
-        this._branchCardDefs = selectBranchCards(state);
+        const progressState = {
+          currentChapter:  saveData.storyProgress?.currentChapter || 1,
+          season2Unlocked: !!saveData.season2Unlocked,
+          season3Unlocked: !!saveData.season3Unlocked,
+          tools:           saveData.tools || {},
+        };
+        this._branchCardDefs = selectBranchCards(branchCardsState, progressState);
       }
       this._renderBranchCards(this._branchCardDefs);
     }

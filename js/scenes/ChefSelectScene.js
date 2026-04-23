@@ -20,6 +20,7 @@ import { ChefManager } from '../managers/ChefManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { STAGES } from '../data/stageData.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
+import { isChefUnlocked } from '../data/chefUnlockHelper.js';
 
 // ── 셰프 ID → portrait 텍스처 키 매핑 (Phase 57) ──
 const CHEF_PORTRAIT_MAP = {
@@ -33,23 +34,16 @@ const CHEF_PORTRAIT_MAP = {
 };
 
 /**
- * 셰프 잠금 여부 판별.
- * @param {string} chefId - 셰프 ID
- * @param {object} save - 세이브 데이터
- * @returns {boolean} 잠금이면 true
+ * 세이브 데이터에서 `chefUnlockHelper`가 요구하는 progressState 구조체를 추출한다.
+ * @param {object} save - SaveManager.load() 결과
+ * @returns {{ currentChapter: number, season2Unlocked: boolean, season3Unlocked: boolean }}
  */
-function isChefLocked(chefId, save) {
-  const ch = save.storyProgress?.currentChapter || 1;
-  switch (chefId) {
-    case 'mimi_chef':  return false;
-    case 'rin_chef':   return false;
-    case 'mage_chef':  return false;
-    case 'yuki_chef':  return !save.season2Unlocked;
-    case 'lao_chef':   return !save.season2Unlocked || ch < 10;
-    case 'andre_chef': return !save.season2Unlocked || ch < 13;
-    case 'arjun_chef': return !save.season3Unlocked || ch < 17;
-    default:           return true;
-  }
+function toProgressState(save) {
+  return {
+    currentChapter:  save?.storyProgress?.currentChapter || 1,
+    season2Unlocked: !!save?.season2Unlocked,
+    season3Unlocked: !!save?.season3Unlocked,
+  };
 }
 
 // ── 레이아웃 상수 ──
@@ -102,9 +96,11 @@ export class ChefSelectScene extends Phaser.Scene {
 
     // ── 세이브 로드 & 셰프 데이터 준비 ──
     this._save = SaveManager.load();
+    // Phase 75: isChefLocked 로컬 함수 제거 후 chefUnlockHelper.isChefUnlocked 재사용
+    const progressState = toProgressState(this._save);
     this._chefList = CHEF_ORDER.map(id => ({
       chef: CHEF_TYPES[id],
-      locked: isChefLocked(id, this._save),
+      locked: !isChefUnlocked(id, progressState),
     }));
 
     // ── 초기 인덱스 결정 (Phase 69 P1-2: lastSelectedChef 우선, fallback 미미) ──

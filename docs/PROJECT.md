@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (Phase 73 세이브 백업 + 포트레이트 정합 완료)
+> 최종 업데이트: 2026-04-23 (Phase 75 행상인 분기 해금 체크)
 
 ## 프로젝트 개요
 
@@ -29,7 +29,7 @@
 | 재료 채집 | GatheringScene.js | 도구 배치/회수/재배치, 적 AI, 재료 드롭, 보스 재료 드롭, 웨이브 진행 |
 | 도구 관리 | ToolManager.js | 영구 도구 인벤토리 (구매/판매/업그레이드/스탯 조회/자동 지급) |
 | 행상인 | MerchantScene.js | 2탭 UI (도구 구매/분기 선택), 도구 구매·판매·업그레이드 + 되돌릴 수 없는 3택 1 분기 카드, 분기 탭 피드백(tint 플래시/출발 disabled/descKo 모달) |
-| 분기 효과 | BranchEffects.js + merchantBranchData.js | 분기 카드 32장 정의(mutation/recipe/bond/blessing × 8), 게임플레이 씬에서 배수·시너지·tint 조회하는 경량 어댑터 |
+| 분기 효과 | BranchEffects.js + merchantBranchData.js + chefUnlockHelper.js | 분기 카드 32장 정의(mutation/recipe/bond/blessing × 8), 게임플레이 씬에서 배수·시너지·tint 조회하는 경량 어댑터, `getEligiblePool(category, branchCardsState, progressState)` 선행 해금 필터(셰프·도구·챕터/시즌), 셰프 해금 판별 헬퍼 공용화 |
 | 월드맵 | WorldMapScene.js | 24챕터 3그룹 탭(1~6/7~15/16~24장), 9노드 3x3 맵, 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js + EndlessMissionManager.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입, 미력 폭풍 이벤트, 정화 임무 4종, 통계 트래킹(폭풍/임무/무결) |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (3레이어 분리 렌더링+depth sorting+홀 데코), 챕터별 홀 배경 (바닥 8종 tileSprite+뒷벽 8종), 엔드리스 웨이브 구간별 배경 테마 전환, 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
@@ -86,7 +86,7 @@
 | 영업씬 렌더링 재구성 | 테이블 3레이어 분리 렌더링(back/customer/front), 손님 독립 스프라이트(5종x2상태), HUD depth 600+ 상향 | 완료 |
 | 쿠폰 코드 시스템 | 설정 메뉴 쿠폰 입력 UI, 일반 쿠폰 3종(프로덕션), DEV 치트 5종(트리쉐이킹), giftIngredients 세이브 v20 | 완료 |
 | 메뉴 비주얼 에셋 | MenuScene에 배경 이미지(menu_bg), 타이틀 로고(menu_title_logo), 미미 스프라이트, 앱 아이콘(app_icon_512) 도입. 장식 원 제거, panel dark alpha 0.5 | 완료 |
-| 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 8종 전수 실효(tint+전투 수치) + Bond 8쌍 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭·적 둔화) + 분기 레시피 반복 등장(chaos_ramen 3회/spice_bomb 2회) | 완료 |
+| 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 8종 전수 실효(tint+전투 수치) + Bond 8쌍 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭·적 둔화) + 분기 레시피 반복 등장(chaos_ramen 3회/spice_bomb 2회). 선행 해금 체크(bond: 셰프 해금 조건 / mutation: 도구 `count>=1` / recipe: minChapter·requiresSeason 스키마) 적용 — 초반 유저에게 아직 만나지 못한 동료의 bond 카드가 노출되던 UX 혼란 해소 | 완료 |
 | 세이브 백업 | 3슬롯 롤링 백업(backup_1~3), 설정 패널 복구 버튼 + 백업 목록 모달 + 확인 모달, quota 초과 시 메인 저장 보호 | 완료 |
 
 ## 콘텐츠 규모
@@ -126,6 +126,15 @@
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
 ## 개발 이력 (최근)
+
+### Phase 75 — 행상인 분기 카드 풀 선행 해금 체크 (2026-04-23)
+
+버그 수정. 행상인 방문 시 `getEligiblePool()`이 유저 진행도(챕터/시즌/도구 보유)를 참조하지 않아, 초반 유저가 아직 만나지 못한 후반 동료(예: 아르준, 17장 해금)의 bond 카드나 미보유 도구의 mutation 카드를 마주치던 UX 혼란을 해소. 셰프 해금 판별 로직은 `chefUnlockHelper.js`로 추출해 `ChefSelectScene`과 `merchantBranchData` 양쪽에서 공유. recipe 카드 스키마에 `minChapter`/`requiresSeason` 선택 필드를 도입했으나, 8장 모두 필드 미설정 상태로 남겨 향후 기획자가 수치를 채울 수 있는 구조만 마련.
+
+- 수정 파일: `chefUnlockHelper.js` (신규), `merchantBranchData.js` (getEligiblePool/selectBranchCards 시그니처 확장), `MerchantScene.js` (progressState 구성), `ChefSelectScene.js` (헬퍼 import 전환)
+- 신규 테스트: `phase75-merchant-branch-filter-qa.spec.js` (27건), `phase58-qa-integration.spec.js` 신 시그니처로 업데이트 (회귀 해소)
+- QA: Playwright 54/54 PASS (Phase 75 27 + Phase 58 회귀 27), 콘솔 에러 0건
+- 스펙: `.claude/specs/2026-04-23-kc-phase75-spec.md`
 
 ### Phase 73 — 세이브 백업 + 포트레이트 정합 (2026-04-23)
 

@@ -1,5 +1,81 @@
 # Changelog
 
+## [Phase 75] 2026-04-23 -- 행상인 분기 카드 풀 선행 해금 체크 (fix)
+
+### 개요
+
+**버그 수정 성격.** 행상인 방문 시 `merchantBranchData.getEligiblePool()`이 유저의 진행도(챕터/시즌 해금)와 도구 보유 상태를 전혀 참조하지 않아, 초반 챕터 유저가 아직 해금되지 않은 후반 동료(예: 아르준, 17장 해금)의 bond 카드나 미보유 도구의 mutation 카드를 풀에서 마주치는 UX 혼란이 있었다. 이번 Phase에서 bond/mutation/recipe 카테고리별 선행 해금 필터를 추가하고, 셰프 해금 판별 로직을 `chefUnlockHelper.js`로 공용화했다.
+
+### 추가
+
+- `kitchen-chaos/js/data/chefUnlockHelper.js` -- 신규 헬퍼 모듈
+  - `isChefUnlocked(chefId, progressState)` export
+  - progressState 구조: `{ currentChapter, season2Unlocked, season3Unlocked }`
+  - 셰프별 해금 규칙 내장 (mimi/rin/mage: 상시, yuki: s2, lao: s2+ch>=10, andre: s2+ch>=13, arjun: s3+ch>=17)
+- `kitchen-chaos/tests/phase75-merchant-branch-filter-qa.spec.js` -- QA 작성 신규 테스트 27건
+  - A. isChefUnlocked 매트릭스 3건 (셰프×진행도, 경계값, undefined/null 안전)
+  - B. getEligiblePool 필터 10건 (bond/mutation/recipe/blessing + 이중 필터)
+  - C. selectBranchCards 폴백 3건
+  - D. MerchantScene 통합 3건 (초반/후반 세이브)
+  - E. ChefSelectScene 잠금 반전 3건
+  - F. SaveManager 안전성 3건
+  - G. 구 시그니처 회귀 2건
+
+### 변경
+
+- `kitchen-chaos/js/data/merchantBranchData.js`
+  - `getEligiblePool(category, branchCardsState)` -> `getEligiblePool(category, branchCardsState, progressState)` 시그니처 확장
+  - `selectBranchCards(branchCardsState)` -> `selectBranchCards(branchCardsState, progressState)` 시그니처 확장
+  - mutation 필터: `!toolMutations[c.targetToolId] && (tools[c.targetToolId]?.count ?? 0) >= 1` 추가
+  - bond 필터: `!chefBonds.includes(c.id) && isChefUnlocked(c.chefId, progressState)` 추가
+  - recipe 필터: `minChapter`/`requiresSeason` 필드 체크 (필드 미설정 시 통과)
+  - recipe 카드 스키마에 `minChapter?: number`, `requiresSeason?: 2 | 3` 선택 필드 추가 (**JSDoc만** -- 기존 8장의 recipe 카드 데이터 자체는 모두 필드 미설정 유지. "향후 기획자가 수치를 채워 넣을 수 있는 구조만 마련"한 상태)
+  - `chefUnlockHelper.js` import 추가
+  - blessing 카테고리: 필터 변경 없음 (현행 유지)
+
+- `kitchen-chaos/js/scenes/MerchantScene.js`
+  - `SaveManager.load()` 단일 호출 후 `branchCardsState`와 `progressState` 두 객체로 분리 구성
+  - `progressState` 조립: `currentChapter`(`storyProgress.currentChapter || 1`), `season2Unlocked`, `season3Unlocked`, `tools`(`saveData.tools || {}`)
+  - `selectBranchCards(state)` -> `selectBranchCards(branchCardsState, progressState)` 호출부 교체
+
+- `kitchen-chaos/js/scenes/ChefSelectScene.js`
+  - 로컬 `isChefLocked(chefId, save)` 함수 제거
+  - `chefUnlockHelper.isChefUnlocked` import로 교체
+  - `toProgressState(save)` 어댑터 추가 (save 객체에서 progressState 추출)
+  - 호출부: `locked: !isChefUnlocked(id, progressState)` (로직 반전 주의)
+
+- `kitchen-chaos/tests/phase58-qa-integration.spec.js` (QA에서 발견한 회귀)
+  - 구 시그니처 호출 6곳(169, 684, 708, 728, 812, 825)을 신 시그니처로 갱신
+  - 각 호출에 "완전 해금 상태" `fullyUnlocked` progressState(`ch=99, s2=true, s3=true, 전 도구 count=1`) 주입
+  - 기대값(7, 7 등)의 의미적 동등성 복원 -- 테스트 원래 의도(변이/본드 해금 상태 필터링 확인) 보존
+
+### 스펙 대비 변경
+
+- 없음. 모든 구현이 스펙 문서를 정확히 따름. QA에서 발견된 phase58 회귀는 Coder 재작업 섹션에서 해소됨.
+
+### 알려진 이슈
+
+- **LOW**: `SaveManager.js:1370` v11->v12 마이그레이션 분기의 `if (data.tools)` 가드가 `tools` 키가 부재한 비정상 세이브에서 tools를 복구하지 않음. Phase 75 코드에서 `saveData.tools || {}` 폴백으로 런타임 에러 방지. 별도 페이즈 검토 권장 (Phase 75와 무관, 사전 존재 결함).
+- **BUG-01 (MEDIUM, 이전 페이즈 미해결)**: mimi+salt Bond-only 미작동 (Phase 58-3 pre-existing). Phase 75 영향 없음.
+
+### 검증
+
+- Playwright 54/54 PASS
+  - Phase 75 QA: 27/27 (신규 필터 로직 전수 검증)
+  - Phase 58 회귀: 27/27 (테스트 신 시그니처 갱신 후 전부 복원)
+- 콘솔 에러: 0건
+- AD 전 단계 생략: visual_change: none (행상인/셰프 선택 UI 레이아웃·애니메이션 무변경)
+- 시각적 검증: 스크린샷 4건 (phase75-early-bond-tab.png, phase75-late-all-unlocked.png, phase75-chefselect-early.png, phase75-chefselect-late.png)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase75-spec.md`
+- 스코프(목적 정의): `.claude/specs/2026-04-23-kc-phase75-scope.md`
+- 코더 리포트: `.claude/specs/2026-04-23-kc-phase75-coder-report.md`
+- QA: `.claude/specs/2026-04-23-kc-phase75-qa.md`
+
+---
+
 ## [Phase 73] 2026-04-23 -- 세이브 백업 + 포트레이트 정합
 
 ### 개요
