@@ -1,8 +1,11 @@
-# Kitchen Chaos — 영업씬 카이로 스타일 방향성
+# Kitchen Chaos — 영업씬 카이로 스타일 방향성 (폐기 후보)
 
 > 작성일: 2026-04-23
-> 상태: 방향성 확정 (시험 목업 V9 승인) — 본 구현 미착수
-> 관련 문서: [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) (Phase 50~52 이전 방향, 일부 폐기)
+> 상태: **폐기 후보** — V10 시안(Travellers Rest 스타일) 비교 검토 후 [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)로 대체됨
+> 보존 사유: 카이로 디메트릭 검토 과정·근거를 향후 재논의에 대비해 남김
+> 관련 문서:
+> - [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md) — **현행 방향성** (V10 채택)
+> - [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) — Phase 50~52 이전 방향, 일부 폐기
 
 ---
 

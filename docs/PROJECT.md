@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (Phase 76 손님 NPC 다양성 확장)
+> 최종 업데이트: 2026-04-23 (영업씬 태번 스타일 방향성 확정 — V10 채택)
 
 ## 프로젝트 개요
 
@@ -137,12 +137,13 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
-### 영업씬 카이로 스타일 재설계 (방향성 확정, 본 구현 미착수)
+### 영업씬 태번(Travellers Rest) 스타일 재설계 (방향성 확정, 본 구현 미착수)
 
-Phase 76 손님 NPC 확장 결과 신규 92×92 스프라이트와 기존 48×64 규격 호환 문제, 의자 정합 문제가 드러나 영업씬을 카이로 소프트(*Cafeteria Nipponica*) 스타일의 사선뷰 식당 시뮬레이션 구조로 전면 재설계하기로 결정. 사전 합성 좌석 세트 + 앉기 전용 상반신 컷 + Y축 깊이 정렬 방식. 시험 시안 V9 검증 완료.
+Phase 76 손님 NPC 확장 결과 신규 92×92 스프라이트와 기존 48×64 규격 호환 문제·의자 정합 문제가 드러나 영업씬을 전면 재설계하기로 결정. 카이로 소프트 디메트릭(V9)을 1차 후보로 검토했으나, **Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터(V10)**가 어셋 발주 난이도·정합 자연스러움·동시 좌석 수에서 우위를 보여 V10을 채택. 긴 벤치 + 사이드뷰 손님 슬롯 구조로 다리·하반신이 자연스럽게 가구에 정합되며, 셰프가 카운터에서 테이블로 트레이를 운반하는 동선이 시각적으로 보인다.
 
-- 방향성 문서: [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md)
-- 시험 목업: `studio-mockup/kitchen-chaos/kairo-style-mockup.html`
+- **현행 방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
+- 시험 목업: `studio-mockup/kitchen-chaos/travellers-style-mockup.html`
+- 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md) (V9 카이로 디메트릭, 비교 검토용)
 - 이전 방향(폐기): [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) (Phase 50~52 시점, 일부 절만 계승)
 
 ## 개발 이력 (최근)
