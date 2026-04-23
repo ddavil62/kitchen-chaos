@@ -1,9 +1,9 @@
 # Kitchen Chaos -- 영업씬 태번 스타일 재설계 페이즈 마스터 플랜
 
-> 최종 업데이트: 2026-04-23 (Phase A 완료)
+> 최종 업데이트: 2026-04-23 (Phase A + A-bis 완료, V12 레이아웃 확정)
 > 관련 문서:
-> - [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md) -- 방향성/핵심 원칙
-> - `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- Phase B 진입 게이트 에셋 발주 규격서
+> - [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md) -- 방향성/핵심 원칙 (V12 기준)
+> - `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- Phase B 진입 게이트 에셋 발주 규격서 (V12 규격 갱신 필요)
 
 ---
 
@@ -13,8 +13,9 @@
 
 | 페이즈 | 이름 | 핵심 범위 | 상태 |
 |--------|------|-----------|------|
-| **A** | 기반 시스템 골격 | 레이아웃 상수, 슬롯 데이터 모델, 상태머신 키, 깊이정렬, PIL 더미 | **완료** |
-| **B** | 에셋 발주 | 손님 10종 + 셰프 7명 + 가구 스프라이트 PixelLab/SD 발주 및 교체 | 대기 |
+| **A** | 기반 시스템 골격 | 레이아웃 상수(V10), 슬롯 데이터 모델, 상태머신 키, 깊이정렬, PIL 더미 | **완료** |
+| **A-bis** | V12 레이아웃 마이그레이션 | V10 가로 3세트 -> V12 4분면 세로, V12 placeholder 5종, 테스트 84/84 | **완료** |
+| **B** | 에셋 발주 | 손님 10종 + 셰프 7명 + V12 규격 가구 스프라이트 PixelLab/SD 발주 및 교체 | 준비 |
 | **C** | 테마 변주 + UI | 챕터별 바닥/벽/소품 8세트, 인내심 게이지, 말풍선, 골드 플로팅 HUD/VFX | 미착수 |
 | **D** | 게임 로직 연동 | 조리 슬롯, 레시피 선택, 골드 획득, 셰프 스킬, 손님 AI, 인내심 감소 | 미착수 |
 | **E** | 마이그레이션 | 기존 ServiceScene -> TavernServiceScene 교체, 레거시 자산 정리 | 미착수 |
@@ -26,7 +27,7 @@
 ### 범위
 
 - A1: 360x640 캔버스 레이아웃 영역 상수 정의 + PIL 더미 합성
-- A2: 긴 벤치 좌석 슬롯 데이터 모델 (lv0 4인, lv3 5인, lv4 6인)
+- A2: 긴 벤치 좌석 슬롯 데이터 모델 (lv0 4인, lv3 5인, lv4 6인) -- V10 가로 구조
 - A3: 셰프/손님 상태머신 키 정의 (ChefState 7, CustomerState 7)
 - A4: Y축 단순 깊이정렬 + 3레이어 분리 렌더링 폐기
 
@@ -43,7 +44,7 @@
 ### 게이트 충족 상태
 
 - [x] 영역 구획 상수 확정 (HUD 32px / WALL 24px / KITCHEN_W 120px / DINING_W 224px / CTRL 80px)
-- [x] 테이블 세트 y좌표 확정 (232, 352, 472 / 간격 120px 균등)
+- [x] 테이블 세트 y좌표 확정 (V10: 232, 352, 472 / 간격 120px 균등) -- Phase A-bis에서 V12로 교체됨
 - [x] 슬롯 데이터 모델 확정 (24석 lv0, occupySlot/vacateSlot API)
 - [x] 상태머신 키 확정 (셰프 7 + 손님 7, scaleY 완전 배제)
 - [x] 깊이정렬 공식 확정 (depth = y 단일 공식)
@@ -63,19 +64,79 @@ PASS (40/40). AD 모드3 REVISE 1건(bench-top 4px 겹침) 반영 완료.
 
 ---
 
-## Phase B -- 에셋 발주 (대기)
+## Phase A-bis -- V12 레이아웃 마이그레이션 (완료)
+
+### 범위
+
+Phase A(V10 가로 긴 테이블 3세트x8석=24석)를 V12(세로 짧은 테이블 4분면x6석=24석)로 전환. 코드 구조/상태머신/함수 인터페이스 유지, 좌표/에셋 크기 상수와 렌더링 배치만 V12 수치로 치환.
+
+- TABLE_SET_ANCHORS: 3엔트리(x,y) -> 4엔트리(quadLeft,quadTop,key: tl/tr/bl/br)
+- BENCH_SLOTS: top/bot(dx) -> left/right(dy)
+- 카운터: 24x120 가로 -> 40x100 세로
+- 셰프 2명 배치 (y=100, y=148)
+- 입구: 우측 상단 -> 좌하단(entrance_v12, left=44, top=480)
+- V12 PIL placeholder 5종 추가
+
+### 산출물
+
+| 파일 | 역할 |
+|------|------|
+| `assets/tavern_dummy/counter_v12.png` (40x100) | V12 카운터 placeholder |
+| `assets/tavern_dummy/table_vertical_v12.png` (44x72) | V12 세로 테이블 placeholder |
+| `assets/tavern_dummy/bench_vertical_l_v12.png` (14x76) | V12 좌측 벤치 placeholder |
+| `assets/tavern_dummy/bench_vertical_r_v12.png` (14x76) | V12 우측 벤치 placeholder |
+| `assets/tavern_dummy/entrance_v12.png` (32x40) | V12 입구 placeholder |
+| `tests/phase-a-bis-v12-qa.spec.js` (27개) | QA 신규 테스트 |
+
+### 게이트 충족 상태
+
+- [x] TABLE_SET_ANCHORS 4엔트리 (tl/tr/bl/br quad 좌표)
+- [x] 24석 총원 유지 (4quad x left3 + right3)
+- [x] 세로 통로 20px, 가로 통로 40px
+- [x] V12 placeholder 5종 존재 + preload 로드
+- [x] ServiceScene.js 무손상 (git diff 0줄)
+- [x] scaleY/flipY 코드 부재
+- [x] Playwright 84/84 PASS, vite build PASS
+
+### QA 결과
+
+PASS (84/84 테스트, 게이트 12/12). AD 모드3 REVISE (WARN 4건, 모두 Phase B 이후 해소 예정).
+
+### 스펙/리포트
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-spec.md`
+- 목적: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-scope.md`
+- Coder 리포트: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-coder-report.md`
+- AD 모드3: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-ad3.md`
+- QA: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-qa.md`
+
+---
+
+## Phase B -- 에셋 발주 (준비)
 
 ### 진입 조건
 
 - [x] Phase A 완료
+- [x] Phase A-bis V12 마이그레이션 완료 (Phase B 에셋 규격이 V12 기준으로 확정)
 - [x] Phase B 진입 게이트 에셋 발주 규격서 존재 (`.claude/specs/2026-04-23-kc-phase-b-asset-spec.md`)
+- [ ] Phase B 규격서를 V12 수치로 갱신 (카운터 40x100, 벤치 14x76, 테이블 44x72, 입구 32x40 등)
 
 ### 범위
 
-- B1: 손님 10종 사이드뷰 스프라이트 발주 (걷기 4방향 + seated_up/down = 40장)
+- B1: 손님 10종 사이드뷰 스프라이트 발주 (걷기 4방향 + seated_left/right = 40장)
 - B2: 셰프 7명 사이드뷰 스프라이트 발주 (idle/walk/carry/cook/serve = 49장)
-- B3: 가구(벤치 lv0/lv3/lv4 + 테이블 lv0/lv3/lv4 + 카운터 + 술통 + 입구) 탑다운 발주
-- B4: PIL 더미를 실제 에셋으로 교체, TavernServiceScene에서 렌더링 검증
+- B3: V12 규격 가구 발주 (세로 벤치 14x76, 세로 테이블 44x72, 카운터 40x100, 입구 32x40, 술통)
+- B4: V12 PIL placeholder를 실제 에셋으로 교체, TavernServiceScene에서 렌더링 검증
+
+### V12 에셋 규격 (Phase A-bis 확정값)
+
+| 에셋 | 크기 | 비고 |
+|------|------|------|
+| 세로 벤치 (lv0) | 14x76px | bench_vertical_l/r, facing 방향 구분 필요 |
+| 세로 테이블 (lv0) | 44x72px | table_vertical |
+| 카운터 | 40x100px | 세로 배치 |
+| 입구 | 32x40px | 좌하단 |
+| 술통 | 32x40px | 주방 소품 |
 
 ### 발주 도구 (방향성 문서 SS5-4 기준)
 
@@ -89,8 +150,8 @@ PASS (40/40). AD 모드3 REVISE 1건(bench-top 4px 겹침) 반영 완료.
 
 ### 게이트 조건 (Phase C 진입)
 
-- [ ] 최소 normal 손님 1종 + 미미 셰프 1명 + lv0 가구 1세트가 TavernServiceScene에서 렌더링 확인
-- [ ] seated_up / seated_down이 scaleY 없이 별도 스프라이트로 자연스러운 정합 확인
+- [ ] 최소 normal 손님 1종 + 미미 셰프 1명 + lv0 V12 가구 1세트가 TavernServiceScene에서 렌더링 확인
+- [ ] seated_left / seated_right가 scaleY/flipY 없이 별도 스프라이트로 자연스러운 정합 확인
 - [ ] 사용자 최종 승인
 
 ---
@@ -165,4 +226,5 @@ PASS (40/40). AD 모드3 REVISE 1건(bench-top 4px 겹침) 반영 완료.
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-23 | Phase A-bis V12 마이그레이션 완료 반영. Phase A-bis 절 추가, Phase B를 V12 규격으로 갱신, 페이즈 총괄 테이블에 A-bis 추가. |
 | 2026-04-23 | 신규 작성. Phase A 완료 반영. |

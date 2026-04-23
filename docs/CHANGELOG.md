@@ -1,5 +1,118 @@
 # Changelog
 
+## [Phase A-bis] 2026-04-23 -- V12 레이아웃 마이그레이션 (V10 가로 -> V12 4분면 세로)
+
+### 개요
+
+Phase A(V10 가로 긴 테이블 3세트x8석=24석)를 AD 검수 확정 V12 수치(세로 짧은 테이블 4분면x6석=24석)로 전면 교체. 코드 구조/상태머신 열거형/함수 인터페이스는 Phase A를 그대로 유지하고, 좌표/에셋 크기 상수와 씬 렌더링 배치만 V12 수치로 치환. V12 마이그레이션 완료로 Phase B(실 에셋 발주) 진입 게이트 충족.
+
+### 변경 사유
+
+V10(가로 긴 테이블 3세트) 구조에서 V11 시안 -> AD REDESIGN -> V12 시안까지 시각 검증을 거쳐, V12의 4분면 세로 배치가 360px 폭 화면에서 더 자연스럽다는 결론. Phase B 에셋 발주 규격이 V12 기준으로 확정되어야 하므로 마이그레이션 실시.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern_dummy/counter_v12.png` -- V12 PIL placeholder 40x100px
+- `kitchen-chaos/assets/tavern_dummy/table_vertical_v12.png` -- V12 PIL placeholder 44x72px
+- `kitchen-chaos/assets/tavern_dummy/bench_vertical_l_v12.png` -- V12 PIL placeholder 14x76px (facing-right)
+- `kitchen-chaos/assets/tavern_dummy/bench_vertical_r_v12.png` -- V12 PIL placeholder 14x76px (facing-left)
+- `kitchen-chaos/assets/tavern_dummy/entrance_v12.png` -- V12 PIL placeholder 32x40px
+- `kitchen-chaos/tests/phase-a-bis-v12-qa.spec.js` -- QA 신규 테스트 27개
+
+### 변경
+
+- `kitchen-chaos/js/data/tavernLayoutData.js` -- V12 좌표 상수 전면 교체
+  - TABLE_SET_ANCHORS: 3엔트리(x,y) -> 4엔트리(quadLeft,quadTop,key: tl/tr/bl/br)
+    - tl(130,90), tr(250,90), bl(130,250), br(250,250)
+  - BENCH_SLOTS: dx(가로 오프셋) -> dy(세로 오프셋), top/bot -> left/right
+    - lv0: 3슬롯(dy=20/47/74), lv3: 4슬롯, lv4: 5슬롯
+  - BENCH_CONFIG: 가로 벤치 -> V12 quad/table/bench 크기
+    - QUAD_W=100, QUAD_H=120, BENCH_W=14, BENCH_H=76, TABLE_W=44, TABLE_H=72
+  - COUNTER_ANCHOR: (64,56) -> (100,90), COUNTER_W: 112->40, COUNTER_H: 52->100
+  - DOOR_ANCHOR: (316,56) -> (60,480), 입구 우측 상단 -> 좌측 하단
+  - CHEF_IDLE_ANCHORS: [(72,48),(112,48)] -> [(40,100),(40,148)], 셰프-2 top=148 (카운터 범위 내)
+  - 삭제: BARREL_ANCHORS, BENCH_W(구), BENCH_TOP_OFFSET_Y, BENCH_BOT_OFFSET_Y
+  - 신규: BENCH_LEFT_OFFSET_X=7, BENCH_RIGHT_OFFSET_X=77
+  - createSeatingState(): 3세트 x top/bot -> 4quad x left/right
+  - findFreeSlot(): ['top','bot'] -> ['left','right'] 순회
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js` -- V12 배치 전면 재작성
+  - import: BARREL_ANCHORS/BENCH_W/BENCH_TOP_OFFSET_Y/BENCH_BOT_OFFSET_Y 제거, BENCH_LEFT_OFFSET_X/BENCH_RIGHT_OFFSET_X 추가
+  - preload(): V10 키(bench_long_lv0, table_long_lv0, counter_topdown, door_frame) 제거, V12 키(counter_v12, table_vertical_v12, bench_vertical_l/r_v12, entrance_v12) 추가
+  - _buildFurniture(): 3세트 가로 루프 -> 4 quad 세로 루프 + 입구(entrance_v12) 좌하단 배치
+  - _buildBenchSlots(): set.top/set.bot -> set.left/set.right 루프, 슬롯 라벨 L0-L2/R0-R2
+  - _buildChef(): 셰프 1명 -> 2명 루프 (idx=0만 인터랙티브, _chefSprite 참조 유지)
+  - _getOccupiedCount(): ['top','bot'] -> ['left','right'] 순회
+  - _buildDebugHUD/_updateDebugHUD: top/bot -> left/right 총 슬롯 계산
+  - window.__tavernLayout: TABLE_SET_ANCHORS 추가 노출 (SC-1 테스트용)
+  - BARREL_POSITIONS: 로컬 상수로 재정의 (카운터 좌측 하단)
+
+- `kitchen-chaos/tests/phase-a-tavern-qa.spec.js` -- V12 구조 적용
+  - top/bot -> left/right, SC-1(TABLE_SET_ANCHORS 4엔트리) 추가, SC-2(24석) 갱신, 통로 폭 검증 2건 추가
+  - 테스트 수: 14 -> 20
+
+- `kitchen-chaos/tests/phase-a-tavern-qa-extended.spec.js` -- V12 구조 적용
+  - top/bot -> left/right, 4슬롯->3슬롯, facingDown/Up -> facingRight/Left
+  - getSlotWorldPos 기댓값: (x=206) -> (x=137, y=110)
+  - 24석 전체 점유 루프: 3세트 x top/bot x 4슬롯 -> 4quad x left/right x 3슬롯
+
+### V12 좌표 수치표 (AD 검수 확정값)
+
+| 항목 | 값 |
+|------|-----|
+| quad 크기 | 100x120px |
+| quad.tl | left=130, top=90 |
+| quad.tr | left=250, top=90 |
+| quad.bl | left=130, top=250 |
+| quad.br | left=250, top=250 |
+| 세로 통로 | 20px (quad.tr.left - quad.tl.right) |
+| 가로 통로 | 40px (quad.bl.top - quad.tl.bottom) |
+| bench-l (quad 내부) | left=8, top=18, 14x76px |
+| table-v (quad 내부) | left=30, top=10, 44x72px |
+| bench-r (quad 내부) | left=78, top=18, 14x76px |
+| 손님 슬롯 dy | 20 / 47 / 74 (quad 상단 기준) |
+| 카운터 | left=80, top=90, 40x100px |
+| 셰프-1 발끝 | x=40, y=100 |
+| 셰프-2 발끝 | x=40, y=148 |
+| 입구 | left=44, top=480, 32x40px |
+
+### 수정 금지 파일
+
+- `kitchen-chaos/js/scenes/ServiceScene.js` -- git diff 0줄 확인
+
+### 테스트 결과
+
+- 기존 테스트: 57/57 PASS (phase-a-tavern-qa.spec.js 20 + phase-a-tavern-qa-extended.spec.js 37)
+- QA 신규 테스트: 27/27 PASS (phase-a-bis-v12-qa.spec.js)
+- 전체: 84/84 PASS
+- 게이트 12항목: 12/12 PASS
+- vite build: PASS (70 modules, 12.51s)
+
+### AD 모드3 판정
+
+REVISE (QA 진행 가능 판정). WARN 4건:
+- WARN-1: 손님 초기 대기 위치(queueBaseX=300)가 quad.tr 영역과 겹침 -> Phase B 수정 예정
+- WARN-2: 카운터 top AD 원문(80) vs mockup(90) 10px 차이 -> 수정 불필요 (mockup 기준 PASS)
+- WARN-3: 좌측 여백 2px (권장 10px 미달) -> Phase B 아키텍처 조정 시 검토
+- WARN-4: ENTER 복귀 좌표(x=40, y=110) 주방 내부 -> Phase B 동선 AI 구현 시 수정
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-spec.md`
+- 목적: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-scope.md`
+- Coder 리포트: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-coder-report.md`
+- AD 모드3: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-ad3.md`
+- QA: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-qa.md`
+
+### 알려진 사항
+
+- V10 더미 PNG(bench_long_lv0.png 등)는 assets/tavern_dummy/에 그대로 유지 (preload에서만 제거)
+- 셰프-2(y=148)가 카운터 블록(40x100, y=90~190)에 가려져 시각 구분 어려움 -> Phase B 실 스프라이트 적용 시 해소
+- 하단 190px 대기열 영역(y=370~560) 빈 공간 -> Phase B+에서 활용 예정
+- window.__tavernLayout에 TABLE_SET_ANCHORS 추가 노출이 DEV 조건 없이 수행 -> Phase B 이후 조건부 변경 권장
+
+---
+
 ## [Phase A] 2026-04-23 -- 영업씬 태번 스타일 재설계 기반 시스템 골격
 
 ### 개요

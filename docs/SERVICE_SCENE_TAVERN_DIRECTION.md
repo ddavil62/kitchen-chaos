@@ -1,10 +1,11 @@
 # Kitchen Chaos — 영업씬 태번(Travellers Rest) 스타일 방향성
 
 > 작성일: 2026-04-23
-> 상태: **Phase A 완료** (시험 시안 V10 채택, 기반 시스템 골격 구현 완료, Phase B 대기)
+> 상태: **Phase A + A-bis 완료** (V12 4분면 세로 레이아웃 확정, Phase B 준비)
+> 현재 레이아웃: **V12** (V10 -> V11 -> V12 시각 검증 거쳐 확정)
 > 관련 문서:
-> - [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md) — 직전 후보(카이로 디메트릭), V10 비교 후 폐기
-> - [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) — Phase 50~52 시점 방향성, 일부 미술 가이드만 계승
+> - [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md) -- 직전 후보(카이로 디메트릭), V10 비교 후 폐기
+> - [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) -- Phase 50~52 시점 방향성, 일부 미술 가이드만 계승
 
 ---
 
@@ -17,10 +18,12 @@
      ↓ Phase 76 손님 NPC 확장에서 의자 정합·규격 호환 한계 노출
 [Phase 76 직후] 카이로 소프트 디메트릭 사선뷰 (V9 시안)
      ↓ Travellers Rest 스타일 검토 후, 어셋 발주 난이도·정합 자연스러움·동시 좌석 수에서 우위 확인
-[현재] 태번(Travellers Rest) 스타일 — 탑다운 가구 + 사이드뷰 풀바디 캐릭터  ← 본 문서
+[Phase A] V10 — 탑다운 가구 + 사이드뷰 풀바디 캐릭터, 가로 긴 테이블 3세트(8석x3=24석)
+     ↓ V11 시안 검토 -> AD REDESIGN -> V12 시안 확정
+[현재] V12 — 4분면 세로 테이블(6석x4=24석), +자 통로, facing-left/right 손님  ← 본 문서
 ```
 
-본 문서는 V10 시험 시안(2026-04-23) 검증 결과 **본 구현 진입 직전 단계**의 지향점·핵심 원칙·기준 시안을 정리한다. 구체적 페이즈 분할, 마이그레이션 계획, 코드 변경 명세는 별도 스펙 문서에서 다룬다.
+본 문서는 V12 레이아웃(2026-04-23 Phase A-bis에서 마이그레이션 완료) 기준의 지향점/핵심 원칙/기준 수치를 정리한다. V10에서 V12로 전환한 이유: V12의 4분면 세로 배치가 360px 폭 화면에서 더 자연스럽고, Phase B 에셋 규격이 V12 기준으로 확정되어야 하기 때문이다. 구체적 페이즈 분할은 별도 스펙 문서에서 다룬다.
 
 ---
 
@@ -51,12 +54,15 @@
 | 외부 풍경 노출 | ✗ 미채용 | 탑다운 시점상 불가능 |
 | 다층 건물 | ✗ 미채용 | 모바일 화면 한계 |
 
-### 2-2. 시험 시안 V10
+### 2-2. 확정 시안 V12
 
-![V10 mockup](references/v10-tavern-style-mockup.png)
+![V12 mockup](references/v12-tavern-style-mockup.png)
 
-`studio-mockup/kitchen-chaos/travellers-style-mockup.html` 에서 인터랙티브 확인 가능.
+`studio-mockup/kitchen-chaos/travellers-v12-mockup.html` 에서 인터랙티브 확인 가능.
 PIL 도형 placeholder로 레이아웃 구조만 검증한 시안. **실제 에셋이 아니다.**
+
+V10(가로 긴 테이블 3세트) -> V11(세로 시도) -> V12(4분면 세로 확정)으로 시각 검증을 거쳤다.
+V10 시안: `studio-mockup/kitchen-chaos/travellers-style-mockup.html` (이전 버전, 참고용)
 
 ### 2-3. 비교 검토된 직전 후보: 카이로 소프트 디메트릭 (V9, 폐기)
 
@@ -90,35 +96,46 @@ V9과의 비교 결과 V10이 다음 항목에서 우위:
 - **캐릭터**: 좌·우 측면을 향한 풀바디(머리부터 발끝까지)
 - 이 조합이 픽셀아트에서 **인체 비율을 가장 정확하게 표현**하며, **벤치 위 측면 좌석 자세**도 자연스럽게 정합된다.
 
-### 3-2. 좌석은 "긴 벤치 + 슬롯" 단위
+### 3-2. 좌석은 "4분면(quad) + 세로 벤치 + 슬롯" 단위 (V12)
 
 ```
-─── 위쪽 벤치 (facing-down 손님 4명) ───
-│ 손님1    손님2    손님3    손님4 │
-═══════════════════════════════════════
-[ 긴 테이블 (음식 접시·잔 장식) ]
-═══════════════════════════════════════
-│ 손님A    손님B    손님C    손님D │
-─── 아래쪽 벤치 (facing-up 손님 4명) ───
+                세로 통로 20px
+        ┌──── tl ────┐    ┌──── tr ────┐
+        │ B-L  T-V  B-R │    │ B-L  T-V  B-R │   quad 100x120px
+        │ L0        R0  │    │ L0        R0  │
+        │ L1        R1  │    │ L1        R1  │   좌석: 좌3+우3=6석
+        │ L2        R2  │    │ L2        R2  │
+        └────────────┘    └────────────┘
+                가로 통로 40px
+        ┌──── bl ────┐    ┌──── br ────┐
+        │ B-L  T-V  B-R │    │ B-L  T-V  B-R │
+        │ L0        R0  │    │ L0        R0  │
+        │ L1        R1  │    │ L1        R1  │
+        │ L2        R2  │    │ L2        R2  │
+        └────────────┘    └────────────┘
+
+B-L: bench-l (14x76, facing-right 손님)
+T-V: table-v (44x72, 세로 테이블)
+B-R: bench-r (14x76, facing-left 손님)
 ```
 
-- 긴 벤치 1개 = 4~5 슬롯, 한 테이블 양옆 = 8~10명 동시 착석
-- 벤치는 사전 합성 스프라이트(테이블+양 벤치는 분리, 벤치는 단독 1장)
-- 손님은 벤치 위 슬롯 좌표에 단순 박힘
-- 위쪽 벤치 손님과 아래쪽 벤치 손님은 **서로 다른 스프라이트** (facing-up / facing-down)
-  - ⚠️ V10 시안에서 사용한 `transform: scaleY(-1)` 미러링은 머리가 거꾸로 보여 부적합. 본 발주 시 facing-up 별도 스프라이트 필수
+- 4분면(quad) x 6슬롯 = 24석 동시 착석
+- 각 quad 내부: bench-l(좌측 세로 벤치) + table-v(세로 테이블) + bench-r(우측 세로 벤치)
+- 좌측 벤치 손님은 facing-right(테이블 방향), 우측 벤치 손님은 facing-left(테이블 방향)
+- facing-left / facing-right는 **서로 다른 스프라이트** (scaleY/flipY 미러링 금지)
+- +자 통로: 세로 20px + 가로 40px로 셰프 운반 동선 확보
 
 ### 3-3. 손님 스프라이트 시트
 
 | 상태 | 파일 패턴 | 해상도 | 용도 |
 |------|----------|--------|------|
-| 걷기 (좌·우) | `customer_{type}_walk_{l/r}.png` (4프레임 시트) | 16×24 | 입장·퇴장·테이블 이동·줄서기 |
-| 앉기 (위쪽 벤치, 머리 위) | `customer_{type}_seated_down.png` | 16×22 | 위쪽 벤치 = 머리 위, 몸이 테이블 향함 |
-| 앉기 (아래쪽 벤치, 머리 아래) | `customer_{type}_seated_up.png` | 16×22 | 아래쪽 벤치 = 머리 아래, 몸이 테이블 향함 (별도 그림) |
-| 식사 (선택) | `customer_{type}_eating_{down/up}.png` 또는 2프레임 | 16×22 | 음식 받은 후 |
-| 만족 (선택) | `customer_{type}_happy_{down/up}.png` | 16×22 | 결제 직전 |
+| 걷기 (좌/우) | `customer_{type}_walk_{l/r}.png` (4프레임 시트) | 16x24 | 입장/퇴장/테이블 이동/줄서기 |
+| 앉기 facing-right (좌측 벤치) | `customer_{type}_seated_right.png` | 16x22 | 좌측 벤치 = 테이블 방향(우측) 향함 |
+| 앉기 facing-left (우측 벤치) | `customer_{type}_seated_left.png` | 16x22 | 우측 벤치 = 테이블 방향(좌측) 향함 (**별도 그림, scaleX 반전 아님**) |
+| 식사 (선택) | `customer_{type}_eating_{left/right}.png` 또는 2프레임 | 16x22 | 음식 받은 후 |
+| 만족 (선택) | `customer_{type}_happy_{left/right}.png` | 16x22 | 결제 직전 |
 
-**기존 자산 재활용**: Phase 76 신규 92×92 풀바디 손님 10종은 **그대로 사용 불가**(시점·해상도 모두 미스매치). 단, 캐릭터 디자인(헤어·복장·피부)은 그대로 계승하여 사이드뷰로 재발주.
+V12에서 벤치 방향이 가로(위/아래) -> 세로(좌/우)로 변경됨에 따라, facing-down/facing-up이 facing-right/facing-left로 전환되었다. **기존 자산 재활용**: Phase 76 신규 92x92 풀바디 손님 10종은 **그대로 사용 불가**(시점/해상도 모두 미스매치). 단, 캐릭터 디자인(헤어/복장/피부)은 그대로 계승하여 사이드뷰로 재발주.
 
 ### 3-4. 셰프 스프라이트 시트 (운반 동선 핵심)
 
@@ -145,43 +162,60 @@ V9과의 비교 결과 V10이 다음 항목에서 우위:
 
 탑다운이라 디메트릭 z-offset 계산이 불필요. **모든 오브젝트의 z는 자기 발 위치 y좌표** 단순 공식. 의자·테이블·벤치는 미리 정해진 슬롯 깊이 사용.
 
-### 3-6. 공간 분할 (360×640 잠정안)
+### 3-6. 공간 분할 (360x640, V12 확정)
 
 ```
 ┌─────────────────────────────────────────┐
-│ HUD (타이머 / 골드 / 챕터)         │ 32px
+│ HUD (타이머 / 골드 / 챕터)              │ 32px  y=0~32
 ├─────────────────────────────────────────┤
-│  ━━━━━ 가로 두꺼운 벽 (액자/창문) ━━━━━│ 24px
-├──────────────┬──────────────────────────┤
-│              │                          │
-│  주방 카운터 │   다이닝홀 (목재 마룻)   │
-│  + 셰프(idle)│                          │
-│              │   ━━━━━━━ 벤치 ━━━━━━━ │ 좌석세트 1
-│  술통×2     │   ▥▥▥▥▥ 테이블 ▥▥▥▥▥ │
-│  (장식)      │   ━━━━━━━ 벤치 ━━━━━━━ │
-│              │                          │
-│              │   ━━━━━━━ 벤치 ━━━━━━━ │ 좌석세트 2
-│              │   ▥▥▥▥▥ 테이블 ▥▥▥▥▥ │
-│              │   ━━━━━━━ 벤치 ━━━━━━━ │
-│              │                          │
-│              │   ━━━━━━━ 벤치 ━━━━━━━ │ 좌석세트 3
-│              │   ▥▥▥▥▥ 테이블 ▥▥▥▥▥ │
-│              │   ━━━━━━━ 벤치 ━━━━━━━ │
-│              │                          │
-│  ┌────┐     │                ┌────┐  │
-│  │입구│     │  ←── 대기열 ──→│대기│  │
-│  │카펫│     │                │손님│  │
-│  └────┘     │                └────┘  │ 528px
-├──────────────┴──────────────────────────┤
-│ 컨트롤 바 (요리 카드 / 일시정지 등)   │ 80px
+│  ━━━━━ 가로 두꺼운 벽 (액자/창문) ━━━━━│ 24px  y=32~56
+├──────────┬──────────────────────────────┤
+│ 주방     │   다이닝홀 (목재 마룻)       │
+│ 카운터   │                              │
+│ 40x100   │  ┌─quad.tl─┐  ┌─quad.tr─┐  │
+│ (세로)   │  │BL TV BR │  │BL TV BR │  │ y=90~210
+│          │  │6석      │  │6석      │  │
+│ 셰프-1   │  └─────────┘  └─────────┘  │
+│ (y=100)  │       +자 통로 40px          │
+│ 셰프-2   │  ┌─quad.bl─┐  ┌─quad.br─┐  │
+│ (y=148)  │  │BL TV BR │  │BL TV BR │  │ y=250~370
+│          │  │6석      │  │6석      │  │
+│ 술통x2   │  └─────────┘  └─────────┘  │
+│          │       세로 통로 20px         │
+│          │                              │
+│  ┌────┐ │     대기열 영역 (Phase B+)    │
+│  │입구│ │     y=370~560 (190px)        │ 528px  y=56~560
+│  └────┘ │                              │
+│  y=480   │                              │
+├──────────┴──────────────────────────────┤
+│ 컨트롤 바 (요리 카드 / 일시정지 등)    │ 80px  y=560~640
 └─────────────────────────────────────────┘
                   360px
 ```
 
-- **좌측 1/3 = 주방·카운터·창고 영역** (셰프 idle, 술통, 카운터 상판)
-- **우측 2/3 = 다이닝홀** (긴 테이블 3개 세트, 동시 24석)
-- **입구는 좌측 또는 우측 하단** (V10에서는 우측 상단이지만 대기열 동선상 좌측 하단도 검토)
+- **좌측 = 주방 영역** (카운터 40x100 세로, 셰프 2명, 술통)
+- **우측 = 다이닝홀** (4분면 quad 배치, 동시 24석)
+- **+자 통로**: 세로 20px(quad 좌우 사이), 가로 40px(quad 상하 사이) -- 셰프 운반 동선
+- **입구는 좌하단** (left=44, top=480)
+- **하단 190px(y=370~560)**: 대기열 영역 (Phase B+에서 활용 예정)
 - **대기열은 풀바디 사이드뷰 손님** (앉기 스프라이트 X, walking 스프라이트 사용)
+
+#### V12 핵심 좌표표
+
+| 항목 | Phaser 절대 좌표 |
+|------|-----------------|
+| quad.tl | left=130, top=90 (100x120px) |
+| quad.tr | left=250, top=90 |
+| quad.bl | left=130, top=250 |
+| quad.br | left=250, top=250 |
+| 카운터 | left=80, top=90, 40x100px |
+| 셰프-1 | x=40, y=100 (발끝) |
+| 셰프-2 | x=40, y=148 (카운터 범위 90~190 내) |
+| 입구 | left=44, top=480, 32x40px |
+| bench-l (quad 내부) | left=8, top=18, 14x76px |
+| table-v (quad 내부) | left=30, top=10, 44x72px |
+| bench-r (quad 내부) | left=78, top=18, 14x76px |
+| 손님 슬롯 dy (lv0) | 20 / 47 / 74 (quad 상단 기준) |
 
 ### 3-7. 챕터별 테마 변주
 
@@ -221,37 +255,37 @@ V9과의 비교 결과 V10이 다음 항목에서 우위:
 
 본 절은 개략이며, 구체 발주 명세는 별도 스펙에서 작성한다.
 
-### 5-1. 좌석 세트 (벤치 + 테이블 분리)
+### 5-1. 좌석 세트 (세로 벤치 + 세로 테이블, V12)
 
-| 등급 | 벤치 | 테이블 |
-|------|------|--------|
-| lv0 | `bench_lv0_long.png` (96×14) | `table_lv0_long.png` (96×40) |
-| lv1 | `bench_lv1_long.png` | `table_lv1_long.png` |
-| lv2 | `bench_lv2_long.png` | `table_lv2_long.png` |
-| lv3 | `bench_lv3_long.png` (128×14, 5인) | `table_lv3_long.png` (128×40) |
-| lv4 | `bench_lv4_long.png` (160×14, 6인) | `table_lv4_long.png` (160×40) |
+| 등급 | 벤치 (좌/우 각 1장) | 테이블 |
+|------|---------------------|--------|
+| lv0 | `bench_vertical_l/r_lv0.png` (14x76, 3인) | `table_vertical_lv0.png` (44x72) |
+| lv3 | `bench_vertical_l/r_lv3.png` (14x96, 4인) | `table_vertical_lv3.png` (44x96) |
+| lv4 | `bench_vertical_l/r_lv4.png` (14x110, 5인) | `table_vertical_lv4.png` (44x110) |
 
-**좌석 슬롯 데이터** (벤치 텍스처에 종속, 코드에서 상수 정의):
+**좌석 슬롯 데이터** (세로 벤치, dy = quad 상단 기준 세로 오프셋):
 
 ```javascript
 const BENCH_SLOTS = {
-  bench_lv0_long: [{ x: 16 }, { x: 40 }, { x: 64 }, { x: 88 }],   // 4인
-  bench_lv3_long: [{ x: 16 }, { x: 40 }, { x: 64 }, { x: 88 }, { x: 112 }],  // 5인
-  bench_lv4_long: [...],  // 6인
+  lv0: [{ dy: 20 }, { dy: 47 }, { dy: 74 }],   // 3인
+  lv3: [{ dy: 14 }, { dy: 34 }, { dy: 54 }, { dy: 74 }],  // 4인
+  lv4: [{ dy: 10 }, { dy: 28 }, { dy: 46 }, { dy: 64 }, { dy: 82 }],  // 5인
 };
 ```
 
-### 5-2. 손님 사이드뷰 스프라이트 (10종 × 2방향 × 상태)
+V10에서는 가로 긴 벤치(192x14, dx 오프셋)였으나 V12에서 세로 짧은 벤치(14x76, dy 오프셋)로 전환. quad당 좌우 각 1벤치 x 3슬롯 = 6석, 4 quad = 24석.
+
+### 5-2. 손님 사이드뷰 스프라이트 (10종 x 2방향 x 상태)
 
 Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, student, traveler, business)을 사이드뷰로 재발주:
 
 | 종류 | 파일 패턴 | 해상도 | 매수 |
 |------|----------|--------|------|
-| 걷기 좌·우 | `customer_{type}_walk_{l/r}.png` (4프레임 시트) | 16×24 | 10종 × 2방향 = 20장 |
-| 앉기 facing-down (위쪽 벤치) | `customer_{type}_seated_down.png` | 16×22 | 10장 |
-| 앉기 facing-up (아래쪽 벤치) | `customer_{type}_seated_up.png` | 16×22 | 10장 |
+| 걷기 좌/우 | `customer_{type}_walk_{l/r}.png` (4프레임 시트) | 16x24 | 10종 x 2방향 = 20장 |
+| 앉기 facing-right (좌측 벤치) | `customer_{type}_seated_right.png` | 16x22 | 10장 |
+| 앉기 facing-left (우측 벤치) | `customer_{type}_seated_left.png` | 16x22 | 10장 |
 
-총 **40장 신규 발주**. 단체(group) 손님은 사이드뷰 어울리는 형태(가족 일렬)로 재해석.
+총 **40장 신규 발주**. V12에서 facing-down/up이 facing-right/left로 변경됨. 단체(group) 손님은 사이드뷰 어울리는 형태(가족 일렬)로 재해석.
 
 ### 5-3. 셰프·주방·기타
 
@@ -262,12 +296,12 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 | `chef_{name}_carry_{l/r}.png` (4프레임) | 트레이 운반 (양손에 트레이) | 16×24 |
 | `chef_{name}_cooking.png` (2프레임) | 조리 모션 | 16×24 |
 | `chef_{name}_serve.png` | 서빙 1프레임 | 16×24 |
-| `counter_topdown.png` | 주방 카운터 윗면 | 96×32 |
+| `counter_v12.png` | 주방 카운터 세로 (탑다운) | 40x100 |
 | `floor_{theme}.png` × 8 | 챕터별 바닥 타일 | 32×32 (반복) |
 | `wall_horizontal_{theme}.png` × 8 | 챕터별 가로 벽 | 64×24 (반복) |
 | `wall_decor_painting.png` 등 | 벽 장식 | 16×14 |
 | `barrel.png`, `crate.png` 등 | 술통/장식 | 16×20 |
-| `door_frame.png` | 입구 | 32×24 |
+| `entrance_v12.png` | 입구 (좌하단) | 32x40 |
 
 7명 셰프(미미·린·메이지·유키·라오·앙드레·아르준) × 5종 변형 = 셰프 35장 신규.
 
@@ -289,19 +323,20 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 본 방향을 실제 페이즈로 진입시키기 전, 아래 항목을 순서대로 확정한다.
 
-- [x] **레이아웃 상수 + 슬롯 데이터 모델 확정** *(Phase A에서 완료: tavernLayoutData.js, 24석 벤치 슬롯, occupySlot/vacateSlot API)*
+- [x] **레이아웃 상수 + 슬롯 데이터 모델 확정** *(Phase A에서 V10 구현, Phase A-bis에서 V12 마이그레이션 완료: 4분면 quad 24석, occupySlot/vacateSlot API)*
 - [x] **상태머신 키 확정** *(Phase A에서 완료: ChefState 7상태, CustomerState 7상태, scaleY 완전 배제)*
 - [x] **Y축 단순 깊이정렬 검증** *(Phase A에서 완료: depth=y 단일 공식, 3레이어 분리 코드 부재 확인)*
-- [ ] **에셋 1세트 진짜 발주 (시험)**: PixelLab으로 normal 손님 1종(걷기 4방향 + seated up·down 2장) + lv0 벤치+테이블 1세트 + 미미 셰프(idle·walk·carry) → V10 placeholder 자리에 교체 → 사용자 최종 승인 *(Phase B)*
-- [ ] **위/아래 벤치 손님 별도 스프라이트** 발주 검증 (scaleY 미러링 X) *(Phase B)*
+- [x] **V12 레이아웃 마이그레이션 완료** *(Phase A-bis: V10 가로 3세트 -> V12 4분면 세로, AD 검수+QA PASS)*
+- [ ] **에셋 1세트 진짜 발주 (시험)**: PixelLab으로 normal 손님 1종(걷기 4방향 + seated left/right 2장) + lv0 세로 벤치+세로 테이블 1세트 + 미미 셰프(idle/walk/carry) -> V12 placeholder 자리에 교체 -> 사용자 최종 승인 *(Phase B)*
+- [ ] **좌/우 벤치 손님 별도 스프라이트** 발주 검증 (scaleY/flipY 미러링 X) *(Phase B)*
 - [ ] **트레이 운반 셰프 동선** 시뮬레이션 (Phaser tween 또는 path follow) *(Phase C~D)*
 - [ ] **GatheringScene과 시점 분리 허용** 최종 사용자 확인
 - [ ] **마이그레이션 계획**: 기존 ServiceScene 코드와의 호환/단계적 전환 페이즈 분할 (Planner 단계) *(Phase E)*
 - [ ] **레거시 자산 처리 결정**:
-  - Phase 50~52 테이블 `_back`/`_front` 10장 → 폐기/보존
-  - Phase 50~52 손님 `_waiting`/`_seated` 10장 → 폐기 (시점 미스매치)
-  - Phase 76 신규 92×92 풀바디 10종 → 폐기/원본 PSD 보존 후 사이드뷰 재발주 시 디자인 참조
-- [ ] **Phase 76 손님 디자인 가이드 보존**: customerProfileData.js 10종 프로필(헤어·복장 키워드)을 사이드뷰 발주 시 그대로 적용
+  - Phase 50~52 테이블 `_back`/`_front` 10장 -> 폐기/보존
+  - Phase 50~52 손님 `_waiting`/`_seated` 10장 -> 폐기 (시점 미스매치)
+  - Phase 76 신규 92x92 풀바디 10종 -> 폐기/원본 PSD 보존 후 사이드뷰 재발주 시 디자인 참조
+- [ ] **Phase 76 손님 디자인 가이드 보존**: customerProfileData.js 10종 프로필(헤어/복장 키워드)을 사이드뷰 발주 시 그대로 적용
 
 ---
 
@@ -309,11 +344,12 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 | 페이즈 | 범위 | 상태 | 산출물 |
 |--------|------|------|--------|
-| **Phase A** | 기반 시스템 골격 (레이아웃/슬롯/상태머신/깊이정렬) | **완료** | TavernServiceScene.js, tavernLayoutData.js, tavernStateData.js, PIL 더미 13개 |
-| **Phase B** | 에셋 발주 (손님 10종 + 셰프 7명 + 가구) | 대기 | 게이트 문서: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` |
-| Phase C | 챕터별 테마 변주 에셋 + HUD/VFX UI | 미착수 | — |
-| Phase D | 게임 로직 연동 (조리/서빙/골드/셰프 스킬) | 미착수 | — |
-| Phase E | 기존 ServiceScene 마이그레이션 | 미착수 | — |
+| **Phase A** | 기반 시스템 골격 (V10 레이아웃/슬롯/상태머신/깊이정렬) | **완료** | TavernServiceScene.js, tavernLayoutData.js, tavernStateData.js, PIL 더미 13개 |
+| **Phase A-bis** | V12 레이아웃 마이그레이션 (V10 가로 -> V12 4분면 세로) | **완료** | V12 placeholder 5종, 테스트 84/84 PASS |
+| **Phase B** | 에셋 발주 (손님 10종 + 셰프 7명 + V12 규격 가구) | 준비 | 게이트 문서: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격 갱신 필요) |
+| Phase C | 챕터별 테마 변주 에셋 + HUD/VFX UI | 미착수 | -- |
+| Phase D | 게임 로직 연동 (조리/서빙/골드/셰프 스킬) | 미착수 | -- |
+| Phase E | 기존 ServiceScene 마이그레이션 | 미착수 | -- |
 
 페이즈 상세 마스터 플랜: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
 
@@ -323,19 +359,25 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-23 | Phase A-bis V12 마이그레이션 완료 반영. V10 기준 내용을 V12로 전면 갱신 (좌석 구조, 공간 분할, 에셋 규격, 체크리스트). |
 | 2026-04-23 | Phase A 완료 반영. 체크리스트 3항목 체크, 본 구현 진행 상황(§7) 절 추가. |
 | 2026-04-23 | 신규 작성. V10 Travellers Rest 시험 시안 검토 후 채택. SERVICE_SCENE_KAIRO_DIRECTION.md(직전 후보)를 supersede. |
 
 ---
 
-## 부록 A. V10 시험 시안 캡처
+## 부록 A. V12 확정 시안
+
+V12 mockup: `studio-mockup/kitchen-chaos/travellers-v12-mockup.html`
+V12 PIL placeholder 생성 스크립트: `studio-mockup/kitchen-chaos/travellers/gen_v12_placeholders.py`
+
+## 부록 B. V10 시험 시안 (이전 버전, 참고용)
 
 ![V10 mockup](references/v10-tavern-style-mockup.png)
 
 세부 인터랙티브: `studio-mockup/kitchen-chaos/travellers-style-mockup.html`
 PIL placeholder 생성 스크립트: `studio-mockup/kitchen-chaos/travellers/gen_placeholders.py`
 
-## 부록 B. 비교 후보 V9 (카이로 디메트릭, 폐기)
+## 부록 C. 비교 후보 V9 (카이로 디메트릭, 폐기)
 
 ![V9 mockup](references/v9-kairo-style-mockup.png)
 ![Kairo reference](references/kairo-cafeteria-nipponica.jpg)

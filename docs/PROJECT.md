@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (영업씬 태번 스타일 Phase A 완료)
+> 최종 업데이트: 2026-04-23 (영업씬 태번 스타일 Phase A-bis V12 마이그레이션 완료)
 
 ## 프로젝트 개요
 
@@ -137,18 +137,27 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
-### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A 완료, Phase B 대기)
+### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A + A-bis 완료, Phase B 준비)
 
-Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터(V10)로 영업씬 전면 재설계 진행 중. Phase A(기반 시스템 골격)에서 레이아웃 상수, 24석 벤치 슬롯 데이터 모델, 셰프/손님 상태머신 14상태, Y축 단순 깊이정렬을 PIL 더미와 함께 확정. 기존 ServiceScene.js는 미수정, 신규 TavernServiceScene으로 병렬 구현.
+Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계 진행 중. Phase A(기반 시스템 골격, V10)에서 레이아웃 상수, 24석 벤치 슬롯 데이터 모델, 셰프/손님 상태머신 14상태, Y축 단순 깊이정렬을 PIL 더미와 함께 확정. Phase A-bis(V12 마이그레이션)에서 V10 가로 테이블 3세트(8석x3) 구조를 V12 세로 테이블 4분면(6석x4) 구조로 전환. 기존 ServiceScene.js는 미수정(레거시), 신규 TavernServiceScene이 V12 기준 영업씬.
 
 - **신규 파일**: `js/scenes/TavernServiceScene.js`, `js/data/tavernLayoutData.js`, `js/data/tavernStateData.js`
 - **진입점**: `?scene=tavern` URL 파라미터 (디버그 전용)
-- **Phase B 게이트 문서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md`
+- **현재 레이아웃**: V12 (4분면 세로 테이블, quad 100x120px, 세로 통로 20px, 가로 통로 40px)
+- **Phase B 게이트 문서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격으로 갱신 필요)
 - **페이즈 마스터 플랜**: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
 - **방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
 - 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md), [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md)
 
 ## 개발 이력 (최근)
+
+### Phase A-bis — V12 레이아웃 마이그레이션 (2026-04-23)
+
+Phase A의 V10 가로 테이블 3세트(8석x3=24석) 구조를 V12 세로 테이블 4분면(6석x4=24석) 구조로 전면 교체. TABLE_SET_ANCHORS 3엔트리->4엔트리(tl/tr/bl/br quad), BENCH_SLOTS top/bot->left/right, 카운터 24x120->40x100 세로, 셰프 2명 배치, 입구 좌하단(entrance_v12) 추가. V12 PIL placeholder 5종 추가. ServiceScene.js 무손상. 24석 총원 유지.
+
+- QA: PASS (Playwright 84/84, 게이트 12/12)
+- AD 모드3: REVISE (WARN 4건, 모두 Phase B 이후 해소 예정)
+- 스펙: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-spec.md`
 
 ### Phase A — 영업씬 태번 스타일 기반 시스템 골격 (2026-04-23)
 
