@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (Phase 75 행상인 분기 해금 체크)
+> 최종 업데이트: 2026-04-23 (Phase 74 UI/카피 마감)
 
 ## 프로젝트 개요
 
@@ -28,12 +28,12 @@
 |------|------|------|
 | 재료 채집 | GatheringScene.js | 도구 배치/회수/재배치, 적 AI, 재료 드롭, 보스 재료 드롭, 웨이브 진행 |
 | 도구 관리 | ToolManager.js | 영구 도구 인벤토리 (구매/판매/업그레이드/스탯 조회/자동 지급) |
-| 행상인 | MerchantScene.js | 2탭 UI (도구 구매/분기 선택), 도구 구매·판매·업그레이드 + 되돌릴 수 없는 3택 1 분기 카드, 분기 탭 피드백(tint 플래시/출발 disabled/descKo 모달) |
+| 행상인 | MerchantScene.js | 2탭 UI (도구 구매/분기 선택), 도구 구매·판매·업그레이드 + 되돌릴 수 없는 3택 1 분기 카드, 분기 탭 피드백(tint 플래시/출발 disabled/descKo 모달), 도구 추천 배지 3종(초심자 추천/공격 중심/서포트 중심) |
 | 분기 효과 | BranchEffects.js + merchantBranchData.js + chefUnlockHelper.js | 분기 카드 32장 정의(mutation/recipe/bond/blessing × 8), 게임플레이 씬에서 배수·시너지·tint 조회하는 경량 어댑터, `getEligiblePool(category, branchCardsState, progressState)` 선행 해금 필터(셰프·도구·챕터/시즌), 셰프 해금 판별 헬퍼 공용화 |
 | 월드맵 | WorldMapScene.js | 24챕터 3그룹 탭(1~6/7~15/16~24장), 9노드 3x3 맵, 스테이지 패널, 진행률 HUD |
 | 엔드리스 | EndlessScene.js + EndlessWaveGenerator.js + EndlessMissionManager.js | 무한 웨이브 TD, 5웨이브마다 영업+행상인 삽입, 미력 폭풍 이벤트, 정화 임무 4종, 통계 트래킹(폭풍/임무/무결) |
 | 영업 코어 | ServiceScene.js | 손님 입장/주문/조리/서빙/팁, 골드→영구 저장, 아이소메트릭 홀 (3레이어 분리 렌더링+depth sorting+홀 데코), 챕터별 홀 배경 (바닥 8종 tileSprite+뒷벽 8종), 엔드리스 웨이브 구간별 배경 테마 전환, 웜 다크 통합 팔레트, 픽셀아트 렌더링 (fallback 지원) |
-| 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결, modal lock (DialogueScene 오버레이 시 버튼 비활성), isCleared 복합 조건 |
+| 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결, modal lock (DialogueScene 오버레이 시 버튼 비활성), isCleared 복합 조건, 셰프별 장보기 실패 대사 (7셰프 x 3 바리에이션) |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 119종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 120항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
 | 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v24, 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients/endless통계/branchCards 헬퍼, `_currentRun` 인메모리 단일 소스 (씬 간 stageId 전달) |
@@ -62,13 +62,13 @@
 | 캠페인 | 24챕터 체계(그룹1~3), 보스 13종, 별점 시스템 | 완료 |
 | 레시피 | 284종, 5등급, 도감 | 완료 |
 | 셰프 시스템 | 7종 Named 셰프 (미미/린/메이지/유키/라오/앙드레/아르준), 전원 패시브+액티브 스킬, 챕터 기반 잠금 해제, 가로 캐러셀 UI (260x380px 카드, 스와이프/화살표 전환, 순환 탐색) | 완료 |
-| 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원) | 완료 |
+| 상점 | 5탭 (업그레이드/레시피/테이블/인테리어/직원), 인테리어/직원 탭 cardH 112 오버플로우 수정 완료 | 완료 |
 | 영업 심화 | 테이블 8석, 인테리어, 직원 2종, 특수손님, 이벤트 | 완료 |
 | 사운드 | SFX 20종 + BGM 5종, 설정 UI | 완료 |
 | VFX | 파티클, 스크린 효과, 플로팅 텍스트 | 완료 |
 | 엔드리스 모드 | 무한 웨이브 TD, 데일리 스페셜, 로컬 랭킹, 미력 폭풍의 눈 이벤트(15웨이브 배수), 정화 임무 4종, 유랑 미력사 8% 등장, 웨이브 구간별 배경 테마 전환 | 완료 |
 | 월드맵 UI | 24챕터 3그룹 탭(1~6/7~15/16~24장), 9노드 3x3 맵, 스테이지 패널, 진행률 HUD, 엔드리스 섹션 | 완료 |
-| 튜토리얼 개선 | 영업/상점/엔드리스 안내, 1-1~1-3 자동 도구 지급, 개별 플래그 | 완료 |
+| 튜토리얼 개선 | 영업/상점/엔드리스 안내, 1-1~1-3 자동 도구 지급, 개별 플래그, 엔드리스 페이지네이터 도트 인디케이터 | 완료 |
 | UI/UX 폴리시 | 씬 전환, 버튼 스타일, 터치 피드백 통일 | 완료 |
 | 성능 최적화 | 오브젝트 풀링, 불필요 렌더링 제거, 메모리 관리 | 완료 |
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
@@ -77,7 +77,7 @@
 | 영업 씬 비주얼 | 아이소메트릭 홀 (3레이어 분리 렌더링, 테이블 front/back 10종+손님 10종+챕터별 바닥 8종+뒷벽 8종, 홀 데코, depth 체계 정비) | 완료 |
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 그룹3 콘텐츠 (16~24장) | 인도(16~18)/멕시칸(19~21)/디저트·최종(22~24) 아크, 적 14종+보스 3종(maharaja/el_diablo_pepper/queen_of_taste 3페이즈), 레시피 57종, 대화 28종, 전 스테이지(16-1~24-6) 구현, 밸런스 QA 완료 | 완료 |
-| 업적 시스템 | 34개 업적 (5카테고리), 조건 판정+보상(골드/코인/정수), 토스트 알림, 전용 AchievementScene UI | 완료 |
+| 업적 시스템 | 34개 업적 (5카테고리), 조건 판정+보상(골드/코인/정수), 토스트 알림, 전용 AchievementScene UI, 수령 대기 카드 골드 glow + alpha 펄스 | 완료 |
 | 아트 리워크 | 레거시 스프라이트 64px 재생성. Phase 44(적/보스 전종) + Phase 45(셰프 5종) 완료. Phase 46에서 metadata.json 일괄 갱신 + cardamom.png 교체 + 렌더링 검증까지 완결 | 완료 |
 | 애니메이션 시스템 | walk+death 프레임 시퀀스 아키텍처 (SpriteLoader death 로딩/등록, Enemy _animState 상태 머신, 비동기 death anim). 보스 13종+일반 적 42종 전종 death anim 완료 | 완료 |
 | 미력의 정수 코어 | mireukEssence 화폐 세이브 v18, mireuk_traveler 특수 손님 (정수 드롭 1~3), HUD 보유량 표시, VFX 플로팅 텍스트, spendMireukEssence 소비 메서드 | 완료 |
@@ -135,6 +135,14 @@
 - 신규 테스트: `phase75-merchant-branch-filter-qa.spec.js` (27건), `phase58-qa-integration.spec.js` 신 시그니처로 업데이트 (회귀 해소)
 - QA: Playwright 54/54 PASS (Phase 75 27 + Phase 58 회귀 27), 콘솔 에러 0건
 - 스펙: `.claude/specs/2026-04-23-kc-phase75-spec.md`
+
+### Phase 74 — UI/카피 마감 P2-4~7 (2026-04-23)
+
+P2-4~7 해결. 5개 독립 UI/카피 작업 일괄 구현. EndlessScene 튜토리얼에 페이지네이터 도트 인디케이터 추가(TutorialManager _render() 확장). ResultScene 셰프별 장보기 실패 대사 21줄+폴백 3줄 상수화. MerchantScene 도구 카드에 추천 배지 3종(초심자 추천/공격 중심/서포트 중심) 추가. AchievementScene 수령 대기 카드 panel_glow_selected + alpha 펄스 tween. ShopScene 인테리어/직원 탭 cardH 90->112 오버플로우 수정.
+
+- 수정 파일: TutorialManager.js, EndlessScene.js, ResultScene.js, MerchantScene.js, AchievementScene.js, ShopScene.js
+- QA: PASS (구현 코드 전수 정상, AD3 APPROVED)
+- 스펙: `.claude/specs/2026-04-23-kc-phase74-spec.md`
 
 ### Phase 73 — 세이브 백업 + 포트레이트 정합 (2026-04-23)
 

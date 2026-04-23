@@ -1,5 +1,75 @@
 # Changelog
 
+## [Phase 74] 2026-04-23 -- UI/카피 마감 (P2-4~7 묶음)
+
+### 개요
+
+P2 품질 보강 마지막 묶음. 5개 독립 UI/카피 결함을 하나의 페이즈에서 해소. EndlessScene 튜토리얼 페이지네이터 명확화, 셰프별 실패 대사 다양화, 행상인 도구 카드 추천 배지, 업적 수령 대기 카드 골드 glow, ShopScene 인테리어/직원 탭 오버플로우 수정. 이로써 P2 품질 보강 트랙이 전수 완료되어 P3(BM/리텐션) 트랙 진입 전제 조건이 충족됨.
+
+### 추가
+
+- `kitchen-chaos/js/managers/TutorialManager.js` -- `_render()`에 페이지네이터 도트 인디케이터 추가
+  - PANEL_H 68->80 확장, 힌트 텍스트 y-offset 상향(-10->-14)
+  - 활성 도트 `●` (#ffdd88) / 비활성 도트 `○` (#888888), 도트 간격 14px, 도트 행 y=OVERLAY_CY+28
+  - 도트 오브젝트를 destroy에 통합
+
+- `kitchen-chaos/js/scenes/ResultScene.js` -- 셰프별 장보기 실패 대사
+  - `CHEF_FAIL_LINES` 상수: 7셰프(mimi/rin/mage/yuki/lao/andre/arjun) x 3바리에이션 = 21줄
+  - `CHEF_FAIL_FALLBACK`: 알 수 없는 셰프 ID용 폴백 대사 3줄
+  - `_createMarketFailedView()`에서 `SaveManager.load()?.selectedChef` 기반 랜덤 대사 선택
+  - 색상 #ffccaa, fontSize 15px, wordWrap width GAME_WIDTH-40
+
+- `kitchen-chaos/js/scenes/MerchantScene.js` -- 도구 추천 배지 3종
+  - `TOOL_BADGE_LABEL`: 8종 도구 -> 배지 레이블 매핑 (pan/salt: 초심자 추천, grill/freezer/wasabi_cannon/spice_grinder: 공격 중심, delivery/soup_pot: 서포트 중심)
+  - `TOOL_BADGE_TINT`: 초심자 추천 0x22aa44 / 공격 중심 0xcc4422 / 서포트 중심 0x2255cc
+  - NineSliceFactory.raw + setTint + 텍스트 레이블 구현 (신규 PNG 에셋 없음)
+  - AD3 1차 REVISE: 배지 위치를 카드 우하단에서 헤더 라인 우측(infoBtnY)으로 이동, 폭 72->64
+
+- `kitchen-chaos/js/scenes/AchievementScene.js` -- 수령 대기 카드 골드 glow
+  - `isClaiming = unlocked && !claimed` 플래그 추가
+  - 수령 대기 시 `panel_glow_selected` 텍스처로 배경 교체 (기존 parchment + tint 대신)
+  - alpha 펄스 tween: 0.7<->1.0, 1200ms, yoyo, Sine.easeInOut
+  - 진행 바는 미달성 분기에서만 렌더되는 기존 구조상 추가 숨김 코드 불필요
+
+### 변경
+
+- `kitchen-chaos/js/scenes/EndlessScene.js`
+  - 튜토리얼 steps 배열에서 `'1/3 '`, `'2/3 '`, `'3/3 '` 접두어 제거 — TutorialManager 페이지네이터가 담당
+
+- `kitchen-chaos/js/scenes/ShopScene.js`
+  - `_renderInteriorShop()`: cardH 90->112, 업그레이드 버튼 y+62->y+74, 다음 효과 미리보기 y+65->y+80
+  - `_renderStaffShop()`: cardH 90->112, 구매 버튼 y+55->y+72, 가격 설명 y+52->y+55
+  - 유랑 미력사 섹션 Y는 cardH 변수 참조로 자동 재조정 (수동 수정 불필요)
+  - 다른 탭(업그레이드 cardH=75, 테이블 cardH=65) 미변경
+
+### 스펙 대비 변경
+
+- T3(행상인 배지): 스펙에서는 카드 우하단(yOff+ITEM_HEIGHT-20, 폭 72x18) 배치를 지정했으나, AD3 1차 검수에서 업그레이드 버튼과 겹침이 발견되어 헤더 라인 우측(infoBtnY, 폭 64)으로 위치 변경됨. AD3 2차 검수에서 APPROVED.
+- 기타 T1/T2/T4/T5: 스펙과 동일하게 구현.
+
+### 알려진 이슈
+
+- 신규 Playwright 테스트 32건 중 6건 어서션 결함: T4 텍스처 키 매핑 검사 방식 3건 + T5 정규식 매칭 3건. 구현 코드는 정상 동작. 테스트 어서션 정비 권장.
+- `tests/phase67-ad3-capture.spec.js` CommonJS require() 사용 ESM 환경 실패 (기존, Phase 74 무관)
+
+### 검증
+
+- QA: **PASS** — 구현 코드 5건 전수 정상 동작
+- AD3: **APPROVED** (T3 1차 REVISE 반영 후 2차 APPROVED)
+- 캡처 스크린샷: phase74-t1-step0/step1-tutorial.png, phase74-t2-result-failed.png, phase74-t3-merchant-badge.png, phase74-t5a-shop-interior-fix.png, phase74-t5b-shop-staff-fix.png
+- 회귀: 기존 phase70~73 테스트 영향 없음, 콘솔 에러 0건
+- SaveManager v24 유지 (변경 없음)
+- 신규 PNG 에셋 없음
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase74-spec.md`
+- 코더 리포트: `.claude/specs/2026-04-23-kc-phase74-coder-report.md`
+- QA: `.claude/specs/2026-04-23-kc-phase74-qa.md`
+- AD3: `.claude/specs/2026-04-23-kc-phase74-ad3.md`
+
+---
+
 ## [Phase 75] 2026-04-23 -- 행상인 분기 카드 풀 선행 해금 체크 (fix)
 
 ### 개요
