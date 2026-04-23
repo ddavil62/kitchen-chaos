@@ -1,7 +1,8 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase A-bis V12.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-3.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12: 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
+ * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
  *
  * 기존 ServiceScene.js와 완전 독립. import/참조/코드 복사 없음.
  * 공용 import(Phaser, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY)만 사용.
@@ -68,6 +69,14 @@ const REAL_KEY_MAP = Object.freeze({
   'tavern_dummy_customer_seated_up':   'tavern_customer_normal_seated_left',
   'tavern_dummy_chef_idle_side':       'tavern_chef_mimi_idle_side',
   'tavern_dummy_chef2_idle_side':      'tavern_chef_rin_idle_side',  // Phase B-2: 두 번째 셰프 린
+  // Phase B-3: 데모 4종 손님 (vip/gourmet/rushed) — normal은 기존 재활용
+  'tavern_dummy_customer_vip_seated_down':     'tavern_customer_vip_seated_right',
+  'tavern_dummy_customer_vip_seated_up':       'tavern_customer_vip_seated_left',
+  'tavern_dummy_customer_gourmet_seated_down': 'tavern_customer_gourmet_seated_right',
+  'tavern_dummy_customer_gourmet_seated_up':   'tavern_customer_gourmet_seated_left',
+  'tavern_dummy_customer_rushed_seated_down':  'tavern_customer_rushed_seated_right',
+  'tavern_dummy_customer_rushed_seated_up':    'tavern_customer_rushed_seated_left',
+  // Phase D 예정: group/critic/regular/student/traveler/business 매핑 + 셰프 5명 매핑
 });
 
 // V12 술통 위치 (카운터 좌측 하단 주방 내)
@@ -75,6 +84,10 @@ const BARREL_POSITIONS = [
   { x: 20, y: 160 },
   { x: 50, y: 160 },
 ];
+
+// ── B-3 데모: 4명 손님 슬롯에 4종 타입 1:1 배치 ──
+// Phase D에서 랜덤 spawn 및 type별 게임 로직 연동으로 교체 예정
+const DEMO_CUSTOMER_TYPES = ['normal', 'vip', 'gourmet', 'rushed'];
 
 export class TavernServiceScene extends Phaser.Scene {
   constructor() {
@@ -116,11 +129,37 @@ export class TavernServiceScene extends Phaser.Scene {
         'bench_vertical_l_v12',  // 14x76px
         'bench_vertical_r_v12',  // 14x76px
         'entrance_v12',          // 32x40px
-        // 캐릭터 4종 (B-2: chef_rin 추가)
+        // 캐릭터 4종 (B-2 기존)
         'customer_normal_seated_right',  // 16x22px
-        'customer_normal_seated_left',   // 16x22px
+        'customer_normal_seated_left',   // 16x22px (B-3 W-1 재발주 파일 교체)
         'chef_mimi_idle_side',           // 16x24px
         'chef_rin_idle_side',            // 16x24px (Phase B-2)
+        // B-3 신규: 손님 9종 seated_right (9개)
+        'customer_vip_seated_right',
+        'customer_gourmet_seated_right',
+        'customer_rushed_seated_right',
+        'customer_group_seated_right',
+        'customer_critic_seated_right',
+        'customer_regular_seated_right',
+        'customer_student_seated_right',
+        'customer_traveler_seated_right',
+        'customer_business_seated_right',
+        // B-3 신규: 손님 9종 seated_left (9개)
+        'customer_vip_seated_left',
+        'customer_gourmet_seated_left',
+        'customer_rushed_seated_left',
+        'customer_group_seated_left',
+        'customer_critic_seated_left',
+        'customer_regular_seated_left',
+        'customer_student_seated_left',
+        'customer_traveler_seated_left',
+        'customer_business_seated_left',
+        // B-3 신규: 셰프 5명 idle_side (5개)
+        'chef_mage_idle_side',
+        'chef_yuki_idle_side',
+        'chef_lao_idle_side',
+        'chef_andre_idle_side',
+        'chef_arjun_idle_side',
       ];
       for (const name of realAssets) {
         this.load.image(`tavern_${name}`, `${realPath}${name}.png`);
@@ -173,10 +212,14 @@ export class TavernServiceScene extends Phaser.Scene {
       window.__CustomerState = CustomerState;
       window.__tavernAssetMode = ASSET_MODE; // Phase B-1 테스트용
 
-      // Phase B-2: 스프라이트 타입 진단 노출
+      // Phase B-3: 스프라이트 타입 진단 노출 (customerType 포함)
       window.__tavernSpriteTypes = {
         chefs: this._chefs.map(c => ({ type: c.sprite.type, textureKey: c.sprite.texture?.key || null })),
-        customers: this._customers.map(c => ({ type: c.sprite.type, textureKey: c.sprite.texture?.key || null })),
+        customers: this._customers.map(c => ({
+          type: c.sprite.type,
+          textureKey: c.sprite.texture?.key || null,
+          customerType: c.customerType || 'normal',
+        })),
       };
     }
   }
@@ -457,6 +500,7 @@ export class TavernServiceScene extends Phaser.Scene {
 
   /**
    * 손님 4명을 초기 배치한다.
+   * B-3: DEMO_CUSTOMER_TYPES에 따라 각 슬롯에 다른 타입을 1:1 배치.
    * 짝수 인덱스 손님은 facing-down 순환, 홀수는 facing-up 순환.
    * 탭하면 상태 순환.
    * @private
@@ -476,11 +520,16 @@ export class TavernServiceScene extends Phaser.Scene {
       const initState = CustomerState.QUEUE;
       const color = CUSTOMER_STATE_COLORS[initState];
 
+      // B-3: 슬롯별 손님 타입 결정
+      const customerType = DEMO_CUSTOMER_TYPES[i] || 'normal';
+
       const x = queueBaseX - i * queueSpacing;
       const y = queueBaseY + i * 4;  // 약간씩 y를 달리하여 depth 차이 보여줌
 
-      // Phase B-2: _placeImageOrRect 경로로 전환 (초기 상태: seated_right 기본값)
-      const dummyKey = 'tavern_dummy_customer_seated_down';
+      // B-3: customerType별 더미 키 분기 (REAL_KEY_MAP으로 실 에셋 변환)
+      const dummyKey = customerType === 'normal'
+        ? 'tavern_dummy_customer_seated_down'
+        : `tavern_dummy_customer_${customerType}_seated_down`;
       const sprite = this._placeImageOrRect(
         dummyKey, x - 16, y - 44, 32, 44, color,
       ).setOrigin(0.5, 1).setInteractive().setDepth(y);
@@ -502,6 +551,7 @@ export class TavernServiceScene extends Phaser.Scene {
         cycleIdx: 1,  // QUEUE는 cycle[1]
         slotRef: null,
         id: `customer-${i}`,
+        customerType,  // B-3: 손님 타입 저장
       };
 
       // 탭 이벤트: 상태 순환
@@ -545,11 +595,12 @@ export class TavernServiceScene extends Phaser.Scene {
           cust.label.y = pos.y + 4;
         }
       }
-      // Phase B-2: SIT 방향에 따라 seated 텍스처 교체
+      // B-3: SIT 방향 + customerType에 따라 seated 텍스처 동적 교체
       if (ASSET_MODE === 'real' && cust.sprite.type === 'Image') {
+        const typeKey = cust.customerType || 'normal';
         const sitKey = nextState === CustomerState.SIT_DOWN
-          ? 'tavern_customer_normal_seated_right'   // 좌측 벤치, facing-right
-          : 'tavern_customer_normal_seated_left';    // 우측 벤치, facing-left
+          ? `tavern_customer_${typeKey}_seated_right`   // 좌측 벤치, facing-right
+          : `tavern_customer_${typeKey}_seated_left`;    // 우측 벤치, facing-left
         if (this.textures.exists(sitKey)) {
           cust.sprite.setTexture(sitKey);
         }

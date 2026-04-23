@@ -118,11 +118,14 @@ test.describe('Phase B-2: 손님 스프라이트 렌더링', () => {
     }
   });
 
-  test('손님 초기 텍스처가 seated_right(facing-down 기본)이다', async ({ page }) => {
+  test('손님 초기 텍스처가 각 타입의 seated_right이다', async ({ page }) => {
     await waitForTavernScene(page);
     const spriteTypes = await page.evaluate(() => window.__tavernSpriteTypes);
-    for (const cust of spriteTypes.customers) {
-      expect(cust.textureKey).toBe('tavern_customer_normal_seated_right');
+    // B-3: DEMO_CUSTOMER_TYPES = ['normal', 'vip', 'gourmet', 'rushed']
+    const expectedTypes = ['normal', 'vip', 'gourmet', 'rushed'];
+    for (let i = 0; i < spriteTypes.customers.length; i++) {
+      const type = expectedTypes[i] || 'normal';
+      expect(spriteTypes.customers[i].textureKey).toBe(`tavern_customer_${type}_seated_right`);
     }
   });
 });
