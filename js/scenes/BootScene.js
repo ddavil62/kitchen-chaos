@@ -70,6 +70,8 @@ export class BootScene extends Phaser.Scene {
       'mission_icon_recipe', 'mission_icon_endless', 'mission_icon_satisfaction',
       'mission_icon_three_star', 'calendar_slot_locked', 'calendar_slot_claimed',
       'calendar_slot_today',
+      // Phase 75B 핫픽스 — 보상 카드 아이콘 (20×20)
+      'icon_reward_kitchencoin', 'icon_reward_mireuk', 'icon_reward_coupon',
     ];
     for (const name of MISSION_ICONS) {
       this.load.image(name, `${MISSION_ROOT}/${name}.png`);

@@ -482,7 +482,7 @@ export class MenuScene extends Phaser.Scene {
     this._missionTabContent.removeAll(true);
 
     const state = LoginBonusManager.getLoginBonusState();
-    const startY = cy - modalH / 2 + 80;
+    const startY = cy - modalH / 2 + 78;
 
     // 타이틀
     const title = this.add.text(cx, startY, `\uC5F0\uC18D \uB85C\uADF8\uC778: ${state.loginStreak}\uC77C\uCC28`, {
@@ -491,46 +491,117 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this._missionTabContent.add(title);
 
-    // 7일 슬롯 배열 (2행 구성: 상단 4개, 하단 3개)
-    const SLOT_SIZE = 32;
-    const SLOT_GAP = 8;
-    const SLOTS_PER_ROW_TOP = 4;
-    const SLOTS_PER_ROW_BOTTOM = 3;
+    // ── Phase 75B 핫픽스: 7일 세로 카드 리스트 (대안 B) ──
+    const CARD_W = 264;
+    const CARD_H = 38;
+    const CARD_GAP = 4;
+    const cardX = cx;
+    const listStartY = startY + 22;
 
-    // 상단 4슬롯
-    const topRowW = SLOTS_PER_ROW_TOP * (SLOT_SIZE + SLOT_GAP) - SLOT_GAP;
-    const topStartX = cx - topRowW / 2 + SLOT_SIZE / 2;
-    const row1Y = startY + 50;
-
-    for (let day = 1; day <= 4; day++) {
-      const slotX = topStartX + (day - 1) * (SLOT_SIZE + SLOT_GAP);
-      this._renderCalendarSlot(slotX, row1Y, day, state, SLOT_SIZE);
-    }
-
-    // 하단 3슬롯
-    const bottomRowW = SLOTS_PER_ROW_BOTTOM * (SLOT_SIZE + SLOT_GAP) - SLOT_GAP;
-    const bottomStartX = cx - bottomRowW / 2 + SLOT_SIZE / 2;
-    const row2Y = row1Y + SLOT_SIZE + SLOT_GAP + 30;
-
-    for (let day = 5; day <= 7; day++) {
-      const slotX = bottomStartX + (day - 5) * (SLOT_SIZE + SLOT_GAP);
-      this._renderCalendarSlot(slotX, row2Y, day, state, SLOT_SIZE);
-    }
-
-    // 보상 목록 (각 날짜별 보상 텍스트)
-    const listStartY = row2Y + SLOT_SIZE / 2 + 30;
     for (let i = 0; i < LOGIN_REWARDS.length; i++) {
       const r = LOGIN_REWARDS[i];
-      const isClaimed = state.claimedDays.includes(r.day);
-      const isToday = state.loginStreak === r.day || (state.loginStreak === 0 && r.day === 1);
-      const color = isClaimed ? '#88ff88' : isToday ? '#ffdd88' : '#888888';
-      const prefix = isClaimed ? '\u2714' : isToday ? '\u25B6' : '\u25CB';
+      const day = r.day;
+      const cardY = listStartY + i * (CARD_H + CARD_GAP) + CARD_H / 2;
+      const isClaimed = state.claimedDays.includes(day);
+      const isToday = (state.loginStreak === day) ||
+                      (state.loginStreak === 0 && day === 1 && state.lastLoginDate !== DailyMissionManager._getDateKey());
+      this._renderCalendarCard(cardX, cardY, CARD_W, CARD_H, day, r, { isClaimed, isToday });
+    }
+  }
 
-      const rowText = this.add.text(cx, listStartY + i * 22, `${prefix} D${r.day}: ${r.descKo}`, {
-        fontSize: '12px', color,
-        stroke: '#000', strokeThickness: 1,
-      }).setOrigin(0.5);
-      this._missionTabContent.add(rowText);
+  /**
+   * 캘린더 카드 1행을 렌더링한다 (Phase 75B 핫픽스 — 대안 B).
+   * 좌측 배지(Dn + 상태 아이콘) | 중앙 보상명 | 우측 보상 아이콘 + 수량
+   * @param {number} cx - 카드 중심 X
+   * @param {number} cy - 카드 중심 Y
+   * @param {number} w - 카드 너비
+   * @param {number} h - 카드 높이
+   * @param {number} day - 날짜 1~7
+   * @param {object} reward - LOGIN_REWARDS 항목
+   * @param {{isClaimed: boolean, isToday: boolean}} status
+   * @private
+   */
+  _renderCalendarCard(cx, cy, w, h, day, reward, status) {
+    const { isClaimed, isToday } = status;
+    const isSpecial = day === 7;
+
+    // 카드 배경 (NineSlice panel dark + tint)
+    let bgTint;
+    if (isClaimed) bgTint = 0x2a4a2a;
+    else if (isToday) bgTint = 0xcc7700;
+    else if (isSpecial) bgTint = 0x3a1a55;
+    else bgTint = 0x1a1a22;
+
+    const bg = NineSliceFactory.panel(this, cx, cy, w, h, 'dark');
+    bg.setTint(bgTint);
+    bg.setAlpha(isToday ? 0.95 : 0.78);
+    this._missionTabContent.add(bg);
+
+    // 좌측 배지 (Dn 라벨 영역)
+    const badgeX = cx - w / 2 + 26;
+    const badgeBg = this.add.rectangle(badgeX, cy, 38, h - 8, isToday ? 0xffcc44 : isClaimed ? 0x4a8a4a : 0x444455, 1)
+      .setStrokeStyle(1, 0x000000, 0.5);
+    this._missionTabContent.add(badgeBg);
+
+    const dayLabel = this.add.text(badgeX, cy - 6, `D${day}`, {
+      fontSize: '13px', fontStyle: 'bold',
+      color: isToday ? '#3a1a00' : isClaimed ? '#ffffff' : '#aaaaaa',
+    }).setOrigin(0.5);
+    this._missionTabContent.add(dayLabel);
+
+    // 상태 마커 (체크/잠금/오늘)
+    const marker = this.add.text(badgeX, cy + 8, isClaimed ? '\u2714' : isToday ? '\u25C6' : '\uD83D\uDD12', {
+      fontSize: '9px',
+      color: isToday ? '#3a1a00' : isClaimed ? '#88ff88' : '#888888',
+    }).setOrigin(0.5);
+    this._missionTabContent.add(marker);
+
+    // 중앙 보상명
+    const titleColor = isClaimed ? '#aaffaa' : isToday ? '#ffffff' : isSpecial ? '#d8b4ff' : '#ddddcc';
+    const nameText = this.add.text(cx - w / 2 + 56, cy - 6, reward.descKo, {
+      fontSize: '12px', fontStyle: 'bold', color: titleColor,
+      stroke: '#000', strokeThickness: 1,
+    }).setOrigin(0, 0.5);
+    this._missionTabContent.add(nameText);
+
+    // 보조 라벨 (상태)
+    const subColor = isClaimed ? '#88dd88' : isToday ? '#ffeecc' : isSpecial ? '#bb88ee' : '#888888';
+    const subLabel = isClaimed ? '\uC218\uB839 \uC644\uB8CC' : isToday ? '\uC624\uB298 \uC218\uB839!' : isSpecial ? '\u2605 \uC2A4\uD398\uC15C' : '\uC7A0\uAE40';
+    const subText = this.add.text(cx - w / 2 + 56, cy + 9, subLabel, {
+      fontSize: '10px', color: subColor,
+    }).setOrigin(0, 0.5);
+    this._missionTabContent.add(subText);
+
+    // 우측 보상 아이콘 + 수량
+    const iconKey = this._getRewardIconKey(reward.type);
+    const iconX = cx + w / 2 - 50;
+    if (iconKey && this.textures.exists(iconKey)) {
+      const icon = this.add.image(iconX, cy, iconKey).setOrigin(0.5);
+      icon.setDisplaySize(20, 20);
+      this._missionTabContent.add(icon);
+    }
+
+    const amountText = this.add.text(cx + w / 2 - 14, cy, `\u00D7${reward.amount}`, {
+      fontSize: '13px', fontStyle: 'bold',
+      color: isClaimed ? '#88ff88' : isToday ? '#ffeecc' : '#ffcc44',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(1, 0.5);
+    this._missionTabContent.add(amountText);
+  }
+
+  /**
+   * 보상 타입별 아이콘 텍스처 키를 반환한다.
+   * @param {string} type
+   * @returns {string|null}
+   * @private
+   */
+  _getRewardIconKey(type) {
+    switch (type) {
+      case 'gold': return 'mission_icon_gold';
+      case 'kitchenCoins': return 'icon_reward_kitchencoin';
+      case 'mireukEssence': return 'icon_reward_mireuk';
+      case 'mimiSkinCoupons': return 'icon_reward_coupon';
+      default: return null;
     }
   }
 
