@@ -1,9 +1,9 @@
 # Kitchen Chaos -- 영업씬 태번 스타일 재설계 페이즈 마스터 플랜
 
-> 최종 업데이트: 2026-04-23 (Phase A + A-bis 완료, V12 레이아웃 확정)
+> 최종 업데이트: 2026-04-24 (Phase A + A-bis + B-1 + B-2 완료, Phase B-3 준비)
 > 관련 문서:
 > - [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md) -- 방향성/핵심 원칙 (V12 기준)
-> - `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- Phase B 진입 게이트 에셋 발주 규격서 (V12 규격 갱신 필요)
+> - `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- Phase B 에셋 발주 규격서 (V12 규격 갱신 완료)
 
 ---
 
@@ -15,7 +15,9 @@
 |--------|------|-----------|------|
 | **A** | 기반 시스템 골격 | 레이아웃 상수(V10), 슬롯 데이터 모델, 상태머신 키, 깊이정렬, PIL 더미 | **완료** |
 | **A-bis** | V12 레이아웃 마이그레이션 | V10 가로 3세트 -> V12 4분면 세로, V12 placeholder 5종, 테스트 84/84 | **완료** |
-| **B** | 에셋 발주 | 손님 10종 + 셰프 7명 + V12 규격 가구 스프라이트 PixelLab/SD 발주 및 교체 | 준비 |
+| **B-1** | 실 에셋 1세트 발주 | 손님 seated 2종 + 셰프 미미 idle + 가구 5종 PixelLab 발주, ASSET_MODE 토글 통합 | **완료** |
+| **B-2** | WARN 해소 + 스프라이트 전환 | 에셋 4종 재발주/신규(seated_left/bench L,R/chef_rin), 셰프+손님 Image 렌더링, vite 빌드 위생 | **완료** |
+| **B-3+** | 에셋 확장 발주 | 손님 9종 추가 seated + 셰프 5명 idle + walk 시트 + 업그레이드 가구 | 준비 |
 | **C** | 테마 변주 + UI | 챕터별 바닥/벽/소품 8세트, 인내심 게이지, 말풍선, 골드 플로팅 HUD/VFX | 미착수 |
 | **D** | 게임 로직 연동 | 조리 슬롯, 레시피 선택, 골드 획득, 셰프 스킬, 손님 AI, 인내심 감소 | 미착수 |
 | **E** | 마이그레이션 | 기존 ServiceScene -> TavernServiceScene 교체, 레거시 자산 정리 | 미착수 |
@@ -112,46 +114,130 @@ PASS (84/84 테스트, 게이트 12/12). AD 모드3 REVISE (WARN 4건, 모두 Ph
 
 ---
 
-## Phase B -- 에셋 발주 (준비)
-
-### 진입 조건
-
-- [x] Phase A 완료
-- [x] Phase A-bis V12 마이그레이션 완료 (Phase B 에셋 규격이 V12 기준으로 확정)
-- [x] Phase B 진입 게이트 에셋 발주 규격서 존재 (`.claude/specs/2026-04-23-kc-phase-b-asset-spec.md`)
-- [ ] Phase B 규격서를 V12 수치로 갱신 (카운터 40x100, 벤치 14x76, 테이블 44x72, 입구 32x40 등)
+## Phase B-1 -- 실 에셋 1세트 발주 (완료)
 
 ### 범위
 
-- B1: 손님 10종 사이드뷰 스프라이트 발주 (걷기 4방향 + seated_left/right = 40장)
-- B2: 셰프 7명 사이드뷰 스프라이트 발주 (idle/walk/carry/cook/serve = 49장)
-- B3: V12 규격 가구 발주 (세로 벤치 14x76, 세로 테이블 44x72, 카운터 40x100, 입구 32x40, 술통)
-- B4: V12 PIL placeholder를 실제 에셋으로 교체, TavernServiceScene에서 렌더링 검증
+PixelLab으로 최소 1세트(normal 손님 seated 2장 + 미미 셰프 idle_side 1장 + V12 가구 5종)를 발주하여, Phase B 파이프라인(발주 -> 후처리 -> 통합 -> 검증)이 정상 동작함을 확인. 동시에 규격서 V10 잔재 7개소를 V12로 갱신.
 
-### V12 에셋 규격 (Phase A-bis 확정값)
+### 산출물
 
-| 에셋 | 크기 | 비고 |
-|------|------|------|
-| 세로 벤치 (lv0) | 14x76px | bench_vertical_l/r, facing 방향 구분 필요 |
-| 세로 테이블 (lv0) | 44x72px | table_vertical |
-| 카운터 | 40x100px | 세로 배치 |
-| 입구 | 32x40px | 좌하단 |
-| 술통 | 32x40px | 주방 소품 |
+| 파일 | 역할 |
+|------|------|
+| `assets/tavern/customer_normal_seated_right.png` (16x22) | 일반 손님 우향 앉기 |
+| `assets/tavern/customer_normal_seated_left.png` (16x22) | 일반 손님 좌향 앉기 |
+| `assets/tavern/chef_mimi_idle_side.png` (16x24) | 셰프 미미 idle |
+| `assets/tavern/counter_v12.png` (40x100) | 실 에셋 카운터 |
+| `assets/tavern/table_vertical_v12.png` (44x72) | 실 에셋 세로 테이블 |
+| `assets/tavern/bench_vertical_l_v12.png` (14x76) | 실 에셋 좌측 벤치 |
+| `assets/tavern/bench_vertical_r_v12.png` (14x76) | 실 에셋 우측 벤치 |
+| `assets/tavern/entrance_v12.png` (32x40) | 실 에셋 입구 |
+| `tests/phase-b1-asset-load.spec.js` (19개) | Playwright 테스트 |
 
-### 발주 도구 (방향성 문서 SS5-4 기준)
+### 게이트 충족 상태
 
-| 종류 | 우선 도구 |
-|------|----------|
-| 손님 걷기 시트 | PixelLab character (mode: standard, n_directions: 4) |
-| 손님 앉기 | PixelLab character (custom action) |
-| 셰프 포즈 | PixelLab character + animate_character |
-| 가구 | PixelLab tiles_pro (square_topdown) |
-| 소품 | PixelLab map_object |
+- [x] 에셋 8종 native 크기 정확 일치 (0px 오차)
+- [x] ASSET_MODE='real' 토글로 실 에셋/PIL placeholder 전환
+- [x] 가구 5종 실 에셋 렌더링 확인
+- [x] 캐릭터 3종 텍스처 로드 확인 (스프라이트 전환은 B-2)
+- [x] tavern_dummy/ 보존, 두 세트 공존
+- [x] ServiceScene.js 무손상 (git diff 0줄)
+- [x] Playwright 46/46 PASS
+
+### QA 결과
+
+PASS (46/46 테스트, SC-1~SC-5 전항목 충족).
+
+### Phase B-2에서 해소된 사항
+
+- ~~손님 seated_left 셔츠 색상 불일치 (AD2 WARN-1)~~ -- 부분 개선 (0% -> 19.2% teal), WARN-1 잔여 -> B-3에서 완전 해소
+- ~~벤치 14px crop 음영 약화 (AD2 WARN-2/3)~~ -- NEAREST 가로 스케일 다운 방식으로 **해소** (W-2 33.6%, W-3 67.4% 어둡)
+- ~~chef-1 placeholder 잔존 (AD3 WARN-1)~~ -- chef_rin_idle_side.png 발주로 **해소**
+- ~~캐릭터 스프라이트 전환~~ -- `_buildChef()`/`_buildCustomers()` -> `_placeImageOrRect()` 경로 전환 **완료**
+- ~~`_postprocess.py`/`_raw/` 프로덕션 빌드 제외 필터~~ -- vite.config.js COPY_DIR_EXCLUDE/COPY_FILE_EXCLUDE **완료**
+
+### Phase B-3 이후 해소 예정 사항
+
+- seated_left 셔츠 청록 완전 일치 (WARN-1 잔여, size=44 큰 캔버스 또는 PIL 마스킹)
+- 술통(barrel) 실 에셋 발주
+- write_ad2_report.py untracked 파일 정리
+
+### 스펙/리포트
+
+- 목적: `.claude/specs/2026-04-23-kc-phase-b1-asset-scope.md`
+- 스펙: `.claude/specs/2026-04-23-kc-phase-b1-asset-spec.md`
+- AD 모드1: `.claude/specs/2026-04-23-kc-phase-b1-ad1.md`
+- Coder 리포트: `.claude/specs/2026-04-23-kc-phase-b1-coder-report.md`
+- AD 모드2: `.claude/specs/2026-04-23-kc-phase-b1-ad2.md`
+- AD 모드3: `.claude/specs/2026-04-23-kc-phase-b1-ad3.md`
+- QA: `.claude/specs/2026-04-23-kc-phase-b1-qa.md`
+
+---
+
+## Phase B-2 -- B-1 WARN 해소 + 스프라이트 전환 (완료)
+
+### 범위
+
+B-1 조건부 승인 WARN 4건(seated_left 셔츠 색상, 벤치 음영 x2, 셰프 placeholder)을 에셋 4종 재발주/신규 발주로 해소. `_buildChef()`/`_buildCustomers()`를 `_placeImageOrRect()` 경로로 전환하여 셰프+손님이 실 Image 오브젝트로 렌더링. vite 빌드에서 `_raw/` + `.py` 제외.
+
+### 산출물
+
+| 파일 | 역할 |
+|------|------|
+| `assets/tavern/chef_rin_idle_side.png` (16x24) | 두 번째 셰프 린 idle (W-4 해소) |
+| `assets/tavern/customer_normal_seated_left.png` (16x22) | 재발주 (W-1 부분 개선) |
+| `assets/tavern/bench_vertical_l_v12.png` (14x76) | 재발주 NEAREST 스케일 다운 (W-2 해소) |
+| `assets/tavern/bench_vertical_r_v12.png` (14x76) | 재발주 NEAREST 스케일 다운 (W-3 해소) |
+| `assets/tavern/_postprocess_b2.py` | B-2 후처리 스크립트 |
+| `tests/phase-b2-sprite-transition.spec.js` (15개) | 스프라이트 전환 Playwright 테스트 |
+
+### 게이트 충족 상태
+
+- [x] 에셋 4종 native 크기 정확 일치 (0px 오차)
+- [x] REAL_KEY_MAP 9개 매핑 (chef2 추가)
+- [x] `_buildChef()` / `_buildCustomers()` 내 `add.rectangle` 직접 호출 0건
+- [x] 셰프 2명(린 idx=0, 미미 idx=1) Image 타입 렌더링
+- [x] 손님 Image 타입 렌더링 + SIT 텍스처 교체
+- [x] vite build 산출물에 `_raw/` + `.py` 미포함
+- [x] ServiceScene.js diff 0줄, scaleX/flipX 0건, tavern_dummy/ 변경 0건
+- [x] Playwright 114/118 PASS (실패 4건 cold-start 인프라)
+
+### QA 결과
+
+PASS (114/118 테스트, SC-1 PARTIAL + SC-2~SC-7 PASS). B-2 회귀 0건.
+
+### 스펙/리포트
+
+- 목적: `.claude/specs/2026-04-24-kc-phase-b2-scope.md`
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b2-spec.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b2-ad1.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b2-coder-report.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b2-ad2.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b2-qa.md`
+
+---
+
+## Phase B-3+ -- 에셋 확장 발주 (준비)
+
+### 진입 조건
+
+- [x] Phase B-1 완료 (발주 파이프라인 검증)
+- [x] Phase B-2 완료 (스프라이트 전환 검증, WARN 해소)
+- [ ] 사용자 최종 승인
+
+### 범위
+
+- seated_left 셔츠 청록 완전 일치 (WARN-1 해소: size=44 큰 캔버스 또는 PIL 마스킹)
+- 손님 9종 추가 seated_right/seated_left 발주 (vip~business, 18장)
+- 셰프 5명 추가 idle 발주 (메이지~아르준, 5장)
+- 손님 10종 walk_l/walk_r 애니메이션 시트 발주 (20장)
+- lv3/lv4 업그레이드 등급 가구 에셋
+- 술통/바닥/벽 에셋
 
 ### 게이트 조건 (Phase C 진입)
 
-- [ ] 최소 normal 손님 1종 + 미미 셰프 1명 + lv0 V12 가구 1세트가 TavernServiceScene에서 렌더링 확인
-- [ ] seated_left / seated_right가 scaleY/flipY 없이 별도 스프라이트로 자연스러운 정합 확인
+- [x] 최소 normal 손님 1종 + 미미 셰프 1명 + lv0 V12 가구 1세트가 TavernServiceScene에서 실 스프라이트로 렌더링 확인 *(Phase B-2에서 충족)*
+- [x] seated_left / seated_right가 scaleY/flipY 없이 별도 스프라이트로 자연스러운 정합 확인 *(Phase B-2에서 충족)*
 - [ ] 사용자 최종 승인
 
 ---
@@ -226,5 +312,7 @@ PASS (84/84 테스트, 게이트 12/12). AD 모드3 REVISE (WARN 4건, 모두 Ph
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-24 | Phase B-2 완료 반영. B-2 절 추가, B-2+ -> B-3+로 갱신, B-1 해소 예정 사항에 B-2 해소 결과 반영, 페이즈 총괄 테이블 B-2 행 추가, Phase C 게이트 2항목 B-2에서 충족으로 갱신. |
+| 2026-04-23 | Phase B-1 완료 반영. Phase B를 B-1(완료)/B-2+(준비)로 분할, B-1 산출물/게이트/QA/해소 예정 사항 추가. |
 | 2026-04-23 | Phase A-bis V12 마이그레이션 완료 반영. Phase A-bis 절 추가, Phase B를 V12 규격으로 갱신, 페이즈 총괄 테이블에 A-bis 추가. |
 | 2026-04-23 | 신규 작성. Phase A 완료 반영. |

@@ -1,8 +1,8 @@
 # Kitchen Chaos — 영업씬 태번(Travellers Rest) 스타일 방향성
 
 > 작성일: 2026-04-23
-> 상태: **Phase A + A-bis 완료** (V12 4분면 세로 레이아웃 확정, Phase B 준비)
-> 현재 레이아웃: **V12** (V10 -> V11 -> V12 시각 검증 거쳐 확정)
+> 상태: **Phase A + A-bis + B-1 + B-2 완료** (V12 4분면 세로 레이아웃 확정, 실 에셋 9종 통합, 셰프+손님 Image 렌더링 완료)
+> 현재 레이아웃: **V12** (V10 -> V11 -> V12 시각 검증 거쳐 확정, ASSET_MODE='real' 토글로 실 에셋/PIL placeholder 전환)
 > 관련 문서:
 > - [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md) -- 직전 후보(카이로 디메트릭), V10 비교 후 폐기
 > - [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) -- Phase 50~52 시점 방향성, 일부 미술 가이드만 계승
@@ -327,8 +327,8 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 - [x] **상태머신 키 확정** *(Phase A에서 완료: ChefState 7상태, CustomerState 7상태, scaleY 완전 배제)*
 - [x] **Y축 단순 깊이정렬 검증** *(Phase A에서 완료: depth=y 단일 공식, 3레이어 분리 코드 부재 확인)*
 - [x] **V12 레이아웃 마이그레이션 완료** *(Phase A-bis: V10 가로 3세트 -> V12 4분면 세로, AD 검수+QA PASS)*
-- [ ] **에셋 1세트 진짜 발주 (시험)**: PixelLab으로 normal 손님 1종(걷기 4방향 + seated left/right 2장) + lv0 세로 벤치+세로 테이블 1세트 + 미미 셰프(idle/walk/carry) -> V12 placeholder 자리에 교체 -> 사용자 최종 승인 *(Phase B)*
-- [ ] **좌/우 벤치 손님 별도 스프라이트** 발주 검증 (scaleY/flipY 미러링 X) *(Phase B)*
+- [x] **에셋 1세트 진짜 발주 (시험)**: PixelLab으로 normal 손님 seated left/right 2장 + lv0 가구 5종 + 미미 셰프 idle -> V12 placeholder 자리에 교체, ASSET_MODE='real' 토글로 실 에셋 통합 *(Phase B-1 완료, 2026-04-23)*
+- [x] **좌/우 벤치 손님 별도 스프라이트** 발주 검증 (scaleX/scaleY 반전 없이 별도 발주, AD 모드2 APPROVED) *(Phase B-1 완료)*
 - [ ] **트레이 운반 셰프 동선** 시뮬레이션 (Phaser tween 또는 path follow) *(Phase C~D)*
 - [ ] **GatheringScene과 시점 분리 허용** 최종 사용자 확인
 - [ ] **마이그레이션 계획**: 기존 ServiceScene 코드와의 호환/단계적 전환 페이즈 분할 (Planner 단계) *(Phase E)*
@@ -346,7 +346,9 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 |--------|------|------|--------|
 | **Phase A** | 기반 시스템 골격 (V10 레이아웃/슬롯/상태머신/깊이정렬) | **완료** | TavernServiceScene.js, tavernLayoutData.js, tavernStateData.js, PIL 더미 13개 |
 | **Phase A-bis** | V12 레이아웃 마이그레이션 (V10 가로 -> V12 4분면 세로) | **완료** | V12 placeholder 5종, 테스트 84/84 PASS |
-| **Phase B** | 에셋 발주 (손님 10종 + 셰프 7명 + V12 규격 가구) | 준비 | 게이트 문서: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격 갱신 필요) |
+| **Phase B-1** | 실 에셋 1세트 발주 (손님 seated 2 + 셰프 미미 idle + 가구 5) | **완료** | `assets/tavern/` 8종, ASSET_MODE='real', Playwright 46/46 |
+| **Phase B-2** | WARN 해소 + 스프라이트 전환 (에셋 4종 재발주/신규, Image 렌더링, vite 위생) | **완료** | `assets/tavern/` 9종, REAL_KEY_MAP 9개, Playwright 114/118 |
+| **Phase B-3+** | 에셋 확장 발주 (손님 9종 + 셰프 5명 + walk 시트 + 업그레이드 가구) | 준비 | 규격서: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 갱신 완료) |
 | Phase C | 챕터별 테마 변주 에셋 + HUD/VFX UI | 미착수 | -- |
 | Phase D | 게임 로직 연동 (조리/서빙/골드/셰프 스킬) | 미착수 | -- |
 | Phase E | 기존 ServiceScene 마이그레이션 | 미착수 | -- |
@@ -359,6 +361,8 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-24 | Phase B-2 완료 반영. 상태 갱신(B-2 완료), 진행 상황 B-2 행 추가 + B-2+ -> B-3+로 갱신, REAL_KEY_MAP 9개 기재. |
+| 2026-04-23 | Phase B-1 완료 반영. 상태 갱신, 체크리스트 에셋 발주/좌우 벤치 항목 체크, 진행 상황 Phase B를 B-1/B-2+로 분할, ASSET_MODE 토글 원칙 기재. |
 | 2026-04-23 | Phase A-bis V12 마이그레이션 완료 반영. V10 기준 내용을 V12로 전면 갱신 (좌석 구조, 공간 분할, 에셋 규격, 체크리스트). |
 | 2026-04-23 | Phase A 완료 반영. 체크리스트 3항목 체크, 본 구현 진행 상황(§7) 절 추가. |
 | 2026-04-23 | 신규 작성. V10 Travellers Rest 시험 시안 검토 후 채택. SERVICE_SCENE_KAIRO_DIRECTION.md(직전 후보)를 supersede. |

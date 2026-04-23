@@ -1,5 +1,169 @@
 # Changelog
 
+## [Phase B-2] 2026-04-24 -- B-1 WARN 해소 + 스프라이트 전환
+
+### 개요
+
+Phase B-1 조건부 승인 WARN 4건(W-1 seated_left 셔츠 색상 불일치, W-2/3 벤치 14px crop 음영 약화, W-4 셰프 placeholder 잔존)을 PixelLab 재발주 에셋 4종으로 해소하고, `_buildChef()`/`_buildCustomers()`를 `_placeImageOrRect()` 경로로 전환하여 ASSET_MODE='real' 상태에서 셰프 2명(린+미미) + 손님이 실 픽셀아트 Image 오브젝트로 렌더링되도록 구현. vite 빌드에서 `_raw/` 디렉토리 + `.py` 파일 제외로 빌드 위생 확보.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/chef_rin_idle_side.png` -- 16x24px, 두 번째 셰프 린 (PixelLab 36x36 -> NEAREST 다운스케일+패딩). W-4 해소
+- `kitchen-chaos/assets/tavern/_raw/customer_normal_seated_left_b2.png` -- 재발주 원본 백업 (32x32)
+- `kitchen-chaos/assets/tavern/_raw/chef_rin_idle_side_b2.png` -- 신규 발주 원본 백업 (36x36)
+- `kitchen-chaos/assets/tavern/_raw/bench_vertical_l_v12_b2.png` -- 재발주 원본 백업 (32x76)
+- `kitchen-chaos/assets/tavern/_raw/bench_vertical_r_v12_b2.png` -- 재발주 원본 백업 (32x76)
+- `kitchen-chaos/assets/tavern/_postprocess_b2.py` -- B-2 후처리 스크립트 (4종 리사이즈/크롭)
+- `kitchen-chaos/tests/phase-b2-sprite-transition.spec.js` -- Playwright 신규 테스트 15개
+
+### 변경
+
+- `kitchen-chaos/assets/tavern/customer_normal_seated_left.png` -- PixelLab 재발주 (32x32 -> 16x22 NEAREST 다운스케일+패딩). W-1 부분 개선 (teal 0% -> 19.2%, 완전 일치는 B-3)
+- `kitchen-chaos/assets/tavern/bench_vertical_l_v12.png` -- PixelLab 재발주 (32x76 -> 14x76 NEAREST 가로 스케일 다운). 우측 2열 33.6% 어둡. W-2 해소
+- `kitchen-chaos/assets/tavern/bench_vertical_r_v12.png` -- PixelLab 재발주 (32x76 -> 14x76 NEAREST 가로 스케일 다운). 좌측 2열 67.4% 어둡. W-3 해소
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - REAL_KEY_MAP 확장: `tavern_dummy_chef2_idle_side` -> `tavern_chef_rin_idle_side` 추가 (8->9개)
+  - preload(): chef_rin_idle_side 실 에셋 추가 로드
+  - `_buildChef()`: `this.add.rectangle()` -> `_placeImageOrRect()` 경로 전환. idx=0(린)/idx=1(미미) 분기
+  - `_buildCustomers()`: `this.add.rectangle()` -> `_placeImageOrRect()` 경로 전환
+  - `_cycleCustomerState()`: SIT 상태 진입 시 seated_right/seated_left 텍스처 교체 추가
+  - fillColor 타입 가드: `sprite.type === 'Rectangle'` 체크 (셰프 line 444 + 손님 line 582)
+  - `__tavernSpriteTypes` 진단 노출 추가 (`typeof window !== 'undefined'` 가드 내부)
+- `kitchen-chaos/vite.config.js`
+  - `copyDirFiltered()`: COPY_DIR_EXCLUDE (`_raw`), COPY_FILE_EXCLUDE (`.py`) 추가. 프로덕션 빌드에서 `_raw/` 디렉토리 + `.py` 파일 제외
+
+### 벤치 후처리 방식 변경
+
+B-1: 32x76 -> center crop width 14 (좌우 9px 균등 자르기) -> 측면 음영 손실 (W-2/W-3)
+B-2: 32x76 -> NEAREST 전체 가로 스케일 다운 14px (세로 76px 유지) -> 측면 음영 보존. 스펙 대안으로 명시된 방식 채택.
+
+### AD 모드2 검수 결과
+
+APPROVED (조건부). FAIL 0건, WARN 1건:
+- WARN-1 (잔여): seated_left 셔츠 청록 5픽셀만 잔존, 주조색은 갈색. PixelLab 원본(32x32)에서는 청록 정상 생성되었으나 16x22 NEAREST 다운스케일 과정에서 셔츠 영역 픽셀 소실. B-3에서 size=44 큰 캔버스 발주 또는 PIL 마스킹으로 해소 예정.
+
+B-1 WARN 해소 상태:
+- W-1 (seated_left 셔츠): 부분 개선 (0px -> 5px teal), WARN-1로 잔여
+- W-2 (bench_l 음영): 해소 (우측 33.6% 어둡, 기준 20% 충족)
+- W-3 (bench_r 음영): 해소 (좌측 67.4% 어둡, 기준 20% 충족)
+- W-4 (chef-1 placeholder): 해소 (chef_rin_idle_side.png 발주 + idx=0 Image 렌더링)
+
+### QA 결과
+
+PASS. Playwright 114/118 (B-2 신규 14/15 + B-1 회귀 19/19 + A/A-bis 회귀 81/84). 실패 4건 모두 cold-start timeout (인프라 이슈, B-2 회귀 아님).
+- SC-1: PARTIAL (seated_left teal 19.2%, AD2 APPROVED 조건부. 발주 프로세스 자체는 성공)
+- SC-2: PASS (bench_l/r 음영 보존, PIL 실측 + 스크린샷 확인)
+- SC-3: PASS (chef_rin 16x24, HTTP 200, Image 타입, 미미 구분 3요소 충족)
+- SC-4: PASS (_buildChef/_buildCustomers 내 add.rectangle 직접 호출 0건, Image 타입 렌더링)
+- SC-5: PASS (dist/sprites/tavern/에 9 PNG만 존재, .py/`_raw/` 제외)
+- SC-6: PASS (B-2 회귀 0건)
+- SC-7: PASS (ServiceScene.js diff 0줄, scaleX/flipX 0건, tavern_dummy/ 변경 0건, 레이아웃 상수 변경 0건)
+
+### 알려진 이슈
+
+- seated_left 셔츠 청록 완전 일치 미달성 (WARN-1 잔여) -> B-3에서 size=44 큰 캔버스 발주 또는 PIL 마스킹
+- `assets/tavern/write_ad2_report.py` untracked 파일 잔존 (빌드 `.py` 필터로 제외됨, 정리 권장)
+- cold-start timeout: `waitForTavernScene` 내부 timeout 상향 권장 (15s->20s, 30s->45s)
+- SIT_DOWN/SIT_UP 텍스처 교체가 `nextState` 기반 (Phase D에서 `free.side` 기반으로 변경 권장)
+- `_placeImageOrRect` origin(0,0) 후 setOrigin(0.5,1) 체인 시 Image/Rectangle 경로 간 위치 미세 불일치 가능 (dummy 모드 디버그 전용이므로 수용)
+
+### B-3 권고 사항
+
+- seated_left 셔츠 청록 완전 일치: PixelLab size=44 큰 캔버스 발주 또는 PIL 셔츠 영역 마스킹 색상 치환
+- 손님 9종 (vip~business) seated_right/seated_left 발주
+- walk_l/walk_r 애니메이션 시트 발주
+- 셰프 추가 5명 (메이지~아르준) idle 발주
+- write_ad2_report.py 정리
+
+### 참고
+
+- 목적: `.claude/specs/2026-04-24-kc-phase-b2-scope.md`
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b2-spec.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b2-ad1.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b2-coder-report.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b2-ad2.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b2-qa.md`
+
+---
+
+## [Phase B-1] 2026-04-23 -- 실 에셋 최소 1세트 발주 및 통합
+
+### 개요
+
+V12 좌표계가 확정된 TavernServiceScene에 최초의 실 픽셀아트 에셋 1세트를 PixelLab으로 발주하여, PIL placeholder를 실 에셋으로 교체하는 Phase B 파이프라인이 정상 동작함을 검증. 동시에 발주 규격서의 V10 잔재 수치를 V12로 갱신.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/` -- 실 에셋 저장 디렉토리 신규 생성
+- `kitchen-chaos/assets/tavern/_raw/` -- PixelLab 원본 다운로드 백업 (8종)
+- `kitchen-chaos/assets/tavern/_postprocess.py` -- PIL NEAREST 후처리 스크립트
+- `kitchen-chaos/assets/tavern/customer_normal_seated_right.png` -- 16x22px (원본 32x44 -> NEAREST 1/2 다운스케일)
+- `kitchen-chaos/assets/tavern/customer_normal_seated_left.png` -- 16x22px (원본 32x44 -> NEAREST 1/2 다운스케일)
+- `kitchen-chaos/assets/tavern/chef_mimi_idle_side.png` -- 16x24px (원본 32x48 -> NEAREST 1/2 다운스케일)
+- `kitchen-chaos/assets/tavern/counter_v12.png` -- 40x100px (원본 크기 일치, 패스스루)
+- `kitchen-chaos/assets/tavern/table_vertical_v12.png` -- 44x72px (원본 크기 일치, 패스스루)
+- `kitchen-chaos/assets/tavern/bench_vertical_l_v12.png` -- 14x76px (원본 32x76 -> center crop width 14)
+- `kitchen-chaos/assets/tavern/bench_vertical_r_v12.png` -- 14x76px (원본 32x76 -> center crop width 14)
+- `kitchen-chaos/assets/tavern/entrance_v12.png` -- 32x40px (원본 크기 일치, 패스스루)
+- `kitchen-chaos/tests/phase-b1-asset-load.spec.js` -- Playwright 신규 테스트 19개
+
+### 변경
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - 파일 상단: ASSET_MODE='real' 토글 상수 추가 (line 54~70)
+  - REAL_KEY_MAP 매핑 테이블: 더미 키 -> 실 에셋 키 변환 정의
+  - preload(): ASSET_MODE='real'일 때 `assets/tavern/` 에셋 8종 추가 로드 (line 108~124)
+  - _placeImageOrRect(): ASSET_MODE 기반 실 에셋 키 우선 시도 + 더미 fallback (line 310~324)
+  - window.__tavernAssetMode 테스트 노출 추가
+- `kitchen-chaos/tests/phase-a-bis-v12-qa.spec.js`
+  - 카운터/입구 텍스처 키 검색을 실 에셋 키도 수용하도록 호환 수정 (2개소)
+- `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- V10 잔재 7개소 V12 갱신
+  - §2-1 벤치: 192x14px(가로) -> 14x76px(세로), 슬롯 가로->세로
+  - §2-2 테이블: 192x40px -> 44x72px
+  - §2-3 카운터: 112x52px -> 40x100px, 입구: 64x48px -> 32x40px
+  - §1-2 파일명: seated_down/up -> seated_right/left
+  - §4 도구표: facing-up/down -> facing-right/left
+
+### AD 모드2 검수 결과
+
+APPROVED (조건부). FAIL 0건, WARN 3건(minor):
+- WARN-1: 손님 seated_left 셔츠 색상이 갈색 계열(#201000~#603000)로, seated_right(#50b0b0 청록)와 불일치
+- WARN-2: bench_vertical_l 14px crop으로 우측 측면 음영 디테일 약화
+- WARN-3: bench_vertical_r 14px crop으로 좌측 측면 음영 디테일 약화
+
+### AD 모드3 검수 결과
+
+APPROVED (조건부). WARN 1건:
+- WARN-1: chef-1(idx=0) 위치에 PIL placeholder(파란 박스) 잔존. chef-2(idx=1)에만 실 에셋 미미 적용. Phase B-2에서 두 번째 셰프 발주 시 해소.
+
+### QA 결과
+
+PASS. Playwright 46/46 (회귀 27 + 신규 19). SC-1~SC-5 전항목 충족.
+- SC-1: 규격서 V10 잔재 0건
+- SC-2: 에셋 8종 `tavern/` 저장 + native 크기 정확 일치
+- SC-3: AD 모드2 APPROVED
+- SC-4: 에셋 HTTP 200 + Phaser 텍스처 로드 오류 0건
+- SC-5: tavern_dummy/ 보존, ASSET_MODE 토글 공존, 회귀 27/27 PASS
+- 빌드: vite build PASS (70 modules, 에러 0건)
+
+### 알려진 이슈
+
+- 캐릭터 3종(customer seated right/left, chef mimi idle)은 텍스처 로드만 완료, 씬에서는 여전히 `this.add.rectangle()` 색상 사각형으로 렌더링 (Phase B-2에서 스프라이트 전환 예정)
+- 술통(barrel.png) 실 에셋 미발주 (선택 사항, tavern_dummy barrel 사용 중)
+- `assets/tavern/_postprocess.py`와 `_raw/` 디렉토리가 프로덕션 빌드에 포함됨 (LOW, Phase B-2에서 빌드 필터 개선 권장)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase-b1-asset-spec.md`
+- 목적: `.claude/specs/2026-04-23-kc-phase-b1-asset-scope.md`
+- AD 모드1: `.claude/specs/2026-04-23-kc-phase-b1-ad1.md`
+- Coder 리포트: `.claude/specs/2026-04-23-kc-phase-b1-coder-report.md`
+- AD 모드2: `.claude/specs/2026-04-23-kc-phase-b1-ad2.md`
+- AD 모드3: `.claude/specs/2026-04-23-kc-phase-b1-ad3.md`
+- QA: `.claude/specs/2026-04-23-kc-phase-b1-qa.md`
+
+---
+
 ## [Phase A-bis] 2026-04-23 -- V12 레이아웃 마이그레이션 (V10 가로 -> V12 4분면 세로)
 
 ### 개요

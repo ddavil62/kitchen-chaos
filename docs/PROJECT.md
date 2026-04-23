@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (영업씬 태번 스타일 Phase A-bis V12 마이그레이션 완료)
+> 최종 업데이트: 2026-04-24 (영업씬 태번 스타일 Phase B-2 WARN 해소 + 스프라이트 전환 완료)
 
 ## 프로젝트 개요
 
@@ -137,74 +137,44 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
-### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A + A-bis 완료, Phase B 준비)
+### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A + A-bis + B-1 + B-2 완료, Phase B-3 준비)
 
-Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계 진행 중. Phase A(기반 시스템 골격, V10)에서 레이아웃 상수, 24석 벤치 슬롯 데이터 모델, 셰프/손님 상태머신 14상태, Y축 단순 깊이정렬을 PIL 더미와 함께 확정. Phase A-bis(V12 마이그레이션)에서 V10 가로 테이블 3세트(8석x3) 구조를 V12 세로 테이블 4분면(6석x4) 구조로 전환. 기존 ServiceScene.js는 미수정(레거시), 신규 TavernServiceScene이 V12 기준 영업씬.
+Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계 진행 중. Phase B-2에서 B-1 WARN 4건(seated_left 셔츠 색상, 벤치 음영, 셰프 placeholder) 해소를 위해 에셋 4종(seated_left 재발주, bench L/R 재발주, chef_rin 신규)을 발주하고, `_buildChef()`/`_buildCustomers()`를 `_placeImageOrRect()` 경로로 전환하여 셰프 2명 + 손님이 실 픽셀아트 Image 오브젝트로 렌더링된다. vite 빌드에서 `_raw/` + `.py` 제외 완료.
 
 - **신규 파일**: `js/scenes/TavernServiceScene.js`, `js/data/tavernLayoutData.js`, `js/data/tavernStateData.js`
+- **실 에셋**: `assets/tavern/` (9종 PNG: 가구 5 + 손님 seated 2 + 셰프 미미/린 각 1), PIL placeholder: `assets/tavern_dummy/` (보존)
 - **진입점**: `?scene=tavern` URL 파라미터 (디버그 전용)
-- **현재 레이아웃**: V12 (4분면 세로 테이블, quad 100x120px, 세로 통로 20px, 가로 통로 40px)
-- **Phase B 게이트 문서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격으로 갱신 필요)
+- **현재 레이아웃**: V12 (4분면 세로 테이블, quad 100x120px, ASSET_MODE='real')
+- **REAL_KEY_MAP**: 9개 매핑 (가구 5 + 손님 seated 2 + 셰프 2)
+- **Phase B 규격서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격, B-2 반영)
 - **페이즈 마스터 플랜**: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
 - **방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
 - 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md), [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md)
 
 ## 개발 이력 (최근)
 
+### Phase B-2 — B-1 WARN 해소 + 스프라이트 전환 (2026-04-24)
+
+B-1 WARN 4건 해소를 위해 에셋 4종 재발주/신규 발주(seated_left 재발주, bench L/R 재발주, chef_rin 신규). `_buildChef()`/`_buildCustomers()`를 `_placeImageOrRect()` 경로로 전환하여 ASSET_MODE='real'에서 셰프 2명(린+미미) + 손님이 실 Image 오브젝트로 렌더링. SIT 상태 진입 시 seated_right/left 텍스처 교체. vite 빌드에서 `_raw/` + `.py` 제외. REAL_KEY_MAP 8->9개(chef2 추가).
+
+- QA: PASS (Playwright 114/118, 실패 4건 cold-start 인프라 이슈, B-2 회귀 0건)
+- AD 모드2: APPROVED (조건부, WARN-1 잔여 — seated_left 셔츠 청록 5픽셀만 잔존, B-3 큰 캔버스 발주로 해소 예정)
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b2-spec.md`
+
+### Phase B-1 — 실 에셋 최소 1세트 발주 및 통합 (2026-04-23)
+
+PixelLab으로 실 픽셀아트 에셋 8종을 발주하여 `assets/tavern/`에 저장. ASSET_MODE='real' 토글 + REAL_KEY_MAP 매핑 추가. 가구 5종 실 에셋 렌더링, 캐릭터 3종 텍스처 로드만 완료.
+
+- QA: PASS (Playwright 46/46, SC-1~SC-5 전항목 충족)
+- AD 모드2: APPROVED (조건부, WARN 3건 minor — Phase B-2에서 해소)
+- 스펙: `.claude/specs/2026-04-23-kc-phase-b1-asset-spec.md`
+
 ### Phase A-bis — V12 레이아웃 마이그레이션 (2026-04-23)
 
-Phase A의 V10 가로 테이블 3세트(8석x3=24석) 구조를 V12 세로 테이블 4분면(6석x4=24석) 구조로 전면 교체. TABLE_SET_ANCHORS 3엔트리->4엔트리(tl/tr/bl/br quad), BENCH_SLOTS top/bot->left/right, 카운터 24x120->40x100 세로, 셰프 2명 배치, 입구 좌하단(entrance_v12) 추가. V12 PIL placeholder 5종 추가. ServiceScene.js 무손상. 24석 총원 유지.
-
-- QA: PASS (Playwright 84/84, 게이트 12/12)
-- AD 모드3: REVISE (WARN 4건, 모두 Phase B 이후 해소 예정)
-- 스펙: `.claude/specs/2026-04-23-kc-phase-a-bis-v12-migration-spec.md`
+V10 가로 3세트 -> V12 4분면 세로 전면 교체. 24석 유지. QA PASS (84/84).
 
 ### Phase A — 영업씬 태번 스타일 기반 시스템 골격 (2026-04-23)
 
-TavernServiceScene + tavernLayoutData + tavernStateData 신규 생성. 360x640 레이아웃 영역 상수, 긴 벤치 24석 슬롯 데이터 모델(occupy/vacate/findFreeSlot/getSlotWorldPos), ChefState 7상태 + CustomerState 7상태 정의, Y축 단순 깊이정렬(depth=y) 구현. PIL 더미 13개 이미지 생성. scaleY 미러링 완전 배제, 3레이어 분리 렌더링 폐기 확인. AD 모드3 REVISE(bench-top 4px 겹침 수정) 반영 후 QA PASS (40/40).
+TavernServiceScene + tavernLayoutData + tavernStateData 신규. V10 레이아웃, 24석 슬롯, 상태머신, 깊이정렬. QA PASS (40/40).
 
-- QA: PASS (Playwright 39/40 + 정적 분석 4, 1건 false positive)
-- 스펙: `.claude/specs/2026-04-23-kc-phase-a-tavern-spec.md`
-
-### Phase 76 — 손님 NPC 다양성 확장 (2026-04-23)
-
-P3-2 영업 씬 변주 확대. 기존 6종 단순 타입(normal/vip/gourmet/rushed/group/mireuk_traveler)에서 10종 프로필 시스템으로 전환. customerProfileData.js 신규 (10종 프로필 정의 + getCustomerProfile()). 평론가(critic) patienceRatio 집계 → 평균 0.7 미만 시 다음 영업 골드 -10% 패널티. 단골(regular) 5회 서빙 누적 시 팁 x1.2 버프. 신규 5종 PixelLab 스프라이트 10장 (92x92, displayHeight=64 스케일 흡수). SaveManager v25->v26 (regularCustomerProgress, criticPenaltyActive).
-
-- 신규 파일: customerProfileData.js, assets/service/ 손님 스프라이트 10장
-- 수정 파일: CustomerManager.js, ServiceScene.js, SaveManager.js, SpriteLoader.js, CustomerZoneUI.js, gameData.js
-- QA: PASS (Playwright 28/28 PASS, 수용 기준 7/7 충족)
-- KNOWN: ResultScene 평론가 혹평/단골 알림 텍스트 미구현 (후속 Phase 권장)
-- 스펙: `.claude/specs/2026-04-23-kc-phase76-spec.md`
-
-### Phase 75B — 일일 미션 + 로그인 보너스 (2026-04-23)
-
-P3-1 F2P 리텐션 핵심 기능. DailyMissionManager + LoginBonusManager 신규. MenuScene 배너 + 모달. SaveManager v24->v25.
-
-- QA: PASS (Playwright 16/16, 수용 기준 9/9)
-- 스펙: `.claude/specs/2026-04-23-kc-phase75B-spec.md`
-
-### Phase 75 — 행상인 분기 카드 풀 선행 해금 체크 (2026-04-23)
-
-버그 수정. getEligiblePool에 bond/mutation/recipe 카테고리별 선행 해금 필터 추가. chefUnlockHelper.js 공용화.
-
-- QA: Playwright 54/54 PASS, 스펙: `.claude/specs/2026-04-23-kc-phase75-spec.md`
-
-### Phase 74 — UI/카피 마감 P2-4~7 (2026-04-23)
-
-튜토리얼 페이지네이터, 셰프 실패 대사, 도구 배지, 업적 glow, ShopScene cardH 수정.
-
-- QA: PASS, 스펙: `.claude/specs/2026-04-23-kc-phase74-spec.md`
-
-### Phase 73 — 세이브 백업 + 포트레이트 정합 (2026-04-23)
-
-3슬롯 롤링 백업 + 복구 UI. portraits 120파일 삭제.
-
-- QA: Playwright 130/130 PASS, 스펙: `.claude/specs/2026-04-23-kc-phase73-spec.md`
-
-### Phase 72 — 분기 카드 수치 전수 반영 (2026-04-23)
-
-변이 4종 + Bond 4쌍 실효, 레시피 반복 규약 구현.
-
-- QA: Playwright 91/91 PASS, 스펙: `.claude/specs/2026-04-23-kc-phase72-spec.md`
-
-이전 이력(Phase 71 이전)은 [CHANGELOG.md](CHANGELOG.md) 참조.
+이전 이력(Phase 76 이전)은 [CHANGELOG.md](CHANGELOG.md) 참조.
