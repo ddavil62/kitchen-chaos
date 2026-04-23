@@ -217,9 +217,9 @@ export class TavernServiceScene extends Phaser.Scene {
     for (const anchor of TABLE_SET_ANCHORS) {
       const halfBench = BENCH_W / 2;
 
-      // 벤치-top (테이블 위쪽)
+      // 벤치-top (테이블 위쪽) — AD 모드3 REVISE: -30 -> -34 (gap=0px)
       this._placeImageOrRect('tavern_dummy_bench_long_lv0',
-        anchor.x - halfBench, anchor.y - 30, BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030);
+        anchor.x - halfBench, anchor.y - 34, BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030);
 
       // 테이블
       this._placeImageOrRect('tavern_dummy_table_long_lv0',

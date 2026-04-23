@@ -78,8 +78,8 @@ export const TABLE_SET_ANCHORS = Object.freeze([
 /** 벤치 너비 (lv0 기준) */
 export const BENCH_W = 192;
 
-/** 벤치-top y 오프셋: 테이블 세트 앵커 대비 위쪽 벤치 캐릭터 발 y 오프셋 */
-export const BENCH_TOP_OFFSET_Y = -38;
+/** 벤치-top y 오프셋: 테이블 세트 앵커 대비 위쪽 벤치 캐릭터 발 y 오프셋 — AD 모드3 REVISE: -38 -> -26 */
+export const BENCH_TOP_OFFSET_Y = -26;
 
 /** 벤치-bot y 오프셋: 테이블 세트 앵커 대비 아래쪽 벤치 캐릭터 발 y 오프셋 */
 export const BENCH_BOT_OFFSET_Y = 38;
