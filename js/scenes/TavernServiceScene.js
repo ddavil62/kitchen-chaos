@@ -67,6 +67,7 @@ const REAL_KEY_MAP = Object.freeze({
   'tavern_dummy_customer_seated_down': 'tavern_customer_normal_seated_right',
   'tavern_dummy_customer_seated_up':   'tavern_customer_normal_seated_left',
   'tavern_dummy_chef_idle_side':       'tavern_chef_mimi_idle_side',
+  'tavern_dummy_chef2_idle_side':      'tavern_chef_rin_idle_side',  // Phase B-2: 두 번째 셰프 린
 });
 
 // V12 술통 위치 (카운터 좌측 하단 주방 내)
@@ -115,10 +116,11 @@ export class TavernServiceScene extends Phaser.Scene {
         'bench_vertical_l_v12',  // 14x76px
         'bench_vertical_r_v12',  // 14x76px
         'entrance_v12',          // 32x40px
-        // 캐릭터 3종
+        // 캐릭터 4종 (B-2: chef_rin 추가)
         'customer_normal_seated_right',  // 16x22px
         'customer_normal_seated_left',   // 16x22px
         'chef_mimi_idle_side',           // 16x24px
+        'chef_rin_idle_side',            // 16x24px (Phase B-2)
       ];
       for (const name of realAssets) {
         this.load.image(`tavern_${name}`, `${realPath}${name}.png`);
@@ -170,6 +172,12 @@ export class TavernServiceScene extends Phaser.Scene {
       window.__ChefState = ChefState;
       window.__CustomerState = CustomerState;
       window.__tavernAssetMode = ASSET_MODE; // Phase B-1 테스트용
+
+      // Phase B-2: 스프라이트 타입 진단 노출
+      window.__tavernSpriteTypes = {
+        chefs: this._chefs.map(c => ({ type: c.sprite.type, textureKey: c.sprite.texture?.key || null })),
+        customers: this._customers.map(c => ({ type: c.sprite.type, textureKey: c.sprite.texture?.key || null })),
+      };
     }
   }
 
@@ -392,9 +400,14 @@ export class TavernServiceScene extends Phaser.Scene {
       const chefState = ChefState.IDLE_SIDE;
       const color = CHEF_STATE_COLORS[chefState];
 
-      const sprite = this.add.rectangle(anchor.x, anchor.y, 32, 48, color)
-        .setOrigin(0.5, 1)
-        .setDepth(anchor.y);
+      // Phase B-2: idx=0(린), idx=1(미미) — _placeImageOrRect 경로로 전환
+      const dummyKey = idx === 0
+        ? 'tavern_dummy_chef2_idle_side'
+        : 'tavern_dummy_chef_idle_side';
+      // _placeImageOrRect는 origin(0,0) 기준이므로 좌상단 좌표 계산 후 setOrigin(0.5,1) 재설정
+      const sprite = this._placeImageOrRect(
+        dummyKey, anchor.x - 16, anchor.y - 48, 32, 48, color,
+      ).setOrigin(0.5, 1).setDepth(anchor.y);
 
       // 셰프-0만 인터랙티브 (탭 상태 순환)
       if (idx === 0) {
@@ -403,7 +416,7 @@ export class TavernServiceScene extends Phaser.Scene {
         /** @type {string} 현재 셰프 상태 */
         this._chefState = chefState;
 
-        /** @type {Phaser.GameObjects.Rectangle} */
+        /** @type {Phaser.GameObjects.Image|Phaser.GameObjects.Rectangle} */
         this._chefSprite = sprite;
 
         // 셰프 라벨
@@ -424,11 +437,13 @@ export class TavernServiceScene extends Phaser.Scene {
           padding: { x: 2, y: 1 },
         }).setOrigin(0.5, 0).setDepth(9000);
 
-        // 탭 이벤트: 상태 순환
+        // 탭 이벤트: 상태 순환 (fillColor는 Rectangle 전용 — Image 타입 가드)
         sprite.on('pointerdown', () => {
           const nextIdx = (CHEF_CYCLE.indexOf(this._chefState) + 1) % CHEF_CYCLE.length;
           this._chefState = CHEF_CYCLE[nextIdx];
-          sprite.fillColor = CHEF_STATE_COLORS[this._chefState];
+          if (sprite.type === 'Rectangle') {
+            sprite.fillColor = CHEF_STATE_COLORS[this._chefState];
+          }
           this._chefStateText.setText(this._chefState);
           this._updateDebugHUD();
         });
@@ -464,10 +479,11 @@ export class TavernServiceScene extends Phaser.Scene {
       const x = queueBaseX - i * queueSpacing;
       const y = queueBaseY + i * 4;  // 약간씩 y를 달리하여 depth 차이 보여줌
 
-      const sprite = this.add.rectangle(x, y, 32, 48, color)
-        .setOrigin(0.5, 1)
-        .setInteractive()
-        .setDepth(y);
+      // Phase B-2: _placeImageOrRect 경로로 전환 (초기 상태: seated_right 기본값)
+      const dummyKey = 'tavern_dummy_customer_seated_down';
+      const sprite = this._placeImageOrRect(
+        dummyKey, x - 16, y - 44, 32, 44, color,
+      ).setOrigin(0.5, 1).setInteractive().setDepth(y);
 
       // 상태 라벨
       const label = this.add.text(x, y + 4, initState, {
@@ -515,7 +531,7 @@ export class TavernServiceScene extends Phaser.Scene {
       }
     }
 
-    // SIT 상태 진입 시 슬롯 배정
+    // SIT 상태 진입 시 슬롯 배정 + 텍스처 교체 (Phase B-2)
     if (nextState === CustomerState.SIT_DOWN || nextState === CustomerState.SIT_UP) {
       const free = findFreeSlot();
       if (free) {
@@ -527,6 +543,15 @@ export class TavernServiceScene extends Phaser.Scene {
           cust.sprite.y = pos.y;
           cust.label.x = pos.x;
           cust.label.y = pos.y + 4;
+        }
+      }
+      // Phase B-2: SIT 방향에 따라 seated 텍스처 교체
+      if (ASSET_MODE === 'real' && cust.sprite.type === 'Image') {
+        const sitKey = nextState === CustomerState.SIT_DOWN
+          ? 'tavern_customer_normal_seated_right'   // 좌측 벤치, facing-right
+          : 'tavern_customer_normal_seated_left';    // 우측 벤치, facing-left
+        if (this.textures.exists(sitKey)) {
+          cust.sprite.setTexture(sitKey);
         }
       }
     }
@@ -553,7 +578,10 @@ export class TavernServiceScene extends Phaser.Scene {
 
     cust.state = nextState;
     cust.cycleIdx = nextIdx;
-    cust.sprite.fillColor = CUSTOMER_STATE_COLORS[nextState];
+    // Phase B-2: fillColor는 Rectangle 전용 — Image 타입 가드
+    if (cust.sprite.type === 'Rectangle') {
+      cust.sprite.fillColor = CUSTOMER_STATE_COLORS[nextState];
+    }
     cust.label.setText(nextState);
 
     this._updateDebugHUD();

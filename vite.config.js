@@ -2,11 +2,17 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, copyFileSync } from 'fs';
 
+// 빌드 번들에서 제외할 디렉토리명 (Phase B-2: _raw/ 원본 백업 제외)
+const COPY_DIR_EXCLUDE = ['_raw'];
+// 빌드 번들에서 제외할 파일 확장자 패턴 (Phase B-2: .py 후처리 스크립트 제외)
+const COPY_FILE_EXCLUDE = ['.zip', '.py'];
+
 /**
- * 디렉토리를 재귀 복사하되 .zip 파일은 제외한다.
+ * 디렉토리를 재귀 복사하되 제외 패턴에 해당하는 파일/디렉토리는 건너뛴다.
  * @param {string} src
  * @param {string} dest
  */
+
 function copyDirFiltered(src, dest) {
   mkdirSync(dest, { recursive: true });
   for (const entry of readdirSync(src)) {
@@ -14,8 +20,11 @@ function copyDirFiltered(src, dest) {
     const destPath = resolve(dest, entry);
     const st = statSync(srcPath);
     if (st.isDirectory()) {
-      copyDirFiltered(srcPath, destPath);
-    } else if (!entry.endsWith('.zip')) {
+      // _raw 등 제외 디렉토리는 재귀 진입하지 않음
+      if (!COPY_DIR_EXCLUDE.includes(entry)) {
+        copyDirFiltered(srcPath, destPath);
+      }
+    } else if (!COPY_FILE_EXCLUDE.some(ex => entry.endsWith(ex))) {
       copyFileSync(srcPath, destPath);
     }
   }
