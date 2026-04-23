@@ -137,6 +137,14 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
+### 영업씬 카이로 스타일 재설계 (방향성 확정, 본 구현 미착수)
+
+Phase 76 손님 NPC 확장 결과 신규 92×92 스프라이트와 기존 48×64 규격 호환 문제, 의자 정합 문제가 드러나 영업씬을 카이로 소프트(*Cafeteria Nipponica*) 스타일의 사선뷰 식당 시뮬레이션 구조로 전면 재설계하기로 결정. 사전 합성 좌석 세트 + 앉기 전용 상반신 컷 + Y축 깊이 정렬 방식. 시험 시안 V9 검증 완료.
+
+- 방향성 문서: [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md)
+- 시험 목업: `studio-mockup/kitchen-chaos/kairo-style-mockup.html`
+- 이전 방향(폐기): [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) (Phase 50~52 시점, 일부 절만 계승)
+
 ## 개발 이력 (최근)
 
 ### Phase 76 — 손님 NPC 다양성 확장 (2026-04-23)
