@@ -1,7 +1,7 @@
 # Kitchen Chaos — 영업씬 태번(Travellers Rest) 스타일 방향성
 
 > 작성일: 2026-04-23
-> 상태: **방향성 확정** (시험 시안 V10 채택, 본 구현 미착수)
+> 상태: **Phase A 완료** (시험 시안 V10 채택, 기반 시스템 골격 구현 완료, Phase B 대기)
 > 관련 문서:
 > - [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md) — 직전 후보(카이로 디메트릭), V10 비교 후 폐기
 > - [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) — Phase 50~52 시점 방향성, 일부 미술 가이드만 계승
@@ -289,11 +289,14 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 본 방향을 실제 페이즈로 진입시키기 전, 아래 항목을 순서대로 확정한다.
 
-- [ ] **에셋 1세트 진짜 발주 (시험)**: PixelLab으로 normal 손님 1종(걷기 4방향 + seated up·down 2장) + lv0 벤치+테이블 1세트 + 미미 셰프(idle·walk·carry) → V10 placeholder 자리에 교체 → 사용자 최종 승인
-- [ ] **위/아래 벤치 손님 별도 스프라이트** 발주 검증 (scaleY 미러링 X)
-- [ ] **트레이 운반 셰프 동선** 시뮬레이션 (Phaser tween 또는 path follow)
+- [x] **레이아웃 상수 + 슬롯 데이터 모델 확정** *(Phase A에서 완료: tavernLayoutData.js, 24석 벤치 슬롯, occupySlot/vacateSlot API)*
+- [x] **상태머신 키 확정** *(Phase A에서 완료: ChefState 7상태, CustomerState 7상태, scaleY 완전 배제)*
+- [x] **Y축 단순 깊이정렬 검증** *(Phase A에서 완료: depth=y 단일 공식, 3레이어 분리 코드 부재 확인)*
+- [ ] **에셋 1세트 진짜 발주 (시험)**: PixelLab으로 normal 손님 1종(걷기 4방향 + seated up·down 2장) + lv0 벤치+테이블 1세트 + 미미 셰프(idle·walk·carry) → V10 placeholder 자리에 교체 → 사용자 최종 승인 *(Phase B)*
+- [ ] **위/아래 벤치 손님 별도 스프라이트** 발주 검증 (scaleY 미러링 X) *(Phase B)*
+- [ ] **트레이 운반 셰프 동선** 시뮬레이션 (Phaser tween 또는 path follow) *(Phase C~D)*
 - [ ] **GatheringScene과 시점 분리 허용** 최종 사용자 확인
-- [ ] **마이그레이션 계획**: 기존 ServiceScene 코드와의 호환/단계적 전환 페이즈 분할 (Planner 단계)
+- [ ] **마이그레이션 계획**: 기존 ServiceScene 코드와의 호환/단계적 전환 페이즈 분할 (Planner 단계) *(Phase E)*
 - [ ] **레거시 자산 처리 결정**:
   - Phase 50~52 테이블 `_back`/`_front` 10장 → 폐기/보존
   - Phase 50~52 손님 `_waiting`/`_seated` 10장 → 폐기 (시점 미스매치)
@@ -302,10 +305,25 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 ---
 
-## 7. 변경 이력
+## 7. 본 구현 진행 상황
+
+| 페이즈 | 범위 | 상태 | 산출물 |
+|--------|------|------|--------|
+| **Phase A** | 기반 시스템 골격 (레이아웃/슬롯/상태머신/깊이정렬) | **완료** | TavernServiceScene.js, tavernLayoutData.js, tavernStateData.js, PIL 더미 13개 |
+| **Phase B** | 에셋 발주 (손님 10종 + 셰프 7명 + 가구) | 대기 | 게이트 문서: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` |
+| Phase C | 챕터별 테마 변주 에셋 + HUD/VFX UI | 미착수 | — |
+| Phase D | 게임 로직 연동 (조리/서빙/골드/셰프 스킬) | 미착수 | — |
+| Phase E | 기존 ServiceScene 마이그레이션 | 미착수 | — |
+
+페이즈 상세 마스터 플랜: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
+
+---
+
+## 8. 변경 이력
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-23 | Phase A 완료 반영. 체크리스트 3항목 체크, 본 구현 진행 상황(§7) 절 추가. |
 | 2026-04-23 | 신규 작성. V10 Travellers Rest 시험 시안 검토 후 채택. SERVICE_SCENE_KAIRO_DIRECTION.md(직전 후보)를 supersede. |
 
 ---

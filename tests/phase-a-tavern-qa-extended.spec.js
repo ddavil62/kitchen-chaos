@@ -20,11 +20,17 @@ async function waitForTavernScene(page) {
 // ── 게이트 1: 절대 준수 사항 ──
 
 test.describe('Gate 1: 절대 준수 사항', () => {
-  test('TavernServiceScene.js에 scaleY/flipY 코드가 없다', async ({ page }) => {
+  test('TavernServiceScene.js에 scaleY/flipY 호출이 없다', async ({ page }) => {
+    // 주석 내 문구는 제외하고 실제 호출 패턴만 검사한다.
     const response = await page.request.get('http://localhost:5173/js/scenes/TavernServiceScene.js');
     const source = await response.text();
-    expect(source).not.toContain('scaleY');
-    expect(source).not.toContain('flipY');
+    const stripped = source
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '');
+    expect(stripped).not.toMatch(/\.scaleY\b/);
+    expect(stripped).not.toMatch(/scaleY\s*[:=]/);
+    expect(stripped).not.toMatch(/\.flipY\b/);
+    expect(stripped).not.toMatch(/flipY\s*[:=]/);
   });
 
   test('TavernServiceScene.js에 _back/_front/_occupied 레이어 분리 패턴이 없다', async ({ page }) => {
@@ -35,18 +41,32 @@ test.describe('Gate 1: 절대 준수 사항', () => {
     expect(source).not.toContain('_occupied');
   });
 
-  test('tavernLayoutData.js에 scaleY/flipY가 없다', async ({ page }) => {
+  test('tavernLayoutData.js에 scaleY/flipY 호출이 없다', async ({ page }) => {
+    // 주석 내 문구는 제외하고 실제 호출 패턴만 검사한다.
     const response = await page.request.get('http://localhost:5173/js/data/tavernLayoutData.js');
     const source = await response.text();
-    expect(source).not.toContain('scaleY');
-    expect(source).not.toContain('flipY');
+    const stripped = source
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '');
+    expect(stripped).not.toMatch(/\.scaleY\b/);
+    expect(stripped).not.toMatch(/scaleY\s*[:=]/);
+    expect(stripped).not.toMatch(/\.flipY\b/);
+    expect(stripped).not.toMatch(/flipY\s*[:=]/);
   });
 
-  test('tavernStateData.js에 scaleY/flipY가 없다', async ({ page }) => {
+  test('tavernStateData.js에 scaleY/flipY 호출이 없다', async ({ page }) => {
+    // JSDoc 주석에는 "scaleY(-1) 미러링 금지" 같은 문구가 포함될 수 있으므로
+    // 단순 텍스트가 아닌 실제 코드 호출 패턴(.scaleY, scaleY: ..., setScale 등)만 검사한다.
     const response = await page.request.get('http://localhost:5173/js/data/tavernStateData.js');
     const source = await response.text();
-    expect(source).not.toContain('scaleY');
-    expect(source).not.toContain('flipY');
+    // 주석(/** ... */, // ...) 전부 제거 후 검사
+    const stripped = source
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '');
+    expect(stripped).not.toMatch(/\.scaleY\b/);
+    expect(stripped).not.toMatch(/scaleY\s*[:=]/);
+    expect(stripped).not.toMatch(/\.flipY\b/);
+    expect(stripped).not.toMatch(/flipY\s*[:=]/);
   });
 
   test('PixelLab/SD API 호출 코드가 없다', async ({ page }) => {

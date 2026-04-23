@@ -1,5 +1,94 @@
 # Changelog
 
+## [Phase A] 2026-04-23 -- 영업씬 태번 스타일 재설계 기반 시스템 골격
+
+### 개요
+
+Travellers Rest 스타일(탑다운 가구 + 사이드뷰 풀바디 캐릭터)의 360x640 레이아웃 상수, 긴 벤치 좌석 슬롯 데이터 모델, 셰프/손님 상태머신 키, Y축 단순 깊이정렬을 PIL 더미 placeholder와 함께 구현. 기존 ServiceScene.js는 일절 수정하지 않고 신규 TavernServiceScene으로 병렬 구현. Phase B(에셋 발주) 즉시 착수 가능한 상태 확립.
+
+### 추가
+
+- `kitchen-chaos/js/data/tavernLayoutData.js` -- 신규 데이터 파일
+  - TAVERN_LAYOUT 상수: HUD_H=32, WALL_H=24, CTRL_H=80, KITCHEN_W=120, DINING_W=224, ROOM_CONTENT_Y=56, ROOM_BOTTOM_Y=560
+  - COUNTER_ANCHOR(x=64, y=56), TABLE_SET_ANCHORS(y=232/352/472, 간격 120px 균등), BARREL_ANCHORS, DOOR_ANCHOR, CHEF_IDLE_ANCHORS
+  - BENCH_SLOTS: lv0(4인), lv3(5인), lv4(6인) 슬롯 오프셋
+  - BENCH_TOP_OFFSET_Y=-26, BENCH_BOT_OFFSET_Y=+38 (AD REVISE 반영)
+  - createSeatingState(benchLevel): 3세트 x top/bot x slotCount 동적 생성
+  - occupySlot(tableSetIdx, side, slotIdx, customerId): 슬롯 점유 (빈칸 true, 이미 점유 false)
+  - vacateSlot(tableSetIdx, side, slotIdx): 슬롯 해제
+  - findFreeSlot(): 최초 빈 슬롯 반환 ({tableSetIdx, side, slotIdx} | null)
+  - getSlotWorldPos(tableSetIdx, side, slotIdx): Phaser 절대 좌표 반환
+  - 방어 코딩: 잘못된 인덱스/side에 대해 false/null 반환, 크래시 없음
+
+- `kitchen-chaos/js/data/tavernStateData.js` -- 신규 데이터 파일
+  - ChefState 7상태: idle_side, walk_l, walk_r, cook, carry_l, carry_r, serve
+  - CustomerState 7상태: enter, queue, sit_down, sit_up, eat_down, eat_up, leave
+  - sit_up/sit_down 별개 상태, scaleY(-1) 미러링 완전 배제
+  - CHEF_STATE_TRANSITIONS / CUSTOMER_STATE_TRANSITIONS: 상태 전환 유효성 맵
+  - CHEF_STATE_COLORS / CUSTOMER_STATE_COLORS: 더미 단계 상태별 대리 색상 (0xRRGGBB)
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js` -- 신규 씬 파일
+  - 씬 키: 'TavernServiceScene'
+  - _buildLayout(): HUD/벽/주방/다이닝홀/CTRL 영역 색상 구분 디버그 표시
+  - _buildFurniture(): 카운터, 3테이블 세트(bench-top/table/bench-bot), 술통 2개, 입구 프레임 배치
+  - _buildBenchSlots(): 24개 슬롯 위치에 4x4 점 + 슬롯 번호 텍스트 표시
+  - _buildChef(): 셰프 컬러 블록(32x48), 탭 시 idle->cook->carry_r->serve 상태 순환
+  - _buildCustomers(): 손님 4명, 탭 시 queue->sit_down/sit_up->eat->leave 순환
+  - _applyDepthSort(): depth = gameObject.y 단일 공식, HUD depth=9000+
+  - update(): 매 프레임 _applyDepthSort() 호출
+  - 디버그 HUD: "TAVERN DEBUG MODE", 점유 슬롯 수/24, 셰프 상태 표시
+  - Back 버튼: MenuScene 복귀
+
+- `kitchen-chaos/assets/tavern_dummy/` -- PIL 더미 이미지 13개
+  - bench_long_lv0.png(192x14), table_long_lv0.png(192x40), counter_topdown.png(112x52)
+  - barrel.png(32x40), door_frame.png(64x48), wall_decor_painting.png(32x28)
+  - chef_idle_side.png(32x48), customer_walk_r.png(32x48)
+  - customer_seated_down.png(32x44), customer_seated_up.png(32x44)
+  - floor_wood_tile.png(32x32), wall_horizontal.png(64x24)
+  - layout_preview.png(360x640) -- 전체 레이아웃 합성 미리보기
+
+- `kitchen-chaos/tests/phase-a-tavern-qa.spec.js` -- Playwright 테스트 14개
+- `kitchen-chaos/tests/phase-a-tavern-qa-extended.spec.js` -- QA 확장 테스트 40개
+
+- `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- Phase B 진입 게이트 에셋 발주 규격서
+  - 손님 10종 x 4포즈 = 40장, 셰프 7명 x 7포즈 = 49장, 가구 3등급 발주 규격
+
+### 변경
+
+- `kitchen-chaos/js/main.js`
+  - TavernServiceScene import 추가
+  - 씬 배열에 TavernServiceScene 추가 (NineSliceSandbox 바로 앞)
+
+- `kitchen-chaos/js/devtools/DevHelper.js`
+  - ?scene=tavern URL 파라미터 감지 로직 추가
+  - BootScene 완료 후 TavernServiceScene 자동 전환 (setInterval 폴링)
+
+### 수정
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js` -- AD 모드3 REVISE 반영
+  - bench-top y 오프셋: anchor.y - 30 -> anchor.y - 34 (bench-top/table 간 4px 겹침 제거)
+- `kitchen-chaos/js/data/tavernLayoutData.js` -- AD 모드3 REVISE 반영
+  - BENCH_TOP_OFFSET_Y: -38 -> -26 (bench-top 이미지 y범위 중앙 근방 재조정)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase-a-tavern-spec.md`
+- 목적: `.claude/specs/2026-04-23-kc-phase-a-tavern-scope.md`
+- Coder 리포트: `.claude/specs/2026-04-23-kc-phase-a-tavern-coder-report.md`
+- AD 모드3: `.claude/specs/2026-04-23-kc-phase-a-tavern-ad3.md`
+- QA: `.claude/specs/2026-04-23-kc-phase-a-tavern-qa.md`
+- Phase B 게이트: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md`
+- PIL 스크립트: `.claude/specs/phase-a-pil-gen-script.py`
+
+### 알려진 사항
+
+- lv0 슬롯 dx 오프셋 불균등(32/72/112/160, 간격 40/40/48px) -- V10 HTML 이식 의도, Phase B 에셋 정합 시 재확인 필요
+- window.__tavernLayout 등 전역 노출이 DEV 조건 없이 수행 -- Phase B 이후 import.meta.env.DEV 조건부 변경 권장
+- 모듈 레벨 _seatingState 공유 패턴 -- Phase D에서 씬 라이프사이클 동기화 재검토 필요
+- Playwright 1건 실패(tavernStateData scaleY 검출)는 JSDoc 주석 내 문자열로 인한 false positive
+
+---
+
 ## [Phase 76] 2026-04-23 -- 손님 NPC 다양성 확장 (P3-2 영업 씬 변주 확대)
 
 ### 개요

@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (영업씬 태번 스타일 방향성 확정 — V10 채택)
+> 최종 업데이트: 2026-04-23 (영업씬 태번 스타일 Phase A 완료)
 
 ## 프로젝트 개요
 
@@ -137,16 +137,25 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
-### 영업씬 태번(Travellers Rest) 스타일 재설계 (방향성 확정, 본 구현 미착수)
+### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A 완료, Phase B 대기)
 
-Phase 76 손님 NPC 확장 결과 신규 92×92 스프라이트와 기존 48×64 규격 호환 문제·의자 정합 문제가 드러나 영업씬을 전면 재설계하기로 결정. 카이로 소프트 디메트릭(V9)을 1차 후보로 검토했으나, **Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터(V10)**가 어셋 발주 난이도·정합 자연스러움·동시 좌석 수에서 우위를 보여 V10을 채택. 긴 벤치 + 사이드뷰 손님 슬롯 구조로 다리·하반신이 자연스럽게 가구에 정합되며, 셰프가 카운터에서 테이블로 트레이를 운반하는 동선이 시각적으로 보인다.
+Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터(V10)로 영업씬 전면 재설계 진행 중. Phase A(기반 시스템 골격)에서 레이아웃 상수, 24석 벤치 슬롯 데이터 모델, 셰프/손님 상태머신 14상태, Y축 단순 깊이정렬을 PIL 더미와 함께 확정. 기존 ServiceScene.js는 미수정, 신규 TavernServiceScene으로 병렬 구현.
 
-- **현행 방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
-- 시험 목업: `studio-mockup/kitchen-chaos/travellers-style-mockup.html`
-- 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md) (V9 카이로 디메트릭, 비교 검토용)
-- 이전 방향(폐기): [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md) (Phase 50~52 시점, 일부 절만 계승)
+- **신규 파일**: `js/scenes/TavernServiceScene.js`, `js/data/tavernLayoutData.js`, `js/data/tavernStateData.js`
+- **진입점**: `?scene=tavern` URL 파라미터 (디버그 전용)
+- **Phase B 게이트 문서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md`
+- **페이즈 마스터 플랜**: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
+- **방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
+- 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md), [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md)
 
 ## 개발 이력 (최근)
+
+### Phase A — 영업씬 태번 스타일 기반 시스템 골격 (2026-04-23)
+
+TavernServiceScene + tavernLayoutData + tavernStateData 신규 생성. 360x640 레이아웃 영역 상수, 긴 벤치 24석 슬롯 데이터 모델(occupy/vacate/findFreeSlot/getSlotWorldPos), ChefState 7상태 + CustomerState 7상태 정의, Y축 단순 깊이정렬(depth=y) 구현. PIL 더미 13개 이미지 생성. scaleY 미러링 완전 배제, 3레이어 분리 렌더링 폐기 확인. AD 모드3 REVISE(bench-top 4px 겹침 수정) 반영 후 QA PASS (40/40).
+
+- QA: PASS (Playwright 39/40 + 정적 분석 4, 1건 false positive)
+- 스펙: `.claude/specs/2026-04-23-kc-phase-a-tavern-spec.md`
 
 ### Phase 76 — 손님 NPC 다양성 확장 (2026-04-23)
 
