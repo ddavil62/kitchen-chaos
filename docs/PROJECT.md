@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-23 (Phase 74 UI/카피 마감)
+> 최종 업데이트: 2026-04-23 (Phase 75B 일일 미션 + 로그인 보너스)
 
 ## 프로젝트 개요
 
@@ -36,14 +36,16 @@
 | 결과 | ResultScene.js | 캠페인 별점/엔드리스 기록 표시, 행상인 방문 연결, modal lock (DialogueScene 오버레이 시 버튼 비활성), isCleared 복합 조건, 셰프별 장보기 실패 대사 (7셰프 x 3 바리에이션) |
 | 대화 시스템 | DialogueManager.js + DialogueScene.js + dialogueData.js | 대화 스크립트 119종 재생, 선택지 분기 UI, 픽셀아트 초상화 렌더링, 시청 기록 |
 | 스토리 시스템 | StoryManager.js + storyData.js | 트리거 중앙 디스패처(triggerPoint 8종), 120항목, 챕터 진행도, 스토리 플래그(객체), onComplete 콜백, 씬 1줄 호출 |
-| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v24, 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API, season3Unlocked, getTotalStars(group), achievements, mireukEssence/wanderingChefs/giftIngredients/endless통계/branchCards 헬퍼, `_currentRun` 인메모리 단일 소스 (씬 간 stageId 전달) |
+| 일일 미션 | DailyMissionManager.js | DAILY_MISSION_POOL 10종에서 매일 3개 랜덤 선정, 자정 리셋, 진행도 추적, 보상 자동 지급 |
+| 로그인 보너스 | LoginBonusManager.js | 7일 연속 로그인 캘린더, streak 관리, D1~D7 보상 지급 |
+| 세이브 | SaveManager.js | localStorage, 마이그레이션 체인 v1~v25, 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API, dailyMissions/loginBonus/mimiSkinCoupons 필드, `_currentRun` 인메모리 단일 소스 (씬 간 stageId 전달) |
 | 쿠폰 | CouponRegistry.js | 쿠폰 레지스트리, redeemCoupon() API, 일반 3종+DEV 치트 5종, 사용 이력 localStorage 관리 |
 | 사운드 | SoundManager.js | 프로시저럴 SFX 20종 + BGM 5종 |
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 34개 업적, 해금 판정/보상(골드/코인/정수), 카테고리 탭 UI |
 | 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated(lv0~lv4) 에셋 로드, 타일셋 15종+타워 8종 preload, portrait 9종 (arjun 포함) |
-| 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰/세이브 복구 |
+| 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰/세이브 복구 + 오늘의 미션 배너 + 미션/캘린더 통합 모달 |
 | 데이터 | stageData.js / gameData.js / recipeData.js / merchantBranchData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 292종(일반 284+분기 8), 분기 카드 32장 |
 
 ### 게임 루프
@@ -86,8 +88,10 @@
 | 영업씬 렌더링 재구성 | 테이블 3레이어 분리 렌더링(back/customer/front), 손님 독립 스프라이트(5종x2상태), HUD depth 600+ 상향 | 완료 |
 | 쿠폰 코드 시스템 | 설정 메뉴 쿠폰 입력 UI, 일반 쿠폰 3종(프로덕션), DEV 치트 5종(트리쉐이킹), giftIngredients 세이브 v20 | 완료 |
 | 메뉴 비주얼 에셋 | MenuScene에 배경 이미지(menu_bg), 타이틀 로고(menu_title_logo), 미미 스프라이트, 앱 아이콘(app_icon_512) 도입. 장식 원 제거, panel dark alpha 0.5 | 완료 |
-| 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 8종 전수 실효(tint+전투 수치) + Bond 8쌍 시너지 + Blessing 실효(골드·조리속도·인내심·코인·드롭·적 둔화) + 분기 레시피 반복 등장(chaos_ramen 3회/spice_bomb 2회). 선행 해금 체크(bond: 셰프 해금 조건 / mutation: 도구 `count>=1` / recipe: minChapter·requiresSeason 스키마) 적용 — 초반 유저에게 아직 만나지 못한 동료의 bond 카드가 노출되던 UX 혼란 해소 | 완료 |
+| 행상인 분기 카드 | 4카테고리(변이/레시피/인연/축복) × 각 8장 = 32장, 매 방문 3장 중 1장 선택(되돌릴 수 없음), 배지 아이콘 4종, 세이브 v24 영구 저장, 변이 8종 전수 실효 + Bond 8쌍 시너지 + Blessing 실효 + 분기 레시피 반복 등장. 선행 해금 체크 적용 | 완료 |
 | 세이브 백업 | 3슬롯 롤링 백업(backup_1~3), 설정 패널 복구 버튼 + 백업 목록 모달 + 확인 모달, quota 초과 시 메인 저장 보호 | 완료 |
+| 일일 미션 | DailyMissionManager: 10종 풀에서 매일 3개 랜덤 선정, 6개 씬 이벤트 훅(try-catch), 자정 리셋, 보상 자동 지급. 메뉴 배너 + 통합 팝업 모달 | 완료 |
+| 로그인 보너스 | LoginBonusManager: 7일 캘린더(D1 미미 스킨 쿠폰, D7 미력의 정수 100), streak 단절 시 D1 재시작. 세이브 v25 | 완료 |
 
 ## 콘텐츠 규모
 
@@ -101,7 +105,7 @@
 | 셰프 | 7종 Named (미미/린/메이지/유키/라오/앙드레/아르준, 전원 패시브+액티브 스킬) |
 | 업적 | 34개 (스토리 10 / 전투 8 / 수집 5 / 경제 5 / 엔드리스 6) |
 | 분기 카드 | 32장 (변이 8 / 레시피 8 / 인연 8 / 축복 8) |
-| 세이브 버전 | v24 |
+| 세이브 버전 | v25 |
 
 ## 알려진 제약사항
 
@@ -120,6 +124,10 @@
 - ~~분기 레시피 반복 규약 불일치~~ → **Phase 72에서 chaos_ramen 3회/spice_bomb 2회 카운트 감산 구현 완료 (2026-04-23)**
 - ~~assets/portraits/에 candidates/(31파일) + _archive/(89파일) 미사용 SDXL 후보군/아카이브 잔존~~ → **Phase 73에서 전수 삭제, 정식 8종만 유지 (2026-04-23)**
 - mimi+salt Bond가 salt 변이 없이 단독 사용 시 미작동 (Phase 58-3 pre-existing 구조 결함: `_applyMutationToTower()`에서 변이 없으면 `_applyBondToTower()` 호출이 차단됨). 다른 3쌍 Bond는 BranchEffects API 직접 조회라 영향 없음. 후속 페이즈에서 수정 권장
+- MenuScene 하단 "엔드리스 도전" 버튼(y=638)이 GAME_HEIGHT=640 경계에서 18px 잘림 (Phase 75B 배너 +60px 시프트 부작용). 후속 quick fix 예정
+- MenuScene._renderCalendarSlot()에서 DailyMissionManager._getDateKey() private 메서드 직접 호출 (캡슐화 위반, 기능 동작에 영향 없음)
+- 미미 스킨 쿠폰(mimiSkinCoupons)은 카운터만 저장, 교환/사용 UI 미구현 (Phase 77 SkinManager 의존)
+- 자정 리셋은 클라이언트 로컬 Date 기반, 기기 시간 조작에 취약 (Phase 78 서버 검증 예정)
 
 ## 향후 계획
 
@@ -127,60 +135,37 @@
 
 ## 개발 이력 (최근)
 
+### Phase 75B — 일일 미션 + 로그인 보너스 (2026-04-23)
+
+P3-1 F2P 리텐션 핵심 기능. DailyMissionManager(10종 풀에서 매일 3개 랜덤 선정, 자정 리셋, 진행도 추적, 보상 자동 지급)와 LoginBonusManager(7일 연속 로그인 캘린더, D1 미미 스킨 쿠폰, D7 미력의 정수 100)를 신규 구현. MenuScene 상단에 "오늘의 미션" 배너 + 미션/캘린더 탭 전환 통합 팝업 모달 추가. 6개 씬(Service/Result/Endless/Gathering/Menu)에 이벤트 훅 연결(전부 try-catch 이중 래핑). SaveManager v24->v25 마이그레이션. 미션 아이콘 7종 + 캘린더 슬롯 3종 에셋(PIL 절차 생성, 32x32 PNG).
+
+- 신규 파일: DailyMissionManager.js, LoginBonusManager.js, assets/sprites/ui/missions/ (10종 PNG)
+- 수정 파일: SaveManager.js, MenuScene.js, BootScene.js, ServiceScene.js, ResultScene.js, EndlessScene.js, GatheringScene.js
+- QA: PASS (Playwright 16/16 non-timeout PASS, 수용 기준 9/9 충족, 스크린샷 8종 확인)
+- 스펙: `.claude/specs/2026-04-23-kc-phase75B-spec.md`
+
 ### Phase 75 — 행상인 분기 카드 풀 선행 해금 체크 (2026-04-23)
 
-버그 수정. 행상인 방문 시 `getEligiblePool()`이 유저 진행도(챕터/시즌/도구 보유)를 참조하지 않아, 초반 유저가 아직 만나지 못한 후반 동료(예: 아르준, 17장 해금)의 bond 카드나 미보유 도구의 mutation 카드를 마주치던 UX 혼란을 해소. 셰프 해금 판별 로직은 `chefUnlockHelper.js`로 추출해 `ChefSelectScene`과 `merchantBranchData` 양쪽에서 공유. recipe 카드 스키마에 `minChapter`/`requiresSeason` 선택 필드를 도입했으나, 8장 모두 필드 미설정 상태로 남겨 향후 기획자가 수치를 채울 수 있는 구조만 마련.
+버그 수정. getEligiblePool에 bond/mutation/recipe 카테고리별 선행 해금 필터 추가. chefUnlockHelper.js 공용화.
 
-- 수정 파일: `chefUnlockHelper.js` (신규), `merchantBranchData.js` (getEligiblePool/selectBranchCards 시그니처 확장), `MerchantScene.js` (progressState 구성), `ChefSelectScene.js` (헬퍼 import 전환)
-- 신규 테스트: `phase75-merchant-branch-filter-qa.spec.js` (27건), `phase58-qa-integration.spec.js` 신 시그니처로 업데이트 (회귀 해소)
-- QA: Playwright 54/54 PASS (Phase 75 27 + Phase 58 회귀 27), 콘솔 에러 0건
-- 스펙: `.claude/specs/2026-04-23-kc-phase75-spec.md`
+- QA: Playwright 54/54 PASS, 스펙: `.claude/specs/2026-04-23-kc-phase75-spec.md`
 
 ### Phase 74 — UI/카피 마감 P2-4~7 (2026-04-23)
 
-P2-4~7 해결. 5개 독립 UI/카피 작업 일괄 구현. EndlessScene 튜토리얼에 페이지네이터 도트 인디케이터 추가(TutorialManager _render() 확장). ResultScene 셰프별 장보기 실패 대사 21줄+폴백 3줄 상수화. MerchantScene 도구 카드에 추천 배지 3종(초심자 추천/공격 중심/서포트 중심) 추가. AchievementScene 수령 대기 카드 panel_glow_selected + alpha 펄스 tween. ShopScene 인테리어/직원 탭 cardH 90->112 오버플로우 수정.
+튜토리얼 페이지네이터, 셰프 실패 대사, 도구 배지, 업적 glow, ShopScene cardH 수정.
 
-- 수정 파일: TutorialManager.js, EndlessScene.js, ResultScene.js, MerchantScene.js, AchievementScene.js, ShopScene.js
-- QA: PASS (구현 코드 전수 정상, AD3 APPROVED)
-- 스펙: `.claude/specs/2026-04-23-kc-phase74-spec.md`
+- QA: PASS, 스펙: `.claude/specs/2026-04-23-kc-phase74-spec.md`
 
 ### Phase 73 — 세이브 백업 + 포트레이트 정합 (2026-04-23)
 
-P2-1, P2-3 해결. SaveManager에 3슬롯 롤링 백업(backup_1~3) + getBackups/restoreBackup API 추가. MenuScene 설정 패널에 복구 버튼 + 백업 목록 모달 + 확인 모달 구현. assets/portraits/ 전수 점검: candidates/(31파일) + _archive/(89파일) 삭제, 정식 8종만 유지.
+3슬롯 롤링 백업 + 복구 UI. portraits 120파일 삭제.
 
-- 수정 파일: SaveManager.js (+88), MenuScene.js (+242/-4)
-- 삭제: assets/portraits/candidates/ (31파일), assets/portraits/_archive/ (89파일)
-- 신규 테스트: phase73-save-backup.spec.js (13건), phase73-portrait-integrity.spec.js (4건), phase73-qa.spec.js (22건)
-- QA: Playwright 130/130 PASS (Phase 73 39 + Phase 70~72 회귀 91), 콘솔 에러 0건
-- 스펙: `.claude/specs/2026-04-23-kc-phase73-spec.md`
+- QA: Playwright 130/130 PASS, 스펙: `.claude/specs/2026-04-23-kc-phase73-spec.md`
 
 ### Phase 72 — 분기 카드 수치 전수 반영 (2026-04-23)
 
-P2-2 해결: "로그라이크 카드의 약속 이행". 변이 4종(chain/cluster/venom/aura_boost) 실효 구현, Bond 4쌍(yuki+soup_pot/andre+delivery/mimi+salt/mimi+spice) 시너지 구현, enemy_slow 축복 회귀 확인(정상 동작), 레시피 반복 규약(chaos_ramen 3회/spice_bomb 2회) 구현.
+변이 4종 + Bond 4쌍 실효, 레시피 반복 규약 구현.
 
-- 수정 파일: Projectile.js, Tower.js, GatheringScene.js, ServiceScene.js, IngredientManager.js, SaveManager.js, merchantBranchData.js
-- 신규 테스트: phase72-branch-effects.spec.js (16건), phase72-qa-edge.spec.js (16건), phase72-qa-bond-bug.spec.js (2건)
-- QA: Playwright 91/91 PASS (Phase 72 34 + Phase 70 회귀 28 + Phase 71 회귀 29), 콘솔 에러 0건
-- 스펙: `.claude/specs/2026-04-23-kc-phase72-spec.md`
+- QA: Playwright 91/91 PASS, 스펙: `.claude/specs/2026-04-23-kc-phase72-spec.md`
 
-### Phase 71 — 체커 패턴 복구 + 에셋 404 전수 수리 (2026-04-23)
-
-P1-6, P2-8 해결. GatheringScene 체커 depth+색상 대비 강화, 타일셋 3종+테이블 8종+타워 2종 신규/수정.
-
-- QA: Playwright 62/62 PASS, AD 모드2/3 APPROVED
-- 스펙: `.claude/specs/2026-04-22-kc-phase71-spec.md`
-
-### Phase 70 — 초반 튜토리얼 안전장치 + 분기 카드 피드백 강화 (2026-04-22)
-
-P1-1, P1-3 해결. ToolManager.grantTool() + 1-1~1-3 자동 도구 지급, MerchantScene 분기 탭 UX 개선.
-
-- QA: Playwright 28/28 PASS, AD 모드3 APPROVED
-- 스펙: `.claude/specs/2026-04-22-kc-phase70-spec.md`
-
-### Phase 68 — P0 판정/레이어/씬 상태 전달 핫픽스 (2026-04-22)
-
-P0-2~4 해결. isCleared 복합 조건, modal lock, _currentRun 인메모리 단일 소스.
-
-- QA: Playwright 40/40 PASS, AD 모드3 APPROVED
-
-이전 이력은 [CHANGELOG.md](CHANGELOG.md) 참조.
+이전 이력(Phase 71 이전)은 [CHANGELOG.md](CHANGELOG.md) 참조.

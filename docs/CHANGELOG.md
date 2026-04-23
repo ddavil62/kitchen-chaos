@@ -1,5 +1,108 @@
 # Changelog
 
+## [Phase 75B] 2026-04-23 -- 일일 미션 + 로그인 보너스 (P3-1 F2P 리텐션)
+
+### 개요
+
+P3 BM/리텐션 트랙 첫 번째 기능. 유저가 매일 접속할 동기를 부여하는 두 시스템(일일 미션, 7일 로그인 캘린더)을 신규 구현. DailyMissionManager가 DAILY_MISSION_POOL 10종에서 매일 3개를 중복 없이 랜덤 선정하고 달성 시 보상을 자동 지급한다. LoginBonusManager가 7일 연속 로그인 캘린더를 관리하며 D1에 미미 스킨 쿠폰, D7에 미력의 정수 100을 지급한다. MenuScene 상단에 "오늘의 미션" 배너와 미션/캘린더 탭 전환 통합 팝업 모달을 추가. 6개 씬에 이벤트 훅을 연결하여 미션 진행도를 자동 추적한다.
+
+### 추가
+
+- `kitchen-chaos/js/managers/DailyMissionManager.js` -- 신규 매니저
+  - DAILY_MISSION_POOL 10종: stage_clear_3/5, gold_earn_500/1000, orders_complete_10/20, perfect_satisfaction_1, endless_wave_5, gather_run_2, three_star_1
+  - `checkAndReset()`: 로컬 Date 기반 날짜 변경 감지, 3개 미션 재선정, progress/completed/claimed 초기화
+  - `recordProgress(missionType, delta)`: type 기반 호출, 선정된 미션 중 해당 type에 delta 적용. endless_wave는 Math.max 갱신, 나머지는 += 누적
+  - `getTodayMissions()`: 당일 3개 미션 + 진행도/완료/수령 상태 반환
+  - `claimReward(missionId)`: 내부용 수동 수령 API (자동 지급이 기본)
+  - `_grantReward(reward)`: gold/kitchenCoins/mireukEssence 분기 지급. mireukEssence 999 캡 방어
+  - null/손상 세이브 방어 (L70-72 기본값 삽입)
+  - 이미 완료된 미션 추가 진행도 누적 방지 (L131 `if (dm.completed[id]) continue`)
+
+- `kitchen-chaos/js/managers/LoginBonusManager.js` -- 신규 매니저
+  - LOGIN_REWARDS 7일 보상 테이블: D1 미미 스킨 쿠폰 x1, D2 골드 100, D3 주방 코인 5, D4 골드 200, D5 주방 코인 10, D6 미력의 정수 30, D7 미력의 정수 100
+  - `checkAndGrantDaily()`: lastLoginDate와 오늘 비교, 어제면 streak+1, 그 외 streak=1+claimedDays 리셋
+  - D7 완주 후 streak=0, claimedDays=[] 리셋 (다음날 D1 재시작)
+  - `getLoginBonusState()`: 팝업 표시용 상태 반환
+  - `_grantReward(rewardDef)`: mimiSkinCoupons/gold/kitchenCoins/mireukEssence 분기. mireukEssence 999 캡 방어
+  - null/손상 세이브 방어 (L65-67)
+
+- `kitchen-chaos/assets/sprites/ui/missions/` -- 에셋 10종 (32x32 PNG, PIL 절차 생성)
+  - 미션 아이콘 7종: mission_icon_clear_stage, mission_icon_gold, mission_icon_serve, mission_icon_recipe, mission_icon_endless, mission_icon_satisfaction, mission_icon_three_star
+  - 캘린더 슬롯 3종: calendar_slot_locked (회색 자물쇠), calendar_slot_claimed (골드 체크마크), calendar_slot_today (골드 강조 + 별)
+  - 카테고리별 컬러: 전투 골드 #D4A24A, 경제 #FFCC44, 요리 #E8794A/#5FB54A, 엔드리스 #8C5BD8, 캘린더 #6B6B6B/#FFE266
+  - 외곽선 #1A1A1A, 투명 배경, 기존 branch_badge_* 톤 일관성 유지
+
+- `kitchen-chaos/js/scenes/MenuScene.js` -- 배너 + 팝업 모달
+  - `_createMissionBanner()`: NineSlice 배너(y=50, tint 0xcc6600), 아이콘 + "오늘의 미션" + 별 상태(★★☆)
+  - `_openDailyMissionModal()`: 반투명 오버레이 + NineSlice panel(dark, 300x440)
+  - 상단 탭: "오늘의 미션" | "로그인 보너스" 전환
+  - 미션 탭: 3개 미션 카드(아이콘 28x28 + 설명 + 진행 바 + 보상 텍스트 + 달성 체크)
+  - 캘린더 탭: D1~D7 슬롯(4+3 배치), 보상 리스트, 연속 로그인 일차 표시
+  - X 닫기 + 오버레이 바깥 클릭 닫기 + _onBack 처리
+  - 더블클릭 모달 중복 생성 방지 (L279 `if (this._missionModalContainer) return`)
+
+- `kitchen-chaos/js/scenes/BootScene.js` -- missions 디렉토리 10개 PNG preload 추가
+
+- 이벤트 훅 (전부 try-catch 이중 래핑):
+  - `ServiceScene.js:2522` -- 주문 완료(servedCount++) 직후: `recordProgress('orders_complete', 1)`
+  - `ServiceScene.js:2765` -- 영업 종료 골드 획득 직후: `recordProgress('gold_earn', earnedGold)`
+  - `ResultScene.js:334` -- 스테이지 클리어: `recordProgress('stage_clear', 1)`
+  - `ResultScene.js:336-337` -- 별 3개: `if (stars === 3) recordProgress('three_star', 1)`
+  - `ResultScene.js:340-341` -- 만족도 95%+: `recordProgress('perfect_satisfaction', 1)`
+  - `EndlessScene.js:274` -- 웨이브 클리어: `recordProgress('endless_wave', this.endlessWave)` (Math.max 갱신)
+  - `GatheringScene.js:70` -- 장보기 시작(setCurrentRun 직후): `recordProgress('gather_run', 1)`
+
+### 변경
+
+- `kitchen-chaos/js/managers/SaveManager.js`
+  - SAVE_VERSION 24 -> 25
+  - `createDefault()`: dailyMissions(dateKey/selected/progress/completed/claimed), loginBonus(loginStreak/lastLoginDate/claimedDays), mimiSkinCoupons 필드 추가
+  - `_migrate()`: v24->v25 분기 추가 (L1538-1548). dailyMissions/loginBonus/mimiSkinCoupons 기본값 삽입, version=25
+  - @fileoverview 주석에 Phase 75B 줄 추가
+
+- `kitchen-chaos/js/scenes/MenuScene.js` -- 기존 요소 y좌표 전체 +60px 하향
+  - 타이틀 y=220->280, 부제 y=320->380, 게임시작 y=390->450, 상점 y=450->510
+  - 도감 y=496->556, 업적 y=534->594, 엔드리스(ENDLESS_Y) y=578->638
+  - DailyMissionManager/LoginBonusManager import 추가
+  - create() 초반에 checkAndReset() + checkAndGrantDaily() 호출
+
+### 스펙 대비 변경
+
+- 스펙에서는 엔드리스 베스트 기록(y=667), 평판+수집률(y=680), 버전(y=690)을 개별 배치했으나, GAME_HEIGHT=640 초과 위험으로 Coder가 하단 정보를 한 줄로 압축하여 y=630에 배치. AD3에서 ACCEPT (후속 quick fix 분리).
+- recordProgress는 스펙 권장대로 missionId가 아닌 type string으로 호출하여 당일 선정 미션 중 해당 type 항목에 일괄 적용하는 방식 채택.
+- 기타 요구사항은 스펙과 동일하게 구현.
+
+### 알려진 이슈
+
+- **KNOWN-1 (MEDIUM)**: MenuScene 하단 "엔드리스 도전" 버튼(ENDLESS_Y=638 + ENDLESS_H=40)이 GAME_HEIGHT=640 경계에서 18px 잘림. 배너 +60px 시프트 부작용. 후속 quick fix 예정. AD3 제안: 시프트 +40px 축소 또는 배너 높이 44->36px 축소.
+- **KNOWN-2 (LOW)**: MenuScene._renderCalendarSlot()에서 DailyMissionManager._getDateKey() private 메서드 직접 호출 (캡슐화 위반). LoginBonusManager에 public getTodayDateKey() 추가 또는 인라인 구현 권장.
+- **KNOWN-3 (LOW)**: DailyMissionManager._grantReward에 mimiSkinCoupons 타입 미구현. 현재 DAILY_MISSION_POOL에 해당 타입 없으므로 미발생. Phase 77 SkinManager 구현 시 함께 처리.
+- Playwright 14개 테스트 타임아웃은 `injectSaveAndReload()` + Phaser 재부팅 시간(에셋 로드 13~14초) 인프라 이슈. 구현 코드 버그 아님.
+- TC-18 더블클릭 테스트 FAIL은 기대값 오류 (두 번째 클릭이 오버레이에 닿아 모달 닫힘은 정상 동작).
+
+### 검증
+
+- QA: **PASS** (2026-04-23)
+  - 수용 기준 9/9 전수 충족
+  - Playwright 16/16 non-timeout PASS, 빌드 PASS (66 modules, 2.5MB)
+  - 시각적 검증 스크린샷 8종 확인 (메뉴 배너, 미션 모달, 캘린더 탭, 탭 전환, 엔드리스 오버플로)
+  - 콘솔 에러 0건
+  - 예외 시나리오 15건 중 14건 PASS, 1건 KNOWN ISSUE (엔드리스 버튼 잘림)
+- AD2: **APPROVED** -- 10종 에셋 모두 AD1 명세 일치
+- AD3: **APPROVED** -- 모달/캘린더 핵심 UI 명세 일치, 하단 메뉴 잘림은 후속 quick fix 분리
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-23-kc-phase75B-spec.md`
+- 목적 정의: `.claude/specs/2026-04-23-kc-phase75B-scope.md`
+- 코더 리포트: `.claude/specs/2026-04-23-kc-phase75B-coder-report.md`
+- QA: `.claude/specs/2026-04-23-kc-phase75B-qa.md`
+- AD1: `.claude/specs/2026-04-23-kc-phase75B-ad1.md`
+- AD2: `.claude/specs/2026-04-23-kc-phase75B-ad2.md`
+- AD3: `.claude/specs/2026-04-23-kc-phase75B-ad3.md`
+
+---
+
 ## [Phase 74] 2026-04-23 -- UI/카피 마감 (P2-4~7 묶음)
 
 ### 개요
