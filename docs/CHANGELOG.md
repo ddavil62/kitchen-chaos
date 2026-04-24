@@ -1,5 +1,96 @@
 # Changelog
 
+## [Phase B-6] 2026-04-24 -- 캐릭터 해상도 업스케일 16x24 -> 32x48
+
+### 개요
+
+캐릭터 15명(손님 10종 + 셰프 5명)을 PixelLab `create_character size=48`로 재발주하여, 기존 16x24px 에셋을 32x48px 캔버스로 업스케일. 총 55장 신규 에셋(seated 20 + idle 5 + walk 30). TavernServiceScene.js의 spritesheet frameWidth/frameHeight를 16/24 -> 32/48으로 갱신. 기존 16x24 에셋 57장은 `assets/tavern/.legacy-b5/`에 백업. business walk_l은 PixelLab ZIP에 west 방향 프레임 부재로 rotation fallback 사용(2프레임 alternation, LOW 이슈).
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/customer_{10종}_seated_right.png` -- 각 32x48px, 손님 10종 우향 앉기 (PixelLab size=48 east rotation -> PIL NEAREST resize 32x32 -> 32x48 캔버스 y=8 정렬)
+- `kitchen-chaos/assets/tavern/customer_{10종}_seated_left.png` -- 각 32x48px, 손님 10종 좌향 앉기 (west rotation 기반)
+- `kitchen-chaos/assets/tavern/customer_{10종}_walk_r.png` -- 각 128x48px, 4프레임 시트 (animate_character walking-4-frames east)
+- `kitchen-chaos/assets/tavern/customer_{10종}_walk_l.png` -- 각 128x48px, 4프레임 시트 (animate_character walking-4-frames west; business는 rotation fallback)
+- `kitchen-chaos/assets/tavern/chef_{mage/yuki/lao/andre/arjun}_idle_side.png` -- 각 32x48px, 셰프 5명 idle (east rotation)
+- `kitchen-chaos/assets/tavern/chef_{mage/yuki/lao/andre/arjun}_walk_r.png` -- 각 128x48px, 셰프 walk 4프레임 시트
+- `kitchen-chaos/assets/tavern/chef_{mage/yuki/lao/andre/arjun}_walk_l.png` -- 각 128x48px, 셰프 walk 4프레임 시트
+- `kitchen-chaos/assets/tavern/.legacy-b5/` -- 기존 16x24 에셋 57장 백업
+- `kitchen-chaos/assets/tavern/.zips-b6/` -- PixelLab ZIP 15개 다운로드 + 추출
+- `kitchen-chaos/assets/tavern/_postprocess_b6.py` -- B-6 후처리 스크립트 (68x68 raw -> 32x48 캔버스)
+- `kitchen-chaos/tests/phase-b6-upscale.spec.js` -- Playwright 66개 테스트
+- `kitchen-chaos/tests/phase-b6-qa-edge.spec.js` -- Playwright QA 엣지 17개 테스트
+
+### 변경
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - fileoverview에 B-6 추가
+  - spritesheet preload 30개소 `frameWidth: 16 -> 32`, `frameHeight: 24 -> 48` 갱신
+  - spritesheet 주석 규격 64x24 -> 128x48 갱신
+  - 총 12줄 변경 (주석 + 프레임 크기 값)
+  - ServiceScene.js diff: 0줄 (무수정)
+  - scaleX/flipX/scaleY/flipY: 0건
+  - tavern_dummy/ 변경: 0건
+- `kitchen-chaos/tests/phase-b4-walk-animation.spec.js`
+  - frameWidth 16 -> 32, frameHeight 24 -> 48 하드코드 갱신
+- `kitchen-chaos/tests/phase-b5-1-chef-walk.spec.js`
+  - frameWidth 16 -> 32, frameHeight 24 -> 48 하드코드 갱신
+
+### 에셋 규격
+
+| 카테고리 | 수량 | 이전 규격 | 신규 규격 |
+|---------|------|----------|----------|
+| 손님 seated R/L | 20 | 16x22 | 32x48 |
+| 손님 walk R/L | 20 | 64x24 | 128x48 |
+| 셰프 idle_side | 5 | 16x24 | 32x48 |
+| 셰프 walk R/L | 10 | 64x24 | 128x48 |
+| **합계** | **55** | -- | -- |
+
+### 후처리 파이프라인
+
+- PixelLab size=48 -> raw 68x68 캔버스 (실측, 스펙 64x64에서 변경)
+- PIL resize(32, 32, NEAREST) -> 32x48 캔버스 y=8 정렬
+- walk: 4프레임 각 32x48 셀 -> 128x48 가로 결합
+
+### PixelLab 발주
+
+- create_character: 15명 x 4 rotations = 60 generations
+- animate_character walking-4-frames: 15명 x 2 방향 = 30 generations
+- 총 90 generations 사용
+- andre/arjun walk v2 generation_failed -> v2b retry 성공
+- Manifest: `.claude/specs/2026-04-24-kc-phase-b6-pixellab-manifest.md`
+
+### AD 모드2 검수 결과
+
+APPROVED. 55/55 PASS (크기 정확, 금지색 0건, opaque 416~524, 프레임 다양성 확인). business walk_l 2프레임 alternation은 LOW 이슈 판정.
+
+### AD 모드3 검수 결과
+
+APPROVED with NOTE. 카운터/입구 비례 적절. 벤치(14px) < 캐릭터(32px) 비례 이슈 -> B-6-2 후속 페이즈로 분리. 게임 로직/충돌에 영향 없음.
+
+### QA 결과
+
+PASS. 총 153/153 (B-6 신규 66 + 회귀 70 + QA 엣지 17). SC-1~SC-10 전수 충족.
+
+### 알려진 이슈
+
+- **business walk_l 2프레임 alternation** (LOW): PixelLab ZIP에 west 방향 프레임 부재, rotation fallback 사용. 다리 alternation 보존되나 4프레임 정상 walk 대비 단조로움. 후속 재발주 권고.
+- **가구 비례** (NOTE): 벤치(14px wide) < 캐릭터(32px wide) -> B-6-2 후속 가구 업스케일 페이즈 분리 확정.
+- **chef_mimi/rin 해상도 격차**: B-6 발주 대상 제외(16x24 레거시 유지). setDisplaySize(32,48)로 표시 크기 동일하나 시각 선명도 낮음. Phase D 또는 별도 발주 페이즈에서 처리 예정.
+- **seated 표시 크기**: TavernServiceScene.js L685에서 setDisplaySize(32, 44) 사용 (에셋 32x48과 4px 불일치, B-6 이전부터 존재하는 의도적 설정).
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b6-spec.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b6-coder-report.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b6-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b6-ad2.md`
+- AD 모드3: `.claude/specs/2026-04-24-kc-phase-b6-ad3.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b6-qa.md`
+- Manifest: `.claude/specs/2026-04-24-kc-phase-b6-pixellab-manifest.md`
+
+---
+
 ## [Phase B-5-1] 2026-04-24 -- 셰프 5명 Walk 스프라이트시트 10장 발주
 
 ### 개요
