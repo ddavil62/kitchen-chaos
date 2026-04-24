@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-24 (영업씬 태번 스타일 Phase B-2 WARN 해소 + 스프라이트 전환 완료)
+> 최종 업데이트: 2026-04-24 (영업씬 태번 스타일 Phase B-3 손님 9종 + 셰프 5명 에셋 확장 완료)
 
 ## 프로젝트 개요
 
@@ -137,21 +137,30 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
-### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A + A-bis + B-1 + B-2 완료, Phase B-3 준비)
+### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A + A-bis + B-1 + B-2 + B-3 완료)
 
-Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계 진행 중. Phase B-2에서 B-1 WARN 4건(seated_left 셔츠 색상, 벤치 음영, 셰프 placeholder) 해소를 위해 에셋 4종(seated_left 재발주, bench L/R 재발주, chef_rin 신규)을 발주하고, `_buildChef()`/`_buildCustomers()`를 `_placeImageOrRect()` 경로로 전환하여 셰프 2명 + 손님이 실 픽셀아트 Image 오브젝트로 렌더링된다. vite 빌드에서 `_raw/` + `.py` 제외 완료.
+Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계 진행 중. Phase B-3에서 손님 9종(vip~business) seated_right/left 18장 + 셰프 5명(mage/yuki/lao/andre/arjun) idle_side 5장 + W-1 재발주(size=44) = 총 24장을 PixelLab 발주 완료. DEMO_CUSTOMER_TYPES 4종 데모 배치, REAL_KEY_MAP 15개, preload realAssets 32개로 확장. 153/153 Playwright PASS.
 
 - **신규 파일**: `js/scenes/TavernServiceScene.js`, `js/data/tavernLayoutData.js`, `js/data/tavernStateData.js`
-- **실 에셋**: `assets/tavern/` (9종 PNG: 가구 5 + 손님 seated 2 + 셰프 미미/린 각 1), PIL placeholder: `assets/tavern_dummy/` (보존)
+- **실 에셋**: `assets/tavern/` (32종 PNG: 가구 5 + 손님 seated 20 + 셰프 7), PIL placeholder: `assets/tavern_dummy/` (보존)
 - **진입점**: `?scene=tavern` URL 파라미터 (디버그 전용)
 - **현재 레이아웃**: V12 (4분면 세로 테이블, quad 100x120px, ASSET_MODE='real')
-- **REAL_KEY_MAP**: 9개 매핑 (가구 5 + 손님 seated 2 + 셰프 2)
+- **REAL_KEY_MAP**: 15개 매핑 (가구 5 + 손님 normal 2 + 데모 3종 seated 6 + 셰프 2)
+- **DEMO_CUSTOMER_TYPES**: 4슬롯 데모 배치 (normal/vip/gourmet/rushed)
 - **Phase B 규격서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격, B-2 반영)
 - **페이즈 마스터 플랜**: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
 - **방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
 - 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md), [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md)
 
 ## 개발 이력 (최근)
+
+### Phase B-3 — 손님 9종 + 셰프 5명 에셋 확장 (2026-04-24)
+
+손님 9종(vip~business) seated R/L 18장 + 셰프 5명(mage/yuki/lao/andre/arjun) idle_side 5장 + W-1 재발주(size=44 + Option B 색상 정규화) = 총 24장 PixelLab 발주. DEMO_CUSTOMER_TYPES 4종(normal/vip/gourmet/rushed) 슬롯 분배, REAL_KEY_MAP +6키(15개), preload +23(32개), SIT 텍스처 동적 교체. W-1은 PARTIAL(11.3%, 구조적 한계).
+
+- QA: PASS (Playwright 153/153, 회귀 0건)
+- AD 모드2: APPROVED (conditional, W-1 PARTIAL, 23/24 완전 PASS)
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b3-spec.md`
 
 ### Phase B-2 — B-1 WARN 해소 + 스프라이트 전환 (2026-04-24)
 

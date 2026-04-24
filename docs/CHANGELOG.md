@@ -1,5 +1,99 @@
 # Changelog
 
+## [Phase B-3] 2026-04-24 -- 손님 9종 + 셰프 5명 에셋 확장
+
+### 개요
+
+손님 9종(vip/gourmet/rushed/group/critic/regular/student/traveler/business) seated_right/left 18장 + 셰프 5명(mage/yuki/lao/andre/arjun) idle_side 5장 + W-1 재발주(size=44 큰 캔버스 + Option B 색상 정규화) = 총 24장을 PixelLab으로 발주하여 `assets/tavern/`에 저장. DEMO_CUSTOMER_TYPES 4종 슬롯 분배, REAL_KEY_MAP +6키(총 15개), preload realAssets +23(총 32개), SIT 텍스처 동적 교체 구현.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/customer_{vip/gourmet/rushed/group/critic/regular/student/traveler/business}_seated_right.png` -- 각 16x22px, 손님 9종 우향 앉기 (PixelLab size=22, 32x32 -> NEAREST 16x16 + 상단 6px 투명 패딩)
+- `kitchen-chaos/assets/tavern/customer_{vip/gourmet/rushed/group/critic/regular/student/traveler/business}_seated_left.png` -- 각 16x22px, 손님 9종 좌향 앉기 (독립 스프라이트, scaleX/flipX 미사용)
+- `kitchen-chaos/assets/tavern/chef_{mage/yuki/lao/andre/arjun}_idle_side.png` -- 각 16x24px, 셰프 5명 idle 사이드뷰 (PixelLab size=24, 36x36 -> NEAREST + crop/패딩)
+- `kitchen-chaos/assets/tavern/_raw/*_b3.png` -- 24장 PixelLab 원본 백업
+- `kitchen-chaos/assets/tavern/_postprocess_b3.py` -- B-3 후처리 스크립트 (리사이즈/패딩)
+- `kitchen-chaos/tests/phase-b3-asset-expansion.spec.js` -- Playwright 35개 테스트 (HTTP 200, 텍스처 레지스트리, customerType, SIT 교체, 회귀)
+
+### 변경
+
+- `kitchen-chaos/assets/tavern/customer_normal_seated_left.png` -- W-1 재발주 (PixelLab size=44 -> 64x64 raw -> NEAREST 직접 16x22 다운스케일 + Option B 색상 정규화). teal 6/53 = 11.3% (B-2 대비 opaque 26->53으로 개선, 비율은 구조적 한계)
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - REAL_KEY_MAP 확장: +6키 (vip/gourmet/rushed seated_down/up 각 2개 = 6). 총 15개
+  - preload realAssets 확장: +23 에셋 (손님 9종x2=18 + 셰프 5명=5). 총 32개. W-1은 기존 항목 파일 교체
+  - DEMO_CUSTOMER_TYPES 상수 추가: `['normal', 'vip', 'gourmet', 'rushed']` (4슬롯 1:1 배치)
+  - `_buildCustomers()`: customerType 프로퍼티 추가, 타입별 더미 키 분기
+  - `_cycleCustomerState()`: SIT_DOWN/SIT_UP 텍스처 교체를 customerType 기반 동적 키로 변경 (`tavern_customer_${typeKey}_seated_right/left`)
+  - `__tavernSpriteTypes`: customerType 필드 노출 추가
+- `kitchen-chaos/tests/phase-b2-sprite-transition.spec.js` -- B-3 DEMO_CUSTOMER_TYPES 반영 (손님 초기 텍스처 검증을 타입별로 갱신)
+
+### W-1 재발주 결과 (PARTIAL)
+
+- size=44 발주 -> PixelLab 64x64 출력 -> PIL 직접 16x22 NEAREST 다운스케일
+- Option B 색상 정규화: 셔츠 6픽셀에 seated_right 4단계 팔레트(MAIN #56b5b4/HIGH #87d8e0/SHADOW #367e7c/DARK #266e6c) 1:1 매핑 적용
+- 시각적으로 청록 셔츠로 인식 가능하나 정량 비율 11.3%로 목표 25% 미달
+- 구조적 한계: facing-left 사이드뷰에서 셔츠 가시 영역 x=7,8 좁은 띠(6cells 상한). silhouette 재설계 없이 개선 불가
+- 권장: Phase B-4 walk_l 시트 발주 시 PixelLab PRO 모드 + size=64로 재시도
+
+### AD 모드2 검수 결과
+
+APPROVED (conditional). FAIL 0건, WARN 1건(W-1 PARTIAL), PASS 23건.
+
+손님 9종 차별화 검증:
+| type | 핵심 색상 | 차별화 |
+|------|----------|--------|
+| vip | 검정 정장, 금색 보타이 | OK |
+| gourmet | 흰색 셰프 모자, 베이지 앞치마 | OK |
+| rushed | 흰셔츠, 빨강 넥타이 | OK |
+| group | 파스텔 핑크/노랑 | OK |
+| critic | 다크 네이비 블레이저, 안경 | OK |
+| regular | 갈색 카디건 | OK |
+| student | 네이비 교복 | OK |
+| traveler | 카키 베스트 | OK |
+| business | 다크 그레이 정장 | OK |
+
+셰프 5명 차별화 검증:
+| 이름 | 핵심 색상 | 미미/린 구분 |
+|------|----------|-------------|
+| mage | 보라/네이비 로브, 은발 | OK |
+| yuki | 흰색 코트, 하늘색 헤어 | OK |
+| lao | 황색 코트, 적색 사쉬 | OK |
+| andre | 검정 코트, 흰 토크 | OK |
+| arjun | 주황 코트, 갈색 피부 | OK |
+
+### QA 결과
+
+PASS. Playwright 153/153 전수 PASS.
+- SC-1: PARTIAL (인정, teal 11.3%, 구조적 한계, AD2 conditional APPROVED)
+- SC-2: PASS (손님 9종 R/L 18장, 16x22)
+- SC-3: PASS (셰프 5명, 16x24)
+- SC-4: PASS (preload 32개, Phaser 텍스처 32종)
+- SC-5: PASS (REAL_KEY_MAP +6 = 15개)
+- SC-6: PASS (DEMO_CUSTOMER_TYPES 4종 배치, customerType 확인)
+- SC-7: PASS (SIT 텍스처 동적 교체)
+- SC-8: PASS (AD2 FAIL 0건)
+- SC-9: PASS (153/153, 회귀 0건)
+- SC-10: PASS (ServiceScene.js diff 0줄, scaleX/flipX 0건, tavern_dummy/ 0건, 레이아웃 상수 0건)
+
+### 알려진 이슈
+
+- W-1 seated_left 셔츠 청록 정량 비율 미달 (PARTIAL, 11.3%) -> Phase B-4 walk_l PRO 모드 재발주 시 해소 권장
+- 5종 손님(group/critic/regular/student/traveler/business)은 preload만, REAL_KEY_MAP 미매핑 -> Phase D 게임 로직 연동 시 추가
+- 셰프 5명(mage~arjun)은 preload만, 화면 배치 없음 -> Phase D 고용 시스템 구현 시 활성화
+- DEMO_CUSTOMER_TYPES는 Phase D에서 랜덤 spawn 및 type별 게임 로직으로 교체 예정
+- `assets/tavern/write_ad2_report.py` untracked 파일 잔존 (빌드 `.py` 필터로 제외됨, 정리 권장)
+
+### 참고
+
+- 목적: `.claude/specs/2026-04-24-kc-phase-b3-scope.md`
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b3-spec.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b3-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b3-ad2.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b3-coder-report.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b3-qa.md`
+
+---
+
 ## [Phase B-2] 2026-04-24 -- B-1 WARN 해소 + 스프라이트 전환
 
 ### 개요

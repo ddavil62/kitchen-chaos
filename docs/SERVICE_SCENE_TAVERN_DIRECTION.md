@@ -1,7 +1,7 @@
 # Kitchen Chaos — 영업씬 태번(Travellers Rest) 스타일 방향성
 
 > 작성일: 2026-04-23
-> 상태: **Phase A + A-bis + B-1 + B-2 완료** (V12 4분면 세로 레이아웃 확정, 실 에셋 9종 통합, 셰프+손님 Image 렌더링 완료)
+> 상태: **Phase A + A-bis + B-1 + B-2 + B-3 완료** (V12 4분면 세로 레이아웃 확정, 실 에셋 32종 통합, 손님 10종 seated + 셰프 7명 idle 완비)
 > 현재 레이아웃: **V12** (V10 -> V11 -> V12 시각 검증 거쳐 확정, ASSET_MODE='real' 토글로 실 에셋/PIL placeholder 전환)
 > 관련 문서:
 > - [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md) -- 직전 후보(카이로 디메트릭), V10 비교 후 폐기
@@ -287,6 +287,34 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 총 **40장 신규 발주**. V12에서 facing-down/up이 facing-right/left로 변경됨. 단체(group) 손님은 사이드뷰 어울리는 형태(가족 일렬)로 재해석.
 
+#### 5-2-1. 손님 10종 확정 색상 팔레트 (Phase B-3 AD2 실측 기준)
+
+| type | 핵심 색상 | 차별화 요소 | seated 발주 상태 |
+|------|----------|-------------|----------------|
+| normal | 청록 셔츠 #50b0b0 | 기준 외형 | 완료 (B-1) |
+| vip | 검정 정장, 금색 보타이 | 선글라스, 슬릭 헤어 | 완료 (B-3) |
+| gourmet | 흰색 셰프 모자, 베이지 앞치마 | 턱수염, 통통한 체형 | 완료 (B-3) |
+| rushed | 흰셔츠, 빨강 넥타이 | 시계, 스트레스 표정 | 완료 (B-3) |
+| group | 파스텔 핑크/노랑 캐주얼 | 가족 분위기 | 완료 (B-3) |
+| critic | 다크 네이비 블레이저, 둥근 안경 | 메모장, 엄격한 표정 | 완료 (B-3) |
+| regular | 갈색 카디건 | 편안한 표정 | 완료 (B-3) |
+| student | 네이비 교복, 흰 칼라 | 어깨 가방 | 완료 (B-3) |
+| traveler | 카키 베스트, 가죽 모자 | 배낭 스트랩 | 완료 (B-3) |
+| business | 다크 그레이 정장 | 서류가방 | 완료 (B-3) |
+
+#### 5-2-2. DEMO_CUSTOMER_TYPES 4종 데모 분배 정책 (Phase B-3)
+
+`DEMO_CUSTOMER_TYPES = ['normal', 'vip', 'gourmet', 'rushed']`
+
+4명 손님 슬롯에 4종 타입을 1:1 배치하여 시각적 다양성을 시연한다. 나머지 5종(group/critic/regular/student/traveler/business)은 preload만 등록되며 Phase D 랜덤 spawn 로직에서 활성화된다.
+
+| 슬롯 idx | customerType | 초기 텍스처 |
+|---------|-------------|-----------|
+| i=0 | normal | tavern_customer_normal_seated_right |
+| i=1 | vip | tavern_customer_vip_seated_right |
+| i=2 | gourmet | tavern_customer_gourmet_seated_right |
+| i=3 | rushed | tavern_customer_rushed_seated_right |
+
 ### 5-3. 셰프·주방·기타
 
 | 에셋 | 용도 | 해상도 |
@@ -303,7 +331,21 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 | `barrel.png`, `crate.png` 등 | 술통/장식 | 16×20 |
 | `entrance_v12.png` | 입구 (좌하단) | 32x40 |
 
-7명 셰프(미미·린·메이지·유키·라오·앙드레·아르준) × 5종 변형 = 셰프 35장 신규.
+7명 셰프(미미·린·메이지·유키·라오·앙드레·아르준) x 5종 변형 = 셰프 35장 신규.
+
+#### 5-3-1. 셰프 7명 확정 색상 팔레트 (Phase B-3 AD2 실측 기준)
+
+| 이름 | 핵심 색상 | 차별화 요소 | idle_side 발주 상태 |
+|------|----------|-------------|-------------------|
+| mimi | 분홍 머리, 보라 앞치마 | 기준 외형 | 완료 (B-1) |
+| rin | 빨강 머리/헤어밴드 | 빨간 앞치마 | 완료 (B-2) |
+| mage | 보라/네이비 로브, 은발 | 마법사 톤, 별 패턴 | 완료 (B-3) |
+| yuki | 흰색 코트, 하늘색 헤어 | 한색계, 기모노 스타일 | 완료 (B-3) |
+| lao | 황색 코트, 검은 장발 | 적색 사쉬, 동양풍 | 완료 (B-3) |
+| andre | 검정 코트, 흰 토크 | 갈색 콧수염, 정통 프렌치 | 완료 (B-3) |
+| arjun | 주황 코트, 갈색 피부 #8b5e2c | 금 자수, 인도풍 | 완료 (B-3) |
+
+화면 배치 현황 (B-3 기준): 미미(idx=1) + 린(idx=0) 2명만 화면에 표시. 나머지 5명은 preload만 등록, Phase D 고용 시스템에서 활성화.
 
 ### 5-4. 발주 도구 우선순위
 
@@ -348,7 +390,8 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 | **Phase A-bis** | V12 레이아웃 마이그레이션 (V10 가로 -> V12 4분면 세로) | **완료** | V12 placeholder 5종, 테스트 84/84 PASS |
 | **Phase B-1** | 실 에셋 1세트 발주 (손님 seated 2 + 셰프 미미 idle + 가구 5) | **완료** | `assets/tavern/` 8종, ASSET_MODE='real', Playwright 46/46 |
 | **Phase B-2** | WARN 해소 + 스프라이트 전환 (에셋 4종 재발주/신규, Image 렌더링, vite 위생) | **완료** | `assets/tavern/` 9종, REAL_KEY_MAP 9개, Playwright 114/118 |
-| **Phase B-3+** | 에셋 확장 발주 (손님 9종 + 셰프 5명 + walk 시트 + 업그레이드 가구) | 준비 | 규격서: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 갱신 완료) |
+| **Phase B-3** | 에셋 확장 발주 (손님 9종 seated + 셰프 5명 idle + W-1 재발주) | **완료** | `assets/tavern/` 32종, REAL_KEY_MAP 15개, DEMO_CUSTOMER_TYPES 4종, Playwright 153/153 |
+| **Phase B-4+** | 에셋 확장 발주 (walk 시트 + 가구) | 미착수 | 규격서: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` |
 | Phase C | 챕터별 테마 변주 에셋 + HUD/VFX UI | 미착수 | -- |
 | Phase D | 게임 로직 연동 (조리/서빙/골드/셰프 스킬) | 미착수 | -- |
 | Phase E | 기존 ServiceScene 마이그레이션 | 미착수 | -- |
@@ -361,6 +404,7 @@ Phase 76 10종 손님(normal, vip, gourmet, rushed, group, critic, regular, stud
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-24 | Phase B-3 완료 반영. 상태 갱신(32종 에셋), 손님 10종 색상 팔레트(SS5-2-1), 데모 분배 정책(SS5-2-2), 셰프 7명 풀(SS5-3-1) 등재. 진행 상황 B-3 행 추가 + B-3+ -> B-4+로 갱신. |
 | 2026-04-24 | Phase B-2 완료 반영. 상태 갱신(B-2 완료), 진행 상황 B-2 행 추가 + B-2+ -> B-3+로 갱신, REAL_KEY_MAP 9개 기재. |
 | 2026-04-23 | Phase B-1 완료 반영. 상태 갱신, 체크리스트 에셋 발주/좌우 벤치 항목 체크, 진행 상황 Phase B를 B-1/B-2+로 분할, ASSET_MODE 토글 원칙 기재. |
 | 2026-04-23 | Phase A-bis V12 마이그레이션 완료 반영. V10 기준 내용을 V12로 전면 갱신 (좌석 구조, 공간 분할, 에셋 규격, 체크리스트). |
