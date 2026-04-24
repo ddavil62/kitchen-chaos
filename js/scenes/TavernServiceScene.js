@@ -1,10 +1,11 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-5-1.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-6.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12: 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
  * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
  * B-4: 손님 10종 walk_l/walk_r 스프라이트시트(4프레임 64x24) 20장 + 애니메이션 등록 + 데모 W/A 키.
  * B-5-1: 셰프 5명 walk_l/walk_r 스프라이트시트(4프레임 64x24) 10장 + 애니메이션 등록 + 데모 C/V 키.
+ * B-6: 캐릭터 15명 size=48 재발주 + 32x48 후처리 + frameWidth/frameHeight 갱신 (16x24 -> 32x48).
  *
  * 기존 ServiceScene.js와 완전 독립. import/참조/코드 복사 없음.
  * 공용 import(Phaser, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY)만 사용.
@@ -132,10 +133,10 @@ export class TavernServiceScene extends Phaser.Scene {
         'bench_vertical_r_v12',  // 14x76px
         'entrance_v12',          // 32x40px
         // 캐릭터 4종 (B-2 기존)
-        'customer_normal_seated_right',  // 16x22px
-        'customer_normal_seated_left',   // 16x22px (B-3 W-1 재발주 파일 교체)
-        'chef_mimi_idle_side',           // 16x24px
-        'chef_rin_idle_side',            // 16x24px (Phase B-2)
+        'customer_normal_seated_right',  // 32x48px (B-6 size=48 재발주)
+        'customer_normal_seated_left',   // 32x48px (B-6 size=48 재발주)
+        'chef_mimi_idle_side',           // 16x24px (B-6 미포함, 레거시)
+        'chef_rin_idle_side',            // 16x24px (Phase B-2, B-6 미포함)
         // B-3 신규: 손님 9종 seated_right (9개)
         'customer_vip_seated_right',
         'customer_gourmet_seated_right',
@@ -167,7 +168,7 @@ export class TavernServiceScene extends Phaser.Scene {
         this.load.image(`tavern_${name}`, `${realPath}${name}.png`);
       }
 
-      // ── B-4: 손님 10종 walk 스프라이트시트 (16px x 4프레임 = 64x24) ──
+      // ── B-4/B-6: 손님 10종 walk 스프라이트시트 (32px x 4프레임 = 128x48) ──
       const walkTypes = [
         'normal', 'vip', 'gourmet', 'rushed', 'group',
         'critic', 'regular', 'student', 'traveler', 'business',
@@ -176,23 +177,23 @@ export class TavernServiceScene extends Phaser.Scene {
         this.load.spritesheet(
           `tavern_customer_${t}_walk_r`,
           `${realPath}customer_${t}_walk_r.png`,
-          { frameWidth: 16, frameHeight: 24 },
+          { frameWidth: 32, frameHeight: 48 },
         );
         this.load.spritesheet(
           `tavern_customer_${t}_walk_l`,
           `${realPath}customer_${t}_walk_l.png`,
-          { frameWidth: 16, frameHeight: 24 },
+          { frameWidth: 32, frameHeight: 48 },
         );
       }
 
-      // ── B-5-1: 셰프 5명 walk 스프라이트시트 (16px x 4프레임 = 64x24) ──
+      // ── B-5-1/B-6: 셰프 5명 walk 스프라이트시트 (32px x 4프레임 = 128x48) ──
       const chefWalkTypes = ['mage', 'yuki', 'lao', 'andre', 'arjun'];
       chefWalkTypes.forEach(name => {
         ['r', 'l'].forEach(side => {
           this.load.spritesheet(
             `tavern_chef_${name}_walk_${side}`,
             `${realPath}chef_${name}_walk_${side}.png`,
-            { frameWidth: 16, frameHeight: 24 },
+            { frameWidth: 32, frameHeight: 48 },
           );
         });
       });

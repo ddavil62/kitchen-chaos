@@ -106,10 +106,10 @@ test.describe('Phase B-5-1: chef walk 애니메이션 등록', () => {
   });
 });
 
-// ── 4. Spritesheet 프레임 크기 검증 (16x24) ──
+// ── 4. Spritesheet 프레임 크기 검증 (32x48, B-6 업스케일) ──
 
 test.describe('Phase B-5-1: chef spritesheet 프레임 규격', () => {
-  test('chef walk spritesheet의 frameWidth=16, frameHeight=24', async ({ page }) => {
+  test('chef walk spritesheet의 frameWidth=32, frameHeight=48', async ({ page }) => {
     await waitForTavernScene(page);
     const frameSizes = await page.evaluate(() => {
       const scene = window.__game.scene.getScene('TavernServiceScene');
@@ -133,8 +133,8 @@ test.describe('Phase B-5-1: chef spritesheet 프레임 규격', () => {
     });
     expect(frameSizes.length).toBeGreaterThanOrEqual(10);
     for (const f of frameSizes) {
-      expect(f.width, `${f.key} frameWidth`).toBe(16);
-      expect(f.height, `${f.key} frameHeight`).toBe(24);
+      expect(f.width, `${f.key} frameWidth`).toBe(32);
+      expect(f.height, `${f.key} frameHeight`).toBe(48);
     }
   });
 });
