@@ -1,0 +1,129 @@
+[
+  {
+    "file": "customer_normal_walk_r.png",
+    "size": "64x24",
+    "opaque": 158,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_normal_walk_l.png",
+    "size": "64x24",
+    "opaque": 168,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_vip_walk_r.png",
+    "size": "64x24",
+    "opaque": 149,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_vip_walk_l.png",
+    "size": "64x24",
+    "opaque": 149,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_gourmet_walk_r.png",
+    "size": "64x24",
+    "opaque": 227,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_gourmet_walk_l.png",
+    "size": "64x24",
+    "opaque": 225,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_rushed_walk_r.png",
+    "size": "64x24",
+    "opaque": 156,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_rushed_walk_l.png",
+    "size": "64x24",
+    "opaque": 145,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_group_walk_r.png",
+    "size": "64x24",
+    "opaque": 159,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_group_walk_l.png",
+    "size": "64x24",
+    "opaque": 159,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_critic_walk_r.png",
+    "size": "64x24",
+    "opaque": 184,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_critic_walk_l.png",
+    "size": "64x24",
+    "opaque": 166,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_regular_walk_r.png",
+    "size": "64x24",
+    "opaque": 206,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_regular_walk_l.png",
+    "size": "64x24",
+    "opaque": 185,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_student_walk_r.png",
+    "size": "64x24",
+    "opaque": 159,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_student_walk_l.png",
+    "size": "64x24",
+    "opaque": 163,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_traveler_walk_r.png",
+    "size": "64x24",
+    "opaque": 226,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_traveler_walk_l.png",
+    "size": "64x24",
+    "opaque": 185,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_business_walk_r.png",
+    "size": "64x24",
+    "opaque": 170,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_business_walk_l.png",
+    "size": "64x24",
+    "opaque": 178,
+    "status": "PASS"
+  },
+  {
+    "file": "customer_normal_seated_left.png (W-1 PRO)",
+    "size": "16x22",
+    "opaque": 26,
+    "teal": 3,
+    "status": "PARTIAL (teal=3, Option B teal=3, target=13)"
+  }
+]

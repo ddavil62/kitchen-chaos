@@ -1,8 +1,9 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-3.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-4.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12: 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
  * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
+ * B-4: 손님 10종 walk_l/walk_r 스프라이트시트(4프레임 64x24) 20장 + 애니메이션 등록 + 데모 W/A 키.
  *
  * 기존 ServiceScene.js와 완전 독립. import/참조/코드 복사 없음.
  * 공용 import(Phaser, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY)만 사용.
@@ -164,6 +165,24 @@ export class TavernServiceScene extends Phaser.Scene {
       for (const name of realAssets) {
         this.load.image(`tavern_${name}`, `${realPath}${name}.png`);
       }
+
+      // ── B-4: 손님 10종 walk 스프라이트시트 (16px x 4프레임 = 64x24) ──
+      const walkTypes = [
+        'normal', 'vip', 'gourmet', 'rushed', 'group',
+        'critic', 'regular', 'student', 'traveler', 'business',
+      ];
+      for (const t of walkTypes) {
+        this.load.spritesheet(
+          `tavern_customer_${t}_walk_r`,
+          `${realPath}customer_${t}_walk_r.png`,
+          { frameWidth: 16, frameHeight: 24 },
+        );
+        this.load.spritesheet(
+          `tavern_customer_${t}_walk_l`,
+          `${realPath}customer_${t}_walk_l.png`,
+          { frameWidth: 16, frameHeight: 24 },
+        );
+      }
     }
   }
 
@@ -198,6 +217,68 @@ export class TavernServiceScene extends Phaser.Scene {
     // Back 버튼 (좌상단)
     this._buildBackButton();
 
+    // ── B-4: walk 애니메이션 등록 (ASSET_MODE='real'일 때만) ──
+    // 10종 × 2방향 = 20개 애니메이션, 4프레임 × 8fps, 무한 반복.
+    if (ASSET_MODE === 'real') {
+      const walkTypes = [
+        'normal', 'vip', 'gourmet', 'rushed', 'group',
+        'critic', 'regular', 'student', 'traveler', 'business',
+      ];
+      for (const t of walkTypes) {
+        // walk_r (east, 우향)
+        const keyR = `tavern_customer_${t}_walk_r`;
+        if (this.textures.exists(keyR) && !this.anims.exists(`customer_${t}_walk_r`)) {
+          this.anims.create({
+            key: `customer_${t}_walk_r`,
+            frames: this.anims.generateFrameNumbers(keyR, { start: 0, end: 3 }),
+            frameRate: 8,
+            repeat: -1,
+          });
+        }
+        // walk_l (west, 좌향)
+        const keyL = `tavern_customer_${t}_walk_l`;
+        if (this.textures.exists(keyL) && !this.anims.exists(`customer_${t}_walk_l`)) {
+          this.anims.create({
+            key: `customer_${t}_walk_l`,
+            frames: this.anims.generateFrameNumbers(keyL, { start: 0, end: 3 }),
+            frameRate: 8,
+            repeat: -1,
+          });
+        }
+      }
+    }
+
+    // ── B-4 데모: W/A 키 → normal 손님 walk 애니메이션 재생 ──
+    // Phase D에서 실제 이동 Tween 연결로 교체 예정.
+    if (ASSET_MODE === 'real') {
+      this.input.keyboard.on('keydown-W', () => {
+        const cust = this._customers[0];
+        if (!cust || !cust.sprite || cust.sprite.type !== 'Image') return;
+        if (cust.sprite.anims) {
+          cust.sprite.play('customer_normal_walk_r');
+        }
+      });
+
+      this.input.keyboard.on('keydown-A', () => {
+        const cust = this._customers[0];
+        if (!cust || !cust.sprite || cust.sprite.type !== 'Image') return;
+        if (cust.sprite.anims) {
+          cust.sprite.play('customer_normal_walk_l');
+        }
+      });
+
+      this.input.keyboard.on('keydown-S', () => {
+        const cust = this._customers[0];
+        if (!cust || !cust.sprite) return;
+        if (cust.sprite.anims) {
+          cust.sprite.anims.stop();
+        }
+        if (cust.sprite.type === 'Image' && this.textures.exists('tavern_customer_normal_seated_right')) {
+          cust.sprite.setTexture('tavern_customer_normal_seated_right');
+        }
+      });
+    }
+
     // A4: 초기 깊이정렬 적용
     this._applyDepthSort();
 
@@ -220,6 +301,24 @@ export class TavernServiceScene extends Phaser.Scene {
           textureKey: c.sprite.texture?.key || null,
           customerType: c.customerType || 'normal',
         })),
+      };
+
+      // Phase B-4: walk 애니메이션 등록 키 목록 노출 (Playwright 테스트용)
+      const walkAnimTypes = [
+        'normal', 'vip', 'gourmet', 'rushed', 'group',
+        'critic', 'regular', 'student', 'traveler', 'business',
+      ];
+      window.__tavernWalkAnims = {
+        registered: walkAnimTypes.flatMap(t => [
+          `customer_${t}_walk_l`, `customer_${t}_walk_r`,
+        ]),
+        exists: walkAnimTypes.reduce((acc, t) => {
+          acc[t] = {
+            walk_l: this.anims.exists(`customer_${t}_walk_l`),
+            walk_r: this.anims.exists(`customer_${t}_walk_r`),
+          };
+          return acc;
+        }, {}),
       };
     }
   }
