@@ -1,6 +1,6 @@
 # Kitchen Chaos -- 영업씬 태번 스타일 재설계 페이즈 마스터 플랜
 
-> 최종 업데이트: 2026-04-24 (Phase A + A-bis + B-1 + B-2 + B-3 + B-4 완료)
+> 최종 업데이트: 2026-04-24 (Phase A + A-bis + B-1 + B-2 + B-3 + B-4 + B-5-1 완료)
 > 관련 문서:
 > - [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md) -- 방향성/핵심 원칙 (V12 기준)
 > - `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- Phase B 에셋 발주 규격서 (V12 규격 갱신 완료)
@@ -19,7 +19,10 @@
 | **B-2** | WARN 해소 + 스프라이트 전환 | 에셋 4종 재발주/신규(seated_left/bench L,R/chef_rin), 셰프+손님 Image 렌더링, vite 빌드 위생 | **완료** |
 | **B-3** | 에셋 확장 발주 (손님 9종 + 셰프 5명) | 손님 9종 seated R/L 18장 + 셰프 5명 idle 5장 + W-1 재발주 = 24장, DEMO_CUSTOMER_TYPES 4종, REAL_KEY_MAP 15개 | **완료** |
 | **B-4** | 에셋 확장 발주 (walk 시트 + W-1 PRO) | 손님 10종 walk_l/r 20장 + W-1 PRO 재발주 (PARTIAL 확정), spritesheet preload + anims 20개 + 데모 키 | **완료** |
-| **B-5+** | 에셋 확장 발주 (셰프 포즈 + 가구) | 셰프 7명 walk/carry/cook/serve + lv3/lv4 가구 + 술통/바닥/벽 환경물 | 미착수 |
+| **B-5-1** | 셰프 walk 시트 발주 | 셰프 5명 walk_r/walk_l 10장(64x24), spritesheet preload + anims 10개 + C/V 데모 키 | **완료** |
+| **B-5-1b** | 셰프 carry/cook/serve 포즈 | 셰프 5명 carry_r/l + cook + serve 정지 포즈 (AD1에서 B-5-1에서 분리) | 미착수 |
+| **B-5-2** | 가구 lv3/lv4 업그레이드 에셋 | lv3/lv4 등급 가구 에셋 발주 | 미착수 |
+| **B-5-3** | 환경물 에셋 | 술통/바닥 타일/벽 장식 환경물 발주 | 미착수 |
 | **C** | 테마 변주 + UI | 챕터별 바닥/벽/소품 8세트, 인내심 게이지, 말풍선, 골드 플로팅 HUD/VFX | 미착수 |
 | **D** | 게임 로직 연동 | 조리 슬롯, 레시피 선택, 골드 획득, 셰프 스킬, 손님 AI, 인내심 감소 | 미착수 |
 | **E** | 마이그레이션 | 기존 ServiceScene -> TavernServiceScene 교체, 레거시 자산 정리 | 미착수 |
@@ -314,18 +317,65 @@ PASS (184/184 테스트, SC-1~SC-6 전수 충족, SC-2 PARTIAL은 AD2 확정 사
 
 ---
 
-## Phase B-5+ -- 에셋 확장 발주: 셰프 포즈 + 가구 (미착수)
+## Phase B-5-1 -- 셰프 Walk 스프라이트시트 발주 (완료)
+
+### 범위
+
+셰프 5명(mage/yuki/lao/andre/arjun)의 walk_r/walk_l 4프레임 스프라이트시트 10장을 PixelLab `animate_character`로 발주. AD 모드1에서 원래 B-5 범위(walk+carry+cook+serve = 최대 35장)를 walk만(10장)으로 축소 결정. carry/cook/serve는 PixelLab 템플릿 매칭 불가 + 시각 일관성 위험으로 B-5-1b로 분리. TavernServiceScene.js에 spritesheet preload 10개 + Phaser anims 10개 + C/V 데모 키 핸들러 + window.__tavernChefAnims 진단 노출 추가.
+
+### 산출물
+
+| 파일 | 역할 |
+|------|------|
+| `assets/tavern/chef_{5종}_walk_r.png` (각 64x24) | 셰프 5명 우향 보행 4프레임 시트 |
+| `assets/tavern/chef_{5종}_walk_l.png` (각 64x24) | 셰프 5명 좌향 보행 4프레임 시트 (독립 스프라이트) |
+| `tests/phase-b5-1-chef-walk.spec.js` (23개) | Playwright 테스트 |
+| `tests/phase-b5-1-qa-edge.spec.js` (16개) | QA 에지케이스 테스트 |
+
+### 게이트 충족 상태
+
+- [x] walk_r/l 10장 64x24 저장, HTTP 200 + PIL 크기 검증
+- [x] spritesheet preload 10개 등록 (기존 52 + chef walk 10 = 62개 이상 텍스처)
+- [x] Phaser anims 10개 등록 (chef_{name}_walk_r/l, 8fps, repeat=-1)
+- [x] C/V 데모 키 동작 (null guard + anims guard, ASSET_MODE='real' 분기)
+- [x] window.__tavernChefAnims 진단 노출
+- [x] ServiceScene.js diff 0줄, scaleX/flipX 0건, tavern_dummy/ 변경 0건
+- [x] Playwright 전체 PASS (B-5-1 신규 23 + 에지 16 = 39, 회귀 B-1~B-4 100/100)
+
+### 스펙 대비 구현 차이
+
+- SC-2~SC-4(carry/cook/serve): AD1에서 DEFERRED 결정, B-5-1b로 분리
+- SC-6(C/V 데모 키): 에러 없이 동작하나, _chefs[0]가 Image 타입이라 walk 애니메이션 실제 미재생 (B-4 동일 한계, Phase D Sprite 전환 시 해소)
+
+### QA 결과
+
+PASS (B-5-1 신규 23 + 에지 16 = 39/39, 회귀 100/100). SC-1/SC-5/SC-6(조건부)/SC-7 충족, SC-2~SC-4 DEFERRED.
+
+### 스펙/리포트
+
+- 목적: `.claude/specs/2026-04-24-kc-phase-b5-1-scope.md`
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b5-1-spec.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b5-1-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b5-1-ad2.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b5-1-coder-report.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b5-1-qa.md`
+
+---
+
+## Phase B-5-1b / B-5-2 / B-5-3 -- 셰프 포즈 + 가구 + 환경물 (미착수)
 
 ### 진입 조건
 
-- [x] Phase B-4 완료 (손님 10종 walk 시트 + W-1 PRO 최종 확정)
+- [x] Phase B-5-1 완료 (셰프 5명 walk 시트 10장)
 - [ ] 사용자 최종 승인
 
 ### 범위
 
-- 셰프 7명 walk/carry_l/carry_r/cook/serve 포즈 발주
-- lv3/lv4 업그레이드 등급 가구 에셋
-- 술통/바닥/벽 에셋
+| 서브 | 내용 | 상태 |
+|------|------|------|
+| **B-5-1b** | 셰프 5명 carry_r/l + cook + serve 정지 포즈 (16x24). PixelLab 템플릿 매칭 불가로 별도 발주 전략 필요 | 미착수 |
+| **B-5-2** | lv3/lv4 업그레이드 등급 가구 에셋 | 미착수 |
+| **B-5-3** | 술통/바닥 타일/벽 장식 환경물 에셋 | 미착수 |
 
 ### 게이트 조건 (Phase C 진입)
 
@@ -333,6 +383,7 @@ PASS (184/184 테스트, SC-1~SC-6 전수 충족, SC-2 PARTIAL은 AD2 확정 사
 - [x] seated_left / seated_right가 scaleY/flipY 없이 별도 스프라이트로 자연스러운 정합 확인 *(Phase B-2에서 충족)*
 - [x] 손님 10종 seated R/L + 셰프 7명 idle_side 전종 실 에셋 완비 *(Phase B-3에서 충족)*
 - [x] 손님 10종 walk_l/r 시트 20장 완비 *(Phase B-4에서 충족)*
+- [x] 셰프 5명 walk_l/r 시트 10장 완비 *(Phase B-5-1에서 충족)*
 - [ ] 사용자 최종 승인
 
 ---
@@ -407,6 +458,7 @@ PASS (184/184 테스트, SC-1~SC-6 전수 충족, SC-2 PARTIAL은 AD2 확정 사
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-24 | Phase B-5-1 완료 반영. B-5-1 절 추가 (셰프 walk 시트 10장). B-5+를 B-5-1(완료)/B-5-1b/B-5-2/B-5-3(미착수)으로 4분할. 페이즈 총괄 테이블 B-5-1 행 추가 + B-5-1b/B-5-2/B-5-3 미착수 행 분리. Phase C 게이트에 B-5-1 충족 항목 추가. |
 | 2026-04-24 | Phase B-4 완료 반영. B-4 절 추가 (walk 시트 20장 + W-1 PRO PARTIAL 최종 확정). B-4+ -> B-5+로 갱신, 페이즈 총괄 B-4 행 추가 + B-5+ 미착수 행 분리. B-3 W-1 PARTIAL 사유를 최종 확정 문구로 갱신. |
 | 2026-04-24 | Phase B-3 완료 반영. B-3 절 추가, B-3+ -> B-4+로 갱신, B-3 산출물/게이트/QA/W-1 PARTIAL 상세 기록. 페이즈 총괄 B-3 행 추가 + B-4+ 미착수 행 분리. |
 | 2026-04-24 | Phase B-2 완료 반영. B-2 절 추가, B-2+ -> B-3+로 갱신, B-1 해소 예정 사항에 B-2 해소 결과 반영, 페이즈 총괄 테이블 B-2 행 추가, Phase C 게이트 2항목 B-2에서 충족으로 갱신. |

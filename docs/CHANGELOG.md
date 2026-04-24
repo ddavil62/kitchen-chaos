@@ -1,5 +1,91 @@
 # Changelog
 
+## [Phase B-5-1] 2026-04-24 -- 셰프 5명 Walk 스프라이트시트 10장 발주
+
+### 개요
+
+셰프 5명(mage/yuki/lao/andre/arjun)의 walk_r/walk_l 4프레임 스프라이트시트 10장(각 64x24px)을 PixelLab `animate_character` ZIP 다운로드 + PIL 후처리로 생성. TavernServiceScene.js에 spritesheet preload 10개 + Phaser 애니메이션 등록 10개 + 데모 C/V 키 핸들러 + `window.__tavernChefAnims` 진단 노출을 추가. AD 모드1에서 원래 B-5 범위(walk+carry+cook+serve = 최대 35장)를 walk만(10장)으로 축소 결정. carry/cook/serve는 PixelLab 템플릿 매칭 불가 + 시각 일관성 위험으로 B-5-1b로 분리.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/chef_{mage/yuki/lao/andre/arjun}_walk_r.png` -- 각 64x24px, 셰프 5명 우향 보행 4프레임 시트 (PixelLab animate_character east, 36x36 raw -> PIL NEAREST 16x16 -> 16x24 캔버스 -> 4프레임 가로 합성)
+- `kitchen-chaos/assets/tavern/chef_{mage/yuki/lao/andre/arjun}_walk_l.png` -- 각 64x24px, 셰프 5명 좌향 보행 4프레임 시트 (독립 스프라이트, scaleX/flipX 미사용)
+- `kitchen-chaos/tests/phase-b5-1-chef-walk.spec.js` -- Playwright 23개 테스트 (HTTP 200 x10, 텍스처/애니메이션 등록, spritesheet 규격, preload 수량, C/V 키 에러 없음, scaleX/flipX 미사용, ServiceScene 무수정, tavern_dummy 무수정, 스크린샷)
+- `kitchen-chaos/tests/phase-b5-1-qa-edge.spec.js` -- Playwright 16개 에지케이스 테스트 (키 연타, B-4 키 충돌, 중복 등록 방지, Image 타입 한계, walk_r/walk_l 독립성, 전체 에셋 로드)
+
+### 변경
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - fileoverview에 B-5-1 추가
+  - preload(): `this.load.spritesheet()` 10개 추가 (chefWalkTypes 5종 x walk_r/walk_l = 10, frameWidth:16, frameHeight:24). ASSET_MODE='real'일 때만 실행 (L188-198)
+  - create(): `this.anims.create()` 10개 등록 (chef_{name}_walk_r/walk_l, 4프레임, 8fps, repeat:-1). `this.textures.exists()` + `!this.anims.exists()` 이중 가드 (L263-277)
+  - create(): C/V 데모 키 핸들러 추가 (C: mage walk_r 재생, V: mage walk_l 재생). null guard + anims guard 포함. ASSET_MODE='real'일 때만 등록 (L310-326)
+  - create(): `window.__tavernChefAnims` 노출 (10개 anim 키 배열, Playwright 테스트용) (L371-373)
+  - ServiceScene.js diff: 0줄 (무수정)
+  - scaleX/flipX/scaleY/flipY: 0건
+  - tavern_dummy/ 변경: 0건
+  - 레이아웃 상수 변경: 0건
+
+### AD 모드1 스코프 축소 결정
+
+- 원래 범위: walk 10 + carry 10 + cook 5 + serve 5~10 = 최대 35장
+- 축소 범위: walk 10장만 발주 (10 generations)
+- 축소 사유: PixelLab 49개 template animation 중 carry/cook/serve 매칭 불가, create_character 대안은 시각 일관성 깨질 위험 + PRO 모드 200 gen 소비, Phase D 의존성으로 현 단계 활용처 없음
+- carry/cook/serve -> B-5-1b 또는 Phase D로 분리
+
+### Walk 시트 규격
+
+| 항목 | 값 |
+|------|-----|
+| 파일 크기 | 64 x 24 px |
+| 프레임 구성 | 4프레임 x 16x24 가로 배열 |
+| Phaser 텍스처 키 | `tavern_chef_{name}_walk_r/l` |
+| Phaser anims 키 | `chef_{name}_walk_r/l` |
+| frameRate | 8 fps |
+| repeat | -1 (무한 반복) |
+
+### PIL 에셋 검증
+
+| 파일 | 크기 | opaque | 프레임별 opaque |
+|------|------|--------|----------------|
+| chef_mage_walk_r | 64x24 | 174 | [40, 46, 38, 50] |
+| chef_mage_walk_l | 64x24 | 192 | [41, 53, 41, 57] |
+| chef_yuki_walk_r | 64x24 | 181 | [41, 50, 39, 51] |
+| chef_yuki_walk_l | 64x24 | 172 | [36, 49, 37, 50] |
+| chef_lao_walk_r | 64x24 | 181 | [38, 49, 40, 54] |
+| chef_lao_walk_l | 64x24 | 202 | [47, 57, 45, 53] |
+| chef_andre_walk_r | 64x24 | 169 | [38, 45, 37, 49] |
+| chef_andre_walk_l | 64x24 | 163 | [35, 44, 36, 48] |
+| chef_arjun_walk_r | 64x24 | 161 | [36, 43, 36, 46] |
+| chef_arjun_walk_l | 64x24 | 164 | [33, 47, 36, 48] |
+
+10/10 PASS (크기 64x24, RGBA, 투명 배경, 금지색 0건, 프레임별 opaque 33~57).
+
+### AD 모드2 검수 결과
+
+APPROVED. walk 10장 전수 PASS (크기 64x24, 금지색 0건, 프레임 분리 정확, 다리 alternation 자연스러움). SC-2~SC-4(carry/cook/serve)는 AD1 결정에 의해 DEFERRED.
+
+### QA 결과
+
+PASS. B-5-1 신규 23/23 + 에지케이스 16/16 = 39/39 PASS. 회귀 B-1~B-4 100/100 PASS. SC-1/SC-5/SC-6(조건부)/SC-7 전수 충족. SC-2~SC-4 DEFERRED.
+
+### 알려진 이슈
+
+- _chefs[0]는 rin 셰프(idx=0)이나 C/V 키로 chef_mage_walk_r/l 애니메이션을 재생하므로 캐릭터 불일치 (데모 한정, Phase D에서 올바른 매핑으로 교체)
+- _chefs[0]가 Phaser.GameObjects.Image 타입이라 anims 프로퍼티 없음, sprite.play() 미동작 (B-4 W/A/S 데모와 동일 구조 한계, 가드절에서 안전 차단, Phase D Sprite 전환 시 해소)
+- phase67-ad3-capture.spec.js CommonJS require() 문법으로 ESM 환경에서 파싱 에러 (기존 이슈, B-5-1 무관)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b5-1-spec.md`
+- 목적: `.claude/specs/2026-04-24-kc-phase-b5-1-scope.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b5-1-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b5-1-ad2.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b5-1-coder-report.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b5-1-qa.md`
+
+---
+
 ## [Phase B-4] 2026-04-24 -- 손님 Walk 애니메이션 시트 20장 + W-1 PRO 재발주
 
 ### 개요
