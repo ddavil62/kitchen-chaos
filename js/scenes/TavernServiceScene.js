@@ -1,9 +1,10 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-4.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-5-1.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12: 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
  * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
  * B-4: 손님 10종 walk_l/walk_r 스프라이트시트(4프레임 64x24) 20장 + 애니메이션 등록 + 데모 W/A 키.
+ * B-5-1: 셰프 5명 walk_l/walk_r 스프라이트시트(4프레임 64x24) 10장 + 애니메이션 등록 + 데모 C/V 키.
  *
  * 기존 ServiceScene.js와 완전 독립. import/참조/코드 복사 없음.
  * 공용 import(Phaser, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY)만 사용.
@@ -183,6 +184,18 @@ export class TavernServiceScene extends Phaser.Scene {
           { frameWidth: 16, frameHeight: 24 },
         );
       }
+
+      // ── B-5-1: 셰프 5명 walk 스프라이트시트 (16px x 4프레임 = 64x24) ──
+      const chefWalkTypes = ['mage', 'yuki', 'lao', 'andre', 'arjun'];
+      chefWalkTypes.forEach(name => {
+        ['r', 'l'].forEach(side => {
+          this.load.spritesheet(
+            `tavern_chef_${name}_walk_${side}`,
+            `${realPath}chef_${name}_walk_${side}.png`,
+            { frameWidth: 16, frameHeight: 24 },
+          );
+        });
+      });
     }
   }
 
@@ -246,6 +259,22 @@ export class TavernServiceScene extends Phaser.Scene {
           });
         }
       }
+
+      // ── B-5-1: 셰프 5명 walk 애니메이션 등록 (4프레임 x 8fps, 무한 반복) ──
+      const chefWalkTypes = ['mage', 'yuki', 'lao', 'andre', 'arjun'];
+      chefWalkTypes.forEach(name => {
+        ['r', 'l'].forEach(side => {
+          const chefKey = `tavern_chef_${name}_walk_${side}`;
+          if (this.textures.exists(chefKey) && !this.anims.exists(`chef_${name}_walk_${side}`)) {
+            this.anims.create({
+              key: `chef_${name}_walk_${side}`,
+              frames: this.anims.generateFrameNumbers(chefKey, { start: 0, end: 3 }),
+              frameRate: 8,
+              repeat: -1,
+            });
+          }
+        });
+      });
     }
 
     // ── B-4 데모: W/A 키 → normal 손님 walk 애니메이션 재생 ──
@@ -275,6 +304,24 @@ export class TavernServiceScene extends Phaser.Scene {
         }
         if (cust.sprite.type === 'Image' && this.textures.exists('tavern_customer_normal_seated_right')) {
           cust.sprite.setTexture('tavern_customer_normal_seated_right');
+        }
+      });
+
+      // ── B-5-1 데모: C/V 키 → mage 셰프 walk 애니메이션 재생 ──
+      // Phase D에서 실제 이동 Tween 연결로 교체 예정.
+      this.input.keyboard.on('keydown-C', () => {
+        const chef = this._chefs[0]; // index=0 = rin (B-2: idx=0 린)
+        if (!chef || !chef.sprite) return;
+        if (chef.sprite.anims) {
+          chef.sprite.play('chef_mage_walk_r');
+        }
+      });
+
+      this.input.keyboard.on('keydown-V', () => {
+        const chef = this._chefs[0];
+        if (!chef || !chef.sprite) return;
+        if (chef.sprite.anims) {
+          chef.sprite.play('chef_mage_walk_l');
         }
       });
     }
@@ -320,6 +367,10 @@ export class TavernServiceScene extends Phaser.Scene {
           return acc;
         }, {}),
       };
+
+      // Phase B-5-1: 셰프 walk 애니메이션 등록 키 목록 노출 (Playwright 테스트용)
+      const chefAnimTypes = ['mage', 'yuki', 'lao', 'andre', 'arjun'];
+      window.__tavernChefAnims = chefAnimTypes.flatMap(n => [`chef_${n}_walk_r`, `chef_${n}_walk_l`]);
     }
   }
 
