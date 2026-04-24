@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-24 (영업씬 태번 스타일 Phase B-3 손님 9종 + 셰프 5명 에셋 확장 완료)
+> 최종 업데이트: 2026-04-24 (영업씬 태번 스타일 Phase B-4 손님 walk 애니메이션 시트 20장 + W-1 PRO 재발주 PARTIAL 확정)
 
 ## 프로젝트 개요
 
@@ -137,22 +137,31 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
-### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A + A-bis + B-1 + B-2 + B-3 완료)
+### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A + A-bis + B-1 + B-2 + B-3 + B-4 완료)
 
-Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계 진행 중. Phase B-3에서 손님 9종(vip~business) seated_right/left 18장 + 셰프 5명(mage/yuki/lao/andre/arjun) idle_side 5장 + W-1 재발주(size=44) = 총 24장을 PixelLab 발주 완료. DEMO_CUSTOMER_TYPES 4종 데모 배치, REAL_KEY_MAP 15개, preload realAssets 32개로 확장. 153/153 Playwright PASS.
+Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계 진행 중. Phase B-4에서 손님 10종 walk_l/walk_r 4프레임 스프라이트시트 20장을 PixelLab animate_character로 발주 완료. TavernServiceScene.js에 spritesheet preload 20개 + Phaser anims 20개(8fps, repeat=-1) + W/A/S 데모 키 핸들러 추가. W-1 PRO 재발주는 teal=3으로 악화하여 파일 미교체, 구조적 한계 최종 확정. 184/184 Playwright PASS.
 
 - **신규 파일**: `js/scenes/TavernServiceScene.js`, `js/data/tavernLayoutData.js`, `js/data/tavernStateData.js`
-- **실 에셋**: `assets/tavern/` (32종 PNG: 가구 5 + 손님 seated 20 + 셰프 7), PIL placeholder: `assets/tavern_dummy/` (보존)
+- **실 에셋**: `assets/tavern/` (52종 PNG: 가구 5 + 손님 seated 20 + 손님 walk 20 + 셰프 7), PIL placeholder: `assets/tavern_dummy/` (보존)
 - **진입점**: `?scene=tavern` URL 파라미터 (디버그 전용)
 - **현재 레이아웃**: V12 (4분면 세로 테이블, quad 100x120px, ASSET_MODE='real')
 - **REAL_KEY_MAP**: 15개 매핑 (가구 5 + 손님 normal 2 + 데모 3종 seated 6 + 셰프 2)
 - **DEMO_CUSTOMER_TYPES**: 4슬롯 데모 배치 (normal/vip/gourmet/rushed)
+- **walk 데모 키**: W(walk_r)/A(walk_l)/S(stop+idle 복귀), normal 손님 제자리 재생 (Phase D에서 실제 이동 Tween 연결 예정)
 - **Phase B 규격서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격, B-2 반영)
 - **페이즈 마스터 플랜**: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
 - **방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
 - 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md), [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md)
 
 ## 개발 이력 (최근)
+
+### Phase B-4 — 손님 walk 애니메이션 시트 20장 + W-1 PRO 재발주 (2026-04-24)
+
+손님 10종 walk_l/walk_r 4프레임 스프라이트시트 20장(각 64x24px)을 PixelLab animate_character로 발주. TavernServiceScene.js에 spritesheet preload 20개 + Phaser anims 20개(8fps, repeat=-1) + W/A/S 데모 키 핸들러 + window.__tavernWalkAnims 진단 노출 추가. W-1 PRO 재발주(size=64, custom proportions)는 teal=3으로 B-3(teal=6)보다 악화하여 파일 미교체, 구조적 한계 최종 확정.
+
+- QA: PASS (Playwright 184/184, B-4 신규 31 + 회귀 153, 2건 기존 cold-start 타임아웃 제외)
+- AD 모드2: APPROVED (conditional, W-1 PARTIAL, walk 20/20 PASS)
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b4-spec.md`
 
 ### Phase B-3 — 손님 9종 + 셰프 5명 에셋 확장 (2026-04-24)
 

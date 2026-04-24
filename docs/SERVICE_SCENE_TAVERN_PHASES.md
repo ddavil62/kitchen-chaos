@@ -1,6 +1,6 @@
 # Kitchen Chaos -- 영업씬 태번 스타일 재설계 페이즈 마스터 플랜
 
-> 최종 업데이트: 2026-04-24 (Phase A + A-bis + B-1 + B-2 + B-3 완료)
+> 최종 업데이트: 2026-04-24 (Phase A + A-bis + B-1 + B-2 + B-3 + B-4 완료)
 > 관련 문서:
 > - [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md) -- 방향성/핵심 원칙 (V12 기준)
 > - `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` -- Phase B 에셋 발주 규격서 (V12 규격 갱신 완료)
@@ -18,7 +18,8 @@
 | **B-1** | 실 에셋 1세트 발주 | 손님 seated 2종 + 셰프 미미 idle + 가구 5종 PixelLab 발주, ASSET_MODE 토글 통합 | **완료** |
 | **B-2** | WARN 해소 + 스프라이트 전환 | 에셋 4종 재발주/신규(seated_left/bench L,R/chef_rin), 셰프+손님 Image 렌더링, vite 빌드 위생 | **완료** |
 | **B-3** | 에셋 확장 발주 (손님 9종 + 셰프 5명) | 손님 9종 seated R/L 18장 + 셰프 5명 idle 5장 + W-1 재발주 = 24장, DEMO_CUSTOMER_TYPES 4종, REAL_KEY_MAP 15개 | **완료** |
-| **B-4+** | 에셋 확장 발주 (walk 시트 + 가구) | 손님 10종 walk_l/r 시트 + 셰프 7명 walk/carry/cook/serve + lv3/lv4 가구 | 미착수 |
+| **B-4** | 에셋 확장 발주 (walk 시트 + W-1 PRO) | 손님 10종 walk_l/r 20장 + W-1 PRO 재발주 (PARTIAL 확정), spritesheet preload + anims 20개 + 데모 키 | **완료** |
+| **B-5+** | 에셋 확장 발주 (셰프 포즈 + 가구) | 셰프 7명 walk/carry/cook/serve + lv3/lv4 가구 + 술통/바닥/벽 환경물 | 미착수 |
 | **C** | 테마 변주 + UI | 챕터별 바닥/벽/소품 8세트, 인내심 게이지, 말풍선, 골드 플로팅 HUD/VFX | 미착수 |
 | **D** | 게임 로직 연동 | 조리 슬롯, 레시피 선택, 골드 획득, 셰프 스킬, 손님 AI, 인내심 감소 | 미착수 |
 | **E** | 마이그레이션 | 기존 ServiceScene -> TavernServiceScene 교체, 레거시 자산 정리 | 미착수 |
@@ -157,10 +158,10 @@ PASS (46/46 테스트, SC-1~SC-5 전항목 충족).
 - ~~캐릭터 스프라이트 전환~~ -- `_buildChef()`/`_buildCustomers()` -> `_placeImageOrRect()` 경로 전환 **완료**
 - ~~`_postprocess.py`/`_raw/` 프로덕션 빌드 제외 필터~~ -- vite.config.js COPY_DIR_EXCLUDE/COPY_FILE_EXCLUDE **완료**
 
-### Phase B-3 해소 결과 / Phase B-4 이후 해소 예정
+### Phase B-3 해소 결과 / Phase B-5 이후 해소 예정
 
-- ~~seated_left 셔츠 청록 완전 일치~~ -- B-3에서 size=44 재발주 + Option B 색상 정규화 적용. **PARTIAL**: 비율 11.3%(구조적 한계), 색상 hue는 seated_right와 매칭. Phase B-4 PRO 모드 재발주 권장
-- 술통(barrel) 실 에셋 발주 -- Phase B-4+ 범위
+- ~~seated_left 셔츠 청록 완전 일치~~ -- B-3에서 size=44 재발주 + Option B 색상 정규화 적용. **PARTIAL 최종 확정**: B-4 PRO 모드(size=64, custom proportions) 재시도 결과 teal=3으로 악화. B-1~B-4 총 4회 시도 실패, 구조적 한계 확정. 추가 재시도 없이 마감
+- 술통(barrel) 실 에셋 발주 -- Phase B-5+ 범위
 - write_ad2_report.py untracked 파일 정리
 
 ### 스펙/리포트
@@ -245,7 +246,7 @@ PixelLab으로 손님 9종(vip~business) seated_right/left 18장 + 셰프 5명(m
 - [x] SIT 텍스처 동적 교체 (customerType 기반)
 - [x] ServiceScene.js diff 0줄, scaleX/flipX 0건, tavern_dummy/ 변경 0건
 - [x] Playwright 153/153 PASS, 회귀 0건
-- [ ] W-1 teal 25% 미달 (PARTIAL, 11.3%) -- 구조적 한계, Phase B-4 PRO 모드 재발주 권장
+- [ ] W-1 teal 25% 미달 (PARTIAL, 11.3%) -- 구조적 한계. B-4 PRO 모드 재발주 결과 teal=3으로 악화, 최종 확정
 
 ### QA 결과
 
@@ -253,7 +254,7 @@ PASS (153/153 테스트, SC-1 PARTIAL + SC-2~SC-10 PASS). AD2 APPROVED (conditio
 
 ### W-1 PARTIAL 사유
 
-facing-left 사이드뷰에서 캐릭터 몸통이 화면 왼쪽으로 회전 -> 셔츠 가시 영역이 x=7,8 좁은 띠(6cells 상한). size=44 큰 캔버스(64x64)에서도 teal이 음영에 묻혀 aggregation에서 소실됨. silhouette 재설계 없이는 개선 불가. Phase B-4 walk_l 발주 시 PixelLab PRO 모드(size=64 + custom proportions) 재시도 권장.
+facing-left 사이드뷰에서 캐릭터 몸통이 화면 왼쪽으로 회전 -> 셔츠 가시 영역이 x=7,8 좁은 띠(6cells 상한). size=44/64 큰 캔버스에서도 teal이 음영에 묻혀 aggregation에서 소실됨. B-4 PRO 모드(size=64 + custom proportions shoulder_width=1.1) 재시도 결과 teal=3으로 악화(B-3의 6보다 감소). **구조적 한계 최종 확정**, silhouette 재설계 또는 수동 편집 없이는 개선 불가. 추가 재시도 없이 마감.
 
 ### 스펙/리포트
 
@@ -266,17 +267,62 @@ facing-left 사이드뷰에서 캐릭터 몸통이 화면 왼쪽으로 회전 ->
 
 ---
 
-## Phase B-4+ -- 에셋 확장 발주: walk 시트 + 가구 (미착수)
+## Phase B-4 -- 손님 Walk 애니메이션 시트 발주 + W-1 PRO 재발주 (완료)
+
+### 범위
+
+손님 10종의 walk_l/walk_r 4프레임 스프라이트시트 20장을 PixelLab `animate_character`로 발주. TavernServiceScene.js에 spritesheet preload + Phaser 애니메이션 등록 + 데모 키 핸들러(W/A/S)를 추가하여 시트 동작 검증. W-1 PRO 모드 재발주(1회 한정)로 구조적 한계 최종 확정.
+
+### 산출물
+
+| 파일 | 역할 |
+|------|------|
+| `assets/tavern/customer_{10종}_walk_r.png` (각 64x24) | 손님 10종 우향 보행 4프레임 시트 |
+| `assets/tavern/customer_{10종}_walk_l.png` (각 64x24) | 손님 10종 좌향 보행 4프레임 시트 (독립 스프라이트) |
+| `assets/tavern/_postprocess_b4.py` | B-4 후처리 스크립트 |
+| `assets/tavern/_raw_b4/` | 원본 프레임 80장 + 결과 JSON 백업 |
+| `tests/phase-b4-walk-animation.spec.js` (31개) | Playwright 테스트 |
+
+### 게이트 충족 상태
+
+- [x] walk_l/r 20장 64x24 저장, HTTP 200 + PIL 크기 검증
+- [x] spritesheet preload 20개 등록 (기존 32 + walk 20 = 52개 이상 텍스처)
+- [x] Phaser anims 20개 등록 (customer_{type}_walk_r/l, 8fps, repeat=-1)
+- [x] W/A/S 데모 키 동작 (null guard, ASSET_MODE='real' 분기)
+- [x] window.__tavernWalkAnims 진단 노출
+- [x] ServiceScene.js diff 0줄, scaleX/flipX 0건, tavern_dummy/ 변경 0건
+- [x] Playwright 184/184 PASS (B-4 31 + 회귀 153), 회귀 0건
+- [ ] W-1 teal 25% 미달 (PARTIAL, PRO 시도 teal=3으로 악화, 구조적 한계 최종 확정)
+
+### QA 결과
+
+PASS (184/184 테스트, SC-1~SC-6 전수 충족, SC-2 PARTIAL은 AD2 확정 사항). 2건 cold-start 타임아웃은 B-2/B-3 기존 인프라 이슈.
+
+### 스펙 대비 구현 차이
+
+- S 키 핸들러 추가 (스펙은 W/A만 명시, S키 stop+idle 복귀는 유용한 디버그 기능으로 추가)
+- Image 객체에서 sprite.play() 호출 시 실제 프레임 전환 미동작 (Coder 인지, Phase D Sprite 전환 시 해소 예정, 현재 에러 미발생)
+
+### 스펙/리포트
+
+- 목적: `.claude/specs/2026-04-24-kc-phase-b4-scope.md`
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b4-spec.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b4-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b4-ad2.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b4-coder-report.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b4-qa.md`
+
+---
+
+## Phase B-5+ -- 에셋 확장 발주: 셰프 포즈 + 가구 (미착수)
 
 ### 진입 조건
 
-- [x] Phase B-3 완료 (손님 9종 seated + 셰프 5명 idle)
+- [x] Phase B-4 완료 (손님 10종 walk 시트 + W-1 PRO 최종 확정)
 - [ ] 사용자 최종 승인
 
 ### 범위
 
-- W-1 seated_left PRO 모드 재발주 (size=64, custom proportions)
-- 손님 10종 walk_l/walk_r 애니메이션 시트 발주 (20장)
 - 셰프 7명 walk/carry_l/carry_r/cook/serve 포즈 발주
 - lv3/lv4 업그레이드 등급 가구 에셋
 - 술통/바닥/벽 에셋
@@ -286,6 +332,7 @@ facing-left 사이드뷰에서 캐릭터 몸통이 화면 왼쪽으로 회전 ->
 - [x] 최소 normal 손님 1종 + 미미 셰프 1명 + lv0 V12 가구 1세트가 TavernServiceScene에서 실 스프라이트로 렌더링 확인 *(Phase B-2에서 충족)*
 - [x] seated_left / seated_right가 scaleY/flipY 없이 별도 스프라이트로 자연스러운 정합 확인 *(Phase B-2에서 충족)*
 - [x] 손님 10종 seated R/L + 셰프 7명 idle_side 전종 실 에셋 완비 *(Phase B-3에서 충족)*
+- [x] 손님 10종 walk_l/r 시트 20장 완비 *(Phase B-4에서 충족)*
 - [ ] 사용자 최종 승인
 
 ---
@@ -360,6 +407,7 @@ facing-left 사이드뷰에서 캐릭터 몸통이 화면 왼쪽으로 회전 ->
 
 | 일자 | 변경 |
 |------|------|
+| 2026-04-24 | Phase B-4 완료 반영. B-4 절 추가 (walk 시트 20장 + W-1 PRO PARTIAL 최종 확정). B-4+ -> B-5+로 갱신, 페이즈 총괄 B-4 행 추가 + B-5+ 미착수 행 분리. B-3 W-1 PARTIAL 사유를 최종 확정 문구로 갱신. |
 | 2026-04-24 | Phase B-3 완료 반영. B-3 절 추가, B-3+ -> B-4+로 갱신, B-3 산출물/게이트/QA/W-1 PARTIAL 상세 기록. 페이즈 총괄 B-3 행 추가 + B-4+ 미착수 행 분리. |
 | 2026-04-24 | Phase B-2 완료 반영. B-2 절 추가, B-2+ -> B-3+로 갱신, B-1 해소 예정 사항에 B-2 해소 결과 반영, 페이즈 총괄 테이블 B-2 행 추가, Phase C 게이트 2항목 B-2에서 충족으로 갱신. |
 | 2026-04-23 | Phase B-1 완료 반영. Phase B를 B-1(완료)/B-2+(준비)로 분할, B-1 산출물/게이트/QA/해소 예정 사항 추가. |

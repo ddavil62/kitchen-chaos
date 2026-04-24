@@ -1,5 +1,78 @@
 # Changelog
 
+## [Phase B-4] 2026-04-24 -- 손님 Walk 애니메이션 시트 20장 + W-1 PRO 재발주
+
+### 개요
+
+손님 10종(normal~business)의 walk_l/walk_r 4프레임 스프라이트시트 20장(각 64x24px)을 PixelLab `animate_character` ZIP 다운로드 + PIL 후처리로 생성. TavernServiceScene.js에 spritesheet preload 20개 + Phaser 애니메이션 등록 20개 + 데모 W/A/S 키 핸들러 + `window.__tavernWalkAnims` 진단 노출을 추가. W-1 PRO 재발주(size=64, custom proportions shoulder_width=1.1)는 teal=3으로 B-3(teal=6)보다 악화하여 파일 미교체, 구조적 한계 최종 확정.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/customer_{normal/vip/gourmet/rushed/group/critic/regular/student/traveler/business}_walk_r.png` -- 각 64x24px, 손님 10종 우향 보행 4프레임 시트 (PixelLab animate_character east, 32x32 raw -> PIL NEAREST 16x24 -> 4프레임 가로 합성)
+- `kitchen-chaos/assets/tavern/customer_{normal/vip/gourmet/rushed/group/critic/regular/student/traveler/business}_walk_l.png` -- 각 64x24px, 손님 10종 좌향 보행 4프레임 시트 (독립 스프라이트, scaleX/flipX 미사용)
+- `kitchen-chaos/assets/tavern/_postprocess_b4.py` -- B-4 후처리 스크립트 (ZIP 다운로드 + 프레임 추출 + PIL 합성)
+- `kitchen-chaos/assets/tavern/_raw_b4/` -- 원본 프레임 PNG 80장 + b4_results.json 백업
+- `kitchen-chaos/tests/phase-b4-walk-animation.spec.js` -- Playwright 31개 테스트 (HTTP 200 x20, 텍스처/애니메이션 등록, spritesheet 규격, preload 수량, 에러 없음, scaleX/flipX 미사용, ServiceScene 무수정, tavern_dummy 무수정, 스크린샷)
+
+### 변경
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - fileoverview에 B-4 추가
+  - preload(): `this.load.spritesheet()` 20개 추가 (walkTypes 10종 x walk_r/walk_l = 20, frameWidth:16, frameHeight:24). ASSET_MODE='real'일 때만 실행
+  - create(): `this.anims.create()` 20개 등록 (customer_{type}_walk_r/walk_l, 4프레임, 8fps, repeat:-1). `this.textures.exists()` + `!this.anims.exists()` 이중 가드
+  - create(): W/A/S 데모 키 핸들러 추가 (W: walk_r 재생, A: walk_l 재생, S: stop+idle 복귀). null guard 포함. ASSET_MODE='real'일 때만 등록
+  - create(): `window.__tavernWalkAnims` 노출 (registered 배열 + exists 객체, Playwright 테스트용)
+  - 총 추가 라인: ~95줄
+  - ServiceScene.js diff: 0줄 (무수정)
+  - scaleX/flipX/scaleY/flipY: 0건
+  - tavern_dummy/ 변경: 0건
+  - 레이아웃 상수 변경: 0건
+
+### W-1 PRO 재발주 결과 (PARTIAL -- 구조적 한계 최종 확정)
+
+- B-4 PRO 시도: mode=pro, size=64, custom proportions (shoulder_width=1.1), view=side, direction=west
+- 결과: raw 124x124 -> PIL NEAREST 16x22. teal=3 (5.7%), 목표 25% 미달
+- B-3 결과 (teal=6, 11.3%)보다 악화 -> 파일 미교체, customer_normal_seated_left.png은 B-3 버전 유지
+- W-1 경과: B-1(5px) -> B-2(5px) -> B-3(6px, 11.3%) -> B-4 PRO(3px, 악화)
+- 구조적 한계 확정: PixelLab facing-left 사이드뷰에서 셔츠 가시 영역 6px 상한. PRO 모드 + custom proportions로도 개선 불가. silhouette 재설계가 아닌 한 정량 25% 달성 불가능. 추가 재시도 없이 마감
+
+### Walk 시트 규격
+
+| 항목 | 값 |
+|------|-----|
+| 파일 크기 | 64 x 24 px |
+| 프레임 구성 | 4프레임 x 16x24 가로 배열 |
+| Phaser 텍스처 키 | `tavern_customer_{type}_walk_r/l` |
+| Phaser anims 키 | `customer_{type}_walk_r/l` |
+| frameRate | 8 fps |
+| repeat | -1 (무한 반복) |
+
+### AD 모드2 검수 결과
+
+APPROVED (conditional). walk 20장 전수 PASS (크기 64x24, 금지색 0건, 프레임 분리 정확, 다리 교차 사이클 자연스러움). W-1 PARTIAL 1건 (구조적 한계 확정).
+
+### QA 결과
+
+PASS. B-4 신규 31/31 PASS + 회귀 151/153 PASS (2건 B-2/B-3 기존 cold-start 타임아웃, B-4 무관). SC-1~SC-6 전수 충족 (SC-2 PARTIAL은 AD2 확정 사항).
+
+### 알려진 이슈
+
+- W-1 customer_normal_seated_left 구조적 한계 최종 확정 (B-1~B-4 총 4회 시도 실패, 추가 재시도 없이 마감)
+- 데모 키 W/A/S: Image 객체에서 sprite.play() 호출 시 실제 프레임 전환 미동작 (Phase D에서 Sprite 객체 전환 시 해소 예정, 현재 에러 미발생)
+- walk 이동 Tween: B-4 범위 외 (Phase D에서 CustomerState.WALKING + 이동 Tween 연결 예정)
+- phase67-ad3-capture.spec.js CommonJS require() 문법으로 ESM 프로젝트에서 전체 테스트 실행 차단 (B-4 무관, 후속 정리 권장)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-24-kc-phase-b4-spec.md`
+- 목적: `.claude/specs/2026-04-24-kc-phase-b4-scope.md`
+- AD 모드1: `.claude/specs/2026-04-24-kc-phase-b4-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-24-kc-phase-b4-ad2.md`
+- Coder 리포트: `.claude/specs/2026-04-24-kc-phase-b4-coder-report.md`
+- QA: `.claude/specs/2026-04-24-kc-phase-b4-qa.md`
+
+---
+
 ## [Phase B-3] 2026-04-24 -- 손님 9종 + 셰프 5명 에셋 확장
 
 ### 개요
@@ -77,7 +150,7 @@ PASS. Playwright 153/153 전수 PASS.
 
 ### 알려진 이슈
 
-- W-1 seated_left 셔츠 청록 정량 비율 미달 (PARTIAL, 11.3%) -> Phase B-4 walk_l PRO 모드 재발주 시 해소 권장
+- W-1 seated_left 셔츠 청록 정량 비율 미달 (PARTIAL, 11.3%) -> B-4 PRO 모드 재발주 결과 teal=3으로 악화, 구조적 한계 최종 확정
 - 5종 손님(group/critic/regular/student/traveler/business)은 preload만, REAL_KEY_MAP 미매핑 -> Phase D 게임 로직 연동 시 추가
 - 셰프 5명(mage~arjun)은 preload만, 화면 배치 없음 -> Phase D 고용 시스템 구현 시 활성화
 - DEMO_CUSTOMER_TYPES는 Phase D에서 랜덤 spawn 및 type별 게임 로직으로 교체 예정
