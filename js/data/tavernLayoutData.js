@@ -2,8 +2,9 @@
  * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 레이아웃 상수 및 좌석 슬롯 데이터.
  * Phase A-bis~B-6-2: 360x640 캔버스 기준 영역 구획, 가구 앵커 좌표, 벤치 슬롯 모델 정의.
  * B-6-2: 가구 비례 업스케일 (bench 14x76->28x96, table 44x72->44x96), QUAD_W 100->104, 슬롯 좌표 재정렬.
+ * Phase D: 손님 64px 업그레이드 + 2 quad 1열 레이아웃 전환 (QUAD_W=232, BENCH_W=80, TABLE_W=64, BENCH_H=200).
  * V12 시안(travellers-v12-mockup.html)의 CSS 수치를 Phaser 절대 좌표로 변환.
- * 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
+ * 2분면(quad) 세로 테이블 배치, 좌석 12석(2quad x 좌3+우3).
  *
  * 기존 ServiceScene.js의 레이아웃 상수(HALL_Y, COOK_Y 등)와 완전 독립.
  * import/참조 금지.
@@ -58,34 +59,31 @@ export const CHEF_IDLE_ANCHORS = Object.freeze([
 ]);
 
 /**
- * V12 4분면 quad 좌상단 절대 좌표.
- * 다이닝홀 x: 128~360(232px) = 좌측여백4+quad104+통로16+quad104+우측여백4
- * quad.tl left=132, quad.tr left=252 (세로 통로 16px: 252-236=16)
- * quad.tl top=90,  quad.bl top=250  (가로 통로 40px: 250-210=40)
- * quad 크기: 104x120
+ * Phase D: 2분면 quad 좌상단 절대 좌표 (1열 2행).
+ * 다이닝홀 x: 128~360(232px) = 1열 quad 232px (세로 통로 없음)
+ * quadLeft=128 (DINING_X), quadTop 계산: 64(top), 328(bottom)
+ * quad 크기: 232x224
  *
  * @type {ReadonlyArray<{quadLeft: number, quadTop: number, key: string}>}
  */
 export const TABLE_SET_ANCHORS = Object.freeze([
-  Object.freeze({ quadLeft: 132, quadTop:  90, key: 'tl' }),  // 좌상단
-  Object.freeze({ quadLeft: 252, quadTop:  90, key: 'tr' }),  // 우상단
-  Object.freeze({ quadLeft: 132, quadTop: 250, key: 'bl' }),  // 좌하단
-  Object.freeze({ quadLeft: 252, quadTop: 250, key: 'br' }),  // 우하단
+  Object.freeze({ quadLeft: 128, quadTop:  64, key: 'top' }),     // 상단
+  Object.freeze({ quadLeft: 128, quadTop: 328, key: 'bottom' }),  // 하단
 ]);
 
 // ── V12: 벤치 슬롯 구성 상수 ──
 
 /**
- * V12 세로 벤치 슬롯 정의.
- * BENCH_SLOTS[level].slotOffsets[i].dy = quad 상단 기준 세로 오프셋.
+ * Phase D 세로 벤치 슬롯 정의.
+ * BENCH_SLOTS[level].slotOffsets[i].dy = quad 상단 기준 세로 오프셋 (손님 발끝 y).
  *
- * quad 내부 좌표계:
- *   bench-l: left=4, top=12, 28x96
- *   bench-r: left=72, top=12, 28x96
- *   손님 슬롯 top: 26 / 60 / 94 (AD 검수 권장값)
+ * Phase D quad 내부 좌표계:
+ *   bench-l: left=4, top=12, 80x200
+ *   bench-r: left=148, top=12, 80x200
+ *   손님 슬롯 dy(발끝): 60 / 116 / 172
  *
- * lv0 = 3슬롯(bench 내 손님 3명)
- * lv3 = 4슬롯 (미래 확장, Phase B+에서 확정)
+ * lv0 = 3슬롯(bench 내 손님 3명, 64px 캐릭터, 슬롯 간격 56px)
+ * lv3 = 4슬롯 (미래 확장, Phase D+ 에서 재확정 필요)
  * lv4 = 5슬롯 (미래 확장)
  *
  * @type {Object}
@@ -93,9 +91,9 @@ export const TABLE_SET_ANCHORS = Object.freeze([
 export const BENCH_SLOTS = Object.freeze({
   lv0: Object.freeze({
     slotOffsets: Object.freeze([
-      Object.freeze({ dy:  26 }),  // 슬롯 0 (손님 cust-1: top=26)
-      Object.freeze({ dy:  60 }),  // 슬롯 1 (손님 cust-2: top=60)
-      Object.freeze({ dy:  94 }),  // 슬롯 2 (손님 cust-3: top=94)
+      Object.freeze({ dy:  60 }),  // 슬롯 0 (Phase D: BENCH_L_TOP+16+32=60)
+      Object.freeze({ dy: 116 }),  // 슬롯 1 (dy[0]+56=116)
+      Object.freeze({ dy: 172 }),  // 슬롯 2 (dy[1]+56=172)
     ]),
   }),
   lv3: Object.freeze({
@@ -118,34 +116,35 @@ export const BENCH_SLOTS = Object.freeze({
 });
 
 /**
- * V12 벤치/테이블 구성 참조.
+ * Phase D 벤치/테이블 구성 참조.
+ * 1열 2행 레이아웃: QUAD_W=232 (4+80+64+80+4), QUAD_H=224 (BENCH_H+24).
  * @type {Object}
  */
 export const BENCH_CONFIG = Object.freeze({
   // quad 컨테이너 크기
-  QUAD_W:    104,  // px (B-6-2: 100->104, bench28+table44+bench28+margin4)
-  QUAD_H:    120,  // px
-  // 세로 벤치 크기 (B-6-2 업스케일)
+  QUAD_W:    232,  // px (Phase D: 4+80+64+80+4, 1열)
+  QUAD_H:    224,  // px (Phase D: BENCH_H(200)+24)
+  // 세로 벤치 크기 (Phase D 업스케일)
   BENCH_L_LEFT:   4,  // bench-l: quad 내 left
   BENCH_L_TOP:   12,  // bench-l: quad 내 top (수직 여백 균등)
-  BENCH_W:       28,  // bench 너비 (28px, L/R 동일)
-  BENCH_H:       96,  // bench 높이 (28x96, 3슬롯 수용)
-  BENCH_R_LEFT:  76,  // bench-r: quad 내 left (Phase C: 72→76, table right=76 정합)
-  // 세로 테이블 크기 (B-6-2 업스케일)
-  TABLE_LEFT:    32,  // table-v: quad 내 left (= BENCH_L_LEFT + BENCH_W)
+  BENCH_W:       80,  // bench 너비 (80px, L/R 동일, Phase D: 28->80)
+  BENCH_H:      200,  // bench 높이 (80x200, 3슬롯 수용, Phase D: 96->200)
+  BENCH_R_LEFT: 148,  // bench-r: quad 내 left (Phase D: 4+80+64=148)
+  // 세로 테이블 크기 (Phase D 업스케일)
+  TABLE_LEFT:    84,  // table-v: quad 내 left (= BENCH_L_LEFT(4) + BENCH_W(80))
   TABLE_TOP:     12,  // table-v: quad 내 top (bench와 동일 top 정렬)
-  TABLE_W:       44,  // table-v 너비 (44x96)
-  TABLE_H:       96,  // table-v 높이 (bench와 동일 높이)
+  TABLE_W:       64,  // table-v 너비 (64x200, Phase D: 44->64)
+  TABLE_H:      200,  // table-v 높이 (bench와 동일 높이, Phase D: 96->200)
   // 통로 간격
-  AISLE_V:       16,  // 세로 통로 (B-6-2: 20->16, QUAD_W 확장 보상)
-  AISLE_H:       40,  // 가로 통로 (quad.tl 하단 ~ quad.bl 상단)
+  AISLE_V:        0,  // 세로 통로 (Phase D: 1열, 세로 통로 없음)
+  AISLE_H:       40,  // 가로 통로 (quad.top 하단 ~ quad.bottom 상단)
 });
 
 /** 좌측 벤치 손님 x 오프셋 (quad 좌상단 기준). 손님 x = quadLeft + BENCH_LEFT_OFFSET_X */
-export const BENCH_LEFT_OFFSET_X  = 17;  // bench-l left(4) + BENCH_W/2(14) - 1 = 17
+export const BENCH_LEFT_OFFSET_X  = 44;  // Phase D: bench-l left(4) + BENCH_W/2(40) = 44
 
 /** 우측 벤치 손님 x 오프셋 (quad 좌상단 기준). 손님 x = quadLeft + BENCH_RIGHT_OFFSET_X */
-export const BENCH_RIGHT_OFFSET_X = 89;  // bench-r left(76) + BENCH_W/2(14) - 1 = 89 (Phase C)
+export const BENCH_RIGHT_OFFSET_X = 188;  // Phase D: BENCH_L_LEFT(4) + BENCH_W(80) + TABLE_W(64) + BENCH_W/2(40) = 188
 
 // ── V12: 좌석 런타임 상태 관리 ──
 
@@ -153,9 +152,9 @@ export const BENCH_RIGHT_OFFSET_X = 89;  // bench-r left(76) + BENCH_W/2(14) - 1
 let _seatingState = null;
 
 /**
- * 좌석 슬롯 런타임 상태를 생성한다. V12: 4 quad x 좌우 벤치 x 3슬롯 = 24석.
+ * 좌석 슬롯 런타임 상태를 생성한다. Phase D: 2 quad x 좌우 벤치 x 3슬롯 = 12석.
  * @param {string} [benchLevel='lv0'] - 벤치 레벨 키
- * @returns {Array<Object>} 좌석 상태 배열 (4엔트리)
+ * @returns {Array<Object>} 좌석 상태 배열 (2엔트리)
  */
 export function createSeatingState(benchLevel = 'lv0') {
   const config = BENCH_SLOTS[benchLevel];
@@ -196,7 +195,7 @@ export function createSeatingState(benchLevel = 'lv0') {
 
 /**
  * 슬롯을 점유한다.
- * @param {number} tableSetIdx - 테이블 세트(quad) 인덱스 (0~3)
+ * @param {number} tableSetIdx - 테이블 세트(quad) 인덱스 (0~1)
  * @param {'left'|'right'} side - 벤치 위치
  * @param {number} slotIdx - 슬롯 인덱스
  * @param {string} customerId - 손님 ID

@@ -1,11 +1,12 @@
 /**
  * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-6.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
- * V12: 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
+ * V12~Phase D: 2분면(quad) 세로 테이블 배치, 좌석 12석(2quad x 좌3+우3).
  * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
  * B-4: 손님 10종 walk_l/walk_r 스프라이트시트(4프레임 64x24) 20장 + 애니메이션 등록 + 데모 W/A 키.
  * B-5-1: 셰프 5명 walk_l/walk_r 스프라이트시트(4프레임 64x24) 10장 + 애니메이션 등록 + 데모 C/V 키.
  * B-6: 캐릭터 15명 size=48 재발주 + 32x48 후처리 + frameWidth/frameHeight 갱신 (16x24 -> 32x48).
+ * Phase D: 손님 10종 64px 재처리 + 2 quad 1열 레이아웃 전환 + BENCH_CONFIG 전면 갱신.
  *
  * 기존 ServiceScene.js와 완전 독립. import/참조/코드 복사 없음.
  * 공용 import(Phaser, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY)만 사용.
@@ -112,9 +113,9 @@ export class TavernServiceScene extends Phaser.Scene {
       'floor_wood_tile', 'wall_horizontal',
       // V12 신규
       'counter_v12',           // 40x100px
-      'table_vertical_v12',    // 44x96px (B-6-2 업스케일)
-      'bench_vertical_l_v12',  // 28x96px (B-6-2 업스케일, facing-right)
-      'bench_vertical_r_v12',  // 28x96px (B-6-2 업스케일, facing-left)
+      'table_vertical_v12',    // 64x200px (Phase D)
+      'bench_vertical_l_v12',  // 80x200px (Phase D, facing-right)
+      'bench_vertical_r_v12',  // 80x200px (Phase D, facing-left)
       'entrance_v12',          // 32x40px
     ];
 
@@ -128,13 +129,13 @@ export class TavernServiceScene extends Phaser.Scene {
       const realAssets = [
         // 가구 5종
         'counter_v12',           // 40x100px
-        'table_vertical_v12',    // 44x96px (B-6-2 업스케일)
-        'bench_vertical_l_v12',  // 28x96px (B-6-2 업스케일)
-        'bench_vertical_r_v12',  // 28x96px (B-6-2 업스케일)
+        'table_vertical_v12',    // 64x200px (Phase D 업스케일)
+        'bench_vertical_l_v12',  // 80x200px (Phase D 업스케일)
+        'bench_vertical_r_v12',  // 80x200px (Phase D 업스케일)
         'entrance_v12',          // 32x40px
         // 캐릭터 4종 (B-2 기존)
-        'customer_normal_seated_right',  // 32x48px (B-6 size=48 재발주)
-        'customer_normal_seated_left',   // 32x48px (B-6 size=48 재발주)
+        'customer_normal_seated_right',  // 64x64px (Phase D 재처리)
+        'customer_normal_seated_left',   // 64x64px (Phase D 재처리)
         'chef_mimi_idle_side',           // 16x24px (B-6 미포함, 레거시)
         'chef_rin_idle_side',            // 16x24px (Phase B-2, B-6 미포함)
         // B-3 신규: 손님 9종 seated_right (9개)
@@ -168,7 +169,7 @@ export class TavernServiceScene extends Phaser.Scene {
         this.load.image(`tavern_${name}`, `${realPath}${name}.png`);
       }
 
-      // ── B-4/B-6: 손님 10종 walk 스프라이트시트 (32px x 4프레임 = 128x48) ──
+      // ── Phase D: 손님 10종 walk 스프라이트시트 (64px x 4프레임 = 256x64) ──
       const walkTypes = [
         'normal', 'vip', 'gourmet', 'rushed', 'group',
         'critic', 'regular', 'student', 'traveler', 'business',
@@ -177,16 +178,16 @@ export class TavernServiceScene extends Phaser.Scene {
         this.load.spritesheet(
           `tavern_customer_${t}_walk_r`,
           `${realPath}customer_${t}_walk_r.png`,
-          { frameWidth: 32, frameHeight: 48 },
+          { frameWidth: 64, frameHeight: 64 },
         );
         this.load.spritesheet(
           `tavern_customer_${t}_walk_l`,
           `${realPath}customer_${t}_walk_l.png`,
-          { frameWidth: 32, frameHeight: 48 },
+          { frameWidth: 64, frameHeight: 64 },
         );
       }
 
-      // ── B-5-1/B-6: 셰프 5명 walk 스프라이트시트 (32px x 4프레임 = 128x48) ──
+      // ── B-5-1/B-6: 셰프 5명 walk 스프라이트시트 (32px x 4프레임 = 128x48, Phase D 스코프 외) ──
       const chefWalkTypes = ['mage', 'yuki', 'lao', 'andre', 'arjun'];
       chefWalkTypes.forEach(name => {
         ['r', 'l'].forEach(side => {
@@ -337,6 +338,7 @@ export class TavernServiceScene extends Phaser.Scene {
         createSeatingState,
         TABLE_SET_ANCHORS,   // SC-1 테스트용 추가
       };
+      window.__tavernBenchConfig = BENCH_CONFIG;  // Phase D: Playwright 테스트용
       window.__ChefState = ChefState;
       window.__CustomerState = CustomerState;
       window.__tavernAssetMode = ASSET_MODE; // Phase B-1 테스트용
@@ -450,10 +452,10 @@ export class TavernServiceScene extends Phaser.Scene {
     g.setDepth(0);
   }
 
-  // ── A1: 가구 앵커 배치 (V12 4분면) ──
+  // ── A1: 가구 앵커 배치 (Phase D: 2분면 1열) ──
 
   /**
-   * 가구(카운터, 4 quad 테이블 세트, 술통, 입구)를 앵커 좌표에 배치한다.
+   * 가구(카운터, 2 quad 테이블 세트, 술통, 입구)를 앵커 좌표에 배치한다.
    * @private
    */
   _buildFurniture() {
@@ -479,26 +481,26 @@ export class TavernServiceScene extends Phaser.Scene {
       32, 40, 0x9b7850,
     );
 
-    // ── 4 quad 루프 ──
+    // ── 2 quad 루프 (Phase D: 1열 2행) ──
     for (const quad of TABLE_SET_ANCHORS) {
       const qx = quad.quadLeft;
       const qy = quad.quadTop;
 
-      // 세로 벤치-l (left=4, top=12, 28x96)
+      // 세로 벤치-l (left=4, top=12, 80x200)
       this._placeImageOrRect(
         'tavern_dummy_bench_vertical_l_v12',
         qx + BENCH_CONFIG.BENCH_L_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
         BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
       );
 
-      // 세로 테이블-v (left=32, top=12, 44x96)
+      // 세로 테이블-v (left=84, top=12, 64x200)
       this._placeImageOrRect(
         'tavern_dummy_table_vertical_v12',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.TABLE_TOP,
         BENCH_CONFIG.TABLE_W, BENCH_CONFIG.TABLE_H, 0x5a3820,
       );
 
-      // 세로 벤치-r (left=72, top=12, 28x96)
+      // 세로 벤치-r (left=148, top=12, 80x200)
       this._placeImageOrRect(
         'tavern_dummy_bench_vertical_r_v12',
         qx + BENCH_CONFIG.BENCH_R_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
@@ -678,11 +680,12 @@ export class TavernServiceScene extends Phaser.Scene {
       const y = queueBaseY + i * 4;  // 약간씩 y를 달리하여 depth 차이 보여줌
 
       // B-3: customerType별 더미 키 분기 (REAL_KEY_MAP으로 실 에셋 변환)
+      // Phase D: 손님 64x64px 표시
       const dummyKey = customerType === 'normal'
         ? 'tavern_dummy_customer_seated_down'
         : `tavern_dummy_customer_${customerType}_seated_down`;
       const sprite = this._placeImageOrRect(
-        dummyKey, x - 16, y - 44, 32, 44, color,
+        dummyKey, x - 32, y - 64, 64, 64, color,
       ).setOrigin(0.5, 1).setInteractive().setDepth(y);
 
       // 상태 라벨
