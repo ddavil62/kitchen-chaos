@@ -1,7 +1,8 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase B-6.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase E.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
- * V12~Phase D: 2분면(quad) 세로 테이블 배치, 좌석 12석(2quad x 좌3+우3).
+ * V12~Phase D: 2분면(quad) 세로 테이블 배치.
+ * Phase E: 착석 레이아웃 재설계 — y축 depth 착석 표현, seated_south 텍스처, 테이블 depth 고정.
  * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
  * B-4: 손님 10종 walk_l/walk_r 스프라이트시트(4프레임 64x24) 20장 + 애니메이션 등록 + 데모 W/A 키.
  * B-5-1: 셰프 5명 walk_l/walk_r 스프라이트시트(4프레임 64x24) 10장 + 애니메이션 등록 + 데모 C/V 키.
@@ -23,7 +24,8 @@ import {
   DOOR_ANCHOR,
   CHEF_IDLE_ANCHORS, TABLE_SET_ANCHORS,
   BENCH_SLOTS, BENCH_CONFIG,
-  BENCH_LEFT_OFFSET_X, BENCH_RIGHT_OFFSET_X,
+  BENCH_LEFT_OFFSET_X, BENCH_RIGHT_OFFSET_X,  // 레거시 보존
+  SEAT_CENTER_OFFSET_X,  // Phase E 신규
   createSeatingState, occupySlot, vacateSlot, findFreeSlot, getSlotWorldPos,
 } from '../data/tavernLayoutData.js';
 import {
@@ -81,6 +83,17 @@ const REAL_KEY_MAP = Object.freeze({
   'tavern_dummy_customer_rushed_seated_down':  'tavern_customer_rushed_seated_right',
   'tavern_dummy_customer_rushed_seated_up':    'tavern_customer_rushed_seated_left',
   // Phase D 예정: group/critic/regular/student/traveler/business 매핑 + 셰프 5명 매핑
+  // Phase E: south-facing seated (depth 착석 표현)
+  'tavern_dummy_customer_seated_south':             'tavern_customer_normal_seated_south',
+  'tavern_dummy_customer_vip_seated_south':         'tavern_customer_vip_seated_south',
+  'tavern_dummy_customer_gourmet_seated_south':     'tavern_customer_gourmet_seated_south',
+  'tavern_dummy_customer_rushed_seated_south':      'tavern_customer_rushed_seated_south',
+  'tavern_dummy_customer_group_seated_south':       'tavern_customer_group_seated_south',
+  'tavern_dummy_customer_critic_seated_south':      'tavern_customer_critic_seated_south',
+  'tavern_dummy_customer_regular_seated_south':     'tavern_customer_regular_seated_south',
+  'tavern_dummy_customer_student_seated_south':     'tavern_customer_student_seated_south',
+  'tavern_dummy_customer_traveler_seated_south':    'tavern_customer_traveler_seated_south',
+  'tavern_dummy_customer_business_seated_south':    'tavern_customer_business_seated_south',
 });
 
 // V12 술통 위치 (카운터 좌측 하단 주방 내)
@@ -158,6 +171,17 @@ export class TavernServiceScene extends Phaser.Scene {
         'customer_student_seated_left',
         'customer_traveler_seated_left',
         'customer_business_seated_left',
+        // Phase E: south-facing seated (depth 착석 표현)
+        'customer_normal_seated_south',
+        'customer_vip_seated_south',
+        'customer_gourmet_seated_south',
+        'customer_rushed_seated_south',
+        'customer_group_seated_south',
+        'customer_critic_seated_south',
+        'customer_regular_seated_south',
+        'customer_student_seated_south',
+        'customer_traveler_seated_south',
+        'customer_business_seated_south',
         // B-3 신규: 셰프 5명 idle_side (5개)
         'chef_mage_idle_side',
         'chef_yuki_idle_side',
@@ -284,7 +308,7 @@ export class TavernServiceScene extends Phaser.Scene {
     if (ASSET_MODE === 'real') {
       this.input.keyboard.on('keydown-W', () => {
         const cust = this._customers[0];
-        if (!cust || !cust.sprite || cust.sprite.type !== 'Image') return;
+        if (!cust || !cust.sprite) return;
         if (cust.sprite.anims) {
           cust.sprite.play('customer_normal_walk_r');
         }
@@ -292,7 +316,7 @@ export class TavernServiceScene extends Phaser.Scene {
 
       this.input.keyboard.on('keydown-A', () => {
         const cust = this._customers[0];
-        if (!cust || !cust.sprite || cust.sprite.type !== 'Image') return;
+        if (!cust || !cust.sprite) return;
         if (cust.sprite.anims) {
           cust.sprite.play('customer_normal_walk_l');
         }
@@ -301,11 +325,10 @@ export class TavernServiceScene extends Phaser.Scene {
       this.input.keyboard.on('keydown-S', () => {
         const cust = this._customers[0];
         if (!cust || !cust.sprite) return;
-        if (cust.sprite.anims) {
-          cust.sprite.anims.stop();
-        }
-        if (cust.sprite.type === 'Image' && this.textures.exists('tavern_customer_normal_seated_right')) {
-          cust.sprite.setTexture('tavern_customer_normal_seated_right');
+        // Phase E: seated_south 텍스처로 변경
+        if (cust.sprite.anims) cust.sprite.anims.stop();
+        if (this.textures.exists('tavern_customer_normal_seated_south')) {
+          cust.sprite.setTexture('tavern_customer_normal_seated_south');
         }
       });
 
@@ -494,11 +517,15 @@ export class TavernServiceScene extends Phaser.Scene {
       );
 
       // 세로 테이블-v (left=84, top=12, 64x200)
-      this._placeImageOrRect(
+      // Phase E: depth = quadTop + TABLE_DEPTH_OFFSET (손님 하체 가림)
+      const tableSprite = this._placeImageOrRect(
         'tavern_dummy_table_vertical_v12',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.TABLE_TOP,
         BENCH_CONFIG.TABLE_W, BENCH_CONFIG.TABLE_H, 0x5a3820,
       );
+      // 테이블 depth 고정 — _applyDepthSort에서 재계산되지 않도록 _fixedDepth flag 설정
+      tableSprite.setDepth(qy + BENCH_CONFIG.TABLE_DEPTH_OFFSET);
+      tableSprite._fixedDepth = true;  // Phase E: depth 고정 마커
 
       // 세로 벤치-r (left=148, top=12, 80x200)
       this._placeImageOrRect(
@@ -552,31 +579,21 @@ export class TavernServiceScene extends Phaser.Scene {
 
   /**
    * BENCH_SLOTS 기반으로 각 슬롯 위치에 시각적 인디케이터를 표시한다.
+   * Phase E: front 단일 열 슬롯 표시.
    * @private
    */
   _buildBenchSlots() {
     const slotSize = 4;
 
     for (const set of this._seatingState) {
-      // 좌측 벤치 슬롯 (facing-right)
-      for (const slot of set.left) {
+      // Phase E: 테이블 정면 슬롯 (facing-south)
+      for (const slot of set.front) {
         const dot = this.add.rectangle(
           slot.worldX, slot.worldY, slotSize, slotSize, 0xffdd00,
         );
         dot.setDepth(slot.worldY);
-        this.add.text(slot.worldX + 3, slot.worldY - 8, `L${slot.slotIdx}`, {
+        this.add.text(slot.worldX + 3, slot.worldY - 8, `F${slot.slotIdx}`, {
           fontSize: '8px', fontFamily: FONT_FAMILY, color: '#ffdd00',
-        }).setOrigin(0, 0.5).setDepth(9000);
-      }
-
-      // 우측 벤치 슬롯 (facing-left)
-      for (const slot of set.right) {
-        const dot = this.add.rectangle(
-          slot.worldX, slot.worldY, slotSize, slotSize, 0xff8800,
-        );
-        dot.setDepth(slot.worldY);
-        this.add.text(slot.worldX + 3, slot.worldY - 8, `R${slot.slotIdx}`, {
-          fontSize: '8px', fontFamily: FONT_FAMILY, color: '#ff8800',
         }).setOrigin(0, 0.5).setDepth(9000);
       }
     }
@@ -749,19 +766,19 @@ export class TavernServiceScene extends Phaser.Scene {
           cust.label.y = pos.y + 4;
         }
       }
-      // B-3: SIT 방향 + customerType에 따라 seated 텍스처 동적 교체
-      if (ASSET_MODE === 'real' && cust.sprite.type === 'Image') {
+      // Phase E: south-facing seated 단일 키 (facing 방향 분기 제거)
+      if (ASSET_MODE === 'real') {
         const typeKey = cust.customerType || 'normal';
-        const sitKey = nextState === CustomerState.SIT_DOWN
-          ? `tavern_customer_${typeKey}_seated_right`   // 좌측 벤치, facing-right
-          : `tavern_customer_${typeKey}_seated_left`;    // 우측 벤치, facing-left
+        const sitKey = `tavern_customer_${typeKey}_seated_south`;
         if (this.textures.exists(sitKey)) {
+          // walk 애니메이션 정지 후 seated 텍스처 교체
+          if (cust.sprite.anims) cust.sprite.anims.stop();
           cust.sprite.setTexture(sitKey);
         }
       }
     }
 
-    // LEAVE 시 입구쪽으로 이동
+    // LEAVE 시 입구쪽으로 이동 + walk_l 애니메이션 재시작
     if (nextState === CustomerState.LEAVE) {
       if (cust.slotRef) {
         vacateSlot(cust.slotRef.tableSetIdx, cust.slotRef.side, cust.slotRef.slotIdx);
@@ -771,14 +788,24 @@ export class TavernServiceScene extends Phaser.Scene {
       cust.sprite.y = DOOR_ANCHOR.y + 60;
       cust.label.x = DOOR_ANCHOR.x;
       cust.label.y = DOOR_ANCHOR.y + 64;
+      // Phase D: seated에서 walk_l로 복귀
+      const leaveAnimKey = `customer_${cust.customerType || 'normal'}_walk_l`;
+      if (cust.sprite.anims && this.anims.exists(leaveAnimKey)) {
+        cust.sprite.play(leaveAnimKey, true);
+      }
     }
 
-    // ENTER 시 입구 위치로 복귀
+    // ENTER 시 입구 위치로 복귀 + walk_r 애니메이션 재시작
     if (nextState === CustomerState.ENTER) {
       cust.sprite.x = DOOR_ANCHOR.x - 20;
       cust.sprite.y = 110;
       cust.label.x = DOOR_ANCHOR.x - 20;
       cust.label.y = 114;
+      // Phase D: walk_r로 재입장 준비
+      const enterAnimKey = `customer_${cust.customerType || 'normal'}_walk_r`;
+      if (cust.sprite.anims && this.anims.exists(enterAnimKey)) {
+        cust.sprite.play(enterAnimKey, true);
+      }
     }
 
     cust.state = nextState;
@@ -801,7 +828,7 @@ export class TavernServiceScene extends Phaser.Scene {
   _buildDebugHUD() {
     const occupiedCount = this._getOccupiedCount();
     const totalSlots = this._seatingState.reduce(
-      (acc, set) => acc + set.left.length + set.right.length, 0,
+      (acc, set) => acc + set.front.length, 0,
     );
 
     /** @type {Phaser.GameObjects.Text} */
@@ -825,7 +852,7 @@ export class TavernServiceScene extends Phaser.Scene {
     if (!this._debugText) return;
     const occupied = this._getOccupiedCount();
     const total = this._seatingState.reduce(
-      (acc, set) => acc + set.left.length + set.right.length, 0,
+      (acc, set) => acc + set.front.length, 0,
     );
     this._debugText.setText(this._debugString(occupied, total));
   }
@@ -855,10 +882,7 @@ export class TavernServiceScene extends Phaser.Scene {
   _getOccupiedCount() {
     let count = 0;
     for (const set of this._seatingState) {
-      for (const slot of set.left) {
-        if (slot.occupiedBy !== null) count++;
-      }
-      for (const slot of set.right) {
+      for (const slot of set.front) {
         if (slot.occupiedBy !== null) count++;
       }
     }
@@ -900,6 +924,8 @@ export class TavernServiceScene extends Phaser.Scene {
       if (obj.depth >= 9000) continue;
       // Graphics 객체는 y가 0이므로 건너뛰기 (배경 레이어)
       if (obj.type === 'Graphics') continue;
+      // Phase E: 테이블 depth 고정 마커 — depth 재계산 제외
+      if (obj._fixedDepth) continue;
       // y 기반 depth 설정
       obj.setDepth(obj.y);
     }
