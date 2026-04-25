@@ -92,15 +92,14 @@ export const TABLE_SET_ANCHORS = Object.freeze([
  */
 export const BENCH_SLOTS = Object.freeze({
   lv0: Object.freeze({
-    // Phase E: y축 depth 착석 — 테이블 정면 3슬롯
-    // dy = quadTop 기준 손님 발끝 y 오프셋
-    // dy[0] = TABLE_TOP(12) + SEAT_OFFSET_Y(24) = 36
-    // dy[1] = 36 + SEAT_SPACING_Y(50) = 86
-    // dy[2] = 86 + SEAT_SPACING_Y(50) = 136
+    // Phase E: x축 depth 착석 — 테이블 상단에 가로로 2슬롯
+    // dy는 동일(36)하고 dx로 좌/우 분리 → 손님 상체가 테이블 위로 노출
+    // TABLE_CENTER_X=116, TABLE_W=64, 손님=64px
+    // dx=-22: x=94 (테이블 왼쪽 영역), dx=+22: x=138 (테이블 오른쪽 영역)
     slotOffsets: Object.freeze([
-      Object.freeze({ dy:  36 }),  // 슬롯 0 — 테이블 상단에 가장 가까운 손님
-      Object.freeze({ dy:  86 }),  // 슬롯 1
-      Object.freeze({ dy: 136 }),  // 슬롯 2
+      Object.freeze({ dx: -22, dy: 36 }),  // 슬롯 0 — 테이블 상단 왼쪽
+      Object.freeze({ dx:  22, dy: 36 }),  // 슬롯 1 — 테이블 상단 오른쪽
+      Object.freeze({ dx:   0, dy: 36 }),  // 슬롯 2 — 테이블 상단 중앙 (3인 만석 시)
     ]),
   }),
   lv3: Object.freeze({
@@ -188,7 +187,7 @@ export function createSeatingState(benchLevel = 'lv0') {
       slotIdx,
       side: 'front',
       facingSouth: true,
-      worldX: quad.quadLeft + SEAT_CENTER_OFFSET_X,
+      worldX: quad.quadLeft + SEAT_CENTER_OFFSET_X + (offset.dx || 0),
       worldY: quad.quadTop  + offset.dy,
       occupiedBy: null,
     })),

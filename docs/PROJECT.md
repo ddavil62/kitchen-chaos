@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon 기획서
 
-> 최종 업데이트: 2026-04-25 (영업씬 손님 캐릭터 64px 업그레이드 + 1열 레이아웃 전환 Phase D 완료)
+> 최종 업데이트: 2026-04-26 (영업씬 착석 레이아웃 재설계 Phase E 완료)
 
 ## 프로젝트 개요
 
@@ -45,7 +45,7 @@
 | VFX | VFXManager.js | Canvas2D 파티클, 스크린 플래시/셰이크, 플로팅 텍스트, 범용 floatingText |
 | 적 | Enemy.js | 적 AI, 메커닉(dodge/charge/thorns/taunt/summon/split/magic resistance 등), 주기적 소환, _animState 상태 머신(IDLE/WALKING/DYING) |
 | 업적 | AchievementManager.js + achievementData.js + AchievementScene.js | 34개 업적, 해금 판정/보상(골드/코인/정수), 카테고리 탭 UI |
-| 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated(10종 프로필) 에셋 로드, 타일셋 15종+타워 8종 preload, portrait 9종 (arjun 포함) |
+| 스프라이트 | SpriteLoader.js | walk/death 프레임 시퀀스 로딩 (적+보스+미니보스), Phaser anim 등록, 방향 폴백 매핑, 챕터별 홀 바닥·뒷벽 에셋 로드, 테이블 front/back+손님 waiting/seated(10종 프로필, seated_south 포함) 에셋 로드, 타일셋 15종+타워 8종 preload, portrait 9종 (arjun 포함) |
 | 메인 메뉴 | MenuScene.js | 배경 이미지(menu_bg) + 타이틀 로고(menu_title_logo) + 미미 스프라이트 + 버튼 5종 + 설정/쿠폰/세이브 복구 + 오늘의 미션 배너 + 미션/캘린더 통합 모달 |
 | 데이터 | stageData.js / gameData.js / recipeData.js / merchantBranchData.js | 스테이지 143슬롯, 적 57종, 재료 32종, 레시피 292종(일반 284+분기 8), 분기 카드 32장 |
 
@@ -77,7 +77,7 @@
 | 출시 준비 | 버전 표기(APP_VERSION), 전역 에러 핸들러, localStorage 용량 체크 | 완료 |
 | 도구/행상인/채집 | 영구 도구 8종, 구매/판매/업그레이드, 행상인 UI, 재료 채집 TD, 도구 도감/팝업 | 완료 |
 | 대화/스토리 | 스크립트 119종, 트리거 120항목, 선택지 분기, 초상화 9종, 15캐릭터, 시나리오 일관성 검증+개그씬 확장 완료 | 완료 |
-| 영업 씬 비주얼 | 아이소메트릭 홀 (3레이어 분리 렌더링, 테이블 front/back 10종+손님 10종+챕터별 바닥 8종+뒷벽 8종, 홀 데코, depth 체계 정비), 태번 손님 64px + 가구 업스케일(bench 80x200, table 64x200) + 2 quad 1열 레이아웃(12석) | 완료 |
+| 영업 씬 비주얼 | 아이소메트릭 홀 (3레이어 분리 렌더링, 테이블 front/back 10종+손님 10종+챕터별 바닥 8종+뒷벽 8종, 홀 데코, depth 체계 정비), 태번 손님 64px + 가구 업스케일(bench 80x200, table 64x200) + 2 quad 1열 레이아웃(6석), y축 depth 착석 표현(테이블 하체 가림, seated_south 10종) | 완료 |
 | 그룹2 콘텐츠 (7~15장) | 일식/중식/양식 아크, 적 16종+보스 4종, 레시피 80종, 대화 32종, 42스테이지 밸런스 검증 완료 | 완료 |
 | 그룹3 콘텐츠 (16~24장) | 인도(16~18)/멕시칸(19~21)/디저트·최종(22~24) 아크, 적 14종+보스 3종(maharaja/el_diablo_pepper/queen_of_taste 3페이즈), 레시피 57종, 대화 28종, 전 스테이지(16-1~24-6) 구현, 밸런스 QA 완료 | 완료 |
 | 업적 시스템 | 34개 업적 (5카테고리), 조건 판정+보상(골드/코인/정수), 토스트 알림, 전용 AchievementScene UI, 수령 대기 카드 골드 glow + alpha 펄스 | 완료 |
@@ -137,34 +137,31 @@
 
 로드맵은 [ROADMAP.md](ROADMAP.md) 참조.
 
-### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A ~ B-6-2 + Phase D 완료)
+### 영업씬 태번(Travellers Rest) 스타일 재설계 (Phase A ~ E 완료)
 
-Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계. Phase D에서 손님 10종을 64px로 업그레이드하고 4 quad 2열을 2 quad 1열 레이아웃으로 전환 완료. 218/218 Playwright PASS.
+Travellers Rest 식 탑다운 가구 + 사이드뷰 풀바디 캐릭터로 영업씬 전면 재설계. Phase E에서 y축 depth 착석 표현을 구현하여 테이블이 손님 하체를 자연스럽게 가리는 Tavern Master식 착석 표현 완성. 29/29 Playwright PASS.
 
 - **신규 파일**: `js/scenes/TavernServiceScene.js`, `js/data/tavernLayoutData.js`, `js/data/tavernStateData.js`
-- **실 에셋**: `assets/tavern/` (62종 PNG: 가구 5 + 손님 seated 20 + 손님 walk 20 + 셰프 idle 7 + 셰프 walk 10), 손님 에셋 규격 64x64(정지)/256x64(walk 4프레임), 셰프 에셋 규격 32x48(정지)/128x48(walk 4프레임), 가구 규격 bench 80x200/table 64x200
-- **레거시 백업**: `assets/tavern/.legacy-b5/` (57 PNG, 16x24), `assets/tavern/.legacy-b6-2/` (가구 3종, bench 14x76 + table 44x72), `assets/tavern/.legacy-phase-d/` (43종, 손님 32x48 + 가구 bench 28x96/table 44x96)
+- **실 에셋**: `assets/tavern/` (72종 PNG: 가구 5 + 손님 seated_right/left 20 + 손님 seated_south 10 + 손님 walk 20 + 셰프 idle 7 + 셰프 walk 10)
+- **레거시 백업**: `assets/tavern/.legacy-b5/`, `.legacy-b6-2/`, `.legacy-phase-d/`
 - **진입점**: `?scene=tavern` URL 파라미터 (디버그 전용)
-- **현재 레이아웃**: 2 quad 1열 (QUAD_W=232, QUAD_H=224, 12석, ASSET_MODE='real')
-- **REAL_KEY_MAP**: 15개 매핑 (가구 5 + 손님 normal 2 + 데모 3종 seated 6 + 셰프 2)
-- **DEMO_CUSTOMER_TYPES**: 4슬롯 데모 배치 (normal/vip/gourmet/rushed)
-- **walk 데모 키**: W(walk_r)/A(walk_l)/S(stop+idle 복귀) 손님, C(walk_r)/V(walk_l) 셰프 mage
+- **현재 레이아웃**: 2 quad 1열 (QUAD_W=232, QUAD_H=224, 6석, x축 3슬롯+depth 착석)
+- **REAL_KEY_MAP**: 25개 매핑 (가구 5 + 손님 seated_right/left 6 + 손님 seated_south 10 + 셰프 2 + normal 2)
+- **walk 데모 키**: W(walk_r)/A(walk_l)/S(stop+seated_south) 손님, C(walk_r)/V(walk_l) 셰프 mage
 - **Phase B 규격서**: `.claude/specs/2026-04-23-kc-phase-b-asset-spec.md` (V12 규격, B-2 반영)
 - **페이즈 마스터 플랜**: [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md)
 - **방향성 문서**: [SERVICE_SCENE_TAVERN_DIRECTION.md](SERVICE_SCENE_TAVERN_DIRECTION.md)
-- 폐기 후보(보존): [SERVICE_SCENE_KAIRO_DIRECTION.md](SERVICE_SCENE_KAIRO_DIRECTION.md), [SERVICE_SCENE_REDESIGN.md](SERVICE_SCENE_REDESIGN.md)
 
 ## 개발 이력 (최근)
 
-### Phase D -- 손님 64px 업그레이드 + 2 quad 1열 레이아웃 전환 (2026-04-25)
+### Phase E -- 착석 레이아웃 재설계 (2026-04-26)
 
-손님 10종 에셋을 68px 소스에서 64px NEAREST로 재처리(40장). 가구 3종을 PIL NEAREST 확장(bench 80x200, table 64x200). 4 quad 2열 레이아웃을 2 quad 1열로 전환(QUAD_W=232, 좌석 24->12석). TavernServiceScene.js의 손님 frameWidth/frameHeight를 64로 갱신.
+[벤치-L][테이블][벤치-R] 가로 배치를 y축 depth 착석 표현으로 전환. 테이블 depth=quadTop+212로 고정하여 손님 하체를 자연스럽게 가림. x축 3슬롯(dx=[-22,+22,0])으로 테이블당 3명 배치. seated_south 텍스처 10종 신규 생성. 좌석 12석->6석.
 
-- QA: PASS (218건 -- 신규 104 + 회귀 114, 의도된 실패 17건 갱신 완료)
-- AD 모드2: APPROVED
-- AD 모드3: APPROVED
-- 스펙 대비 차이: 후처리 스크립트 단일 파일 통합, LANCZOS->NEAREST 변경(AD 모드1 결정), 셰프 frameWidth 32 유지
-- 잔존 이슈: lv3/lv4 슬롯 dy 미갱신(Phase D 벤치 높이 기준 재계산 필요), 셰프 에셋 32x48 잔존
-- 스펙: `.claude/specs/2026-04-25-kc-phase-d-spec.md`
+- QA: PASS (29건, 28 통과 + 1 인프라 타임아웃)
+- AD 모드2: APPROVED, AD 모드3: APPROVED
+- 스펙 대비 차이: y축 세로 3슬롯(dy=[36,86,136]) -> x축 가로 3슬롯(dy=36 고정, dx=[-22,+22,0])으로 변경 (AD3 승인)
+- 잔존 이슈: 3인 착석 시 스프라이트 부분 겹침(2인 운용 권장), SEAT_OFFSET_Y/SEAT_SPACING_Y dead code
+- 스펙: `.claude/specs/2026-04-26-kc-seating-layout-spec.md`
 
-Phase B-6-2 이전 이력은 [CHANGELOG.md](CHANGELOG.md) 및 [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md) 참조.
+Phase D 이전 이력은 [CHANGELOG.md](CHANGELOG.md) 및 [SERVICE_SCENE_TAVERN_PHASES.md](SERVICE_SCENE_TAVERN_PHASES.md) 참조.

@@ -1,5 +1,69 @@
 # Changelog
 
+## [Phase E] 2026-04-26 -- 착석 레이아웃 재설계 (y축 depth 착석 표현)
+
+### 개요
+
+[벤치-L][테이블][벤치-R] 가로 배치에서 y축 depth 착석 표현으로 전환. 테이블 depth를 quadTop+212(테이블 하단 y)로 고정하고, 손님을 테이블 상단 앞(y 작은 쪽)에 배치하여 테이블이 손님 하체를 자연스럽게 가리는 Tavern Master식 착석 표현을 구현. seated_south 텍스처 10종 신규 생성. 좌석 12석에서 6석으로 변경(quad당 3슬롯).
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/customer_{normal,vip,gourmet,rushed,group,critic,regular,student,traveler,business}_seated_south.png` x 10 -- south-facing seated 포즈 64x64px (PixelLab 생성)
+- `kitchen-chaos/tests/phase-e-seating-layout-qa.spec.js` -- Phase E 전용 Playwright 테스트 29건
+
+### 변경
+
+- `kitchen-chaos/js/data/tavernLayoutData.js`
+  - BENCH_CONFIG에 Phase E 상수 4개 추가: SEAT_CENTER_OFFSET_X(116), SEAT_OFFSET_Y(24), SEAT_SPACING_Y(50), TABLE_DEPTH_OFFSET(212)
+  - BENCH_SLOTS.lv0: dy=[60,116,172] -> dy=36 고정, dx=[-22,+22,0] (x축 3슬롯, 스펙은 y축 세로 3슬롯이었으나 AD3 승인으로 변경)
+  - createSeatingState: left/right 벤치 구조 -> front 단일 열 (facingSouth: true)
+  - findFreeSlot: ['left','right'] -> ['front'] 순회
+  - occupySlot/vacateSlot/getSlotWorldPos: front 지원 + 레거시 left/right fallback
+  - SEAT_CENTER_OFFSET_X = 116 신규 export
+  - BENCH_LEFT_OFFSET_X / BENCH_RIGHT_OFFSET_X: deprecated 주석 추가 (export 유지)
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - import에 SEAT_CENTER_OFFSET_X 추가
+  - REAL_KEY_MAP에 seated_south 10종 추가 (총 25개 매핑)
+  - preload에 seated_south 10종 에셋 로드 추가
+  - _buildFurniture: 테이블 depth = qy + TABLE_DEPTH_OFFSET(212) 고정 + _fixedDepth 마커 설정
+  - _applyDepthSort: _fixedDepth 체크 추가 (고정 depth 보호)
+  - _buildBenchSlots: set.left/set.right -> set.front 순회로 전환
+  - _cycleCustomerState: seated 텍스처를 seated_right/seated_left 분기에서 seated_south 단일 키로 변경
+  - S 키 핸들러: seated_south 텍스처로 업데이트
+  - _buildDebugHUD / _updateDebugHUD / _getOccupiedCount: set.front 기반으로 전환
+
+### 스펙 대비 차이점
+
+- SC-2 슬롯 배치: 스펙은 y축 세로 3슬롯(dy=[36,86,136], 테이블 길이 방향)을 정의했으나, 구현은 x축 가로 3슬롯(dy=36 고정, dx=[-22,+22,0])으로 변경. 사유: 테이블 너비 64px에 64px 캐릭터를 y축으로 3명 배치하면 하체 가림 비율이 슬롯마다 달라져 부자연스러움. x축 배치로 3명 모두 동일한 하체 가림률(24px, 37.5%) 보장. AD 모드3에서 APPROVED.
+- SEAT_OFFSET_Y(24), SEAT_SPACING_Y(50): 원본 스펙의 y축 배치용 상수. x축 배치로 변경 후 런타임 미참조 (dead code로 잔존)
+
+### QA 결과
+
+PASS. 총 29건 (정상 13 + 예외 8 + 시각적 3 + 보조 5). 28 통과 / 1 간헐적 타임아웃(Phaser cold start 인프라 이슈, 코드 무관).
+
+- 수용 기준 8개 전수 충족 (SC-2는 AD3 승인된 스펙 변경 반영)
+- 예외 시나리오 8개 엣지케이스 전수 PASS (만석, 레거시 side 접근, 잘못된 인덱스, 이중 점유 등)
+- 시각적 검증: `tests/screenshots/phase_e_{initial,seated,top_quad_zoom}.png` 3장
+
+### 잔존 이슈
+
+- 3인 착석 시 64px 캐릭터가 dx=44px 간격으로 부분 겹침 발생. AD3 조건부 승인: 2인 운용 시 해결, 3인은 만석 엣지케이스
+- BENCH_CONFIG.SEAT_OFFSET_Y(24), SEAT_SPACING_Y(50)이 dead code로 잔존 (기능 영향 없음)
+- SEAT_CENTER_OFFSET_X가 BENCH_CONFIG 내부와 독립 export 양쪽에 중복 정의 (값 동일, 기능 문제 없음)
+- tableSprite._fixedDepth: Phaser GameObjects에 사용자 정의 프로퍼티 직접 추가 (setData 대안 가능, 현재 동작 정상)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-26-kc-seating-layout-spec.md`
+- 목적 정의서: `.claude/specs/2026-04-26-kc-seating-layout-scope.md`
+- Coder 리포트: `.claude/specs/2026-04-26-kc-seating-layout-coder-report.md`
+- QA: `.claude/specs/2026-04-26-kc-seating-layout-qa.md`
+- AD 모드1: `.claude/specs/2026-04-26-kc-seating-layout-ad1.md`
+- AD 모드2: `.claude/specs/2026-04-26-kc-seating-layout-ad2.md`
+- AD 모드3: `.claude/specs/2026-04-26-kc-seating-layout-ad3.md`
+
+---
+
 ## [Phase D] 2026-04-25 -- 손님 64px 업그레이드 + 2 quad 1열 레이아웃 전환
 
 ### 개요
