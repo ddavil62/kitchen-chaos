@@ -1,6 +1,6 @@
 /**
  * @fileoverview Phase B-6 해상도 업스케일 검증 테스트.
- * 손님 10종 + 셰프 5명 32x48 에셋 55장 + spritesheet frameWidth/frameHeight 갱신 검증.
+ * 손님 10종 + 셰프 5명 64x64 에셋 55장 + spritesheet frameWidth/frameHeight 갱신 검증.
  */
 import { test, expect } from '@playwright/test';
 
@@ -77,10 +77,10 @@ test.describe('Phase B-6: walk 시트 HTTP 200', () => {
   }
 });
 
-// ── 4. Spritesheet frameWidth=32, frameHeight=48 검증 ──
+// ── 4. Spritesheet frameWidth=64, frameHeight=64 검증 (Phase D 업스케일) ──
 
-test.describe('Phase B-6: spritesheet 프레임 규격 32x48', () => {
-  test('손님 walk spritesheet frameWidth=32, frameHeight=48', async ({ page }) => {
+test.describe('Phase B-6: spritesheet 프레임 규격 64x64', () => {
+  test('손님 walk spritesheet frameWidth=64, frameHeight=64', async ({ page }) => {
     await waitForTavernScene(page);
     const frameSizes = await page.evaluate(() => {
       const scene = window.__game.scene.getScene('TavernServiceScene');
@@ -100,12 +100,12 @@ test.describe('Phase B-6: spritesheet 프레임 규격 32x48', () => {
     });
     expect(frameSizes.length).toBeGreaterThanOrEqual(20);
     for (const f of frameSizes) {
-      expect(f.width, `${f.key} frameWidth`).toBe(32);
-      expect(f.height, `${f.key} frameHeight`).toBe(48);
+      expect(f.width, `${f.key} frameWidth`).toBe(64);
+      expect(f.height, `${f.key} frameHeight`).toBe(64);
     }
   });
 
-  test('셰프 walk spritesheet frameWidth=32, frameHeight=48', async ({ page }) => {
+  test('셰프 walk spritesheet frameWidth=32, frameHeight=48 (Phase D 스코프 외)', async ({ page }) => {
     await waitForTavernScene(page);
     const frameSizes = await page.evaluate(() => {
       const scene = window.__game.scene.getScene('TavernServiceScene');

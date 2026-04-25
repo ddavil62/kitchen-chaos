@@ -1,6 +1,6 @@
 /**
  * @fileoverview Phase B-6-2 가구 비례 업스케일 검증 테스트.
- * bench 28x96, table 44x96, BENCH_CONFIG/BENCH_SLOTS/TABLE_SET_ANCHORS 상수 갱신 검증.
+ * bench 80x200, table 64x200, BENCH_CONFIG/BENCH_SLOTS/TABLE_SET_ANCHORS 상수 갱신 검증 (Phase D).
  */
 import { test, expect } from '@playwright/test';
 import { execSync } from 'child_process';
@@ -26,9 +26,9 @@ async function waitForTavernScene(page) {
 }
 
 const FURNITURE_ASSETS = [
-  { name: 'bench_vertical_l_v12.png', expW: 28, expH: 96 },
-  { name: 'bench_vertical_r_v12.png', expW: 28, expH: 96 },
-  { name: 'table_vertical_v12.png',   expW: 44, expH: 96 },
+  { name: 'bench_vertical_l_v12.png', expW: 80, expH: 200 },
+  { name: 'bench_vertical_r_v12.png', expW: 80, expH: 200 },
+  { name: 'table_vertical_v12.png',   expW: 64, expH: 200 },
 ];
 
 // ── TC-1: 신규 가구 에셋 HTTP 200 ──
@@ -75,27 +75,27 @@ test.describe('Phase B-6-2: BENCH_CONFIG 상수값', () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
-    // QUAD_W
-    expect(content).toMatch(/QUAD_W:\s*104/);
-    // BENCH_W
-    expect(content).toMatch(/BENCH_W:\s*28/);
-    // BENCH_H
-    expect(content).toMatch(/BENCH_H:\s*96/);
+    // QUAD_W (Phase D: 104→232)
+    expect(content).toMatch(/QUAD_W:\s*232/);
+    // BENCH_W (Phase D: 28→80)
+    expect(content).toMatch(/BENCH_W:\s*80/);
+    // BENCH_H (Phase D: 96→200)
+    expect(content).toMatch(/BENCH_H:\s*200/);
     // BENCH_L_LEFT
     expect(content).toMatch(/BENCH_L_LEFT:\s*4/);
-    // BENCH_R_LEFT (Phase C: 72→76)
-    expect(content).toMatch(/BENCH_R_LEFT:\s*76/);
-    // TABLE_W
-    expect(content).toMatch(/TABLE_W:\s*44/);
-    // TABLE_H
-    expect(content).toMatch(/TABLE_H:\s*96/);
+    // BENCH_R_LEFT (Phase D: 76→148)
+    expect(content).toMatch(/BENCH_R_LEFT:\s*148/);
+    // TABLE_W (Phase D: 44→64)
+    expect(content).toMatch(/TABLE_W:\s*64/);
+    // TABLE_H (Phase D: 96→200)
+    expect(content).toMatch(/TABLE_H:\s*200/);
   });
 });
 
 // ── TC-4: BENCH_SLOTS.lv0 dy 값 검증 ──
 
 test.describe('Phase B-6-2: BENCH_SLOTS.lv0 dy', () => {
-  test('lv0 slotOffsets dy = [26, 60, 94]', async () => {
+  test('lv0 slotOffsets dy = [60, 116, 172]', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -104,31 +104,31 @@ test.describe('Phase B-6-2: BENCH_SLOTS.lv0 dy', () => {
     expect(lv0Match).not.toBeNull();
 
     const dyValues = [...lv0Match[1].matchAll(/dy:\s*(\d+)/g)].map(m => parseInt(m[1]));
-    expect(dyValues).toEqual([26, 60, 94]);
+    expect(dyValues).toEqual([60, 116, 172]);
   });
 });
 
 // ── TC-5: BENCH_LEFT/RIGHT_OFFSET_X 검증 ──
 
 test.describe('Phase B-6-2: BENCH OFFSET_X', () => {
-  test('BENCH_LEFT_OFFSET_X = 17, BENCH_RIGHT_OFFSET_X = 89', async () => {
+  test('BENCH_LEFT_OFFSET_X = 44, BENCH_RIGHT_OFFSET_X = 188', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
     const leftMatch = content.match(/BENCH_LEFT_OFFSET_X\s*=\s*(\d+)/);
     expect(leftMatch).not.toBeNull();
-    expect(parseInt(leftMatch[1])).toBe(17);
+    expect(parseInt(leftMatch[1])).toBe(44);
 
     const rightMatch = content.match(/BENCH_RIGHT_OFFSET_X\s*=\s*(\d+)/);
     expect(rightMatch).not.toBeNull();
-    expect(parseInt(rightMatch[1])).toBe(89);  // Phase C: 85→89 (BENCH_R_LEFT 76 + BENCH_W/2 14 - 1)
+    expect(parseInt(rightMatch[1])).toBe(188);  // Phase D: BENCH_L_LEFT(4) + BENCH_W(80) + TABLE_W(64) + BENCH_W/2(40) = 188
   });
 });
 
 // ── TC-6: TABLE_SET_ANCHORS 재계산 검증 ──
 
 test.describe('Phase B-6-2: TABLE_SET_ANCHORS quadLeft', () => {
-  test('4 quad quadLeft = [132, 252, 132, 252]', async () => {
+  test('2 quad quadLeft = [128, 128] (Phase D: 1열 2행)', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -137,7 +137,7 @@ test.describe('Phase B-6-2: TABLE_SET_ANCHORS quadLeft', () => {
     expect(anchorsMatch).not.toBeNull();
 
     const quadLeftValues = [...anchorsMatch[1].matchAll(/quadLeft:\s*(\d+)/g)].map(m => parseInt(m[1]));
-    expect(quadLeftValues).toEqual([132, 252, 132, 252]);
+    expect(quadLeftValues).toEqual([128, 128]);
   });
 });
 

@@ -1,7 +1,7 @@
 /**
  * @fileoverview Phase B-6-2 QA 엣지케이스 테스트.
- * BENCH_CONFIG QUAD_W 100->104 연쇄 영향, slot worldY 계산, 가구 렌더 위치,
- * bench-r/table 4px 겹침, lv3/lv4 미래 슬롯 범위 검증.
+ * BENCH_CONFIG QUAD_W 232 (Phase D) 연쇄 영향, slot worldY 계산, 가구 렌더 위치,
+ * bench-r/table 밀착, lv3/lv4 미래 슬롯 범위 검증.
  */
 import { test, expect } from '@playwright/test';
 
@@ -23,7 +23,7 @@ async function waitForTavernScene(page) {
 
 test.describe('B-6-2 Edge: BENCH_CONFIG 연쇄 영향', () => {
 
-  test('QUAD_W(104) = BENCH_L_LEFT(4) + BENCH_W(28) + TABLE_W(44) + BENCH_W(28) = 104 수학적 정합', async () => {
+  test('QUAD_W(232) = BENCH_L_LEFT(4) + BENCH_W(80) + TABLE_W(64) + BENCH_W(80) + margin(4) = 232 수학적 정합', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -47,7 +47,7 @@ test.describe('B-6-2 Edge: BENCH_CONFIG 연쇄 영향', () => {
     expect(benchRRight, 'bench_r 우측 경계').toBeLessThanOrEqual(QUAD_W);
   });
 
-  test('TABLE_LEFT(32) = BENCH_L_LEFT(4) + BENCH_W(28) gap 0 확인', async () => {
+  test('TABLE_LEFT(84) = BENCH_L_LEFT(4) + BENCH_W(80) gap 0 확인', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -63,7 +63,7 @@ test.describe('B-6-2 Edge: BENCH_CONFIG 연쇄 영향', () => {
     expect(TABLE_LEFT, 'TABLE_LEFT == BENCH_L_LEFT + BENCH_W').toBe(BENCH_L_LEFT + BENCH_W);
   });
 
-  test('BENCH_R_LEFT(76) vs TABLE right(76): 0px 갭(밀착, 겹침 없음), QUAD_W(104) 내 수용', async () => {
+  test('BENCH_R_LEFT(148) vs TABLE right(148): 0px 갭(밀착, 겹침 없음), QUAD_W(232) 내 수용', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -77,18 +77,18 @@ test.describe('B-6-2 Edge: BENCH_CONFIG 연쇄 영향', () => {
     const BENCH_R_LEFT = getVal('BENCH_R_LEFT');
     const QUAD_W = getVal('QUAD_W');
 
-    const tableRight = TABLE_LEFT + TABLE_W;  // 32 + 44 = 76
-    const gap = BENCH_R_LEFT - tableRight;    // Phase C: 76 - 76 = 0 (겹침 해소)
+    const tableRight = TABLE_LEFT + TABLE_W;  // 84 + 64 = 148
+    const gap = BENCH_R_LEFT - tableRight;    // Phase D: 148 - 148 = 0 (밀착)
 
-    // Phase C: 수치 정합 — gap=0 (bench-r이 table에 밀착, 겹침 없음)
+    // Phase D: 수치 정합 — gap=0 (bench-r이 table에 밀착, 겹침 없음)
     expect(gap, 'bench-r/table 갭').toBe(0);
 
-    // bench_r 우측이 QUAD_W 내에 수용되는지 (76 + 28 = 104 = QUAD_W)
+    // bench_r 우측이 QUAD_W 내에 수용되는지 (148 + 80 = 228 <= QUAD_W=232)
     const benchRRight = BENCH_R_LEFT + getVal('BENCH_W');
     expect(benchRRight, 'bench_r 우측').toBeLessThanOrEqual(QUAD_W);
   });
 
-  test('AISLE_V(16) + QUAD_W(104)*2 + 여백(8) = 232 <= 다이닝홀 가용폭(232)', async () => {
+  test('AISLE_V(0) + QUAD_W(232) = 232 <= 다이닝홀 가용폭(232) (Phase D: 1열)', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -103,17 +103,19 @@ test.describe('B-6-2 Edge: BENCH_CONFIG 연쇄 영향', () => {
     const GAME_W = 360;
 
     const diningAvailable = GAME_W - DINING_X;  // 232
-    const totalUsed = 4 + QUAD_W + AISLE_V + QUAD_W + 4;  // 좌여백4 + quad + 통로 + quad + 우여백4
+    // Phase D: 1열 레이아웃, QUAD_W=232 = diningAvailable
+    const totalUsed = QUAD_W;  // 세로 통로 없음 (AISLE_V=0)
 
+    expect(AISLE_V, 'AISLE_V=0 (1열)').toBe(0);
     expect(totalUsed, '다이닝홀 내 전체 사용폭').toBeLessThanOrEqual(diningAvailable);
   });
 });
 
 // ── 2. TABLE_SET_ANCHORS quadLeft 변경 (+2) 검증 ──
 
-test.describe('B-6-2 Edge: TABLE_SET_ANCHORS 좌표 검증', () => {
+test.describe('B-6-2 Edge: TABLE_SET_ANCHORS 좌표 검증 (Phase D: 2 quad)', () => {
 
-  test('tl/bl quadLeft(132) = DINING_X(128) + 좌여백(4)', async () => {
+  test('top/bottom quadLeft(128) = DINING_X(128) (Phase D: 1열, 여백 없음)', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -121,35 +123,27 @@ test.describe('B-6-2 Edge: TABLE_SET_ANCHORS 좌표 검증', () => {
     expect(anchorsMatch).not.toBeNull();
 
     const quadLeftValues = [...anchorsMatch[1].matchAll(/quadLeft:\s*(\d+)/g)].map(m => parseInt(m[1]));
-    // tl=132, tr=252, bl=132, br=252
-    expect(quadLeftValues[0], 'tl quadLeft').toBe(128 + 4);  // DINING_X + margin
-    expect(quadLeftValues[2], 'bl quadLeft').toBe(128 + 4);
+    // Phase D: top=128, bottom=128
+    expect(quadLeftValues.length, '2 quads').toBe(2);
+    expect(quadLeftValues[0], 'top quadLeft').toBe(128);
+    expect(quadLeftValues[1], 'bottom quadLeft').toBe(128);
   });
 
-  test('tr/br quadLeft(252) = tl(132) + QUAD_W(104) + AISLE_V(16)', async () => {
-    const fs = await import('fs');
-    const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
-
-    const anchorsMatch = content.match(/TABLE_SET_ANCHORS\s*=\s*Object\.freeze\(\[([\s\S]*?)\]\)/);
-    const quadLeftValues = [...anchorsMatch[1].matchAll(/quadLeft:\s*(\d+)/g)].map(m => parseInt(m[1]));
-
-    // tr = tl + QUAD_W + AISLE_V = 132 + 104 + 16 = 252
-    expect(quadLeftValues[1], 'tr quadLeft').toBe(132 + 104 + 16);
-    expect(quadLeftValues[3], 'br quadLeft').toBe(132 + 104 + 16);
+  test('quad 우측(360) = quadLeft(128) + QUAD_W(232) = GAME_W(360)', async () => {
+    // Phase D: 1열, quad가 다이닝홀 전체를 사용
+    expect(128 + 232, 'quad right == GAME_W').toBe(360);
   });
 
-  test('tr/br quad 우측(356)이 GAME_W(360) 내에 수용됨', async () => {
-    // tr/br quadRight = 252 + 104 = 356 < 360
-    expect(252 + 104, 'tr/br quad right').toBeLessThan(360);
+  test('quad 우측(360)이 GAME_W(360) 내에 수용됨', async () => {
+    expect(128 + 232, 'quad right <= GAME_W').toBeLessThanOrEqual(360);
   });
 
-  test('tr/br quad 우측(356)이 DINING_RIGHT(352)를 4px 초과 (AD3 W-2 확인)', async () => {
-    // 기록용: DINING_RIGHT = 128 + 224 = 352, quad right = 356
-    const diningRight = 128 + 224;
-    const quadRight = 252 + 104;
-    expect(quadRight - diningRight, 'DINING_RIGHT 초과량').toBe(4);
-    // 화면 내이므로 렌더링 문제 없음
-    expect(quadRight, 'vs GAME_W').toBeLessThan(360);
+  test('quad 우측(360)이 DINING_RIGHT(360)와 일치 (Phase D: 1열 전폭)', async () => {
+    // Phase D: DINING_W=232, DINING_RIGHT = 128 + 232 = 360
+    const diningRight = 128 + 232;
+    const quadRight = 128 + 232;
+    expect(quadRight - diningRight, 'DINING_RIGHT 초과량').toBe(0);
+    expect(quadRight, 'vs GAME_W').toBeLessThanOrEqual(360);
   });
 });
 
@@ -157,10 +151,10 @@ test.describe('B-6-2 Edge: TABLE_SET_ANCHORS 좌표 검증', () => {
 
 test.describe('B-6-2 Edge: 슬롯 worldY 계산', () => {
 
-  test('lv0 3슬롯 dy=[26,60,94] 모두 bench 범위(12~108) 내', async () => {
+  test('lv0 3슬롯 dy=[60,116,172] 모두 bench 범위(12~212) 내', async () => {
     const benchTop = 12;
-    const benchBottom = 12 + 96;  // 108
-    const dyValues = [26, 60, 94];
+    const benchBottom = 12 + 200;  // 212 (Phase D: BENCH_H=200)
+    const dyValues = [60, 116, 172];
 
     for (const dy of dyValues) {
       expect(dy, `dy=${dy} >= benchTop`).toBeGreaterThanOrEqual(benchTop);
@@ -168,36 +162,37 @@ test.describe('B-6-2 Edge: 슬롯 worldY 계산', () => {
     }
   });
 
-  test('lv0 슬롯 간 균등 배분: 간격 34px', async () => {
-    const dyValues = [26, 60, 94];
-    const gap01 = dyValues[1] - dyValues[0];  // 34
-    const gap12 = dyValues[2] - dyValues[1];  // 34
+  test('lv0 슬롯 간 균등 배분: 간격 56px', async () => {
+    const dyValues = [60, 116, 172];
+    const gap01 = dyValues[1] - dyValues[0];  // 56
+    const gap12 = dyValues[2] - dyValues[1];  // 56
     expect(gap01, '슬롯0-1 간격').toBe(gap12);
-    expect(gap01, '간격').toBe(34);
+    expect(gap01, '간격').toBe(56);
   });
 
-  test('lv0 슬롯 상하 여백 대칭: 14px', async () => {
+  test('lv0 슬롯 상하 여백 대칭: 48/40px (Phase D)', async () => {
     const benchTop = 12;
-    const benchBottom = 108;
-    const topMargin = 26 - benchTop;    // 14
-    const bottomMargin = benchBottom - 94;  // 14
-    expect(topMargin, '상단 여백').toBe(bottomMargin);
-    expect(topMargin, '여백 14px').toBe(14);
+    const benchBottom = 212;  // 12 + 200
+    const topMargin = 60 - benchTop;      // 48
+    const bottomMargin = benchBottom - 172;  // 40
+    // Phase D에서는 정확한 대칭이 아님 (48 vs 40), 8px 차이
+    expect(topMargin, '상단 여백').toBe(48);
+    expect(bottomMargin, '하단 여백').toBe(40);
   });
 
-  test('lv0 착석 캐릭터(48px 높이) Y 겹침 14px: depth sort로 처리됨 (AD3 확인)', async () => {
-    // origin(0.5, 1) 기준: 캐릭터 머리(top) = dy - 48, 발(bottom) = dy
-    // 슬롯 간격 34px < 캐릭터 높이 48px -> 14px 겹침 발생
+  test('lv0 착석 캐릭터(64px 높이) Y 겹침 8px: depth sort로 처리됨 (AD3 확인)', async () => {
+    // origin(0.5, 1) 기준: 캐릭터 머리(top) = dy - 64, 발(bottom) = dy
+    // 슬롯 간격 56px < 캐릭터 높이 64px -> 8px 겹침 발생
     // 이는 depth sort(y 기반)로 앞뒤 관계가 자연스럽게 처리되므로 의도된 동작
-    const charH = 48;
-    const dyValues = [26, 60, 94];
+    const charH = 64;
+    const dyValues = [60, 116, 172];
 
     for (let i = 0; i < dyValues.length - 1; i++) {
       const currentFeet = dyValues[i];
       const nextHead = dyValues[i + 1] - charH;
       const overlap = currentFeet - nextHead;
-      // 14px 겹침이 예상됨 (34 - (48-34) = 34-14 = ... feet(26) - head(12) = 14)
-      expect(overlap, `슬롯${i}-${i+1} 겹침`).toBe(14);
+      // 8px 겹침이 예상됨 (56 - (64-56) = ... feet(60) - head(52) = 8)
+      expect(overlap, `슬롯${i}-${i+1} 겹침`).toBe(8);
     }
   });
 
@@ -218,14 +213,14 @@ test.describe('B-6-2 Edge: 슬롯 worldY 계산', () => {
     });
 
     expect(result).not.toBeNull();
-    expect(result.length, '4 quads').toBe(4);
+    expect(result.length, '2 quads (Phase D)').toBe(2);
 
     for (const set of result) {
       for (const slot of set.leftSlots) {
-        expect([26, 60, 94]).toContain(slot.dy);
+        expect([60, 116, 172]).toContain(slot.dy);
       }
       for (const slot of set.rightSlots) {
-        expect([26, 60, 94]).toContain(slot.dy);
+        expect([60, 116, 172]).toContain(slot.dy);
       }
     }
   });
@@ -235,31 +230,31 @@ test.describe('B-6-2 Edge: 슬롯 worldY 계산', () => {
 
 test.describe('B-6-2 Edge: 손님 x 좌표 벤치 범위 확인', () => {
 
-  test('BENCH_LEFT_OFFSET_X(17)가 bench-l 범위(4~32) 내', async () => {
+  test('BENCH_LEFT_OFFSET_X(44)가 bench-l 범위(4~84) 내', async () => {
     const benchLLeft = 4;
-    const benchLRight = 4 + 28;  // 32
-    const offsetX = 17;
+    const benchLRight = 4 + 80;  // 84 (Phase D: BENCH_W=80)
+    const offsetX = 44;
     expect(offsetX).toBeGreaterThanOrEqual(benchLLeft);
     expect(offsetX).toBeLessThanOrEqual(benchLRight);
   });
 
-  test('BENCH_RIGHT_OFFSET_X(85)가 bench-r 범위(72~100) 내', async () => {
-    const benchRLeft = 72;
-    const benchRRight = 72 + 28;  // 100
-    const offsetX = 85;
+  test('BENCH_RIGHT_OFFSET_X(188)가 bench-r 범위(148~228) 내', async () => {
+    const benchRLeft = 148;  // Phase D: BENCH_R_LEFT
+    const benchRRight = 148 + 80;  // 228 (Phase D: BENCH_W=80)
+    const offsetX = 188;
     expect(offsetX).toBeGreaterThanOrEqual(benchRLeft);
     expect(offsetX).toBeLessThanOrEqual(benchRRight);
   });
 
-  test('손님 x가 bench 중앙에 근사: left offset(17) = bench center(18) - 1', async () => {
-    const benchLCenter = 4 + 28 / 2;  // 18
-    const leftOffset = 17;
+  test('손님 x가 bench 중앙에 일치: left offset(44) = bench center(44)', async () => {
+    const benchLCenter = 4 + 80 / 2;  // 44 (Phase D)
+    const leftOffset = 44;
     expect(Math.abs(benchLCenter - leftOffset), 'left bench 중앙 오차').toBeLessThanOrEqual(1);
   });
 
-  test('손님 x가 bench 중앙에 근사: right offset(85) = bench center(86) - 1', async () => {
-    const benchRCenter = 72 + 28 / 2;  // 86
-    const rightOffset = 85;
+  test('손님 x가 bench 중앙에 일치: right offset(188) = bench center(188)', async () => {
+    const benchRCenter = 148 + 80 / 2;  // 188 (Phase D)
+    const rightOffset = 188;
     expect(Math.abs(benchRCenter - rightOffset), 'right bench 중앙 오차').toBeLessThanOrEqual(1);
   });
 
@@ -290,9 +285,9 @@ test.describe('B-6-2 Edge: 손님 x 좌표 벤치 범위 확인', () => {
 
 test.describe('B-6-2 Edge: lv3/lv4 미래 슬롯 (범위 외 사전 점검)', () => {
 
-  test('lv3 4슬롯 dy=[14,34,54,74] 모두 신규 bench 범위(12~108) 내', async () => {
+  test('lv3 4슬롯 dy=[14,34,54,74] 모두 신규 bench 범위(12~212) 내', async () => {
     const benchTop = 12;
-    const benchBottom = 108;
+    const benchBottom = 12 + 200;  // 212 (Phase D: BENCH_H=200)
     const dyValues = [14, 34, 54, 74];
 
     for (const dy of dyValues) {
@@ -301,9 +296,9 @@ test.describe('B-6-2 Edge: lv3/lv4 미래 슬롯 (범위 외 사전 점검)', ()
     }
   });
 
-  test('lv4 5슬롯 dy=[10,28,46,64,82]: dy=10 bench 범위(12~108) 밖 (INFO)', async () => {
+  test('lv4 5슬롯 dy=[10,28,46,64,82]: dy=10 bench 범위(12~212) 밖 (INFO)', async () => {
     const benchTop = 12;
-    const benchBottom = 108;
+    const benchBottom = 12 + 200;  // 212 (Phase D: BENCH_H=200)
     const dyValues = [10, 28, 46, 64, 82];
 
     // dy=10 < benchTop=12 -> bench 밖에 슬롯 배치됨
@@ -378,7 +373,7 @@ test.describe('B-6-2 Edge: 손님 순차 슬롯 배정', () => {
       return { occupied: count, freeAfter: layout.findFreeSlot() };
     });
 
-    expect(result.occupied, '24석 전체 점유').toBe(24);
+    expect(result.occupied, '12석 전체 점유 (Phase D: 2 quad)').toBe(12);
     expect(result.freeAfter, '남은 빈 슬롯 없음').toBeNull();
   });
 });
@@ -408,11 +403,11 @@ test.describe('B-6-2 Edge: Phaser 가구 렌더 위치', () => {
       return furnitureCount;
     });
 
-    // 4 quad x 3 가구(bench-l, table, bench-r) = 12
-    expect(count, '12개 가구 이미지').toBe(12);
+    // 2 quad x 3 가구(bench-l, table, bench-r) = 6 (Phase D)
+    expect(count, '6개 가구 이미지').toBe(6);
   });
 
-  test('bench 이미지 displayWidth=28, displayHeight=96', async ({ page }) => {
+  test('bench 이미지 displayWidth=80, displayHeight=200', async ({ page }) => {
     await waitForTavernScene(page);
 
     const benchSizes = await page.evaluate(() => {
@@ -436,14 +431,14 @@ test.describe('B-6-2 Edge: Phaser 가구 렌더 위치', () => {
       return sizes;
     });
 
-    expect(benchSizes.length, '8개 bench 이미지 (4 quad x 2)').toBe(8);
+    expect(benchSizes.length, '4개 bench 이미지 (2 quad x 2)').toBe(4);
     for (const b of benchSizes) {
-      expect(b.displayW, `${b.key} displayWidth`).toBe(28);
-      expect(b.displayH, `${b.key} displayHeight`).toBe(96);
+      expect(b.displayW, `${b.key} displayWidth`).toBe(80);
+      expect(b.displayH, `${b.key} displayHeight`).toBe(200);
     }
   });
 
-  test('table 이미지 displayWidth=44, displayHeight=96', async ({ page }) => {
+  test('table 이미지 displayWidth=64, displayHeight=200', async ({ page }) => {
     await waitForTavernScene(page);
 
     const tableSizes = await page.evaluate(() => {
@@ -467,10 +462,10 @@ test.describe('B-6-2 Edge: Phaser 가구 렌더 위치', () => {
       return sizes;
     });
 
-    expect(tableSizes.length, '4개 table 이미지').toBe(4);
+    expect(tableSizes.length, '2개 table 이미지 (Phase D: 2 quad)').toBe(2);
     for (const t of tableSizes) {
-      expect(t.displayW, `${t.key} displayWidth`).toBe(44);
-      expect(t.displayH, `${t.key} displayHeight`).toBe(96);
+      expect(t.displayW, `${t.key} displayWidth`).toBe(64);
+      expect(t.displayH, `${t.key} displayHeight`).toBe(200);
     }
   });
 });
@@ -515,8 +510,8 @@ test.describe('B-6-2 Edge: 안정성', () => {
       return count;
     });
 
-    // 4 quad x (3 left + 3 right) = 24
-    expect(dotCount, '24개 슬롯 인디케이터').toBe(24);
+    // 2 quad x (3 left + 3 right) = 12 (Phase D)
+    expect(dotCount, '12개 슬롯 인디케이터').toBe(12);
   });
 });
 
