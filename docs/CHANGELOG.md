@@ -1,5 +1,70 @@
 # Changelog
 
+## [Phase B-6-2] 2026-04-25 -- 태번 가구 비례 업스케일 및 좌석 anchor 재정렬
+
+### 개요
+
+B-6 캐릭터 32x48 업스케일 후 발생한 가구-캐릭터 비례 불균형(벤치 14px < 캐릭터 32px) 해소. 가구 3종을 PIL 픽셀 확장(NEAREST)으로 업스케일하고, tavernLayoutData.js 상수를 전면 갱신하여 좌석 anchor를 재정렬.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/.legacy-b6-2/` -- 기존 가구 3종 백업 (bench_l 14x76, bench_r 14x76, table 44x72)
+- `kitchen-chaos/assets/tavern/_postprocess_b6-2.py` -- PIL 후처리 스크립트 (bench width 2x + height 연장, table height 연장)
+- `kitchen-chaos/tests/phase-b6-2-furniture.spec.js` -- Playwright 가구 비례 검증 17건
+- `kitchen-chaos/tests/phase-b6-2-qa-edge.spec.js` -- Playwright QA 엣지케이스 31건
+
+### 변경
+
+- `kitchen-chaos/assets/tavern/bench_vertical_l_v12.png` -- 14x76 -> 28x96 (PIL width 2x + height stretch)
+- `kitchen-chaos/assets/tavern/bench_vertical_r_v12.png` -- 14x76 -> 28x96 (bench_l 수평 플립)
+- `kitchen-chaos/assets/tavern/table_vertical_v12.png` -- 44x72 -> 44x96 (PIL height stretch, 폭 유지)
+- `kitchen-chaos/js/data/tavernLayoutData.js`
+  - QUAD_W: 100 -> 104
+  - BENCH_L_LEFT: 8 -> 4, BENCH_L_TOP: 18 -> 12
+  - BENCH_W: 14 -> 28, BENCH_H: 76 -> 96
+  - BENCH_R_LEFT: 78 -> 72
+  - TABLE_LEFT: 30 -> 32, TABLE_TOP: 10 -> 12, TABLE_H: 72 -> 96
+  - AISLE_V: 20 -> 16
+  - TABLE_SET_ANCHORS quadLeft: tl/bl 130->132, tr/br 250->252
+  - BENCH_LEFT_OFFSET_X: 7 -> 17, BENCH_RIGHT_OFFSET_X: 77 -> 85
+  - BENCH_SLOTS.lv0 dy: [20,47,74] -> [26,60,94] (균등 배분 간격 34px, 상하 여백 14px 대칭)
+- `kitchen-chaos/js/scenes/TavernServiceScene.js` -- 가구 크기 주석 갱신 (렌더 로직 변경 없음, ServiceScene.js 무수정)
+
+### AD 모드2 검수 결과
+
+APPROVED. 에셋 3종 크기 정확, 금지색 0건, 투명배경 확인.
+
+### AD 모드3 검수 결과
+
+APPROVED with NOTE. 캐릭터-벤치 비례(32px vs 28px = 87.5%)로 좌석 인식 자연스러움. 비파괴적 WARN 3건:
+- W-1 (INFO): bench-r left(72) + width(28) = 100 vs table right(76) -- 4px 논리 겹침, 시각 결함 없음
+- W-2 (LOW): tr/br quad right(356) > DINING_RIGHT(352) -- 4px 초과, 화면 내 수용
+- W-3 (LOW): 하단 여백 190px 과다 -- Phase D 이후 활용 예정
+
+### QA 결과
+
+PASS. 총 184/184 (신규 48 + 회귀 136). SC-1~SC-7 전수 충족.
+- phase-b6-2-furniture.spec.js: 17건 PASS
+- phase-b6-2-qa-edge.spec.js: 31건 PASS (상수 연쇄 4 + 좌표 4 + 슬롯 5 + 손님x 5 + 미래슬롯 2 + 배정 2 + 렌더 3 + 안정성 3 + 시각 3)
+- 회귀: 136건 PASS (b6-upscale 66 + b5-1-chef 23 + b5-1-qa 17 + b4-walk 30)
+
+### 알려진 이슈
+
+- lv4 slot0 dy=10 < bench top=12 (bench 밖) -- 현재 미사용, Phase D lv4 활성화 시 재정렬 필요
+- bench-r/table 4px 논리 겹침 -- Phase C 리팩토링 시 BENCH_R_LEFT=76, QUAD_W=108 검토 권장
+- tr/br quad DINING_RIGHT 4px 초과 -- DINING_W 확장 또는 quad 이동으로 해소 가능
+- B-6 이월: business walk_l 2프레임 alternation (LOW), chef_mimi/rin 16x24 레거시 (INFO), seated displaySize 32x44 vs 에셋 32x48 (INFO)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-25-kc-phase-b6-2-scope.md`
+- 리포트: `.claude/specs/2026-04-25-kc-phase-b6-2-coder-report.md`
+- QA: `.claude/specs/2026-04-25-kc-phase-b6-2-qa.md`
+- AD1: `.claude/specs/2026-04-25-kc-phase-b6-2-ad1.md`
+- AD2: `.claude/specs/2026-04-25-kc-phase-b6-2-ad2.md`
+- AD3: `.claude/specs/2026-04-25-kc-phase-b6-2-ad3.md`
+- 커밋: kitchen-chaos c5ee561f (Coder), 34d28fc1 (QA), 8049f151 (TC-8 픽스)
+
 ## [Phase B-6] 2026-04-24 -- 캐릭터 해상도 업스케일 16x24 -> 32x48
 
 ### 개요
