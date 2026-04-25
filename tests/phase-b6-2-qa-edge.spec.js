@@ -63,7 +63,7 @@ test.describe('B-6-2 Edge: BENCH_CONFIG 연쇄 영향', () => {
     expect(TABLE_LEFT, 'TABLE_LEFT == BENCH_L_LEFT + BENCH_W').toBe(BENCH_L_LEFT + BENCH_W);
   });
 
-  test('BENCH_R_LEFT(72) vs TABLE right(76): 4px 겹침 발생하지만 QUAD_W(104) 내 수용', async () => {
+  test('BENCH_R_LEFT(76) vs TABLE right(76): 0px 갭(밀착, 겹침 없음), QUAD_W(104) 내 수용', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -78,12 +78,12 @@ test.describe('B-6-2 Edge: BENCH_CONFIG 연쇄 영향', () => {
     const QUAD_W = getVal('QUAD_W');
 
     const tableRight = TABLE_LEFT + TABLE_W;  // 32 + 44 = 76
-    const gap = BENCH_R_LEFT - tableRight;    // 72 - 76 = -4
+    const gap = BENCH_R_LEFT - tableRight;    // Phase C: 76 - 76 = 0 (겹침 해소)
 
-    // 기록: 4px 겹침이 의도된 밀착 배치
-    expect(gap, 'bench-r/table 갭').toBe(-4);
+    // Phase C: 수치 정합 — gap=0 (bench-r이 table에 밀착, 겹침 없음)
+    expect(gap, 'bench-r/table 갭').toBe(0);
 
-    // bench_r 우측이 QUAD_W 내에 수용되는지
+    // bench_r 우측이 QUAD_W 내에 수용되는지 (76 + 28 = 104 = QUAD_W)
     const benchRRight = BENCH_R_LEFT + getVal('BENCH_W');
     expect(benchRRight, 'bench_r 우측').toBeLessThanOrEqual(QUAD_W);
   });

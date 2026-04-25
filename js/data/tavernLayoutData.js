@@ -38,7 +38,7 @@ export const TAVERN_LAYOUT = Object.freeze({
   KITCHEN_X:   8,         // 주방 영역 좌측 경계
   KITCHEN_W: 120,         // 주방 폭 (0 ~ 120px, 전체 1/3)
   DINING_X:  128,         // 다이닝홀 시작 x (주방 우측)
-  DINING_W:  224,         // 다이닝홀 폭 (128 ~ 352px, 전체 2/3)
+  DINING_W:  232,         // 다이닝홀 폭 (128 ~ 360px = GAME_W, Phase C: 224→232 실제 경계 정합)
 });
 
 // ── V12: 가구 앵커 좌표 ──
@@ -130,7 +130,7 @@ export const BENCH_CONFIG = Object.freeze({
   BENCH_L_TOP:   12,  // bench-l: quad 내 top (수직 여백 균등)
   BENCH_W:       28,  // bench 너비 (28px, L/R 동일)
   BENCH_H:       96,  // bench 높이 (28x96, 3슬롯 수용)
-  BENCH_R_LEFT:  72,  // bench-r: quad 내 left
+  BENCH_R_LEFT:  76,  // bench-r: quad 내 left (Phase C: 72→76, table right=76 정합)
   // 세로 테이블 크기 (B-6-2 업스케일)
   TABLE_LEFT:    32,  // table-v: quad 내 left (= BENCH_L_LEFT + BENCH_W)
   TABLE_TOP:     12,  // table-v: quad 내 top (bench와 동일 top 정렬)
@@ -145,7 +145,7 @@ export const BENCH_CONFIG = Object.freeze({
 export const BENCH_LEFT_OFFSET_X  = 17;  // bench-l left(4) + BENCH_W/2(14) - 1 = 17
 
 /** 우측 벤치 손님 x 오프셋 (quad 좌상단 기준). 손님 x = quadLeft + BENCH_RIGHT_OFFSET_X */
-export const BENCH_RIGHT_OFFSET_X = 85;  // bench-r left(72) + BENCH_W/2(14) - 1 = 85
+export const BENCH_RIGHT_OFFSET_X = 89;  // bench-r left(76) + BENCH_W/2(14) - 1 = 89 (Phase C)
 
 // ── V12: 좌석 런타임 상태 관리 ──
 

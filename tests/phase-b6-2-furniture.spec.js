@@ -83,8 +83,8 @@ test.describe('Phase B-6-2: BENCH_CONFIG 상수값', () => {
     expect(content).toMatch(/BENCH_H:\s*96/);
     // BENCH_L_LEFT
     expect(content).toMatch(/BENCH_L_LEFT:\s*4/);
-    // BENCH_R_LEFT
-    expect(content).toMatch(/BENCH_R_LEFT:\s*72/);
+    // BENCH_R_LEFT (Phase C: 72→76)
+    expect(content).toMatch(/BENCH_R_LEFT:\s*76/);
     // TABLE_W
     expect(content).toMatch(/TABLE_W:\s*44/);
     // TABLE_H
@@ -111,7 +111,7 @@ test.describe('Phase B-6-2: BENCH_SLOTS.lv0 dy', () => {
 // ── TC-5: BENCH_LEFT/RIGHT_OFFSET_X 검증 ──
 
 test.describe('Phase B-6-2: BENCH OFFSET_X', () => {
-  test('BENCH_LEFT_OFFSET_X = 17, BENCH_RIGHT_OFFSET_X = 85', async () => {
+  test('BENCH_LEFT_OFFSET_X = 17, BENCH_RIGHT_OFFSET_X = 89', async () => {
     const fs = await import('fs');
     const content = fs.readFileSync('js/data/tavernLayoutData.js', 'utf-8');
 
@@ -121,7 +121,7 @@ test.describe('Phase B-6-2: BENCH OFFSET_X', () => {
 
     const rightMatch = content.match(/BENCH_RIGHT_OFFSET_X\s*=\s*(\d+)/);
     expect(rightMatch).not.toBeNull();
-    expect(parseInt(rightMatch[1])).toBe(85);
+    expect(parseInt(rightMatch[1])).toBe(89);  // Phase C: 85→89 (BENCH_R_LEFT 76 + BENCH_W/2 14 - 1)
   });
 });
 
