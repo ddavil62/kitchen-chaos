@@ -1,0 +1,4 @@
+# ZIP 원본 및 추출 파일 — 대용량 바이너리, git 추적 제외
+_extract_*/
+*.json
+*.zip

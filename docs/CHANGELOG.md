@@ -1,5 +1,79 @@
 # Changelog
 
+## [Phase D] 2026-04-25 -- 손님 64px 업그레이드 + 2 quad 1열 레이아웃 전환
+
+### 개요
+
+손님 10종의 에셋을 기존 68px ZIP 소스에서 64px NEAREST로 재처리하여 40장 교체(32x48->64x64). 가구 3종을 PIL NEAREST 확장(bench 28x96->80x200, table 44x96->64x200). 4 quad 2열 레이아웃을 2 quad 1열로 전환(QUAD_W=232, 좌석 24->12석). TavernServiceScene.js의 손님 관련 frameWidth/frameHeight를 64px로 갱신.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/_postprocess_phase_d.py` -- 손님 40장 + 가구 3종 통합 후처리 스크립트 (스펙은 별도 파일 분리 안내, 사용자 지시로 통합)
+- `kitchen-chaos/assets/tavern/.legacy-phase-d/` -- 교체 전 백업 43종 (손님 32x48 40장 + 가구 3종 bench 28x96/table 44x96)
+- `kitchen-chaos/tests/phase-d-layout.spec.js` -- Phase D 전용 Playwright 테스트 104건
+
+### 변경
+
+- `kitchen-chaos/assets/tavern/customer_{10종}_seated_right.png` -- 32x48 -> 64x64 (68px ZIP 소스 NEAREST 다운스케일)
+- `kitchen-chaos/assets/tavern/customer_{10종}_seated_left.png` -- 32x48 -> 64x64
+- `kitchen-chaos/assets/tavern/customer_{10종}_walk_r.png` -- 128x48 -> 256x64 (4프레임 x 64px)
+- `kitchen-chaos/assets/tavern/customer_{10종}_walk_l.png` -- 128x48 -> 256x64 (business walk_l: east flip fallback 유지)
+- `kitchen-chaos/assets/tavern/bench_vertical_l_v12.png` -- 28x96 -> 80x200 (PIL NEAREST width stretch + border-preserving height extend)
+- `kitchen-chaos/assets/tavern/bench_vertical_r_v12.png` -- 28x96 -> 80x200 (bench_l 수평 플립)
+- `kitchen-chaos/assets/tavern/table_vertical_v12.png` -- 44x96 -> 64x200 (PIL NEAREST width stretch + border-preserving height extend)
+- `kitchen-chaos/js/data/tavernLayoutData.js`
+  - QUAD_W: 104 -> 232
+  - QUAD_H: 120 -> 224
+  - BENCH_W: 28 -> 80, BENCH_H: 96 -> 200
+  - BENCH_R_LEFT: 72 -> 148 (=4+80+64)
+  - TABLE_LEFT: 32 -> 84 (=4+80), TABLE_W: 44 -> 64, TABLE_H: 96 -> 200
+  - AISLE_V: 16 -> 0 (1열, 세로 통로 없음)
+  - TABLE_SET_ANCHORS: 4 quad (tl/tr/bl/br) -> 2 quad (top quadTop=64, bottom quadTop=328), quadLeft: 128
+  - BENCH_LEFT_OFFSET_X: 17 -> 44, BENCH_RIGHT_OFFSET_X: 85 -> 188
+  - BENCH_SLOTS.lv0 dy: [26,60,94] -> [60,116,172] (슬롯 간격 56px)
+  - window.__tavernBenchConfig 노출 추가 (Playwright 테스트용)
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - 손님 walk_r/walk_l frameWidth: 32 -> 64, frameHeight: 48 -> 64
+  - 셰프 walk frameWidth/frameHeight: 32/48 유지 (Phase D 스코프 외, 주석 명기)
+  - 손님 _placeImageOrRect: x-16,y-44,32,44 -> x-32,y-64,64,64
+  - @fileoverview Phase D 이력 추가
+  - _buildFurniture 주석 갱신 (4 quad -> 2 quad)
+
+### 스펙 대비 차이점
+
+- 후처리 스크립트: 스펙은 `_postprocess_phase_d.py`(손님)와 `_postprocess_phase_d_furniture.py`(가구) 분리 안내 -> 사용자 지시로 단일 파일 통합
+- 리사이즈 알고리즘: 스펙은 LANCZOS -> AD 모드1 결정으로 NEAREST 채택
+- 셰프 walk frameWidth/frameHeight: 스펙 제약사항 기준 기존 32/48 유지 (셰프 에셋 미교체)
+
+### QA 결과
+
+PASS. 총 218건 (신규 104 + 회귀 114).
+- phase-d-layout.spec.js: 104건 PASS (에셋 HTTP 83 + 레이아웃 상수 1 + TABLE_SET_ANCHORS 5 + BENCH 2 + frameWidth 2 + 씬 안정성 2 + 스크린샷 2 + 런타임 4 + 슬롯 2 + 코드 검증 1)
+- 회귀: 114/131 PASS (17건 실패는 전부 Phase D 의도된 수치 변경, 실제 버그 0건)
+  - phase-b6-qa-edge.spec.js: 17/17 PASS
+  - phase-b6-upscale.spec.js: 65/66 (1건 의도 실패: frameWidth=32 -> 64)
+  - phase-b6-2-furniture.spec.js: 10/17 (7건 의도 실패: 구 가구/레이아웃 수치)
+  - phase-b6-2-qa-edge.spec.js: 22/31 (9건 의도 실패: 4 quad->2 quad, 24->12석 등)
+
+### 시각적 검증
+
+- `tests/screenshots/phase-d-full.png` -- 전체 레이아웃 (2 quad 1열, 가구 비율 정상)
+- `tests/screenshots/phase-d-dining-area.png` -- 다이닝 영역 클로즈업 (벤치/테이블 밀착, 좌우 대칭)
+- `tests/screenshots/phase-d-mobile-320x568.png` -- 모바일 안정성 (에러 0건)
+
+### 알려진 이슈
+
+- lv3/lv4 슬롯 dy 값이 B-6-2 기준 그대로 유지. Phase D 벤치 높이(200px) 기준으로 재계산 필요 (현재 미사용)
+- 셰프 walk 스프라이트시트(128x48)는 frameWidth:32, frameHeight:48 유지. 셰프 에셋 교체 시 함께 갱신 필요
+- B-6 이월: business walk_l east flip fallback (LOW)
+
+### 참고
+
+- 스코프: `.claude/specs/2026-04-25-kc-phase-d-scope.md`
+- 스펙: `.claude/specs/2026-04-25-kc-phase-d-spec.md`
+- 리포트: `.claude/specs/2026-04-25-kc-phase-d-coder-report.md`
+- QA: `.claude/specs/2026-04-25-kc-phase-d-qa.md`
+
 ## [Phase B-6-2] 2026-04-25 -- 태번 가구 비례 업스케일 및 좌석 anchor 재정렬
 
 ### 개요
