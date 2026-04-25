@@ -3,6 +3,12 @@
  * bench 28x96, table 44x96, BENCH_CONFIG/BENCH_SLOTS/TABLE_SET_ANCHORS 상수 갱신 검증.
  */
 import { test, expect } from '@playwright/test';
+import { execSync } from 'child_process';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // ── 헬퍼 ──
 
@@ -156,39 +162,33 @@ test.describe('Phase B-6-2: 레거시 백업', () => {
   });
 });
 
-// ── TC-8: 금지색 0건 (Canvas API 방식) ──
+// ── TC-8: 금지색 0건 (Python PIL 방식 — Canvas API CORS 우회) ──
+
+import { writeFileSync, unlinkSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 test.describe('Phase B-6-2: 금지색 검증', () => {
   for (const asset of FURNITURE_ASSETS) {
-    test(`${asset.name} 금지색(magenta/pure green) 0건`, async ({ page }) => {
-      // 페이지 네비게이션 필요 (Image 로드를 위한 same-origin 컨텍스트)
-      await page.goto('http://localhost:5173/');
-      const forbidden = await page.evaluate(async (assetName) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-            let count = 0;
-            for (let i = 0; i < data.length; i += 4) {
-              const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-              if (a === 0) continue; // 투명 픽셀은 건너뜀
-              // magenta: #FF00FF
-              if (r === 255 && g === 0 && b === 255) count++;
-              // pure green: #00FF00
-              if (r === 0 && g === 255 && b === 0) count++;
-            }
-            resolve(count);
-          };
-          img.onerror = () => reject(new Error('Image load failed'));
-          img.src = `/assets/tavern/${assetName}`;
-        });
-      }, asset.name);
-      expect(forbidden, `${asset.name} 금지색`).toBe(0);
+    test(`${asset.name} 금지색(magenta/pure green) 0건`, () => {
+      const assetPath = resolve(__dirname, '..', 'assets', 'tavern', asset.name).replace(/\\/g, '/');
+      // 임시 Python 스크립트 파일 생성 (따옴표 충돌 방지)
+      const pyScript = join(tmpdir(), `check_forbidden_${asset.name.replace(/\./g, '_')}.py`);
+      writeFileSync(pyScript, [
+        'from PIL import Image',
+        `img = Image.open("${assetPath}").convert("RGBA")`,
+        'data = img.getdata()',
+        'count = sum(1 for r,g,b,a in data if a>0 and ((r==255 and g==0 and b==255) or (r==0 and g==255 and b==0)))',
+        'print(count)',
+      ].join('\n'), 'utf8');
+      let result;
+      try {
+        result = execSync(`python "${pyScript}"`, { encoding: 'utf8' }).trim();
+      } finally {
+        try { unlinkSync(pyScript); } catch (_) {}
+      }
+      const forbiddenCount = parseInt(result, 10);
+      expect(forbiddenCount, `${asset.name} 금지색 픽셀 수`).toBe(0);
     });
   }
 });
