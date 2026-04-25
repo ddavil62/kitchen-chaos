@@ -1,6 +1,7 @@
 /**
  * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 레이아웃 상수 및 좌석 슬롯 데이터.
- * Phase A-bis: 360x640 캔버스 기준 영역 구획, 가구 앵커 좌표, 벤치 슬롯 모델 정의.
+ * Phase A-bis~B-6-2: 360x640 캔버스 기준 영역 구획, 가구 앵커 좌표, 벤치 슬롯 모델 정의.
+ * B-6-2: 가구 비례 업스케일 (bench 14x76->28x96, table 44x72->44x96), QUAD_W 100->104, 슬롯 좌표 재정렬.
  * V12 시안(travellers-v12-mockup.html)의 CSS 수치를 Phaser 절대 좌표로 변환.
  * 4분면(quad) 세로 테이블 배치, 좌석 24석(4quad x 좌3+우3).
  *
@@ -58,18 +59,18 @@ export const CHEF_IDLE_ANCHORS = Object.freeze([
 
 /**
  * V12 4분면 quad 좌상단 절대 좌표.
- * 다이닝홀 x: 120~360(240px) = 좌측여백10+quad100+통로20+quad100+우측여백10
- * quad.tl left=130, quad.tr left=250 (세로 통로 20px: 250-230=20)
+ * 다이닝홀 x: 128~360(232px) = 좌측여백4+quad104+통로16+quad104+우측여백4
+ * quad.tl left=132, quad.tr left=252 (세로 통로 16px: 252-236=16)
  * quad.tl top=90,  quad.bl top=250  (가로 통로 40px: 250-210=40)
- * quad 크기: 100x120
+ * quad 크기: 104x120
  *
  * @type {ReadonlyArray<{quadLeft: number, quadTop: number, key: string}>}
  */
 export const TABLE_SET_ANCHORS = Object.freeze([
-  Object.freeze({ quadLeft: 130, quadTop:  90, key: 'tl' }),  // 좌상단
-  Object.freeze({ quadLeft: 250, quadTop:  90, key: 'tr' }),  // 우상단
-  Object.freeze({ quadLeft: 130, quadTop: 250, key: 'bl' }),  // 좌하단
-  Object.freeze({ quadLeft: 250, quadTop: 250, key: 'br' }),  // 우하단
+  Object.freeze({ quadLeft: 132, quadTop:  90, key: 'tl' }),  // 좌상단
+  Object.freeze({ quadLeft: 252, quadTop:  90, key: 'tr' }),  // 우상단
+  Object.freeze({ quadLeft: 132, quadTop: 250, key: 'bl' }),  // 좌하단
+  Object.freeze({ quadLeft: 252, quadTop: 250, key: 'br' }),  // 우하단
 ]);
 
 // ── V12: 벤치 슬롯 구성 상수 ──
@@ -79,9 +80,9 @@ export const TABLE_SET_ANCHORS = Object.freeze([
  * BENCH_SLOTS[level].slotOffsets[i].dy = quad 상단 기준 세로 오프셋.
  *
  * quad 내부 좌표계:
- *   bench-l: left=8, top=18, 14x76
- *   bench-r: left=78, top=18, 14x76
- *   손님 슬롯 top: 20 / 47 / 74 (AD 검수 권장값)
+ *   bench-l: left=4, top=12, 28x96
+ *   bench-r: left=72, top=12, 28x96
+ *   손님 슬롯 top: 26 / 60 / 94 (AD 검수 권장값)
  *
  * lv0 = 3슬롯(bench 내 손님 3명)
  * lv3 = 4슬롯 (미래 확장, Phase B+에서 확정)
@@ -92,9 +93,9 @@ export const TABLE_SET_ANCHORS = Object.freeze([
 export const BENCH_SLOTS = Object.freeze({
   lv0: Object.freeze({
     slotOffsets: Object.freeze([
-      Object.freeze({ dy:  20 }),  // 슬롯 0 (손님 cust-1: top=20)
-      Object.freeze({ dy:  47 }),  // 슬롯 1 (손님 cust-2: top=47)
-      Object.freeze({ dy:  74 }),  // 슬롯 2 (손님 cust-3: top=74)
+      Object.freeze({ dy:  26 }),  // 슬롯 0 (손님 cust-1: top=26)
+      Object.freeze({ dy:  60 }),  // 슬롯 1 (손님 cust-2: top=60)
+      Object.freeze({ dy:  94 }),  // 슬롯 2 (손님 cust-3: top=94)
     ]),
   }),
   lv3: Object.freeze({
@@ -122,29 +123,29 @@ export const BENCH_SLOTS = Object.freeze({
  */
 export const BENCH_CONFIG = Object.freeze({
   // quad 컨테이너 크기
-  QUAD_W:    100,  // px
+  QUAD_W:    104,  // px (B-6-2: 100->104, bench28+table44+bench28+margin4)
   QUAD_H:    120,  // px
-  // 세로 벤치 크기 (V12)
-  BENCH_L_LEFT:   8,  // bench-l: quad 내 left
-  BENCH_L_TOP:   18,  // bench-l: quad 내 top
-  BENCH_W:       14,  // bench 너비 (14px, L/R 동일)
-  BENCH_H:       76,  // bench 높이 (14x76, 6석 수용)
-  BENCH_R_LEFT:  78,  // bench-r: quad 내 left
-  // 세로 테이블 크기 (V12)
-  TABLE_LEFT:    30,  // table-v: quad 내 left
-  TABLE_TOP:     10,  // table-v: quad 내 top
-  TABLE_W:       44,  // table-v 너비 (44x72)
-  TABLE_H:       72,  // table-v 높이
+  // 세로 벤치 크기 (B-6-2 업스케일)
+  BENCH_L_LEFT:   4,  // bench-l: quad 내 left
+  BENCH_L_TOP:   12,  // bench-l: quad 내 top (수직 여백 균등)
+  BENCH_W:       28,  // bench 너비 (28px, L/R 동일)
+  BENCH_H:       96,  // bench 높이 (28x96, 3슬롯 수용)
+  BENCH_R_LEFT:  72,  // bench-r: quad 내 left
+  // 세로 테이블 크기 (B-6-2 업스케일)
+  TABLE_LEFT:    32,  // table-v: quad 내 left (= BENCH_L_LEFT + BENCH_W)
+  TABLE_TOP:     12,  // table-v: quad 내 top (bench와 동일 top 정렬)
+  TABLE_W:       44,  // table-v 너비 (44x96)
+  TABLE_H:       96,  // table-v 높이 (bench와 동일 높이)
   // 통로 간격
-  AISLE_V:       20,  // 세로 통로 (quad.tl 우측 ~ quad.tr 좌측)
+  AISLE_V:       16,  // 세로 통로 (B-6-2: 20->16, QUAD_W 확장 보상)
   AISLE_H:       40,  // 가로 통로 (quad.tl 하단 ~ quad.bl 상단)
 });
 
 /** 좌측 벤치 손님 x 오프셋 (quad 좌상단 기준). 손님 x = quadLeft + BENCH_LEFT_OFFSET_X */
-export const BENCH_LEFT_OFFSET_X  =  7;  // bench-l left(8) - 1px = 7 (손님 왼쪽 끝 정렬)
+export const BENCH_LEFT_OFFSET_X  = 17;  // bench-l left(4) + BENCH_W/2(14) - 1 = 17
 
 /** 우측 벤치 손님 x 오프셋 (quad 좌상단 기준). 손님 x = quadLeft + BENCH_RIGHT_OFFSET_X */
-export const BENCH_RIGHT_OFFSET_X = 77;  // bench-r left(78) - 1px = 77
+export const BENCH_RIGHT_OFFSET_X = 85;  // bench-r left(72) + BENCH_W/2(14) - 1 = 85
 
 // ── V12: 좌석 런타임 상태 관리 ──
 

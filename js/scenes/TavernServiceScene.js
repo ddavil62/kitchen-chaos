@@ -112,9 +112,9 @@ export class TavernServiceScene extends Phaser.Scene {
       'floor_wood_tile', 'wall_horizontal',
       // V12 신규
       'counter_v12',           // 40x100px
-      'table_vertical_v12',    // 44x72px
-      'bench_vertical_l_v12',  // 14x76px (facing-right)
-      'bench_vertical_r_v12',  // 14x76px (facing-left)
+      'table_vertical_v12',    // 44x96px (B-6-2 업스케일)
+      'bench_vertical_l_v12',  // 28x96px (B-6-2 업스케일, facing-right)
+      'bench_vertical_r_v12',  // 28x96px (B-6-2 업스케일, facing-left)
       'entrance_v12',          // 32x40px
     ];
 
@@ -128,9 +128,9 @@ export class TavernServiceScene extends Phaser.Scene {
       const realAssets = [
         // 가구 5종
         'counter_v12',           // 40x100px
-        'table_vertical_v12',    // 44x72px
-        'bench_vertical_l_v12',  // 14x76px
-        'bench_vertical_r_v12',  // 14x76px
+        'table_vertical_v12',    // 44x96px (B-6-2 업스케일)
+        'bench_vertical_l_v12',  // 28x96px (B-6-2 업스케일)
+        'bench_vertical_r_v12',  // 28x96px (B-6-2 업스케일)
         'entrance_v12',          // 32x40px
         // 캐릭터 4종 (B-2 기존)
         'customer_normal_seated_right',  // 32x48px (B-6 size=48 재발주)
@@ -484,21 +484,21 @@ export class TavernServiceScene extends Phaser.Scene {
       const qx = quad.quadLeft;
       const qy = quad.quadTop;
 
-      // 세로 벤치-l (left=8, top=18, 14x76)
+      // 세로 벤치-l (left=4, top=12, 28x96)
       this._placeImageOrRect(
         'tavern_dummy_bench_vertical_l_v12',
         qx + BENCH_CONFIG.BENCH_L_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
         BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
       );
 
-      // 세로 테이블-v (left=30, top=10, 44x72)
+      // 세로 테이블-v (left=32, top=12, 44x96)
       this._placeImageOrRect(
         'tavern_dummy_table_vertical_v12',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.TABLE_TOP,
         BENCH_CONFIG.TABLE_W, BENCH_CONFIG.TABLE_H, 0x5a3820,
       );
 
-      // 세로 벤치-r (left=78, top=18, 14x76)
+      // 세로 벤치-r (left=72, top=12, 28x96)
       this._placeImageOrRect(
         'tavern_dummy_bench_vertical_r_v12',
         qx + BENCH_CONFIG.BENCH_R_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
