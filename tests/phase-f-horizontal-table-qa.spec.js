@@ -385,11 +385,13 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
       };
     });
 
-    expect(result.count).toBe(2);
+    // Phase F 수정: bench_bot도 _fixedDepth=true → 총 4개 (table×2 + bench_bot×2)
+    expect(result.count).toBe(4);
     expect(result.unchanged).toBe(true);
-    // Phase F: quadTop(168) + 84 = 252, quadTop(328) + 84 = 412
-    expect(result.depthsBefore).toEqual([252, 412]);
-    expect(result.depthsAfter).toEqual([252, 412]);
+    // table: quadTop(168)+84=252, quadTop(328)+84=412
+    // bench_bot: quadTop(168)+109=277, quadTop(328)+109=437
+    expect(result.depthsBefore).toEqual([252, 277, 412, 437]);
+    expect(result.depthsAfter).toEqual([252, 277, 412, 437]);
   });
 
   // ====================================================
@@ -571,11 +573,21 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
       }));
     });
 
-    expect(result.length).toBe(2);
-    for (const t of result) {
+    // Phase F 수정: bench_bot도 _fixedDepth=true → 총 4개 (table×2 + bench_bot×2)
+    expect(result.length).toBe(4);
+    const tables = result.filter(t => t.displayHeight === 48);
+    const benches = result.filter(t => t.displayHeight === 24);
+    expect(tables.length).toBe(2);
+    expect(benches.length).toBe(2);
+    for (const t of tables) {
       // 가로 테이블: 200x48
       expect(t.displayWidth).toBe(200);
       expect(t.displayHeight).toBe(48);
+    }
+    for (const b of benches) {
+      // 하단 벤치: 200x24
+      expect(b.displayWidth).toBe(200);
+      expect(b.displayHeight).toBe(24);
     }
   });
 

@@ -566,11 +566,14 @@ export class TavernServiceScene extends Phaser.Scene {
       tableSprite._fixedDepth = true;  // Phase E/F: depth 고정 마커
 
       // 가로 벤치 하단 (near side, 200x24)
-      this._placeImageOrRect(
+      // back 손님 depth(BACK_SLOT_DY=108)보다 +1로 고정 → 손님 하체(다리 24px) 가림
+      const benchBotSprite = this._placeImageOrRect(
         'tavern_dummy_bench_horizontal_bot_v12',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.BENCH_BOT_TOP,
         BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
       );
+      benchBotSprite.setDepth(qy + BENCH_CONFIG.BACK_SLOT_DY + 1);
+      benchBotSprite._fixedDepth = true;
     }
 
     // ── 벽 장식 ──
