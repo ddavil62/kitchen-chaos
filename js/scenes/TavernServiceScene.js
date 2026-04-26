@@ -1,5 +1,5 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase G.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase H.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12~Phase D: 2분면(quad) 세로 테이블 배치.
  * Phase E: 착석 레이아웃 재설계 — y축 depth 착석 표현, seated_south 텍스처, 테이블 depth 고정.
@@ -111,6 +111,9 @@ const REAL_KEY_MAP = Object.freeze({
   'tavern_dummy_table_4p_v13':     'tavern_table_4p_v13',
   'tavern_dummy_chair_back_v13':   'tavern_chair_back_v13',
   'tavern_dummy_chair_front_v13':  'tavern_chair_front_v13',
+  // Phase H: v14 배경 타일
+  'tavern_dummy_floor_wood_tile_v14':   'tavern_floor_wood_tile_v14',
+  'tavern_dummy_wall_horizontal_v14':   'tavern_wall_horizontal_v14',
 });
 
 // V12 술통 위치 (카운터 좌측 하단 주방 내)
@@ -140,7 +143,7 @@ export class TavernServiceScene extends Phaser.Scene {
       'barrel', 'wall_decor_painting',
       'chef_idle_side', 'customer_walk_r',
       'customer_seated_down', 'customer_seated_up',
-      'floor_wood_tile', 'wall_horizontal',
+      'floor_wood_tile_v14', 'wall_horizontal_v14',
       // V12 신규
       'counter_v12',           // 40x100px
       'table_vertical_v12',    // 64x200px (Phase D)
@@ -218,6 +221,9 @@ export class TavernServiceScene extends Phaser.Scene {
         'table_4p_v13',
         'chair_back_v13',
         'chair_front_v13',
+        // Phase H: v14 배경 타일
+        'floor_wood_tile_v14',
+        'wall_horizontal_v14',
         // B-3 신규: 셰프 5명 idle_side (5개)
         'chef_mage_idle_side',
         'chef_yuki_idle_side',
@@ -457,28 +463,28 @@ export class TavernServiceScene extends Phaser.Scene {
     const L = TAVERN_LAYOUT;
     const g = this.add.graphics();
 
-    // HUD 영역 (적갈색)
-    g.fillStyle(0x3a1a0a, 0.85);
+    // HUD 영역 (다크차콜 — Phase H 현대 레스토랑)
+    g.fillStyle(0x2c2c2c, 0.90);
     g.fillRect(0, 0, L.GAME_W, L.HUD_H);
 
-    // 벽 영역 (회색)
-    g.fillStyle(0x555555, 0.7);
+    // 벽 영역 (밝은 아이보리 — Phase H 현대 레스토랑)
+    g.fillStyle(0xe8dcc8, 0.90);
     g.fillRect(0, L.ROOM_Y, L.GAME_W, L.WALL_H);
 
-    // 주방 영역 (진한 갈색)
-    g.fillStyle(0x3d2810, 0.5);
+    // 주방 영역 (연한 스틸그레이 — Phase H 현대 레스토랑)
+    g.fillStyle(0xb8c5c8, 0.40);
     g.fillRect(L.KITCHEN_X, L.ROOM_CONTENT_Y, L.KITCHEN_W, L.ROOM_BOTTOM_Y - L.ROOM_CONTENT_Y);
 
-    // 다이닝홀 영역 (밝은 갈색)
-    g.fillStyle(0x5a3d20, 0.35);
+    // 다이닝홀 영역 (크림/웜화이트 — Phase H 현대 레스토랑)
+    g.fillStyle(0xfff8f0, 0.50);
     g.fillRect(L.DINING_X, L.ROOM_CONTENT_Y, L.DINING_W, L.ROOM_BOTTOM_Y - L.ROOM_CONTENT_Y);
 
-    // 컨트롤 바 영역 (진한 배경)
-    g.fillStyle(0x15100a, 0.9);
+    // 컨트롤 바 영역 (다크슬레이트 — Phase H 현대 레스토랑)
+    g.fillStyle(0x37474f, 0.92);
     g.fillRect(0, L.ROOM_BOTTOM_Y, L.GAME_W, L.CTRL_H);
 
-    // 영역 경계선 (디버그 오버레이)
-    g.lineStyle(1, 0xffd166, 0.6);
+    // 영역 경계선 (디버그 오버레이 — Phase H: 중립 회색)
+    g.lineStyle(1, 0xaaaaaa, 0.4);
     g.strokeRect(0, 0, L.GAME_W, L.HUD_H);                       // HUD
     g.strokeRect(0, L.ROOM_Y, L.GAME_W, L.WALL_H);               // 벽
     g.strokeRect(L.KITCHEN_X, L.ROOM_CONTENT_Y, L.KITCHEN_W,
@@ -487,24 +493,24 @@ export class TavernServiceScene extends Phaser.Scene {
       L.ROOM_BOTTOM_Y - L.ROOM_CONTENT_Y);                        // 다이닝홀
     g.strokeRect(0, L.ROOM_BOTTOM_Y, L.GAME_W, L.CTRL_H);        // 컨트롤 바
 
-    // 바닥 타일 반복 (다이닝홀 + 주방 영역)
-    const floorKey = 'tavern_dummy_floor_wood_tile';
+    // 바닥 타일 반복 (다이닝홀 + 주방 영역) — Phase H: v14 현대 원목 마루
+    const floorKey = this._resolveTextureKey('tavern_dummy_floor_wood_tile_v14');
     if (this.textures.exists(floorKey)) {
       for (let ty = L.ROOM_CONTENT_Y; ty < L.ROOM_BOTTOM_Y; ty += 32) {
         for (let tx = 0; tx < L.GAME_W; tx += 32) {
           const tile = this.add.image(tx, ty, floorKey).setOrigin(0, 0);
-          tile.setAlpha(0.3);
+          tile.setAlpha(0.55);
           tile.setDepth(0);
         }
       }
     }
 
-    // 벽 타일 반복
-    const wallKey = 'tavern_dummy_wall_horizontal';
+    // 벽 타일 반복 — Phase H: v14 밝은 아이보리 벽
+    const wallKey = this._resolveTextureKey('tavern_dummy_wall_horizontal_v14');
     if (this.textures.exists(wallKey)) {
       for (let wx = 0; wx < L.GAME_W; wx += 64) {
         const wallTile = this.add.image(wx, L.ROOM_Y, wallKey).setOrigin(0, 0);
-        wallTile.setAlpha(0.6);
+        wallTile.setAlpha(0.85);
         wallTile.setDepth(1);
       }
     }
@@ -588,6 +594,21 @@ export class TavernServiceScene extends Phaser.Scene {
         'tavern_dummy_wall_decor_painting', pos.x, pos.y, 32, 28, 0xaa8855,
       );
     }
+  }
+
+  /**
+   * 더미 텍스처 키를 실 에셋 키로 해석한다. ASSET_MODE=real이면 REAL_KEY_MAP을 통해 실 에셋 키를 반환.
+   * 타일 반복 루프 등 _placeImageOrRect를 사용하지 않는 곳에서 키 해석용.
+   * @param {string} dummyKey - 더미 텍스처 키 (tavern_dummy_* 형식)
+   * @returns {string} 사용할 텍스처 키
+   * @private
+   */
+  _resolveTextureKey(dummyKey) {
+    if (ASSET_MODE === 'real') {
+      const realKey = REAL_KEY_MAP[dummyKey];
+      if (realKey && this.textures.exists(realKey)) return realKey;
+    }
+    return dummyKey;
   }
 
   /**
