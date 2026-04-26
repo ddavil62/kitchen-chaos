@@ -5,8 +5,7 @@
  * Phase D: 손님 64px 업그레이드 + 2 quad 1열 레이아웃 전환 (QUAD_W=232, BENCH_W=80, TABLE_W=64, BENCH_H=200).
  * Phase E: 착석 레이아웃 재설계 — y축 depth 착석 표현 (테이블 depth > 손님 depth).
  * Phase F: 가로 테이블 양면 착석 레이아웃 — front(south-facing) + back(north-facing) 양면 12석.
- * V12 시안(travellers-v12-mockup.html)의 CSS 수치를 Phaser 절대 좌표로 변환.
- * 2분면(quad) 가로 테이블 배치, 좌석 12석(2quad x (front 3 + back 3)).
+ * Phase G: 현대 식당 2열x3행 6테이블 24석 레이아웃 — v13 가구(100x40 테이블, 100x20 의자), QUAD_W=116, QUAD_H=128.
  *
  * 기존 ServiceScene.js의 레이아웃 상수(HALL_Y, COOK_Y 등)와 완전 독립.
  * import/참조 금지.
@@ -61,34 +60,38 @@ export const CHEF_IDLE_ANCHORS = Object.freeze([
 ]);
 
 /**
- * Phase F: 2분면 quad 좌상단 절대 좌표 (1열 2행).
- * 다이닝홀 x: 128~360(232px) = 1열 quad 232px (세로 통로 없음)
- * quadLeft=128 (DINING_X), quadTop 계산: 168(top), 328(bottom)
- * quad 크기: 232x120 (Phase F: 가로 테이블 레이아웃)
+ * Phase G: 6분면 quad 좌상단 절대 좌표 (2열 3행).
+ * 다이닝홀 x: 128~360(232px) = 2열 × QUAD_W(116px)
+ * 3행: quadTop = 64, 232, 400 (행간 AISLE_H=40px)
+ * quad 크기: 116x128 (Phase G: 현대 식당 4인 테이블)
  *
  * @type {ReadonlyArray<{quadLeft: number, quadTop: number, key: string}>}
  */
 export const TABLE_SET_ANCHORS = Object.freeze([
-  Object.freeze({ quadLeft: 128, quadTop: 168, key: 'top' }),     // 상단
-  Object.freeze({ quadLeft: 128, quadTop: 328, key: 'bottom' }),  // 하단
+  Object.freeze({ quadLeft: 128, quadTop:  64, key: 'row0_left'  }),   // 좌열 1행
+  Object.freeze({ quadLeft: 244, quadTop:  64, key: 'row0_right' }),   // 우열 1행
+  Object.freeze({ quadLeft: 128, quadTop: 232, key: 'row1_left'  }),   // 좌열 2행
+  Object.freeze({ quadLeft: 244, quadTop: 232, key: 'row1_right' }),   // 우열 2행
+  Object.freeze({ quadLeft: 128, quadTop: 400, key: 'row2_left'  }),   // 좌열 3행
+  Object.freeze({ quadLeft: 244, quadTop: 400, key: 'row2_right' }),   // 우열 3행
 ]);
 
-// ── V12: 벤치 슬롯 구성 상수 ──
+// ── Phase G: 좌석 슬롯 구성 상수 ──
 
 /**
- * Phase F 가로 테이블 양면 슬롯 정의.
+ * Phase G 현대 식당 4인 테이블 슬롯 정의.
  * BENCH_SLOTS[level].slotOffsets[i] = { side, dx, dy }
  *   side: 'front'(south-facing) 또는 'back'(north-facing)
- *   dx: quadLeft + SEAT_CENTER_OFFSET_X(116) 기준 x 오프셋
+ *   dx: quadLeft + SEAT_CENTER_OFFSET_X(58) 기준 x 오프셋
  *   dy: quadTop 기준 y 오프셋 (손님 발끝)
  *
- * Phase F quad 내부 좌표계:
- *   SEAT_CENTER_OFFSET_X = 116 (TABLE_LEFT(16) + TABLE_W/2(100))
- *   front 슬롯 dy = 36 (< TABLE_DEPTH_OFFSET(84) → 테이블이 하체 가림)
- *   back  슬롯 dy = 116 (벤치 등받이 효과: 머리+어깨(32px)만 벤치 위로 노출, 나머지 벤치 가림)
- *   dx = [-66, 0, +66] (슬롯간격 66px, 손님 64px 대비 2px 여유)
+ * Phase G quad 내부 좌표계:
+ *   SEAT_CENTER_OFFSET_X = 58 (QUAD_W/2)
+ *   front 슬롯 dy = 40 (< TABLE_DEPTH_OFFSET(80) → 테이블이 하체 가림)
+ *   back  슬롯 dy = 104 (64px 기준: 머리+상체(40px) 노출, 의자가 하체 가림)
+ *   dx = [-24, +24] (슬롯간격 48px, 64px 손님 부분 오버랩 허용)
  *
- * lv0 = 6슬롯 (front 3 + back 3, 가로 테이블 양면)
+ * lv0 = 4슬롯 (front 2 + back 2, 4인 테이블 양면)
  * lv3 = 4슬롯 (미래 확장, Phase D+ 에서 재확정 필요)
  * lv4 = 5슬롯 (미래 확장)
  *
@@ -96,16 +99,14 @@ export const TABLE_SET_ANCHORS = Object.freeze([
  */
 export const BENCH_SLOTS = Object.freeze({
   lv0: Object.freeze({
-    // Phase F: 가로 테이블 양면 착석
-    // front 3슬롯 (south-facing, depth < 테이블 depth)
-    // back  3슬롯 (north-facing, depth > 테이블 depth)
+    // Phase G: 4인 테이블 양면 착석
+    // front 2슬롯 (south-facing, depth < 테이블 depth)
+    // back  2슬롯 (north-facing, depth > 테이블 depth)
     slotOffsets: Object.freeze([
-      Object.freeze({ side: 'front', dx: -66, dy: 36 }),   // front[0] — 좌
-      Object.freeze({ side: 'front', dx:   0, dy: 36 }),   // front[1] — 중
-      Object.freeze({ side: 'front', dx:  66, dy: 36 }),   // front[2] — 우
-      Object.freeze({ side: 'back',  dx: -66, dy: 116 }),  // back[0] — 좌
-      Object.freeze({ side: 'back',  dx:   0, dy: 116 }),  // back[1] — 중
-      Object.freeze({ side: 'back',  dx:  66, dy: 116 }),  // back[2] — 우
+      Object.freeze({ side: 'front', dx: -24, dy: 40 }),   // front[0] — 좌
+      Object.freeze({ side: 'front', dx:  24, dy: 40 }),   // front[1] — 우
+      Object.freeze({ side: 'back',  dx: -24, dy: 104 }),  // back[0] — 좌
+      Object.freeze({ side: 'back',  dx:  24, dy: 104 }),  // back[1] — 우
     ]),
   }),
   lv3: Object.freeze({
@@ -128,33 +129,33 @@ export const BENCH_SLOTS = Object.freeze({
 });
 
 /**
- * Phase F 가로 테이블/벤치 구성 참조.
- * 1열 2행 레이아웃: QUAD_W=232, QUAD_H=120 (12+24+48+24+12).
+ * Phase G 현대 식당 테이블/의자 구성 참조.
+ * 2열 3행 레이아웃: QUAD_W=116, QUAD_H=128.
  * @type {Object}
  */
 export const BENCH_CONFIG = Object.freeze({
   // quad 컨테이너 크기
-  QUAD_W:    232,  // px (dining 폭, 유지)
-  QUAD_H:    120,  // px (Phase F: 12+24+48+24+12, 가로 레이아웃)
-  // 가로 테이블 (Phase F)
-  TABLE_LEFT:  16,  // quad 내 x (= (232-200)/2, 수평 중앙)
-  TABLE_TOP:   36,  // quad 내 y (= BENCH_TOP_TOP(12) + BENCH_H(24))
-  TABLE_W:    200,  // 가로 테이블 너비 (200x48)
-  TABLE_H:     48,  // 가로 테이블 높이
-  // 가로 벤치 (Phase F)
-  BENCH_TOP_TOP:  12,  // 상단 벤치 quad 내 y (far side)
-  BENCH_BOT_TOP:  84,  // 하단 벤치 quad 내 y (= TABLE_TOP + TABLE_H, near side)
-  BENCH_W:       200,  // 벤치 너비 (= TABLE_W)
-  BENCH_H:        24,  // 벤치 높이
+  QUAD_W:    116,  // px (DINING_W 232 / 2열)
+  QUAD_H:    128,  // px (Phase G: 20+20+40+20+28여유)
+  // 테이블 (Phase G: 100x40)
+  TABLE_LEFT:   8,  // quad 내 x (= (116-100)/2, 수평 중앙)
+  TABLE_TOP:   40,  // quad 내 y (= BENCH_TOP_TOP(20) + BENCH_H(20))
+  TABLE_W:    100,  // 테이블 너비
+  TABLE_H:     40,  // 테이블 높이
+  // 의자 (Phase G: 100x20)
+  BENCH_TOP_TOP:  20,  // 상단 의자 quad 내 y (far side, chair_back)
+  BENCH_BOT_TOP:  80,  // 하단 의자 quad 내 y (= TABLE_TOP + TABLE_H, near side, chair_front)
+  BENCH_W:       100,  // 의자 너비 (= TABLE_W)
+  BENCH_H:        20,  // 의자 높이
   // 통로 간격
-  AISLE_V:        0,  // 세로 통로 (Phase D: 1열, 세로 통로 없음)
-  AISLE_H:       40,  // 가로 통로 (quad.top 하단 ~ quad.bottom 상단)
-  // Phase F: depth 착석 상수
-  SEAT_CENTER_OFFSET_X: 116,  // 손님 x = quadLeft + 116 (TABLE_LEFT(16) + TABLE_W/2(100))
-  TABLE_DEPTH_OFFSET:    84,  // 테이블 depth = quadTop + 84 (TABLE_TOP(36) + TABLE_H(48))
-  SLOT_DX:               66,  // 슬롯 x 간격 (손님 64px, 여유 2px)
-  FRONT_SLOT_DY:         36,  // front 슬롯 발끝 dy
-  BACK_SLOT_DY:         116,  // back 슬롯 발끝 dy (벤치 등받이 효과: 머리+어깨만 노출)
+  AISLE_V:        0,  // 세로 통로 (2열, 경계는 quadLeft로 분리)
+  AISLE_H:       40,  // 가로 통로 (행 간격)
+  // Phase G: depth 착석 상수
+  SEAT_CENTER_OFFSET_X:  58,  // 손님 x = quadLeft + 58 (QUAD_W/2)
+  TABLE_DEPTH_OFFSET:    80,  // 테이블 depth = quadTop + 80 (TABLE_TOP(40) + TABLE_H(40))
+  SLOT_DX:               24,  // 슬롯 x 간격 (64px 손님, ±24px)
+  FRONT_SLOT_DY:         40,  // front 슬롯 발끝 dy
+  BACK_SLOT_DY:         104,  // back 슬롯 발끝 dy (64px 기준: 머리+상체 노출)
 });
 
 /** @deprecated Phase E: front 단일 열로 전환. SEAT_CENTER_OFFSET_X 사용 권장. */
@@ -163,8 +164,8 @@ export const BENCH_LEFT_OFFSET_X  = 44;  // Phase D: bench-l left(4) + BENCH_W/2
 /** @deprecated Phase E: front 단일 열로 전환. SEAT_CENTER_OFFSET_X 사용 권장. */
 export const BENCH_RIGHT_OFFSET_X = 188;  // Phase D: BENCH_L_LEFT(4) + BENCH_W(80) + TABLE_W(64) + BENCH_W/2(40) = 188
 
-/** Phase E: 손님 x 오프셋 (테이블 중앙, quad 좌상단 기준). 손님 x = quadLeft + 116 */
-export const SEAT_CENTER_OFFSET_X = 116;  // TABLE_LEFT(84) + TABLE_W/2(32)
+/** Phase G: 손님 x 오프셋 (quad 중앙, quad 좌상단 기준). 손님 x = quadLeft + 58 */
+export const SEAT_CENTER_OFFSET_X = 58;  // QUAD_W(116) / 2
 
 // ── V12: 좌석 런타임 상태 관리 ──
 
@@ -172,9 +173,9 @@ export const SEAT_CENTER_OFFSET_X = 116;  // TABLE_LEFT(84) + TABLE_W/2(32)
 let _seatingState = null;
 
 /**
- * 좌석 슬롯 런타임 상태를 생성한다. Phase F: 2 quad x (front 3 + back 3) = 12석.
+ * 좌석 슬롯 런타임 상태를 생성한다. Phase G: 6 quad x (front 2 + back 2) = 24석.
  * @param {string} [benchLevel='lv0'] - 벤치 레벨 키
- * @returns {Array<Object>} 좌석 상태 배열 (2엔트리, 각 front/back 슬롯 보유)
+ * @returns {Array<Object>} 좌석 상태 배열 (6엔트리, 각 front/back 슬롯 보유)
  */
 export function createSeatingState(benchLevel = 'lv0') {
   const config = BENCH_SLOTS[benchLevel];

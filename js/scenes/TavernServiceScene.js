@@ -1,9 +1,10 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase F.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase G.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12~Phase D: 2분면(quad) 세로 테이블 배치.
  * Phase E: 착석 레이아웃 재설계 — y축 depth 착석 표현, seated_south 텍스처, 테이블 depth 고정.
  * Phase F: 가로 테이블 양면 착석 — front(south) + back(north) 12석, 가로 가구 3종, seated_north 10종.
+ * Phase G: 현대 식당 2열x3행 6테이블 24석 — v13 가구(테이블 100x40, 의자 100x20), QUAD_W=116.
  * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
  * B-4: 손님 10종 walk_l/walk_r 스프라이트시트(4프레임 64x24) 20장 + 애니메이션 등록 + 데모 W/A 키.
  * B-5-1: 셰프 5명 walk_l/walk_r 스프라이트시트(4프레임 64x24) 10장 + 애니메이션 등록 + 데모 C/V 키.
@@ -106,10 +107,10 @@ const REAL_KEY_MAP = Object.freeze({
   'tavern_dummy_customer_student_seated_north':     'tavern_customer_student_seated_north',
   'tavern_dummy_customer_traveler_seated_north':    'tavern_customer_traveler_seated_north',
   'tavern_dummy_customer_business_seated_north':    'tavern_customer_business_seated_north',
-  // Phase F: 가로 가구
-  'tavern_dummy_table_horizontal_v12':     'tavern_table_horizontal_v12',
-  'tavern_dummy_bench_horizontal_top_v12': 'tavern_bench_horizontal_top_v12',
-  'tavern_dummy_bench_horizontal_bot_v12': 'tavern_bench_horizontal_bot_v12',
+  // Phase G: v13 현대 가구
+  'tavern_dummy_table_4p_v13':     'tavern_table_4p_v13',
+  'tavern_dummy_chair_back_v13':   'tavern_chair_back_v13',
+  'tavern_dummy_chair_front_v13':  'tavern_chair_front_v13',
 });
 
 // V12 술통 위치 (카운터 좌측 하단 주방 내)
@@ -146,10 +147,10 @@ export class TavernServiceScene extends Phaser.Scene {
       'bench_vertical_l_v12',  // 80x200px (Phase D, facing-right)
       'bench_vertical_r_v12',  // 80x200px (Phase D, facing-left)
       'entrance_v12',          // 32x40px
-      // Phase F: 가로 가구 더미
-      'table_horizontal_v12',       // 200x48px
-      'bench_horizontal_top_v12',   // 200x24px
-      'bench_horizontal_bot_v12',   // 200x24px
+      // Phase G: v13 현대 가구 더미
+      'table_4p_v13',           // 100x40px
+      'chair_back_v13',         // 100x20px
+      'chair_front_v13',        // 100x20px
     ];
 
     for (const name of dummies) {
@@ -213,10 +214,10 @@ export class TavernServiceScene extends Phaser.Scene {
         'customer_student_seated_north',
         'customer_traveler_seated_north',
         'customer_business_seated_north',
-        // Phase F: 가로 가구
-        'table_horizontal_v12',
-        'bench_horizontal_top_v12',
-        'bench_horizontal_bot_v12',
+        // Phase G: v13 현대 가구
+        'table_4p_v13',
+        'chair_back_v13',
+        'chair_front_v13',
         // B-3 신규: 셰프 5명 idle_side (5개)
         'chef_mage_idle_side',
         'chef_yuki_idle_side',
@@ -512,11 +513,11 @@ export class TavernServiceScene extends Phaser.Scene {
     g.setDepth(0);
   }
 
-  // ── A1: 가구 앵커 배치 (Phase F: 가로 테이블 2분면) ──
+  // ── A1: 가구 앵커 배치 (Phase G: 2열x3행 6테이블) ──
 
   /**
-   * 가구(카운터, 2 quad 가로 테이블 세트, 술통, 입구)를 앵커 좌표에 배치한다.
-   * Phase F: 세로 벤치-L/R → 가로 벤치 상단/하단, 세로 테이블 → 가로 테이블 전환.
+   * 가구(카운터, 6 quad v13 테이블+의자 세트, 술통, 입구)를 앵커 좌표에 배치한다.
+   * Phase G: v12 가로 벤치/테이블 → v13 현대 의자/테이블 전환, 2열x3행 배치.
    * @private
    */
   _buildFurniture() {
@@ -542,38 +543,38 @@ export class TavernServiceScene extends Phaser.Scene {
       32, 40, 0x9b7850,
     );
 
-    // ── 2 quad 루프 (Phase F: 가로 테이블 양면 배치) ──
+    // ── 6 quad 루프 (Phase G: 2열x3행 현대 테이블+의자 배치) ──
     for (const quad of TABLE_SET_ANCHORS) {
       const qx = quad.quadLeft;
       const qy = quad.quadTop;
 
-      // 가로 벤치 상단 (far side, 200x24)
+      // 상단 의자 (chair_back, far side, 100x20)
       this._placeImageOrRect(
-        'tavern_dummy_bench_horizontal_top_v12',
+        'tavern_dummy_chair_back_v13',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.BENCH_TOP_TOP,
         BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
       );
 
-      // 가로 테이블 (200x48)
-      // Phase F: depth = quadTop + TABLE_DEPTH_OFFSET(84) (front 손님 하체 가림)
+      // 테이블 (100x40)
+      // Phase G: depth = quadTop + TABLE_DEPTH_OFFSET(80) (front 손님 하체 가림)
       const tableSprite = this._placeImageOrRect(
-        'tavern_dummy_table_horizontal_v12',
+        'tavern_dummy_table_4p_v13',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.TABLE_TOP,
         BENCH_CONFIG.TABLE_W, BENCH_CONFIG.TABLE_H, 0x5a3820,
       );
       // 테이블 depth 고정 -- _applyDepthSort에서 재계산되지 않도록 _fixedDepth flag 설정
       tableSprite.setDepth(qy + BENCH_CONFIG.TABLE_DEPTH_OFFSET);
-      tableSprite._fixedDepth = true;  // Phase E/F: depth 고정 마커
+      tableSprite._fixedDepth = true;  // Phase E/G: depth 고정 마커
 
-      // 가로 벤치 하단 (near side, 200x24)
-      // back 손님 depth(BACK_SLOT_DY=108)보다 +1로 고정 → 손님 하체(다리 24px) 가림
-      const benchBotSprite = this._placeImageOrRect(
-        'tavern_dummy_bench_horizontal_bot_v12',
+      // 하단 의자 (chair_front, near side, 100x20)
+      // back 손님 depth(BACK_SLOT_DY=104)보다 +1로 고정 → 손님 하체 가림
+      const chairFrontSprite = this._placeImageOrRect(
+        'tavern_dummy_chair_front_v13',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.BENCH_BOT_TOP,
         BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
       );
-      benchBotSprite.setDepth(qy + BENCH_CONFIG.BACK_SLOT_DY + 1);
-      benchBotSprite._fixedDepth = true;
+      chairFrontSprite.setDepth(qy + BENCH_CONFIG.BACK_SLOT_DY + 1);
+      chairFrontSprite._fixedDepth = true;
     }
 
     // ── 벽 장식 ──
