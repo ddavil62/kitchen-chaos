@@ -1,5 +1,74 @@
 # Changelog
 
+## [Phase G] 2026-04-26 -- 현대식 레스토랑 리디자인
+
+### 개요
+
+v12(중세 태번) 가구 에셋을 v13(현대 캐주얼 다이닝)으로 전면 교체. 테이블 배치를 1열x2행(2테이블, 12석) -> 2열x3행(6테이블, 24석)으로 확장. 손님 seated_south/north 20종을 현대 캐주얼 복장 스타일로 교체(64x64px). BENCH_CONFIG 수치 전면 갱신.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/table_4p_v13.png` -- 현대 4인 테이블 100x40px
+- `kitchen-chaos/assets/tavern/chair_back_v13.png` -- 상단 의자(등받이 뒤) 100x20px
+- `kitchen-chaos/assets/tavern/chair_front_v13.png` -- 하단 의자(등받이 앞) 100x20px
+- `kitchen-chaos/tests/phase-g-layout-qa.spec.js` -- Phase G 전용 Playwright 테스트 35건
+
+### 변경
+
+- `kitchen-chaos/js/data/tavernLayoutData.js`
+  - TABLE_SET_ANCHORS: 2개 -> 6개 (row0_left/right, row1_left/right, row2_left/right)
+  - BENCH_CONFIG 전면 갱신:
+    - QUAD_W: 232 -> 116 (2열 배치)
+    - QUAD_H: 120 -> 128 (3행 배치)
+    - TABLE_W: 200 -> 100, TABLE_H: 48 -> 40
+    - BENCH_W: 200 -> 100, BENCH_H: 24 -> 20
+    - TABLE_LEFT: 16 -> 8, TABLE_TOP: 36 -> 40, BENCH_TOP_TOP: 12 -> 20, BENCH_BOT_TOP: 84 -> 80
+    - TABLE_DEPTH_OFFSET: 84 -> 80
+    - SLOT_DX: 66 -> 24, FRONT_SLOT_DY: 36 -> 40, BACK_SLOT_DY: 108 -> 104
+    - AISLE_H: 40 (신규)
+  - SEAT_CENTER_OFFSET_X: 116 -> 58
+  - BENCH_SLOTS.lv0: 6슬롯(front 3+back 3) -> 4슬롯(front 2+back 2, dx +/-24)
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - preload: v12 가로 가구 3종(table_horizontal_v12, bench_horizontal_top/bot_v12) -> v13 3종(table_4p_v13, chair_back_v13, chair_front_v13)
+  - REAL_KEY_MAP: v12 가로 가구 더미 키 -> v13 실 에셋 키로 갱신
+  - _buildFurniture: v13 가구 키/사이즈(100x40, 100x20) 적용
+  - depth 수치: TABLE_DEPTH_OFFSET=80, chair_front depth=BACK_SLOT_DY+1=105
+- `kitchen-chaos/assets/tavern/customer_{type}_seated_south.png` x 10 -- 현대 캐주얼 복장 64x64px로 교체
+- `kitchen-chaos/assets/tavern/customer_{type}_seated_north.png` x 10 -- 현대 캐주얼 복장 64x64px로 교체
+
+### 삭제
+
+- v12 가로 가구 3종(table_horizontal_v12, bench_horizontal_top_v12, bench_horizontal_bot_v12) preload 및 REAL_KEY_MAP 제거
+
+### 스펙 대비 차이점
+
+- 스펙에서 손님 seated 에셋 크기를 48x48px로 명시했으나, 실제 구현은 64x64px 유지 (walk 스프라이트와 동일 크기, 픽셀 계단 현상 방지)
+- 스펙 요구사항의 depth 값 "BACK_SLOT_DY+1=91"은 오기. 실제 코드는 BACK_SLOT_DY(104)+1=105로 정확하게 구현
+
+### QA 결과
+
+PASS. 총 35건 전부 통과 (정상 22 + 예외 6 + 시각 4 + 안정성 1 + 렌더링 4 + 인터랙션 1 + HUD 1 + 레이아웃 1 + 레거시 1).
+
+- 수용 기준 G-1~G-8 전수 충족
+- 예외 시나리오 11건 전수 PASS (24슬롯 포화, 이중 점유 거부, 레거시 side fallback, 범위 밖 tableSetIdx 등)
+- 시각적 검증: `tests/screenshots/phase-g-{full-layout,dining-area,row0-closeup,row2-closeup,ad3-tavern-layout}.png` 5장
+- AD 모드2: APPROVED, AD 모드3: APPROVED
+
+### 잔존 이슈
+
+- v12 세로 가구(table_vertical_v12, bench_vertical_l/r_v12) preload 잔존 -- 실제 배치 미사용, 불필요한 404 요청 (LOW)
+- occupySlot JSDoc의 tableSetIdx 범위가 "0~1"로 기재 -- Phase G에서 0~5로 확장됨, 갱신 권장 (LOW)
+- 5개 손님 타입(regular, critic, traveler, student, business) walk 스프라이트시트 로드 에러 -- Phase E/F 이전 레거시 더미 에셋 누락 (LOW, Phase G 범위 외)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-26-kc-phase-g-spec.md`
+- 리포트: `.claude/specs/2026-04-26-kc-phase-g-coder-report.md`
+- QA: `.claude/specs/2026-04-26-kc-phase-g-qa.md`
+- 목적 정의: `.claude/specs/2026-04-26-kc-phase-g-scope.md`
+
+---
+
 ## [Phase F] 2026-04-26 -- 가로 테이블 양면 착석 레이아웃
 
 ### 개요
