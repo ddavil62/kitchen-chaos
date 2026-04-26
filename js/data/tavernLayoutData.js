@@ -85,7 +85,7 @@ export const TABLE_SET_ANCHORS = Object.freeze([
  * Phase F quad 내부 좌표계:
  *   SEAT_CENTER_OFFSET_X = 116 (TABLE_LEFT(16) + TABLE_W/2(100))
  *   front 슬롯 dy = 36 (< TABLE_DEPTH_OFFSET(84) → 테이블이 하체 가림)
- *   back  슬롯 dy = 108 (> TABLE_DEPTH_OFFSET(84) → 손님이 테이블 앞에 렌더)
+ *   back  슬롯 dy = 116 (벤치 등받이 효과: 머리+어깨(32px)만 벤치 위로 노출, 나머지 벤치 가림)
  *   dx = [-66, 0, +66] (슬롯간격 66px, 손님 64px 대비 2px 여유)
  *
  * lv0 = 6슬롯 (front 3 + back 3, 가로 테이블 양면)
@@ -103,9 +103,9 @@ export const BENCH_SLOTS = Object.freeze({
       Object.freeze({ side: 'front', dx: -66, dy: 36 }),   // front[0] — 좌
       Object.freeze({ side: 'front', dx:   0, dy: 36 }),   // front[1] — 중
       Object.freeze({ side: 'front', dx:  66, dy: 36 }),   // front[2] — 우
-      Object.freeze({ side: 'back',  dx: -66, dy: 108 }),  // back[0] — 좌
-      Object.freeze({ side: 'back',  dx:   0, dy: 108 }),  // back[1] — 중
-      Object.freeze({ side: 'back',  dx:  66, dy: 108 }),  // back[2] — 우
+      Object.freeze({ side: 'back',  dx: -66, dy: 116 }),  // back[0] — 좌
+      Object.freeze({ side: 'back',  dx:   0, dy: 116 }),  // back[1] — 중
+      Object.freeze({ side: 'back',  dx:  66, dy: 116 }),  // back[2] — 우
     ]),
   }),
   lv3: Object.freeze({
@@ -154,7 +154,7 @@ export const BENCH_CONFIG = Object.freeze({
   TABLE_DEPTH_OFFSET:    84,  // 테이블 depth = quadTop + 84 (TABLE_TOP(36) + TABLE_H(48))
   SLOT_DX:               66,  // 슬롯 x 간격 (손님 64px, 여유 2px)
   FRONT_SLOT_DY:         36,  // front 슬롯 발끝 dy
-  BACK_SLOT_DY:         108,  // back 슬롯 발끝 dy
+  BACK_SLOT_DY:         116,  // back 슬롯 발끝 dy (벤치 등받이 효과: 머리+어깨만 노출)
 });
 
 /** @deprecated Phase E: front 단일 열로 전환. SEAT_CENTER_OFFSET_X 사용 권장. */

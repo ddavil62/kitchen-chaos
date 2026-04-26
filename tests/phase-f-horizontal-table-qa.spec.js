@@ -161,7 +161,7 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
   // ====================================================
   // SC-9: back slot worldY = quadTop + 108
   // ====================================================
-  test('SC-9: back slot worldY = quadTop + 108', async ({ page }) => {
+  test('SC-9: back slot worldY = quadTop + 116', async ({ page }) => {
     const result = await page.evaluate(() => {
       const state = window.__tavernLayout.createSeatingState('lv0');
       return state.map(set => ({
@@ -172,7 +172,7 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
 
     for (const set of result) {
       for (const y of set.backWorldYs) {
-        expect(y).toBe(set.quadTop + 108);
+        expect(y).toBe(set.quadTop + 116);
       }
     }
   });
@@ -210,7 +210,7 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
   // ====================================================
   // SC-11: back slot depth > table depth (108 > 84)
   // ====================================================
-  test('SC-11: back slot depth > table depth (108 > 84)', async ({ page }) => {
+  test('SC-11: back slot depth > table depth (116 > 84)', async ({ page }) => {
     const result = await page.evaluate(() => {
       const state = window.__tavernLayout.createSeatingState('lv0');
       const config = window.__tavernBenchConfig;
@@ -233,7 +233,7 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
 
     for (const c of result) {
       expect(c.valid, `${c.quad} back[${c.slotIdx}]: dy=${c.dy} > 84`).toBe(true);
-      expect(c.dy).toBe(108);
+      expect(c.dy).toBe(116);
     }
   });
 
@@ -389,9 +389,9 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
     expect(result.count).toBe(4);
     expect(result.unchanged).toBe(true);
     // table: quadTop(168)+84=252, quadTop(328)+84=412
-    // bench_bot: quadTop(168)+109=277, quadTop(328)+109=437
-    expect(result.depthsBefore).toEqual([252, 277, 412, 437]);
-    expect(result.depthsAfter).toEqual([252, 277, 412, 437]);
+    // bench_bot: quadTop(168)+117=285, quadTop(328)+117=445 (BACK_SLOT_DY=116+1)
+    expect(result.depthsBefore).toEqual([252, 285, 412, 445]);
+    expect(result.depthsAfter).toEqual([252, 285, 412, 445]);
   });
 
   // ====================================================
@@ -509,7 +509,7 @@ test.describe('Phase F 가로 테이블 양면 착석 레이아웃 QA', () => {
     expect(config.TABLE_DEPTH_OFFSET).toBe(84);
     expect(config.SLOT_DX).toBe(66);
     expect(config.FRONT_SLOT_DY).toBe(36);
-    expect(config.BACK_SLOT_DY).toBe(108);
+    expect(config.BACK_SLOT_DY).toBe(116);
 
     // 내부 일관성 검증
     expect(config.TABLE_TOP).toBe(config.BENCH_TOP_TOP + config.BENCH_H); // 12+24=36
