@@ -1,5 +1,64 @@
 # Changelog
 
+## [Phase H] 2026-04-26 -- 배경 현대 레스토랑 리디자인
+
+### 개요
+
+TavernServiceScene의 배경(5개 fillRect 팔레트 + 바닥/벽 타일)을 중세 태번 톤에서 현대 캐주얼 다이닝 레스토랑 톤으로 전면 교체. Phase G에서 전환된 v13 가구(밝은 원목 테이블/의자)와 시각적으로 일관된 씬 완성.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern_dummy/floor_wood_tile_v14.png` -- 현대 원목 마루 바닥 타일 32x32px (라이트 오크/메이플, 나뭇결)
+- `kitchen-chaos/assets/tavern_dummy/wall_horizontal_v14.png` -- 현대 밝은 크림/아이보리 벽 타일 64x24px
+- `kitchen-chaos/assets/tavern/floor_wood_tile_v14.png` -- 실 에셋 경로 복사 (ASSET_MODE=real 용)
+- `kitchen-chaos/assets/tavern/wall_horizontal_v14.png` -- 실 에셋 경로 복사 (ASSET_MODE=real 용)
+- `kitchen-chaos/tests/phase-h-background-qa.spec.js` -- Phase H 전용 Playwright 테스트 10건
+- `_resolveTextureKey()` 헬퍼 메서드 -- ASSET_MODE=real 시 타일 루프에서 REAL_KEY_MAP 키 해석 분리
+
+### 변경
+
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - `_buildLayout()` fillRect 팔레트 5개 영역 교체:
+    - HUD: `0x3a1a0a, 0.85` -> `0x2c2c2c, 0.90` (다크차콜)
+    - 벽: `0x555555, 0.70` -> `0xe8dcc8, 0.90` (밝은 아이보리)
+    - 주방: `0x3d2810, 0.50` -> `0xb8c5c8, 0.40` (연한 스틸그레이)
+    - 다이닝홀: `0x5a3d20, 0.35` -> `0xfff8f0, 0.50` (크림/웜화이트)
+    - 컨트롤바: `0x15100a, 0.90` -> `0x37474f, 0.92` (다크슬레이트)
+  - 경계선 lineStyle: `0xffd166, 0.6` (금색) -> `0xaaaaaa, 0.4` (중립 회색)
+  - 바닥 타일 alpha: `0.3` -> `0.55`
+  - 벽 타일 alpha: `0.6` -> `0.85`
+  - preload() dummies 배열: `floor_wood_tile` -> `floor_wood_tile_v14`, `wall_horizontal` -> `wall_horizontal_v14`
+  - preload() realAssets 배열: v14 에셋 2종 추가
+  - REAL_KEY_MAP: v14 더미->실 키 매핑 2쌍 추가 (`tavern_dummy_floor_wood_tile_v14` -> `tavern_floor_wood_tile_v14`, `tavern_dummy_wall_horizontal_v14` -> `tavern_wall_horizontal_v14`)
+  - 바닥/벽 타일 텍스처 키를 v14로 교체
+
+### 스펙 대비 차이점
+
+- 없음. 모든 수치가 스펙과 일치하여 구현됨.
+- 추가 구현: `_resolveTextureKey()` 헬퍼 메서드 (스펙에 미명시, ASSET_MODE=real 시 키 해석을 위해 coder가 추가)
+
+### QA 결과
+
+PASS. Phase H 전용 10건 전부 통과 (정상 7 + 예외 3).
+
+- 수용 기준 H-1~H-4 전수 충족
+- 예외 시나리오: 구 팔레트 잔존 없음(EX-1), v14 REAL_KEY_MAP 매핑 정상(EX-2), 콘솔 치명적 에러 없음(EX-3)
+- 회귀 테스트: Phase A 10/17(기존 실패 7건 Phase G 이전 이슈), Phase G 32/35(3건 beforeEach 타임아웃 인프라 이슈). Phase H로 인한 신규 실패 0건
+- 시각적 검증: `tests/screenshots/phase-h-full-rendering.png`, `tests/screenshots/phase-h-dining-closeup.png` 2장
+
+### 잔존 이슈
+
+- Phase A 테스트 7건 pre-existing 실패 (Phase G 레이아웃 변경 이후 테스트 미갱신)
+- Phase G 테스트 3건 beforeEach 타임아웃 (Phaser.js 씬 로드 인프라 이슈, 로직 assertion 자체는 통과)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-26-kc-phase-h-spec.md`
+- 리포트: `.claude/specs/2026-04-26-kc-phase-h-coder-report.md`
+- QA: `.claude/specs/2026-04-26-kc-phase-h-qa.md`
+
+---
+
 ## [Phase G] 2026-04-26 -- 현대식 레스토랑 리디자인
 
 ### 개요
