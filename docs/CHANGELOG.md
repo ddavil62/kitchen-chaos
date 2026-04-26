@@ -1,5 +1,75 @@
 # Changelog
 
+## [Phase F] 2026-04-26 -- 가로 테이블 양면 착석 레이아웃
+
+### 개요
+
+세로 테이블(64x200)을 가로 테이블(200x48)로 전환하여 테이블 상단(front, south-facing) + 하단(back, north-facing) 양면 착석 구현. 6석에서 12석으로 확대 (2 quad x (front 3 + back 3)). seated_north 10종 + 가로 가구 3종 신규 에셋. TABLE_DEPTH_OFFSET 212->84, quadTop[top] 64->168.
+
+### 추가
+
+- `kitchen-chaos/assets/tavern/customer_{normal,vip,gourmet,rushed,group,critic,regular,student,traveler,business}_seated_north.png` x 10 -- north-facing seated 포즈 64x64px (.zips-b6 north.png 추출, NEAREST 리사이즈)
+- `kitchen-chaos/assets/tavern/table_horizontal_v12.png` -- 가로 테이블 200x48px
+- `kitchen-chaos/assets/tavern/bench_horizontal_top_v12.png` -- 가로 벤치 상단 200x24px
+- `kitchen-chaos/assets/tavern/bench_horizontal_bot_v12.png` -- 가로 벤치 하단 200x24px
+- `kitchen-chaos/tests/phase-f-horizontal-table-qa.spec.js` -- Phase F 전용 Playwright 테스트 40건
+
+### 변경
+
+- `kitchen-chaos/js/data/tavernLayoutData.js`
+  - BENCH_CONFIG 전면 재설계:
+    - QUAD_H: 224 -> 120 (가로 레이아웃: 12+24+48+24+12)
+    - TABLE_W: 64 -> 200, TABLE_H: 200 -> 48 (세로->가로 전환)
+    - TABLE_LEFT: 84 -> 16, TABLE_TOP: 12 -> 36
+    - BENCH_W: 80 -> 200, BENCH_H: 200 -> 24
+    - TABLE_DEPTH_OFFSET: 212 -> 84 (= TABLE_TOP(36)+TABLE_H(48))
+    - BENCH_L_LEFT/BENCH_R_LEFT 제거, BENCH_TOP_TOP(12)/BENCH_BOT_TOP(84) 신규
+    - SLOT_DX(66)/FRONT_SLOT_DY(36)/BACK_SLOT_DY(108) 신규
+    - SEAT_OFFSET_Y/SEAT_SPACING_Y Phase E dead code 제거
+  - TABLE_SET_ANCHORS[0].quadTop: 64 -> 168 (수직 중앙 배치)
+  - BENCH_SLOTS.lv0: front+back 6슬롯 (side 필드 추가, dx=[-66,0,+66], front dy=36, back dy=108)
+  - createSeatingState: front/back 양면 배열 생성 (레거시 lv3/lv4 side 미포함 시 front 일괄 처리)
+  - findFreeSlot: ['front','back'] 순회 + tableSetIdx 파라미터 추가
+  - occupySlot/vacateSlot/getSlotWorldPos: 'back' side 지원 (레거시 'left'/'right' fallback 유지)
+- `kitchen-chaos/js/scenes/TavernServiceScene.js`
+  - REAL_KEY_MAP: seated_north 10종 + 가로 가구 3종 추가 (25->38 매핑)
+  - preload: seated_north 10종 + 가로 가구 3종 에셋 로드 추가
+  - _buildFurniture: 벤치-L/R/세로테이블 -> 벤치-상단/하단/가로테이블 배치로 전환
+  - _cycleCustomerState: back 슬롯->seated_north, front 슬롯->seated_south 텍스처 분기
+  - _buildBenchSlots: front(노란색 #ffdd00)/back(청록색 #00ffdd) 구분 인디케이터
+  - _getOccupiedCount/_buildDebugHUD/_updateDebugHUD: front+back 합산
+  - S키 핸들러: slotRef 기반 seated_south/seated_north 분기
+
+### 스펙 대비 차이점
+
+- createSeatingState에서 레거시 벤치 레벨(lv3, lv4)에 side 필드가 없는 경우를 자동 감지하여 front 일괄 처리 추가 (스펙 미명시, 하위 호환 목적)
+- 스펙에서 createSeatingState 반환값에 Object.freeze() 제시했으나, occupySlot/vacateSlot mutation 패턴과 충돌하여 freeze 미적용 (Phase E 기존 방식 유지)
+
+### QA 결과
+
+PASS. 총 40건 (정상 25 + 예외 11 + 시각적 4). 39 통과 / 1 실패 (SC-19 더미 에셋 3건 로드 에러, 기능 무관).
+
+- 수용 기준 SC-1~SC-20 전수 충족 (SC-19 조건부 PASS)
+- 예외 시나리오 11건 전수 PASS (만석 12석, 이중 점유 거부, 레거시 side fallback, 50회 연타 순환 등)
+- 시각적 검증: `tests/screenshots/phase_f_{initial,seated,top_quad_zoom,bottom_quad_zoom}.png` 4장
+- AD 모드2: APPROVED, AD 모드3: APPROVED
+
+### 잔존 이슈
+
+- 레거시 세로 가구(table_vertical_v12, bench_vertical_l/r_v12) dummies/realAssets/REAL_KEY_MAP 잔존 -- 실제 배치 미사용, 불필요한 404 요청 발생 (LOW)
+- 가로 가구 더미 파일 3종(tavern_dummy/ 디렉토리) 누락 -- ASSET_MODE='real'에서 기능 영향 없음 (LOW)
+- BENCH_SLOTS.lv3/lv4가 Phase F 이전 형식(side 필드 없음) 잔존 -- createSeatingState hasSide 자동 감지로 front-only 동작 (LOW)
+- Phase E 테스트(phase-e-seating-layout-qa.spec.js)가 Phase E 수치 하드코딩으로 Phase F 환경에서 실패 -- Phase F 테스트가 상위 호환, 아카이브 처리 권장
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-26-kc-phase-f-spec.md`
+- 리포트: `.claude/specs/2026-04-26-kc-phase-f-coder-report.md`
+- AD3: `.claude/specs/2026-04-26-kc-phase-f-ad3.md`
+- QA: `.claude/specs/2026-04-26-kc-phase-f-qa.md`
+
+---
+
 ## [Phase E] 2026-04-26 -- 착석 레이아웃 재설계 (y축 depth 착석 표현)
 
 ### 개요
