@@ -1,8 +1,9 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase E.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase F.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12~Phase D: 2분면(quad) 세로 테이블 배치.
  * Phase E: 착석 레이아웃 재설계 — y축 depth 착석 표현, seated_south 텍스처, 테이블 depth 고정.
+ * Phase F: 가로 테이블 양면 착석 — front(south) + back(north) 12석, 가로 가구 3종, seated_north 10종.
  * B-3: 손님 9종(seated R/L) + 셰프 5명(idle_side) 에셋 확장, DEMO_CUSTOMER_TYPES 4종 분배.
  * B-4: 손님 10종 walk_l/walk_r 스프라이트시트(4프레임 64x24) 20장 + 애니메이션 등록 + 데모 W/A 키.
  * B-5-1: 셰프 5명 walk_l/walk_r 스프라이트시트(4프레임 64x24) 10장 + 애니메이션 등록 + 데모 C/V 키.
@@ -94,6 +95,21 @@ const REAL_KEY_MAP = Object.freeze({
   'tavern_dummy_customer_student_seated_south':     'tavern_customer_student_seated_south',
   'tavern_dummy_customer_traveler_seated_south':    'tavern_customer_traveler_seated_south',
   'tavern_dummy_customer_business_seated_south':    'tavern_customer_business_seated_south',
+  // Phase F: north-facing seated (back 슬롯 착석)
+  'tavern_dummy_customer_seated_north':             'tavern_customer_normal_seated_north',
+  'tavern_dummy_customer_vip_seated_north':         'tavern_customer_vip_seated_north',
+  'tavern_dummy_customer_gourmet_seated_north':     'tavern_customer_gourmet_seated_north',
+  'tavern_dummy_customer_rushed_seated_north':      'tavern_customer_rushed_seated_north',
+  'tavern_dummy_customer_group_seated_north':       'tavern_customer_group_seated_north',
+  'tavern_dummy_customer_critic_seated_north':      'tavern_customer_critic_seated_north',
+  'tavern_dummy_customer_regular_seated_north':     'tavern_customer_regular_seated_north',
+  'tavern_dummy_customer_student_seated_north':     'tavern_customer_student_seated_north',
+  'tavern_dummy_customer_traveler_seated_north':    'tavern_customer_traveler_seated_north',
+  'tavern_dummy_customer_business_seated_north':    'tavern_customer_business_seated_north',
+  // Phase F: 가로 가구
+  'tavern_dummy_table_horizontal_v12':     'tavern_table_horizontal_v12',
+  'tavern_dummy_bench_horizontal_top_v12': 'tavern_bench_horizontal_top_v12',
+  'tavern_dummy_bench_horizontal_bot_v12': 'tavern_bench_horizontal_bot_v12',
 });
 
 // V12 술통 위치 (카운터 좌측 하단 주방 내)
@@ -130,6 +146,10 @@ export class TavernServiceScene extends Phaser.Scene {
       'bench_vertical_l_v12',  // 80x200px (Phase D, facing-right)
       'bench_vertical_r_v12',  // 80x200px (Phase D, facing-left)
       'entrance_v12',          // 32x40px
+      // Phase F: 가로 가구 더미
+      'table_horizontal_v12',       // 200x48px
+      'bench_horizontal_top_v12',   // 200x24px
+      'bench_horizontal_bot_v12',   // 200x24px
     ];
 
     for (const name of dummies) {
@@ -182,6 +202,21 @@ export class TavernServiceScene extends Phaser.Scene {
         'customer_student_seated_south',
         'customer_traveler_seated_south',
         'customer_business_seated_south',
+        // Phase F: north-facing seated (back 슬롯 착석)
+        'customer_normal_seated_north',
+        'customer_vip_seated_north',
+        'customer_gourmet_seated_north',
+        'customer_rushed_seated_north',
+        'customer_group_seated_north',
+        'customer_critic_seated_north',
+        'customer_regular_seated_north',
+        'customer_student_seated_north',
+        'customer_traveler_seated_north',
+        'customer_business_seated_north',
+        // Phase F: 가로 가구
+        'table_horizontal_v12',
+        'bench_horizontal_top_v12',
+        'bench_horizontal_bot_v12',
         // B-3 신규: 셰프 5명 idle_side (5개)
         'chef_mage_idle_side',
         'chef_yuki_idle_side',
@@ -325,10 +360,12 @@ export class TavernServiceScene extends Phaser.Scene {
       this.input.keyboard.on('keydown-S', () => {
         const cust = this._customers[0];
         if (!cust || !cust.sprite) return;
-        // Phase E: seated_south 텍스처로 변경
+        // Phase F: slotRef에 따라 seated_south/seated_north 분기
         if (cust.sprite.anims) cust.sprite.anims.stop();
-        if (this.textures.exists('tavern_customer_normal_seated_south')) {
-          cust.sprite.setTexture('tavern_customer_normal_seated_south');
+        const direction = (cust.slotRef && cust.slotRef.side === 'back') ? 'north' : 'south';
+        const sitKey = `tavern_customer_normal_seated_${direction}`;
+        if (this.textures.exists(sitKey)) {
+          cust.sprite.setTexture(sitKey);
         }
       });
 
@@ -475,10 +512,11 @@ export class TavernServiceScene extends Phaser.Scene {
     g.setDepth(0);
   }
 
-  // ── A1: 가구 앵커 배치 (Phase D: 2분면 1열) ──
+  // ── A1: 가구 앵커 배치 (Phase F: 가로 테이블 2분면) ──
 
   /**
-   * 가구(카운터, 2 quad 테이블 세트, 술통, 입구)를 앵커 좌표에 배치한다.
+   * 가구(카운터, 2 quad 가로 테이블 세트, 술통, 입구)를 앵커 좌표에 배치한다.
+   * Phase F: 세로 벤치-L/R → 가로 벤치 상단/하단, 세로 테이블 → 가로 테이블 전환.
    * @private
    */
   _buildFurniture() {
@@ -504,33 +542,33 @@ export class TavernServiceScene extends Phaser.Scene {
       32, 40, 0x9b7850,
     );
 
-    // ── 2 quad 루프 (Phase D: 1열 2행) ──
+    // ── 2 quad 루프 (Phase F: 가로 테이블 양면 배치) ──
     for (const quad of TABLE_SET_ANCHORS) {
       const qx = quad.quadLeft;
       const qy = quad.quadTop;
 
-      // 세로 벤치-l (left=4, top=12, 80x200)
+      // 가로 벤치 상단 (far side, 200x24)
       this._placeImageOrRect(
-        'tavern_dummy_bench_vertical_l_v12',
-        qx + BENCH_CONFIG.BENCH_L_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
+        'tavern_dummy_bench_horizontal_top_v12',
+        qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.BENCH_TOP_TOP,
         BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
       );
 
-      // 세로 테이블-v (left=84, top=12, 64x200)
-      // Phase E: depth = quadTop + TABLE_DEPTH_OFFSET (손님 하체 가림)
+      // 가로 테이블 (200x48)
+      // Phase F: depth = quadTop + TABLE_DEPTH_OFFSET(84) (front 손님 하체 가림)
       const tableSprite = this._placeImageOrRect(
-        'tavern_dummy_table_vertical_v12',
+        'tavern_dummy_table_horizontal_v12',
         qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.TABLE_TOP,
         BENCH_CONFIG.TABLE_W, BENCH_CONFIG.TABLE_H, 0x5a3820,
       );
-      // 테이블 depth 고정 — _applyDepthSort에서 재계산되지 않도록 _fixedDepth flag 설정
+      // 테이블 depth 고정 -- _applyDepthSort에서 재계산되지 않도록 _fixedDepth flag 설정
       tableSprite.setDepth(qy + BENCH_CONFIG.TABLE_DEPTH_OFFSET);
-      tableSprite._fixedDepth = true;  // Phase E: depth 고정 마커
+      tableSprite._fixedDepth = true;  // Phase E/F: depth 고정 마커
 
-      // 세로 벤치-r (left=148, top=12, 80x200)
+      // 가로 벤치 하단 (near side, 200x24)
       this._placeImageOrRect(
-        'tavern_dummy_bench_vertical_r_v12',
-        qx + BENCH_CONFIG.BENCH_R_LEFT, qy + BENCH_CONFIG.BENCH_L_TOP,
+        'tavern_dummy_bench_horizontal_bot_v12',
+        qx + BENCH_CONFIG.TABLE_LEFT, qy + BENCH_CONFIG.BENCH_BOT_TOP,
         BENCH_CONFIG.BENCH_W, BENCH_CONFIG.BENCH_H, 0x7a5030,
       );
     }
@@ -575,18 +613,18 @@ export class TavernServiceScene extends Phaser.Scene {
     return this.add.rectangle(x + w / 2, y + h / 2, w, h, fallbackColor).setAlpha(0.8);
   }
 
-  // ── A2: 벤치 슬롯 표시 (V12 좌/우) ──
+  // ── A2: 벤치 슬롯 표시 (Phase F: front + back 양면) ──
 
   /**
    * BENCH_SLOTS 기반으로 각 슬롯 위치에 시각적 인디케이터를 표시한다.
-   * Phase E: front 단일 열 슬롯 표시.
+   * Phase F: front(노란색) + back(청록색) 양면 슬롯 표시.
    * @private
    */
   _buildBenchSlots() {
     const slotSize = 4;
 
     for (const set of this._seatingState) {
-      // Phase E: 테이블 정면 슬롯 (facing-south)
+      // Phase F: 테이블 정면 슬롯 (facing-south, 노란색)
       for (const slot of set.front) {
         const dot = this.add.rectangle(
           slot.worldX, slot.worldY, slotSize, slotSize, 0xffdd00,
@@ -595,6 +633,18 @@ export class TavernServiceScene extends Phaser.Scene {
         this.add.text(slot.worldX + 3, slot.worldY - 8, `F${slot.slotIdx}`, {
           fontSize: '8px', fontFamily: FONT_FAMILY, color: '#ffdd00',
         }).setOrigin(0, 0.5).setDepth(9000);
+      }
+      // Phase F: 테이블 후면 슬롯 (facing-north, 청록색)
+      if (set.back) {
+        for (const slot of set.back) {
+          const dot = this.add.rectangle(
+            slot.worldX, slot.worldY, slotSize, slotSize, 0x00ffdd,
+          );
+          dot.setDepth(slot.worldY);
+          this.add.text(slot.worldX + 3, slot.worldY - 8, `B${slot.slotIdx}`, {
+            fontSize: '8px', fontFamily: FONT_FAMILY, color: '#00ffdd',
+          }).setOrigin(0, 0.5).setDepth(9000);
+        }
       }
     }
   }
@@ -766,10 +816,11 @@ export class TavernServiceScene extends Phaser.Scene {
           cust.label.y = pos.y + 4;
         }
       }
-      // Phase E: south-facing seated 단일 키 (facing 방향 분기 제거)
+      // Phase F: back 슬롯이면 seated_north, front 슬롯이면 seated_south 텍스처 적용
       if (ASSET_MODE === 'real') {
         const typeKey = cust.customerType || 'normal';
-        const sitKey = `tavern_customer_${typeKey}_seated_south`;
+        const direction = (cust.slotRef && cust.slotRef.side === 'back') ? 'north' : 'south';
+        const sitKey = `tavern_customer_${typeKey}_seated_${direction}`;
         if (this.textures.exists(sitKey)) {
           // walk 애니메이션 정지 후 seated 텍스처 교체
           if (cust.sprite.anims) cust.sprite.anims.stop();
@@ -828,7 +879,7 @@ export class TavernServiceScene extends Phaser.Scene {
   _buildDebugHUD() {
     const occupiedCount = this._getOccupiedCount();
     const totalSlots = this._seatingState.reduce(
-      (acc, set) => acc + set.front.length, 0,
+      (acc, set) => acc + set.front.length + (set.back ? set.back.length : 0), 0,
     );
 
     /** @type {Phaser.GameObjects.Text} */
@@ -852,7 +903,7 @@ export class TavernServiceScene extends Phaser.Scene {
     if (!this._debugText) return;
     const occupied = this._getOccupiedCount();
     const total = this._seatingState.reduce(
-      (acc, set) => acc + set.front.length, 0,
+      (acc, set) => acc + set.front.length + (set.back ? set.back.length : 0), 0,
     );
     this._debugText.setText(this._debugString(occupied, total));
   }
@@ -875,18 +926,17 @@ export class TavernServiceScene extends Phaser.Scene {
   }
 
   /**
-   * 현재 점유된 슬롯 수를 반환한다.
+   * 현재 점유된 슬롯 수를 반환한다. Phase F: front + back 합산.
    * @returns {number}
    * @private
    */
   _getOccupiedCount() {
-    let count = 0;
-    for (const set of this._seatingState) {
-      for (const slot of set.front) {
-        if (slot.occupiedBy !== null) count++;
-      }
-    }
-    return count;
+    return this._seatingState.reduce(
+      (acc, set) => acc
+        + set.front.filter(s => s.occupiedBy !== null).length
+        + (set.back ? set.back.filter(s => s.occupiedBy !== null).length : 0),
+      0,
+    );
   }
 
   // ── Back 버튼 ──
