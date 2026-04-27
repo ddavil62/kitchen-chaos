@@ -296,6 +296,13 @@ export class ServiceScene extends Phaser.Scene {
     this.isPaused = false;
     this.isServiceOver = false;
 
+    // Phase 80: 레시피 선택 강조 상태
+    this._selectedRecipeId = null;
+    this._highlightRects = new Map(); // tableIdx → Rectangle
+
+    // Phase 80: 긴급 인내심 tween 관리
+    this._urgentTweens = new Map();   // tableIdx → { tween, rect }
+
     // ── Phase 8-3: 동적 테이블 수 결정 ──
     this.unlockedTables = SaveManager.getUnlockedTables();
     this.tableCols = Math.ceil(this.unlockedTables / TABLE_ROWS);
@@ -1210,6 +1217,36 @@ export class ServiceScene extends Phaser.Scene {
     if (ratio < 0.3) pColor = 0xff0000;
     else if (ratio < 0.6) pColor = 0xffcc00;
     pBarFill.setFillStyle(pColor);
+
+    // Phase 80: patience 30% 미만 긴급 깜빡임
+    if (ratio < 0.3 && cust) {
+      if (!this._urgentTweens.has(idx)) {
+        const cont = this.tableContainers[idx];
+        const urgentRect = this.add.rectangle(cont.x, cont.y, 98, 78)
+          .setStrokeStyle(3, 0x333333)
+          .setFillStyle(0x000000, 0)
+          .setDepth(cont.depth + 2);
+        const urgentTween = this.tweens.add({
+          targets: urgentRect,
+          alpha: { from: 0.6, to: 1.0 },
+          duration: 500,
+          yoyo: true,
+          repeat: -1,
+          onUpdate: (tween) => {
+            const t = tween.progress;
+            urgentRect.setStrokeStyle(3, t < 0.5 ? 0x333333 : 0xff0000);
+          },
+        });
+        this._urgentTweens.set(idx, { tween: urgentTween, rect: urgentRect });
+      }
+    } else {
+      if (this._urgentTweens.has(idx)) {
+        const { tween, rect } = this._urgentTweens.get(idx);
+        tween.stop();
+        rect.destroy();
+        this._urgentTweens.delete(idx);
+      }
+    }
   }
 
   // ── 조리 슬롯 (280~340px) ────────────────────────────────────────
@@ -2381,6 +2418,24 @@ export class ServiceScene extends Phaser.Scene {
     this._showMessage(`${name} 버림`);
   }
 
+  // ── Phase 80: 골든 테두리 헬퍼 ──────────────────────────────────────
+
+  /** @private Phase 80: 골든 테두리 전체 해제 */
+  _clearHighlightRects() {
+    this._highlightRects.forEach(rect => rect.destroy());
+    this._highlightRects.clear();
+    this._selectedRecipeId = null;
+  }
+
+  /** @private Phase 80: 특정 테이블 골든 테두리 해제 */
+  _clearHighlightRect(tableIdx) {
+    const rect = this._highlightRects.get(tableIdx);
+    if (rect) {
+      rect.destroy();
+      this._highlightRects.delete(tableIdx);
+    }
+  }
+
   // ── 레시피 탭 → 조리 시작 ─────────────────────────────────────────
 
   /**
@@ -2390,6 +2445,20 @@ export class ServiceScene extends Phaser.Scene {
    */
   _onRecipeTap(recipe) {
     if (this.isServiceOver || this.isPaused) return;
+
+    // Phase 80: 레시피 탭 → 해당 주문 테이블 골든 강조
+    this._clearHighlightRects();
+    this._selectedRecipeId = recipe.id;
+    this.tables.forEach((cust, idx) => {
+      if (cust && cust.dish === recipe.id && this.tableContainers[idx]) {
+        const cont = this.tableContainers[idx];
+        const rect = this.add.rectangle(cont.x, cont.y, 94, 74)
+          .setStrokeStyle(3, 0xffd700)
+          .setFillStyle(0x000000, 0)
+          .setDepth(cont.depth + 1);
+        this._highlightRects.set(idx, rect);
+      }
+    });
 
     // 재료 확인
     if (!this.inventoryManager.hasEnough(recipe.ingredients)) {
@@ -2469,6 +2538,8 @@ export class ServiceScene extends Phaser.Scene {
       return;
     }
 
+    // Phase 80: 서빙 성공 → 골든 테두리 해제
+    this._clearHighlightRect(tableIdx);
     this._serveToCustomer(tableIdx, readySlotIdx);
   }
 
@@ -2710,8 +2781,31 @@ export class ServiceScene extends Phaser.Scene {
       this.vfx.customerEmoji(tblContainer.x, tblContainer.y - 20, true);
     }
 
-    // VFX: 콤보 텍스트 (3콤보 이상)
-    if (this.comboCount >= 3) {
+    // VFX: 콤보 팝업 (Phase 80: 2콤보 이상으로 임계값 하향)
+    if (this.comboCount >= 2) {
+      // Phase 80: 화면 중앙 인라인 팝업 텍스트
+      const comboLabel = this.add.text(
+        GAME_WIDTH / 2,
+        GAME_HEIGHT / 2 - 50,
+        `${this.comboCount} COMBO! +${totalGold}G`,
+        {
+          fontSize: '24px',
+          color: '#ffd700',
+          stroke: '#000000',
+          strokeThickness: 4,
+          fontStyle: 'bold',
+        }
+      ).setOrigin(0.5).setDepth(500);
+
+      this.tweens.add({
+        targets: comboLabel,
+        y: comboLabel.y - 50,
+        alpha: 0,
+        duration: 1200,
+        ease: 'Power1',
+        onComplete: () => comboLabel.destroy(),
+      });
+
       this.vfx.comboPopup(this.comboCount);
       SoundManager.playSFX('sfx_combo');
     }
@@ -3302,6 +3396,20 @@ export class ServiceScene extends Phaser.Scene {
     this.skillBtnText = null;
     // Phase 11-3a: 튜토리얼 정리
     this._tutorial?.end?.();
+
+    // Phase 80: 골든 테두리 / 긴급 tween 정리
+    if (this._highlightRects) {
+      this._highlightRects.forEach(rect => { if (rect?.active) rect.destroy(); });
+      this._highlightRects.clear();
+    }
+    if (this._urgentTweens) {
+      this._urgentTweens.forEach(({ tween, rect }) => {
+        tween?.stop();
+        if (rect?.active) rect.destroy();
+      });
+      this._urgentTweens.clear();
+    }
+    this._selectedRecipeId = null;
 
     // Phase 11-3c: 씬 전환 시 Tween/Timer 명시적 정리
     this.tweens.killAll();
