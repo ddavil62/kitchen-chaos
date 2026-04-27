@@ -32,12 +32,13 @@
  * Phase 75B: v25 마이그레이션 — dailyMissions, loginBonus, mimiSkinCoupons 추가.
  * Phase 76: v26 마이그레이션 — 손님 프로필 시스템 (regularCustomerProgress, criticPenaltyActive).
  *           getRegularProgress, setRegularProgress, getCriticPenalty, setCriticPenalty 헬퍼 추가.
+ * Phase 77: v27 마이그레이션 — 엔드리스 해금 조건 24-6 → 6-6 완화.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 26;
+const SAVE_VERSION = 27;
 
 // ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
 const BACKUP_KEYS = [
@@ -140,7 +141,7 @@ function createDefault() {
     giftIngredients: {},     // 쿠폰으로 지급된 재료 (GatheringScene 진입 시 소비)
     // ── Phase 11-1 추가 ──
     endless: {
-      unlocked: false,            // 24-6 클리어 시 true
+      unlocked: false,            // 6-6 클리어 시 true
       bestWave: 0,                // 최고 도달 웨이브
       bestScore: 0,               // 최고 누적 골드
       bestCombo: 0,               // 최고 연속 콤보
@@ -317,8 +318,8 @@ export class SaveManager {
       coinsEarned = Math.max(1, Math.floor((coinByStars[stars] || 0) * 0.2));
     }
 
-    // ── Phase 11-1: 최종 스테이지(24-6) 클리어 시 엔드리스 해금 ──
-    if (stageId === '24-6' && stars > 0) {
+    // ── Phase 11-1: 엔드리스 해금 기준 스테이지(6-6) 클리어 시 엔드리스 해금 ──
+    if (stageId === '6-6' && stars > 0) {
       data.endless = data.endless || { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0, lastDailySeed: 0 };
       data.endless.unlocked = true;
     }
@@ -1603,6 +1604,19 @@ export class SaveManager {
       data.regularCustomerProgress = data.regularCustomerProgress ?? 0;
       data.criticPenaltyActive = data.criticPenaltyActive ?? false;
       data.version = 26;
+    }
+
+    // v26 → v27: 엔드리스 해금 조건 24-6 → 6-6 완화 (Phase 77)
+    if (data.version < 27) {
+      // 6-6을 클리어한 유저는 자동으로 엔드리스 해금
+      if (!data.endless?.unlocked && data.stages?.['6-6']?.cleared) {
+        if (!data.endless) {
+          data.endless = { unlocked: false, bestWave: 0, bestScore: 0, bestCombo: 0,
+                           lastDailySeed: 0, stormCount: 0, missionSuccessCount: 0, noLeakStreak: 0 };
+        }
+        data.endless.unlocked = true;
+      }
+      data.version = 27;
     }
 
     // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)

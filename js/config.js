@@ -2,6 +2,7 @@
  * @fileoverview Kitchen Chaos Tycoon 전역 설정 상수.
  * 화면 크기, 게임 씬 레이아웃, 아이소메트릭 그리드, 경로 유틸리티를 정의한다.
  *
+ * Phase 77: ENDLESS_UNLOCK_STAGE 24-6 → 6-6 완화.
  * 화면 레이아웃 (360×640):
  *   0~40    HUD (GatheringScene / EndlessScene)
  *   40~480  아이소메트릭 맵 그리드 — 다이아몬드 9×10, 440px
@@ -249,8 +250,7 @@ export const STARTING_LIVES = 15;       // 라운드 시작 생명 수 (Gatherin
 export const FRESHNESS_WINDOW_MS = 5000; // 재료 신선도 유지 시간 (ms) (Enemy, IngredientManager)
 
 // ── Phase 69 (P1-4): 엔드리스 해금 조건 상수화 ──
-// SaveManager.commitStageResult()가 stageId === '24-6' && stars > 0에서 해금하므로
-// UI 문구도 이 조건과 1:1 일치해야 한다. MenuScene이 과거 "6-3 클리어 필요"로
-// 잘못 표시하던 회귀를 상수로 고정.
-export const ENDLESS_UNLOCK_STAGE = '24-6';
+// SaveManager.commitStageResult()가 stageId === ENDLESS_UNLOCK_STAGE && stars > 0에서 해금하므로
+// UI 문구도 이 조건과 1:1 일치해야 한다. Phase 77: 24-6 → 6-6 완화.
+export const ENDLESS_UNLOCK_STAGE = '6-6';
 export const ENDLESS_LOCK_LABEL = `\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (${ENDLESS_UNLOCK_STAGE} \uD074\uB9AC\uC5B4 \uD544\uC694)`;
