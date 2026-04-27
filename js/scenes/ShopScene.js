@@ -259,9 +259,11 @@ export class ShopScene extends Phaser.Scene {
         : def.id === 'delivery_speed' ? `수거속도 +${Math.round(currentEffect * 100)}%`
         : `조리시간 -${Math.round(currentEffect * 100)}%`;
 
+      // W-4 Fix: 텍스트 오버플로우 방지 — wordWrap 적용 (화면 너비 - 좌우 패딩 120px)
       this._contentContainer.add(
         this.add.text(30, y + 34, `${def.desc}  (현재: ${effectStr})`, {
           fontSize: '11px', color: '#aaaaaa',
+          wordWrap: { width: GAME_WIDTH - 120 },
         })
       );
 

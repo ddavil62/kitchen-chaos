@@ -34,7 +34,8 @@ const GOLD_Y = 48;
 const TAB_Y = 72;              // 탭 바 중심 Y
 const TAB_HEIGHT = 36;         // Phase 58-2 AD3 REVISE: 20 → 36 (히트박스 ≥ 44px 기준 근접)
 const LIST_TOP = 100;
-const LIST_BOTTOM = 525;
+// F-2 Fix: 도구 목록 하단을 500px로 축소하여 하단 UI와의 겹침 방지
+const LIST_BOTTOM = 500;
 const LIST_HEIGHT = LIST_BOTTOM - LIST_TOP;
 const SUMMARY_Y = 540;
 const DEPART_BTN_Y = 595;
@@ -1157,10 +1158,10 @@ export class MerchantScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(title);
 
-    // 하단 descKo (10px, wordWrap)
+    // 하단 descKo (F-3 Fix: 10px → 12px, wordWrap 너비 94px으로 미세 확장)
     const desc = this.add.text(cx, topY + 82, cardDef.descKo || '', {
-      fontSize: '10px', color: '#bbbbbb',
-      wordWrap: { width: CARD_WIDTH - 10 },
+      fontSize: '12px', color: '#bbbbbb',
+      wordWrap: { width: CARD_WIDTH - 6 },
       align: 'center', lineSpacing: 2,
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(desc);

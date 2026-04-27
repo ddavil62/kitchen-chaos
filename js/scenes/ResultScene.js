@@ -592,7 +592,8 @@ export class ResultScene extends Phaser.Scene {
    * @private
    */
   _createButton(y, label, color, onClick) {
-    const BTN_W = 220;
+    // F-4 Fix: BTN_W 220→240 (텍스트 클리핑 방지, 화면 360px 기준 좌우 60px 여백 확보)
+    const BTN_W = 240;
     const BTN_H = 44;
     const btnBg = NineSliceFactory.raw(this, GAME_WIDTH / 2, y, BTN_W, BTN_H, 'btn_primary_normal');
     btnBg.setTint(color);

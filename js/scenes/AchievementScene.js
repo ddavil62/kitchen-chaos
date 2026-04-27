@@ -291,20 +291,20 @@ export class AchievementScene extends Phaser.Scene {
       claimBg.on('pointerout', () => { claimBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); claimBg.setTint(0xcc8800); });
 
     } else {
-      // 미달성: 진행률 바
+      // 미달성: 진행률 바 (F-5 Fix: barH 12→16, 9-slice 최소 stretch 확보)
       const barW = 80;
-      const barH = 12;
+      const barH = 16;
       const barX = statusX - barW;
-      const barY = y + CARD_HEIGHT / 2 - 6;
+      const barY = y + CARD_HEIGHT / 2 - 8;
 
-      // Phase 60-19: 진행 바 배경 rect → NineSliceFactory.panel 'stone' + setTint
+      // 진행 바 배경
       const barBg = NineSliceFactory.panel(this, barX + barW / 2, barY + barH / 2, barW, barH, 'stone');
       barBg.setTint(0x444444);
       container.add(barBg);
 
-      // Phase 60-19: 진행 바 채움 rect → NineSliceFactory.raw 'bar_fill' + setTint
+      // 진행 바 채움
       const ratio = Math.min(item.current / item.threshold, 1);
-      const fillW = Math.max(1, barW * ratio);
+      const fillW = Math.max(2, barW * ratio);
       const fillColor = ratio >= 1 ? 0x44ff44 : 0xff6b35;
       const barFill = NineSliceFactory.raw(this, barX + fillW / 2, barY + barH / 2, fillW, barH, 'bar_fill');
       barFill.setTint(fillColor);

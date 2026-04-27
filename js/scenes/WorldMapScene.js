@@ -92,6 +92,8 @@ export class WorldMapScene extends Phaser.Scene {
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ─���
     this.cameras.main.fadeIn(300, 0, 0, 0);
 
+    // 방어적 배경: panel_dark 텍스처 미로드 시 Phaser 기본 초록 배경 방지
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x1a0a00);
     // Phase 60-16: 배경 rect → NineSliceFactory.panel 'dark'
     NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
 

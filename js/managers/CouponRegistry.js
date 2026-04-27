@@ -154,7 +154,8 @@ function _markUsed(code) {
  * @returns {Array<{code: string, desc: string}>}
  */
 export function getCheatCodeHints() {
-  if (import.meta.env.DEV) {
+  // F-8 Fix: DEV 플래그와 런타임 가드 이중 확인 — 배포 환경에서 치트 코드 노출 방지
+  if (import.meta.env.DEV && !import.meta.env.PROD) {
     return DEV_COUPONS.map(c => ({ code: c.code, desc: c.desc }));
   }
   return [];

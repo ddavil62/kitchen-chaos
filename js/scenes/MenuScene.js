@@ -456,11 +456,11 @@ export class MenuScene extends Phaser.Scene {
       }).setOrigin(0, 0.5);
       this._missionTabContent.add(progressText);
 
-      // 진행 바 그래픽
+      // 진행 바 그래픽 (F-6 Fix: barH 8→16, 시각적 식별성 개선)
       const barX = cx + 30;
       const barY = rowY + 46;
       const barW = 80;
-      const barH = 8;
+      const barH = 16;
       const barBgGfx = this.add.rectangle(barX, barY, barW, barH, 0x333333).setOrigin(0, 0.5);
       this._missionTabContent.add(barBgGfx);
       const fillRatio = m.target > 0 ? Math.min(1, progressVal / m.target) : 0;
@@ -887,12 +887,16 @@ export class MenuScene extends Phaser.Scene {
   _openBackupListModal() {
     if (this._backupListContainer) return;
 
+    // F-7 Fix: 쿠폰 모달(depth 1100)이 열려있으면 강제 닫기 — z-레이어 출혈 방지
+    this._closeCouponModal();
+
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
     const modalW = 280;
     const modalH = 200;
 
-    const container = this.add.container(0, 0).setDepth(1200);
+    // F-7 Fix: depth 1200→1300 (쿠폰 드롭다운 depth 1200보다 위로 올림)
+    const container = this.add.container(0, 0).setDepth(1300);
     this._backupListContainer = container;
 
     // 반투명 오버레이
@@ -1100,8 +1104,8 @@ export class MenuScene extends Phaser.Scene {
     const container = this.add.container(0, 0).setDepth(1100);
     this._couponContainer = container;
 
-    // ── 반투명 오버레이 ──
-    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+    // W-3 Fix: 오버레이 alpha 0.6→0.75 (쿠폰 팝업 뒤 배경 과도한 투과 방지)
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.75)
       .setInteractive();
     container.add(overlay);
 
@@ -1210,8 +1214,8 @@ export class MenuScene extends Phaser.Scene {
 
     // ── DEV 치트 자동완성 드롭다운 ──
     // submit 정의 이후에 위치해야 항목 클릭 즉시 효과를 적용할 수 있다.
-    // 프로덕션 빌드에서는 트리쉐이킹된다.
-    if (import.meta.env.DEV) {
+    // F-8 Fix: DEV 환경 이중 확인 — 배포 환경에서 치트 코드 노출 방지
+    if (import.meta.env.DEV && !import.meta.env.PROD) {
       const hints = getCheatCodeHints();
       if (hints.length > 0) {
         const sugW = 220;
