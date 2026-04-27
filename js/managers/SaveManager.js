@@ -1007,6 +1007,12 @@ export class SaveManager {
     if (data.branchCards.lastVisit === undefined) {
       data.branchCards.lastVisit = null;
     }
+    // Phase 76-1: 내부 배열 필드 타입 방어 (BUG-H1 수정)
+    if (!Array.isArray(data.branchCards.chefBonds))             data.branchCards.chefBonds = [];
+    if (!Array.isArray(data.branchCards.unlockedBranchRecipes)) data.branchCards.unlockedBranchRecipes = [];
+    if (typeof data.branchCards.toolMutations !== 'object' || Array.isArray(data.branchCards.toolMutations)) {
+      data.branchCards.toolMutations = {};
+    }
     return data.branchCards;
   }
 

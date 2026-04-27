@@ -409,25 +409,31 @@ export class ResultScene extends Phaser.Scene {
       });
       y += 24;
 
-      const serveRate = sr.totalCustomers > 0
-        ? Math.round(sr.servedCount / sr.totalCustomers * 100)
+      // Phase 76-1: 필드 누락 방어 — undefined 텍스트 노출 방지 (BUG-M1)
+      const servedCount = sr.servedCount ?? 0;
+      const totalCustomers = sr.totalCustomers ?? 0;
+      const goldEarned = sr.goldEarned ?? 0;
+      const tipEarned = sr.tipEarned ?? 0;
+      const maxCombo = sr.maxCombo ?? 0;
+      const serveRate = totalCustomers > 0
+        ? Math.round(servedCount / totalCustomers * 100)
         : 0;
-      this.add.text(40, y, `서빙 성공: ${sr.servedCount}/${sr.totalCustomers} (${serveRate}%)`, {
+      this.add.text(40, y, `서빙 성공: ${servedCount}/${totalCustomers} (${serveRate}%)`, {
         fontSize: '14px', color: '#ffffff',
       });
       y += 22;
 
-      this.add.text(40, y, `매출: ${sr.goldEarned} 골드`, {
+      this.add.text(40, y, `매출: ${goldEarned} 골드`, {
         fontSize: '14px', color: '#ffd700',
       });
       y += 22;
 
-      this.add.text(40, y, `팁: +${sr.tipEarned} 골드`, {
+      this.add.text(40, y, `팁: +${tipEarned} 골드`, {
         fontSize: '14px', color: '#ffd700',
       });
       y += 22;
 
-      this.add.text(40, y, `콤보 최대: ${sr.maxCombo}연속`, {
+      this.add.text(40, y, `콤보 최대: ${maxCombo}연속`, {
         fontSize: '14px', color: '#ffffff',
       });
       y += 30;

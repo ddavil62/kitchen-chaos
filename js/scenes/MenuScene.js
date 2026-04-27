@@ -147,13 +147,14 @@ export class MenuScene extends Phaser.Scene {
 
     // Phase 60-15: 업적 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
     // Phase 75B: y=534 → y=594 / BugFix: y=594 → y=582 / Bugfix2: y=582 → y=568 (bottomInfo 공간 확보)
+    // Phase 76-1: y=568 → y=582 (레시피 도감 버튼 하단 edge=564 기준, NineSlice 14px 겹침 → 0px, BUG-M2 수정)
     const ACHIEVE_W = 160;
     const ACHIEVE_H = 36;
-    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 568, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
+    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 582, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
     achieveBtn.setTint(0x886600);
     const achieveHit = new Phaser.Geom.Rectangle(-ACHIEVE_W / 2, -ACHIEVE_H / 2, ACHIEVE_W, ACHIEVE_H);
     achieveBtn.setInteractive(achieveHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 568, '\uD83C\uDFC6 \uC5C5\uC801', {
+    this.add.text(GAME_WIDTH / 2, 582, '\uD83C\uDFC6 \uC5C5\uC801', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -174,9 +175,10 @@ export class MenuScene extends Phaser.Scene {
     const endlessRecord = SaveManager.getEndlessRecord();
 
     // Phase 60-15: 엔드리스 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
+    // Phase 76-1: H=40→36, Y=606→618 (업적 버튼 하단=600 기준, BUG-M2 연쇄 조정)
     const ENDLESS_W = 180;
-    const ENDLESS_H = 40;
-    const ENDLESS_Y = 606;
+    const ENDLESS_H = 36;
+    const ENDLESS_Y = 618;
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x555555;
     const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, ENDLESS_Y, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
     endlessBtn.setTint(endlessColor);

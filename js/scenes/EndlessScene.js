@@ -467,7 +467,7 @@ export class EndlessScene extends GatheringScene {
       if (this.vfx) this.vfx.screenFlash(0x9900ff, 0.6, 500);
       this._stormOverlay = this.add.rectangle(
         GAME_WIDTH / 2, 320, GAME_WIDTH, 640, 0x9900ff, 0.12
-      ).setDepth(999);
+      ).setDepth(9000);
     }
 
     // ── Phase 55-3: 정화 임무 시작 ──

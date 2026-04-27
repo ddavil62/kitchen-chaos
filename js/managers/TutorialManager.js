@@ -14,8 +14,8 @@ const OVERLAY_CX = GAME_WIDTH / 2;
 const OVERLAY_CY = 64;            // Phase 62: 60 → 64 (팝업 중심 미세 하강)
 const PANEL_W = 300;
 const PANEL_H = 80;                // Phase 74: 68 → 80 (페이지네이터 도트 행 추가, P2-4)
-const PANEL_DEPTH = 130;
-const TEXT_DEPTH = 131;
+const PANEL_DEPTH = 1010; // Phase 76-1: HUD depth 1000+ 대응 (BUG-C1 수정)
+const TEXT_DEPTH = 1011;
 
 export class TutorialManager {
   /**
