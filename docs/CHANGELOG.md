@@ -1,5 +1,44 @@
 # Changelog
 
+## [Phase 76-2] 2026-04-27 -- 시각 감사 이슈 전체 수정
+
+### 개요
+
+시각 감사 리포트(`2026-04-27-kc-visual-audit.md`)에서 발견된 FAIL 8건 + WARN 4건을 수정하여 production 배포 가능 상태로 개선.
+
+### Fixed
+
+- `WorldMapScene.js`: NineSliceFactory.panel 호출 전 방어적 배경 rectangle(0x1a0a00) 추가 -- panel_dark 텍스처 미로드 시 Phaser 기본 초록 배경 노출 방지 (F-1)
+- `MerchantScene.js`: 도구 목록 마스크를 VISIBLE_LIST_H=220으로 제한 -- DialogueScene 초상화(Y=368~464)와의 시각적 겹침 방지 (F-2). 스펙에서는 LIST_BOTTOM 축소 방식이었으나, 마스크 제한 방식으로 구현 변경
+- `MerchantScene.js`: 분기 카드 설명 텍스트 fontSize 10px->12px, wordWrap 너비 90->94px (F-3)
+- `ResultScene.js`: _createButton BTN_W 220->240 -- 버튼 텍스트 클리핑 해소, 화면 360px 기준 좌우 60px 여백 확보 (F-4)
+- `AchievementScene.js`: 진행도 바 barH 12->16, barY 조정, fillW 최소값 1->2 -- 9-slice 최소 stretch 확보 (F-5)
+- `MenuScene.js`: 미션 팝업 진행도 바 barH 8->16 (F-6)
+- `MenuScene.js`: _openBackupListModal에서 쿠폰 모달 강제 닫기(_closeCouponModal) + depth 1200->1300 -- z-레이어 출혈 방지 (F-7)
+- `MenuScene.js`: 쿠폰 팝업 배경 오버레이 alpha 0.6->0.75 (W-3)
+- `CouponRegistry.js`: getCheatCodeHints()에 `!import.meta.env.PROD` 런타임 가드 추가 -- DEV&&!PROD 이중 가드로 production 빌드에서 치트 코드 미노출 보장 (F-8). 스펙에서는 VITE_CHEAT_ENABLED 환경변수 방식이었으나, !PROD 가드로 간결하게 구현 변경
+- `MenuScene.js`: DEV 드롭다운 생성 코드에도 이중 가드 적용 (F-8)
+- `ShopScene.js`: 업그레이드 효과 설명 텍스트에 wordWrap: { width: GAME_WIDTH - 120 } 추가 -- 텍스트 오버플로우 방지 (W-4)
+
+### Not Fixed (해당 없음)
+
+- W-1 "순프" 오타: 코드베이스 전체 검색 결과 해당 문자열 없음. 감사 리포트 OCR 오류로 확인
+- W-2 "골발하기" 오타: 코드베이스 전체 검색 결과 해당 문자열 없음. 감사 리포트 OCR 오류로 확인
+
+### QA 결과
+
+PASS. Playwright 13건 전부 통과 (정상 10 + 예외 3). 시각적 검증 스크린샷 8장 확인.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-27-kc-ad-audit-fix-scope.md`
+- 리포트: `.claude/specs/2026-04-27-kc-ad-audit-fix-coder-report.md`
+- AD 모드3: `.claude/specs/2026-04-27-kc-ad-audit-fix-ad3.md`
+- QA: `.claude/specs/2026-04-27-kc-ad-audit-fix-qa.md`
+- 시각 감사 원본: `.claude/specs/2026-04-27-kc-visual-audit.md`
+
+---
+
 ## [Phase H] 2026-04-26 -- 배경 현대 레스토랑 리디자인
 
 ### 개요

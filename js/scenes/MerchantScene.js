@@ -34,9 +34,12 @@ const GOLD_Y = 48;
 const TAB_Y = 72;              // 탭 바 중심 Y
 const TAB_HEIGHT = 36;         // Phase 58-2 AD3 REVISE: 20 → 36 (히트박스 ≥ 44px 기준 근접)
 const LIST_TOP = 100;
-// F-2 Fix: 도구 목록 하단을 500px로 축소하여 하단 UI와의 겹침 방지
 const LIST_BOTTOM = 500;
 const LIST_HEIGHT = LIST_BOTTOM - LIST_TOP;
+// DialogueScene 초상화(Y=368~464, X=16~112)와의 겹침 방지:
+// ITEM_HEIGHT=110, LIST_TOP=100 기준 2개 아이템이 딱 맞는 높이(220)로 마스크 제한.
+// 3번째 아이템(화염 그릴, Y=372)의 구매 버튼이 초상화 영역과 겹치는 것을 방지.
+const VISIBLE_LIST_H = 220; // 2 * ITEM_HEIGHT = 2 * 110
 const SUMMARY_Y = 540;
 const DEPART_BTN_Y = 595;
 const MARGIN_X = 20;
@@ -211,9 +214,9 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer = this.add.container(0, LIST_TOP);
     this._toolTabElements.push(this.listContainer);
 
-    // 마스크 설정
+    // 마스크 설정 — VISIBLE_LIST_H(220px)로 제한하여 DialogueScene 초상화 겹침 방지
     const maskShape = this.make.graphics({ add: false });
-    maskShape.fillRect(0, LIST_TOP, GAME_WIDTH, LIST_HEIGHT);
+    maskShape.fillRect(0, LIST_TOP, GAME_WIDTH, VISIBLE_LIST_H);
     this.listContainer.setMask(new Phaser.Display.Masks.GeometryMask(this, maskShape));
 
     // 각 도구 아이템 렌더링
@@ -518,7 +521,7 @@ export class MerchantScene extends Phaser.Scene {
    * @private
    */
   _setupScroll(contentHeight) {
-    const maxScroll = Math.max(0, contentHeight - LIST_HEIGHT);
+    const maxScroll = Math.max(0, contentHeight - VISIBLE_LIST_H);
     this.scrollY = 0;
 
     let dragging = false;
