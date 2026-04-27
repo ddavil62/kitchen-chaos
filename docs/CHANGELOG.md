@@ -1,5 +1,51 @@
 # Changelog
 
+## [Phase 77] 2026-04-27 -- 엔드리스 해금 완화 + GatheringScene 2x 배속 버튼
+
+### 개요
+
+엔드리스 모드 해금 조건을 24-6 클리어에서 6-6 클리어로 완화하고, GatheringScene HUD에 1x/2x 배속 토글 버튼을 추가. 세이브 v27 마이그레이션으로 기존 6-6 클리어 유저 자동 해금.
+
+### Changed
+
+- `kitchen-chaos/js/config.js`: `ENDLESS_UNLOCK_STAGE` `'24-6'` -> `'6-6'` 변경. `ENDLESS_LOCK_LABEL`은 템플릿 리터럴 참조로 자동 갱신
+- `kitchen-chaos/js/managers/SaveManager.js`: `SAVE_VERSION` 26 -> 27, `commitStageResult()` 해금 조건 `stageId === '24-6'` -> `stageId === '6-6'`, `createDefault()` endless.unlocked 주석 갱신
+
+### Added
+
+- `kitchen-chaos/js/managers/SaveManager.js`: v26->v27 마이그레이션 블록 추가 (6-6 클리어 유저 `endless.unlocked = true` 자동 전환, endless 객체 미존재 시 생성)
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_createHUD()`에 배속 토글 버튼 추가 (x=288, y=20, 36x32, NineSliceFactory.button variant:icon, "1x"/"2x" 레이블)
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_toggleSpeed()` 메서드 추가 -- `this.time.timeScale` 1x/2x 토글, `setLabel()` API로 버튼 텍스트 갱신
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `shutdown()`에 `this.time.timeScale = 1` 복원 코드 추가
+
+### 스펙 대비 구현 차이
+
+- 스펙: `this.physics.world.timeScale`과 `this.time.timeScale` 동시 변경 -> 실제: 게임에 physics 미등록 환경이므로 `this.time.timeScale`만 사용 (delta 기반 이동에 작용)
+- 스펙: 배속 버튼 위치 x=310 -> 실제: x=288 (HUD 레이아웃 최적화)
+- 스펙: `getByName('label')?.setText()` 텍스트 갱신 -> 실제: `NineSliceFactory.button`의 `setLabel()` API 사용
+- 스펙: `WorldMapScene.js`/`MenuScene.js` 직접 수정 언급 -> 실제: `config.js` 상수(`ENDLESS_UNLOCK_STAGE`) 변경만으로 자동 반영 (별도 수정 불필요)
+
+### QA 수정 이력
+
+- 1차: `shutdown()` TypeError -- `this.physics?.world` optional chaining 추가
+- 2차: `_toggleSpeed()` physics 참조 완전 제거, `shutdown()`에서 `this.time.timeScale = 1` 직접 복원으로 변경
+
+### QA 결과
+
+PASS. Playwright 8건 전부 통과 (정상 5 + 예외 2 + UI 안정성 1). 인프라 flake 2건(Vite HMR `net::ERR_ABORTED`)은 단독 재실행 시 통과 확인.
+
+### 잔존 이슈 (범위 외)
+
+- `SaveManager.js:607` `unlockEndless()` JSDoc "24-6 클리어 시" 잔존 (LOW, 기능 영향 없음)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-27-kc-phase77-scope.md`
+- 리포트: `.claude/specs/2026-04-27-kc-phase77-coder-report.md`
+- QA: `.claude/specs/2026-04-27-kc-phase77-qa.md`
+
+---
+
 ## [Phase 76-2] 2026-04-27 -- 시각 감사 이슈 전체 수정
 
 ### 개요

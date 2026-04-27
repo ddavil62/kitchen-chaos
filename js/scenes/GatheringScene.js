@@ -398,10 +398,10 @@ export class GatheringScene extends Phaser.Scene {
 
     // ── 배속 토글 버튼 (Phase 77) ──
     // 위치: HUD 우측, livesText(x=GAME_WIDTH-10) 왼쪽에 배치
-    // x = GAME_WIDTH - 50 = 310 (livesText와 간격 확보)
+    // x = GAME_WIDTH - 72 = 288 (livesText와 6px 이상 간격 확보, AD 모드3 수정)
     this._speedMultiplier = 1;
     this._speedBtn = NineSliceFactory.button(
-      this, GAME_WIDTH - 50, HUD_HEIGHT / 2, 36, 32,
+      this, GAME_WIDTH - 72, HUD_HEIGHT / 2, 36, 32,
       '1\u00d7',
       {
         variant: 'icon',
@@ -421,14 +421,13 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
-   * 웨이브 배속을 1x / 2x로 토글한다.
-   * physics.world.timeScale과 this.time.timeScale을 동시에 조정한다.
+   * 웨이브 배속을 1× / 2×로 토글한다.
+   * 적 이동이 delta 기반(_moveAlongPath)이므로 this.time.timeScale만으로 배속 제어.
    * @private
    */
   _toggleSpeed() {
     this._speedMultiplier = this._speedMultiplier === 1 ? 2 : 1;
     const ts = this._speedMultiplier;
-    this.physics.world.timeScale = ts;
     this.time.timeScale = ts;
     // 버튼 레이블 갱신 (NineSliceFactory.button의 setLabel API 사용)
     this._speedBtn?.setLabel(`${ts}\u00d7`);
@@ -2715,8 +2714,8 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   shutdown() {
-    // ── Phase 77: 배속 상태 복원 (physics.world.timeScale은 전역이므로 반드시 리셋) ──
-    this.physics.world.timeScale = 1;
+    // ── Phase 77: 배속 상태 복원 (씬 종료 시 시간 배율 초기화) ──
+    this.time.timeScale = 1;
 
     // ── Phase 54: DEV 치트 핸들러 해제 ──
     if (import.meta.env.DEV && window.__kcCheat) {

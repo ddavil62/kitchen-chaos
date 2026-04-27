@@ -604,7 +604,7 @@ export class SaveManager {
   }
 
   /**
-   * 엔드리스 모드 해금 기록. 24-6 클리어 시 clearStage에서 자동 호출됨.
+   * 엔드리스 모드 해금 기록. 6-6 클리어 시 commitStageResult에서 자동 호출됨. (Phase 77)
    */
   static unlockEndless() {
     const data = SaveManager.load();
