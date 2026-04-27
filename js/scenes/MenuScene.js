@@ -63,7 +63,7 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Phase 60-15: 게임 시작 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
-    // Phase 75B: y=390 → y=450
+    // Phase 75B: y=390 → y=450 (start button은 위치 유지)
     const BTN_START_W = 200;
     const BTN_START_H = 60;
     const btn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 450, BTN_START_W, BTN_START_H, 'btn_primary_normal');
@@ -102,14 +102,14 @@ export class MenuScene extends Phaser.Scene {
     });
 
     // Phase 60-15: 상점 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
-    // Phase 75B: y=450 → y=510
+    // Phase 75B: y=450 → y=510 / BugFix: y=510 → y=508 (하단 overflow 방지 cascade)
     const SHOP_W = 160;
     const SHOP_H = 40;
-    const shopBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 510, SHOP_W, SHOP_H, 'btn_primary_normal');
+    const shopBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 508, SHOP_W, SHOP_H, 'btn_primary_normal');
     shopBtn.setTint(0x886600);
     const shopHit = new Phaser.Geom.Rectangle(-SHOP_W / 2, -SHOP_H / 2, SHOP_W, SHOP_H);
     shopBtn.setInteractive(shopHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 510, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
+    this.add.text(GAME_WIDTH / 2, 508, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
       fontSize: '16px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -124,14 +124,14 @@ export class MenuScene extends Phaser.Scene {
     shopBtn.on('pointerout', () => { shopBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); shopBtn.setTint(0x886600); });
 
     // Phase 60-15: 도감 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
-    // Phase 75B: y=496 → y=556
+    // Phase 75B: y=496 → y=556 / BugFix: y=556 → y=546
     const BOOK_W = 160;
     const BOOK_H = 36;
-    const bookBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 556, BOOK_W, BOOK_H, 'btn_primary_normal');
+    const bookBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 546, BOOK_W, BOOK_H, 'btn_primary_normal');
     bookBtn.setTint(0x886600);
     const bookHit = new Phaser.Geom.Rectangle(-BOOK_W / 2, -BOOK_H / 2, BOOK_W, BOOK_H);
     bookBtn.setInteractive(bookHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 556, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
+    this.add.text(GAME_WIDTH / 2, 546, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -146,14 +146,14 @@ export class MenuScene extends Phaser.Scene {
     bookBtn.on('pointerout', () => { bookBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); bookBtn.setTint(0x886600); });
 
     // Phase 60-15: 업적 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
-    // Phase 75B: y=534 → y=594
+    // Phase 75B: y=534 → y=594 / BugFix: y=594 → y=582
     const ACHIEVE_W = 160;
     const ACHIEVE_H = 36;
-    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 594, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
+    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 582, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
     achieveBtn.setTint(0x886600);
     const achieveHit = new Phaser.Geom.Rectangle(-ACHIEVE_W / 2, -ACHIEVE_H / 2, ACHIEVE_W, ACHIEVE_H);
     achieveBtn.setInteractive(achieveHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 594, '\uD83C\uDFC6 \uC5C5\uC801', {
+    this.add.text(GAME_WIDTH / 2, 582, '\uD83C\uDFC6 \uC5C5\uC801', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -169,14 +169,14 @@ export class MenuScene extends Phaser.Scene {
 
     // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570 -> 578) ──
     // Phase 63 FIX-16: 잠김 상태 tint 0x444444→0x555555, 라벨 색 #666666→#888888로 대비 +1
-    // Phase 75B: y=578 → y=638 (GAME_HEIGHT=640이므로 경계 근접, AD3 검수 대상)
+    // Phase 75B: y=578 → y=638 / BugFix: y=638 → y=620 (ENDLESS_Y+20=640, 하단 edge 정확히 맞춤)
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
     // Phase 60-15: 엔드리스 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
     const ENDLESS_W = 180;
     const ENDLESS_H = 40;
-    const ENDLESS_Y = 638;
+    const ENDLESS_Y = 620;
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x555555;
     const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, ENDLESS_Y, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
     endlessBtn.setTint(endlessColor);
@@ -218,7 +218,7 @@ export class MenuScene extends Phaser.Scene {
     if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
       bottomInfo = `\u221E W${endlessRecord.bestWave}  ` + bottomInfo;
     }
-    this.add.text(GAME_WIDTH / 2, 630, bottomInfo, {
+    this.add.text(GAME_WIDTH / 2, 636, bottomInfo, {
       fontSize: '10px', color: '#888888',
     }).setOrigin(0.5);
 

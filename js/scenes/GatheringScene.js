@@ -2121,6 +2121,8 @@ export class GatheringScene extends Phaser.Scene {
       case 'collect_radius_on_slow':
         // mimi 미미 시너지 — 둔화 적 대상 수거 범위 가산 (플래그만)
         tower._collectRadiusOnSlow = bondEffect.value || 0;
+        // 캐시 무효화: 새 salt 타워 배치 시 다음 delivery 사이클에서 재계산
+        this._saltCollectRadiusCached = false;
         break;
       case 'drop_rate_on_poison':
         // mimi 미미 향신료 — 중독 적 재료 드롭률 가산 (IngredientManager 참조용 플래그)
