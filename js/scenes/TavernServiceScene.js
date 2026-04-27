@@ -69,9 +69,6 @@ const ASSET_MODE = 'real'; // Phase B-1 실 에셋 전환
 // _placeImageOrRect에서 ASSET_MODE === 'real'일 때 우선 시도할 키
 const REAL_KEY_MAP = Object.freeze({
   'tavern_dummy_counter_v12':          'tavern_counter_v12',
-  'tavern_dummy_table_vertical_v12':   'tavern_table_vertical_v12',
-  'tavern_dummy_bench_vertical_l_v12': 'tavern_bench_vertical_l_v12',
-  'tavern_dummy_bench_vertical_r_v12': 'tavern_bench_vertical_r_v12',
   'tavern_dummy_entrance_v12':         'tavern_entrance_v12',
   'tavern_dummy_customer_seated_down': 'tavern_customer_normal_seated_right',
   'tavern_dummy_customer_seated_up':   'tavern_customer_normal_seated_left',
@@ -146,9 +143,6 @@ export class TavernServiceScene extends Phaser.Scene {
       'floor_wood_tile_v14', 'wall_horizontal_v14',
       // V12 신규
       'counter_v12',           // 40x100px
-      'table_vertical_v12',    // 64x200px (Phase D)
-      'bench_vertical_l_v12',  // 80x200px (Phase D, facing-right)
-      'bench_vertical_r_v12',  // 80x200px (Phase D, facing-left)
       'entrance_v12',          // 32x40px
       // Phase G: v13 현대 가구 더미
       'table_4p_v13',           // 100x40px
@@ -164,11 +158,8 @@ export class TavernServiceScene extends Phaser.Scene {
     if (ASSET_MODE === 'real') {
       const realPath = 'assets/tavern/';
       const realAssets = [
-        // 가구 5종
+        // 가구 3종
         'counter_v12',           // 40x100px
-        'table_vertical_v12',    // 64x200px (Phase D 업스케일)
-        'bench_vertical_l_v12',  // 80x200px (Phase D 업스케일)
-        'bench_vertical_r_v12',  // 80x200px (Phase D 업스케일)
         'entrance_v12',          // 32x40px
         // 캐릭터 4종 (B-2 기존)
         'customer_normal_seated_right',  // 64x64px (Phase D 재처리)

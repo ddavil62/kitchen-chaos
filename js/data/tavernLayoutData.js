@@ -221,7 +221,7 @@ export function createSeatingState(benchLevel = 'lv0') {
 
 /**
  * 슬롯을 점유한다.
- * @param {number} tableSetIdx - 테이블 세트(quad) 인덱스 (0~1)
+ * @param {number} tableSetIdx - 테이블 세트(quad) 인덱스 (0~5)
  * @param {'front'|'back'|'left'|'right'} side - 슬롯 위치 (Phase F: 'front'/'back', 레거시 'left'/'right'는 front로 fallback)
  * @param {number} slotIdx - 슬롯 인덱스
  * @param {string} customerId - 손님 ID
