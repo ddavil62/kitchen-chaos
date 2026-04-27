@@ -144,10 +144,7 @@ export class TavernServiceScene extends Phaser.Scene {
       // V12 신규
       'counter_v12',           // 40x100px
       'entrance_v12',          // 32x40px
-      // Phase G: v13 현대 가구 더미
-      'table_4p_v13',           // 100x40px
-      'chair_back_v13',         // 100x20px
-      'chair_front_v13',        // 100x20px
+      // Phase G: v13 현대 가구 — 더미 파일 미존재, ASSET_MODE='real'에서 실 에셋 직접 로드
     ];
 
     for (const name of dummies) {

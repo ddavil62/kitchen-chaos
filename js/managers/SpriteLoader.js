@@ -743,7 +743,10 @@ export class SpriteLoader {
       scene.load.image(`table_lv${lv}_seated`,  `${SERVICE_ROOT}/table_lv${lv}_seated.png`);
     }
     // 손님 프로필별 정지 이미지 (레거시 키, 폴백용 유지)
-    for (const id of CUSTOMER_PROFILE_IDS) {
+    // Phase 76 신규 5종(critic, regular, student, traveler, business)은
+    // 독립 프로필 이미지가 없으므로 기존 5종만 로드
+    const LEGACY_PROFILE_IDS = ['normal', 'vip', 'gourmet', 'rushed', 'group'];
+    for (const id of LEGACY_PROFILE_IDS) {
       scene.load.image(`customer_${id}`, `${SERVICE_ROOT}/customer_${id}.png`);
     }
     // Phase 52+: 손님 독립 스프라이트 (waiting/seated 2상태) — Phase 76: 10종 × 2상태 = 20키
