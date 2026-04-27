@@ -22,14 +22,17 @@ export class TutorialManager {
    * @param {Phaser.Scene} scene - 튜토리얼을 표시할 씬 인스턴스
    * @param {'battle'|'service'|'shop'|'endless'} key - SaveManager 플래그 키
    * @param {string[]} steps - 각 스텝의 힌트 텍스트 배열
+   * @param {Array<{x:number,y:number,w:number,h:number,color:number}>} [targetInfos=[]] - 각 스텝의 하이라이트/화살표 위치 정보
    */
-  constructor(scene, key, steps) {
+  constructor(scene, key, steps, targetInfos = []) {
     /** @private */
     this._scene = scene;
     /** @private */
     this._key = key;
     /** @private */
     this._steps = steps;
+    /** @private 각 스텝의 하이라이트/화살표 타깃 정보 */
+    this._targetInfos = targetInfos;
     /** @private */
     this._stepIndex = -1;
     /** @private */
@@ -90,6 +93,7 @@ export class TutorialManager {
 
   /**
    * 현재 스텝의 오버레이를 렌더링한다.
+   * Phase 79: 화살표 + 하이라이트 오버레이 추가, 스킵 버튼 터치 영역 확대.
    * @private
    */
   _render() {
@@ -118,14 +122,20 @@ export class TutorialManager {
       wordWrap: { width: PANEL_W - 32 },
     }).setOrigin(0.5, 0.5).setDepth(TEXT_DEPTH);
 
-    // 스킵 버튼 — Phase 62: 살짝 밝게 + 아래로 정렬 보정
-    const skip = scene.add.text(OVERLAY_CX + 132, OVERLAY_CY + 22, '[\uAC74\uB108\uB6F0\uAE30]', {
+    // Phase 79: 스킵 버튼 — 투명 hitArea Rectangle로 터치 영역 44px 이상 확보
+    const skipX = OVERLAY_CX + 132;
+    const skipY = OVERLAY_CY + 22;
+    const skip = scene.add.text(skipX, skipY, '[건너뛰기]', {
       fontSize: '10px',
       color: '#cccccc',
       stroke: '#000000',
       strokeThickness: 2,
-    }).setOrigin(1, 0.5).setDepth(TEXT_DEPTH).setInteractive({ useHandCursor: true });
-    skip.on('pointerdown', () => this.end());
+    }).setOrigin(1, 0.5).setDepth(TEXT_DEPTH);
+
+    // 투명 hitArea: 스킵 텍스트 중심에 72x44 터치 영역 배치
+    const skipBg = scene.add.rectangle(skipX - 36, skipY, 72, 44, 0x000000, 0)
+      .setOrigin(0, 0.5).setDepth(TEXT_DEPTH).setInteractive({ useHandCursor: true });
+    skipBg.on('pointerdown', () => this.end());
 
     // Phase 74: 페이지네이터 도트 인디케이터 추가 (P2-4)
     const pageObjects = [];
@@ -143,7 +153,47 @@ export class TutorialManager {
       pageObjects.push(dot);
     }
 
-    // Phase 62: panel은 이미 씬에 등록된 오브젝트. 개별 오브젝트로 추적하여 end()/advance()에서 destroy.
-    this._container = { destroy: () => { bg.destroy(); label.destroy(); skip.destroy(); pageObjects.forEach(d => d.destroy()); } };
+    // Phase 79: 화살표 + 하이라이트 오버레이 생성
+    let highlightRect = null;
+    let arrowText = null;
+    const info = this._targetInfos[this._stepIndex];
+    if (info) {
+      // 하이라이트 사각형: stroke-only (fillAlpha=0)
+      highlightRect = scene.add.rectangle(info.x, info.y, info.w + 8, info.h + 8)
+        .setStrokeStyle(3, info.color)
+        .setFillStyle(0x000000, 0)
+        .setDepth(960);
+
+      // 화살표 텍스트: 하이라이트 박스 위에 배치
+      arrowText = scene.add.text(info.x, info.y - info.h / 2 - 20, '\u25BC', {
+        fontSize: '22px',
+        color: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 3,
+      }).setOrigin(0.5, 0.5).setDepth(965);
+
+      // bounce 애니메이션: yoyo +-6px, 500ms
+      scene.tweens.add({
+        targets: arrowText,
+        y: arrowText.y + 6,
+        duration: 500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.InOut',
+      });
+    }
+
+    // 개별 오브젝트로 추적하여 end()/advance()에서 destroy
+    this._container = {
+      destroy: () => {
+        bg.destroy();
+        label.destroy();
+        skipBg.destroy();
+        skip.destroy();
+        pageObjects.forEach(d => d.destroy());
+        if (highlightRect) highlightRect.destroy();
+        if (arrowText) { scene.tweens.killTweensOf(arrowText); arrowText.destroy(); }
+      },
+    };
   }
 }

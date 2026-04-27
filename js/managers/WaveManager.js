@@ -58,9 +58,12 @@ export class WaveManager {
 
     waveDef.enemies.forEach(group => {
       // Phase 58: 적 수 0.6배 압축 (최소 1마리, __pause__ 제외)
+      // Phase 79: tutorialWave 플래그가 있는 그룹은 압축 면제 (정확한 수 스폰)
       const count = group.type === '__pause__'
         ? group.count
-        : Math.max(1, Math.round(group.count * 0.6));
+        : group.tutorialWave
+          ? group.count
+          : Math.max(1, Math.round(group.count * 0.6));
       for (let i = 0; i < count; i++) {
         const entry = { type: group.type, delay: group.interval };
         // Phase 26-1: hpOverride 스폰 파라미터 전달

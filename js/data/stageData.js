@@ -38,6 +38,7 @@ export const STAGES = {
     waves: [
       {
         wave: 1,
+        tutorialWave: true,          // Phase 79: 튜토리얼 웨이브 플래그 (GatheringScene에서 오버라이드)
         enemies: [
           { type: 'carrot_goblin', count: 6, interval: 1500 },
         ],

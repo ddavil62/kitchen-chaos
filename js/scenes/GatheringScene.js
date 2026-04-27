@@ -115,7 +115,19 @@ export class GatheringScene extends Phaser.Scene {
     }
 
     // 스토리 스테이지는 모든 웨이브를 단일 연속 웨이브로 병합한다
-    const storyWaves = this.stageData?.waves;
+    // Phase 79: 1-1 Wave 1 튜토리얼 웨이브 적 수 오버라이드
+    let storyWaves = this.stageData?.waves;
+    if (this.stageId === '1-1' && storyWaves && !SaveManager.isTutorialDone('battle')) {
+      storyWaves = storyWaves.map((waveDef, idx) => {
+        if (idx === 0 && waveDef.tutorialWave) {
+          return {
+            ...waveDef,
+            enemies: [{ type: 'carrot_goblin', count: 2, interval: 1500, tutorialWave: true }],
+          };
+        }
+        return waveDef;
+      });
+    }
     this.waveManager = new WaveManager(this, this.enemies, {
       waves: storyWaves ? WaveManager.mergeWaves(storyWaves) : undefined,
       waypoints: this.stageWaypoints,
@@ -183,13 +195,32 @@ export class GatheringScene extends Phaser.Scene {
     // ── 웨이브 시작 버튼 ──
     this._createWaveButton();
 
-    // ── 튜토리얼 ──
-    this._tutorial = new TutorialManager(this, 'battle', [
-      '1/3 하단 도구 바에서\n도구를 선택하세요!',
-      '2/3 경로 옆 빈 칸에\n도구를 배치하세요!',
-      '3/3 준비되면\n웨이브 시작 버튼을 탭!',
-    ]);
-    this._tutorial.start();
+    // ── 튜토리얼 (Phase 79: 화살표 + 하이라이트 오버레이 방식으로 전환) ──
+    {
+      // 타깃 좌표 계산
+      const towers = this.stageData?.availableTowers || [];
+      const towerBtnW = towers.length > 0 ? GAME_WIDTH / towers.length : GAME_WIDTH;
+      const towerBarFirstBtnX = towerBtnW / 2;
+      const towerBarBtnY = TOWER_BAR_Y + 16 + 17; // 버튼 영역 중심 (_renderTowerButtons 기준)
+
+      const SAFE_CELLS_11 = [{ col: 0, row: 0 }, { col: 0, row: 1 }, { col: 2, row: 0 }];
+      const firstSafe = SAFE_CELLS_11[0];
+      const firstCellPos = cellToWorld(firstSafe.col, firstSafe.row);
+
+      const waveBtnX = GAME_WIDTH / 2;
+      const waveBtnY = WAVE_CONTROL_Y + WAVE_CONTROL_HEIGHT / 2;
+
+      this._tutorial = new TutorialManager(this, 'battle', [
+        '1/3 하단 도구 바에서\n도구를 선택하세요!',
+        '2/3 경로 옆 빈 칸에\n도구를 배치하세요!',
+        '3/3 준비되면\n웨이브 시작 버튼을 탭!',
+      ], [
+        { x: towerBarFirstBtnX, y: towerBarBtnY, w: towerBtnW, h: TOWER_BAR_HEIGHT - 26, color: 0x00ff88 },
+        { x: firstCellPos.x, y: firstCellPos.y, w: CELL_W, h: CELL_H, color: 0x00ff88 },
+        { x: waveBtnX, y: waveBtnY, w: 160, h: 44, color: 0xffdd00 },
+      ]);
+      this._tutorial.start();
+    }
 
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
