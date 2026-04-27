@@ -229,8 +229,16 @@ export class WorldMapScene extends Phaser.Scene {
   _switchGroup(group) {
     this._currentGroup = group;
 
-    // 기존 패널 닫기
+    // 기존 패널 닫기 (Bugfix: destroy 전에 드래그 리스너 해제하여 메모리 누수 방지)
     if (this._panelContainer) {
+      if (this._panelDragStart) {
+        this.input.off('pointerdown', this._panelDragStart);
+        this._panelDragStart = null;
+      }
+      if (this._panelDragMove) {
+        this.input.off('pointermove', this._panelDragMove);
+        this._panelDragMove = null;
+      }
       this._panelContainer.destroy();
       this._panelContainer = null;
     }

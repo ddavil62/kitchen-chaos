@@ -327,7 +327,8 @@ export class ServiceScene extends Phaser.Scene {
     /** 현재 장 번호 (stageId '1-1' → 1, '3-4' → 3) */
     this.chapter = parseInt(this.stageId.split('-')[0], 10) || 1;
     /** 장별 특수 손님 출현 확률 테이블 */
-    this.specialRates = SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[1];
+    // Bugfix: 챕터 4 이상은 챕터 3 확률 적용 (챕터 1 폴백 시 특수 손님 0%로 떨어지는 문제 수정)
+    this.specialRates = SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[3];
 
     // ── Phase 76: 평론가/단골 추적 상태 ──
     /** @type {number[]} 평론가 patienceRatio 누적 배열 */
@@ -563,7 +564,7 @@ export class ServiceScene extends Phaser.Scene {
 
     // ── 적용: 특수 손님 확률 (specialRates 복사본 생성) ──
     if (this._buffGourmetRateAdd > 0 || this._buffVipRateMult !== 1) {
-      const base = this.specialRates || SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[1];
+      const base = this.specialRates || SPECIAL_CUSTOMER_RATES[this.chapter] || SPECIAL_CUSTOMER_RATES[3];
       this.specialRates = { ...base };
       if (this._buffGourmetRateAdd > 0) {
         this.specialRates.gourmet = Math.min(0.50, (base.gourmet || 0) + this._buffGourmetRateAdd);

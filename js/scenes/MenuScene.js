@@ -146,14 +146,14 @@ export class MenuScene extends Phaser.Scene {
     bookBtn.on('pointerout', () => { bookBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); bookBtn.setTint(0x886600); });
 
     // Phase 60-15: 업적 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
-    // Phase 75B: y=534 → y=594 / BugFix: y=594 → y=582
+    // Phase 75B: y=534 → y=594 / BugFix: y=594 → y=582 / Bugfix2: y=582 → y=568 (bottomInfo 공간 확보)
     const ACHIEVE_W = 160;
     const ACHIEVE_H = 36;
-    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 582, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
+    const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, 568, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
     achieveBtn.setTint(0x886600);
     const achieveHit = new Phaser.Geom.Rectangle(-ACHIEVE_W / 2, -ACHIEVE_H / 2, ACHIEVE_W, ACHIEVE_H);
     achieveBtn.setInteractive(achieveHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 582, '\uD83C\uDFC6 \uC5C5\uC801', {
+    this.add.text(GAME_WIDTH / 2, 568, '\uD83C\uDFC6 \uC5C5\uC801', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -169,14 +169,14 @@ export class MenuScene extends Phaser.Scene {
 
     // ── 엔드리스 모드 버튼 (Phase 11-1, Phase 42: y 550 -> 570 -> 578) ──
     // Phase 63 FIX-16: 잠김 상태 tint 0x444444→0x555555, 라벨 색 #666666→#888888로 대비 +1
-    // Phase 75B: y=578 → y=638 / BugFix: y=638 → y=620 (ENDLESS_Y+20=640, 하단 edge 정확히 맞춤)
+    // Phase 75B: y=578 → y=638 / BugFix: y=638 → y=620 / Bugfix2: y=620 → y=606 (bottomInfo 공간 확보)
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
     // Phase 60-15: 엔드리스 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
     const ENDLESS_W = 180;
     const ENDLESS_H = 40;
-    const ENDLESS_Y = 620;
+    const ENDLESS_Y = 606;
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x555555;
     const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, ENDLESS_Y, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
     endlessBtn.setTint(endlessColor);
@@ -218,7 +218,7 @@ export class MenuScene extends Phaser.Scene {
     if (isEndlessUnlocked && endlessRecord.bestWave > 0) {
       bottomInfo = `\u221E W${endlessRecord.bestWave}  ` + bottomInfo;
     }
-    this.add.text(GAME_WIDTH / 2, 636, bottomInfo, {
+    this.add.text(GAME_WIDTH / 2, 634, bottomInfo, {
       fontSize: '10px', color: '#888888',
     }).setOrigin(0.5);
 

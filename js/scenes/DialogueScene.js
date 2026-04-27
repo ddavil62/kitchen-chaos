@@ -176,8 +176,8 @@ export class DialogueScene extends Phaser.Scene {
     // ── 터치/클릭으로 진행 ──
     this._panelBg.setInteractive();
     this._panelBg.on('pointerdown', () => this._onTap());
-    // 딤 오버레이 탭도 진행으로 처리
-    this._dimOverlay.on('pointerdown', () => this._onTap());
+    // Bugfix: 딤 오버레이(패널 외 영역) 탭 → 전체 대화 즉시 종료 (패널 탭은 한 줄씩 진행)
+    this._dimOverlay.on('pointerdown', () => this._endDialogue());
 
     // 씬 종료 시 정리
     this.events.once('shutdown', this.shutdown, this);
