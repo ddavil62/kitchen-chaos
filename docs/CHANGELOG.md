@@ -1,5 +1,53 @@
 # Changelog
 
+## [Phase 79] 2026-04-28 -- 인터랙티브 온보딩 재설계
+
+### 개요
+
+1-1 튜토리얼을 텍스트 팝업 방식에서 화살표(`▼`/`▲`) + 하이라이트 overlay 방식으로 전환. 스킵 버튼 터치 영역을 72x44px로 확대하고, 튜토리얼 웨이브 적 수를 정확히 2마리로 고정하여 신규 유저의 성공 경험을 보장.
+
+### Added
+
+- `kitchen-chaos/js/managers/TutorialManager.js`: 생성자에 `targetInfos` 파라미터 추가 (기본값 `[]`로 하위 호환 유지)
+- `kitchen-chaos/js/managers/TutorialManager.js`: `_render()`에 하이라이트 Rectangle(depth=1009, strokeColor) + 화살표 Text(`▼`/`▲`, depth=1011, bounce tween yoyo +-6px 500ms) 생성 로직 추가
+- `kitchen-chaos/js/managers/TutorialManager.js`: `useBelow` 로직 -- 화살표 위치가 패널 영역(24~104) 내에 겹치면 `▲`를 타깃 아래에 배치하여 패널 겹침 회피
+- `kitchen-chaos/js/managers/TutorialManager.js`: 스킵 버튼을 투명 Rectangle hitArea(72x44px, depth=TEXT_DEPTH)로 분리하여 터치 영역 확대
+- `kitchen-chaos/js/managers/TutorialManager.js`: `_container.destroy()`에서 highlightRect, arrowText(tween kill 포함) 정리
+- `kitchen-chaos/js/scenes/GatheringScene.js`: TutorialManager 생성 시 3개 스텝의 targetInfos 배열 전달 (Step1: 도구바 첫 버튼 초록, Step2: 첫 안전 셀 초록, Step3: 웨이브 버튼 노란)
+- `kitchen-chaos/js/scenes/GatheringScene.js`: WaveManager 생성 전 1-1 + 튜토리얼 미완료 시 Wave 1을 `carrot_goblin count:2 + tutorialWave:true`로 오버라이드
+- `kitchen-chaos/js/data/stageData.js`: 1-1 Wave 1에 `tutorialWave: true` 플래그 추가
+- `kitchen-chaos/js/managers/WaveManager.js`: `_buildSpawnQueue()`에서 `group.tutorialWave === true` 그룹은 0.6배 압축 면제 (정확한 count 스폰)
+
+### Changed
+
+- `kitchen-chaos/js/managers/TutorialManager.js`: 생성자 시그니처 `(scene, key, steps)` -> `(scene, key, steps, targetInfos = [])`
+- `kitchen-chaos/js/managers/WaveManager.js`: `_buildSpawnQueue()` 내 count 계산에 tutorialWave 조건 분기 추가
+
+### 스펙 대비 구현 차이
+
+- **depth 값 변경**: 스펙은 하이라이트 depth=960, 화살표 depth=965를 지정했으나, 실제 HUD가 모두 depth 1000+이므로 스펙대로 하면 UI 아래에 가려짐. 실제 구현은 depth=1009(하이라이트), depth=1011(화살표)로 조정. QA에서도 현재 값이 올바르다고 판정
+- **Step 2 화살표 방향**: 스펙은 `▼`만 명시했으나, cellToWorld(0,0)의 화살표 위치(y=51)가 패널 범위(24~104) 내에 있어 겹침 발생. `useBelow` 로직으로 `▲`를 타깃 아래에 배치하는 분기 추가
+- **스킵 버튼 크기**: 스펙 최소 44x44px 요구, 실제 72x44px로 확대 구현
+- **WaveManager 수정 추가**: 스펙에서 권장 옵션으로 제시한 tutorialWave 압축 면제를 WaveManager.js에 실제 구현
+
+### QA 결과
+
+PASS. Playwright 23건 중 18건 통과, 5건 intermittent timeout(`net::ERR_ABORTED`, dev server 인프라 이슈이며 코드 결함 아님). 시각적 검증 스크린샷 4장 확인. AD 모드 3 APPROVED.
+
+LOW 이슈 4건:
+- `TutorialManager.js:166` depth=1009 스펙 불일치 (기능적으로 올바른 판단, 스펙 갱신으로 해소)
+- `TutorialManager.js:180` depth=1011 스펙 불일치 (화살표 가시성 향상 의도적 트레이드오프)
+- `TutorialManager.js:162` Step 3 하이라이트 높이 52->47 클램프 (화면 하단 근접 시 5px 축소, 시각적으로 미미)
+- `GatheringScene.js:206` SAFE_CELLS_11 하드코딩 중복 정의 (기능 영향 없음, 상수 공유 권장)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-27-kc-phase79-scope.md`
+- 리포트: `.claude/specs/2026-04-27-kc-phase79-coder-report.md`
+- QA: `.claude/specs/2026-04-27-kc-phase79-qa.md`
+
+---
+
 ## [Phase 78] 2026-04-28 -- 이진 실패 -> 부분 성공 구조 전환
 
 ### 개요

@@ -5,7 +5,7 @@
  *           웜톤 갈색 테마와 통일. 본문 간섭 완화 위해 PANEL_H 60→68.
  */
 
-import { GAME_WIDTH } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { SaveManager } from './SaveManager.js';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 
@@ -158,19 +158,26 @@ export class TutorialManager {
     let arrowText = null;
     const info = this._targetInfos[this._stepIndex];
     if (info) {
-      // 하이라이트 사각형: stroke-only (fillAlpha=0)
-      highlightRect = scene.add.rectangle(info.x, info.y, info.w + 8, info.h + 8)
+      // 하이라이트 사각형: stroke-only (fillAlpha=0). depth는 게임 UI(1000) 위, 패널(1010) 아래
+      const hlH = Math.min(info.h + 8, GAME_HEIGHT - info.y + info.h / 2); // 화면 하단 클램프
+      highlightRect = scene.add.rectangle(info.x, info.y, info.w + 8, hlH)
         .setStrokeStyle(3, info.color)
         .setFillStyle(0x000000, 0)
-        .setDepth(960);
+        .setDepth(PANEL_DEPTH - 1);
 
-      // 화살표 텍스트: 하이라이트 박스 위에 배치
-      arrowText = scene.add.text(info.x, info.y - info.h / 2 - 20, '\u25BC', {
+      // 화살표: 패널 Y 범위(OVERLAY_CY ± PANEL_H/2)와 겹치면 대상 아래에 ▲로 배치
+      const panelTop = OVERLAY_CY - PANEL_H / 2;
+      const panelBottom = OVERLAY_CY + PANEL_H / 2;
+      const arrowAboveY = info.y - info.h / 2 - 20;
+      const useBelow = arrowAboveY >= panelTop && arrowAboveY <= panelBottom;
+      const arrowY = useBelow ? info.y + info.h / 2 + 20 : arrowAboveY;
+      const arrowChar = useBelow ? '\u25B2' : '\u25BC'; // ▲ or ▼
+      arrowText = scene.add.text(info.x, arrowY, arrowChar, {
         fontSize: '22px',
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 3,
-      }).setOrigin(0.5, 0.5).setDepth(965);
+      }).setOrigin(0.5, 0.5).setDepth(TEXT_DEPTH);
 
       // bounce 애니메이션: yoyo +-6px, 500ms
       scene.tweens.add({
