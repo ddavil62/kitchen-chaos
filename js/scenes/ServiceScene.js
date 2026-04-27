@@ -227,7 +227,7 @@ export class ServiceScene extends Phaser.Scene {
 
   /**
    * MarketScene에서 전달받는 데이터.
-   * @param {{ inventory: Object, stageId: string, gold: number, lives: number }} data
+   * @param {{ inventory: Object, stageId: string, gold: number, lives: number, partialFail?: boolean }} data
    */
   init(data) {
     this.inventoryManager = new InventoryManager();
@@ -256,6 +256,19 @@ export class ServiceScene extends Phaser.Scene {
       livesRemaining: this.marketLives,
       livesMax: 15,
     };
+
+    // ── Phase 78: 부분 성공 — 인벤토리 50% 컷 ──
+    // HP=0 상태로 재료가 있을 때 ServiceScene 진입 시 각 재료를 ceil(qty*0.5)로 제한한다.
+    this.partialFail = data.partialFail || false;
+    if (this.partialFail) {
+      for (const [type, qty] of Object.entries(this.inventoryManager.inventory)) {
+        if (qty > 0) {
+          const cut = Math.ceil(qty * 0.5);
+          this.inventoryManager.inventory[type] = cut;
+        }
+      }
+      console.log('[ServiceScene] partialFail: 재료 50% 컷 적용');
+    }
 
     // ── Phase 11-1: 엔드리스 모드 상태 ──
     this.isEndless = data.isEndless || false;

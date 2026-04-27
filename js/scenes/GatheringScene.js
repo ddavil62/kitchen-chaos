@@ -2252,7 +2252,9 @@ export class GatheringScene extends Phaser.Scene {
   // ── 게임 종료 ───────────────────────────────────────────────────
 
   /**
-   * 게임오버 처리. 패배 연출 후 ResultScene으로 전환 (영업 건너뜀).
+   * 게임오버 처리. 패배 연출 후 재료 유무에 따라 분기.
+   * - 재료 > 0: ServiceScene 경유 (부분 성공, 재료 50% 컷, 별점 최대 2개)
+   * - 재료 = 0: ResultScene 직행 (완전 실패, 기존 동작 유지)
    * @private
    */
   _triggerGameOver() {
@@ -2263,17 +2265,36 @@ export class GatheringScene extends Phaser.Scene {
 
     this.cameras.main.fadeOut(600, 100, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      // 재료 채집 실패 → ResultScene으로 직접 전환 (영업 건너뜀)
-      this.scene.start('ResultScene', {
-        stageId: this.stageId,
-        marketResult: {
-          totalIngredients: this.inventoryManager.getTotal(),
-          livesRemaining: 0,
-          livesMax: STARTING_LIVES,
-        },
-        serviceResult: null,
-        isMarketFailed: true,
-      });
+      const total = this.inventoryManager.getTotal();
+
+      // ── Phase 78: 부분 성공 분기 ──
+      // 재료가 1개 이상이면 ServiceScene 경유 (재료 50% 컷, 별점 최대 2개)
+      // 재료가 0개이면 기존 완전 실패 경로 유지
+      if (total > 0) {
+        this.scene.start('ServiceScene', {
+          inventory: this.inventoryManager.getAll(),
+          stageId: this.stageId,
+          lives: 0,
+          partialFail: true,
+          marketResult: {
+            totalIngredients: total,
+            livesRemaining: 0,
+            livesMax: STARTING_LIVES,
+            partialFail: true,
+          },
+        });
+      } else {
+        this.scene.start('ResultScene', {
+          stageId: this.stageId,
+          marketResult: {
+            totalIngredients: 0,
+            livesRemaining: 0,
+            livesMax: STARTING_LIVES,
+          },
+          serviceResult: null,
+          isMarketFailed: true,
+        });
+      }
     });
   }
 

@@ -77,7 +77,7 @@ export class ResultScene extends Phaser.Scene {
   /**
    * @param {{
    *   stageId: string,
-   *   marketResult: { totalIngredients: number, livesRemaining: number, livesMax: number },
+   *   marketResult: { totalIngredients: number, livesRemaining: number, livesMax: number, partialFail?: boolean },
    *   serviceResult: { servedCount: number, totalCustomers: number, goldEarned: number, tipEarned: number, maxCombo: number, satisfaction: number } | null,
    *   isMarketFailed: boolean
    * }} data
@@ -96,6 +96,9 @@ export class ResultScene extends Phaser.Scene {
     this.marketResult = data?.marketResult || { totalIngredients: 0, livesRemaining: 0, livesMax: 15 };
     this.serviceResult = data?.serviceResult || null;
     this.isMarketFailed = data?.isMarketFailed || false;
+
+    // ── Phase 78: 부분 성공 플래그 ──
+    this.partialFail = data?.marketResult?.partialFail || false;
 
     // ── Phase 11-1: 엔드리스 결과 ──
     this.isEndless = data?.isEndless || false;
@@ -297,6 +300,8 @@ export class ResultScene extends Phaser.Scene {
       else if (satisfaction >= 80) stars = 2;
       else if (satisfaction >= 60) stars = 1;
     }
+    // ── Phase 78: 부분 성공 — 별점 최대 2개 캡 ──
+    if (this.partialFail && stars > 2) stars = 2;
 
     // 코인 보상 계산
     let coinReward = 0;
@@ -387,8 +392,12 @@ export class ResultScene extends Phaser.Scene {
     });
     y += 28;
 
-    this.add.text(40, y, `수집 재료: ${this.marketResult.totalIngredients}개`, {
-      fontSize: '14px', color: '#ffffff',
+    // ── Phase 78: 부분 성공 시 재료 표시에 50% 사용 문구 추가 ──
+    const ingredientLabel = this.partialFail
+      ? `수집 재료: ${this.marketResult.totalIngredients}개 (부분 성공 — 50% 사용)`
+      : `수집 재료: ${this.marketResult.totalIngredients}개`;
+    this.add.text(40, y, ingredientLabel, {
+      fontSize: '14px', color: this.partialFail ? '#ffaa44' : '#ffffff',
     });
     y += 22;
 
