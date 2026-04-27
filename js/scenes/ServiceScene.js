@@ -267,7 +267,6 @@ export class ServiceScene extends Phaser.Scene {
           this.inventoryManager.inventory[type] = cut;
         }
       }
-      console.log('[ServiceScene] partialFail: 재료 50% 컷 적용');
     }
 
     // ── Phase 11-1: 엔드리스 모드 상태 ──

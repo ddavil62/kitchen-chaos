@@ -1,5 +1,47 @@
 # Changelog
 
+## [Phase 78] 2026-04-28 -- 이진 실패 -> 부분 성공 구조 전환
+
+### 개요
+
+HP=0이더라도 수집 재료가 1개 이상이면 "부분 성공" 상태로 ServiceScene을 경유하여 영업할 수 있도록 3단계 실패 구조를 도입. 재료 50% 컷 + 별점 최대 2개 캡으로 밸런스 조정하여 실패 시 보상 0이던 이탈 유발 구조를 개선.
+
+### Added
+
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_triggerGameOver()` 내 재료 유무 분기 -- `inventoryManager.getTotal() > 0`이면 `partialFail: true`로 ServiceScene 전환, `=== 0`이면 기존 ResultScene 직행 유지
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `init()` 내 `this.partialFail` 플래그 수신 + partialFail=true 시 인벤토리 각 재료를 `Math.ceil(qty * 0.5)`로 50% 컷
+- `kitchen-chaos/js/scenes/ResultScene.js`: `init()` 내 `this.partialFail` 플래그 수신 (`data.marketResult.partialFail`)
+- `kitchen-chaos/js/scenes/ResultScene.js`: `_createResultView()` 내 `partialFail && stars > 2` 시 `stars = 2` 캡 적용
+- `kitchen-chaos/js/scenes/ResultScene.js`: `_createResultView()` 장보기 섹션에 부분 성공 시 "(부분 성공 -- 50% 사용)" 오렌지색(#ffaa44) 메시지 표시
+
+### Changed
+
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_triggerGameOver()` JSDoc 갱신 (partialFail 경로 설명 추가)
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `init()` JSDoc에 `partialFail?: boolean` 파라미터 추가
+- `kitchen-chaos/js/scenes/ResultScene.js`: `init()` JSDoc에 `marketResult.partialFail?: boolean` 타입 추가
+- `marketResult` 전달 객체에 `partialFail: boolean` 필드 추가 (GatheringScene -> ServiceScene -> ResultScene 전파 경로)
+
+### 스펙 대비 구현 차이
+
+- 없음. 스펙의 모든 요구사항이 그대로 구현됨.
+
+### QA 결과
+
+PASS. Playwright 19건 전부 통과 (정상 6 + 비회귀 2 + 예외 8 + 안정성 2 + E2E 1). 시각적 검증 스크린샷 8장 확인. LOW 이슈 2건 (디버그 console.log 잔존, InventoryManager 캡슐화 위반) -- 기능 영향 없음.
+
+### 잔존 이슈 (범위 외)
+
+- `ServiceScene.js:270` `console.log('[ServiceScene] partialFail: 재료 50% 컷 적용')` 디버그 로그 잔존 (LOW, 프로덕션 빌드 전 제거 권장)
+- `ServiceScene.js:264` `Object.entries(this.inventoryManager.inventory)` 직접 프로퍼티 접근 (LOW, 기존 코드 패턴과 일치, 캡슐화 리팩토링 시 개선)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-27-kc-phase78-scope.md`
+- 리포트: `.claude/specs/2026-04-27-kc-phase78-coder-report.md`
+- QA: `.claude/specs/2026-04-27-kc-phase78-qa.md`
+
+---
+
 ## [Phase 77] 2026-04-27 -- 엔드리스 해금 완화 + GatheringScene 2x 배속 버튼
 
 ### 개요
