@@ -1,5 +1,51 @@
 # Changelog
 
+## [Phase 80] 2026-04-28 -- 영업 씬 서빙 인터랙션 강화
+
+### 개요
+
+ServiceScene.js 단일 파일 수정. 3종 시각 피드백 추가: (1) 레시피 탭 → 해당 주문 테이블 골든 테두리 강조(2단계 서빙 인터랙션), (2) patience < 30% 테이블 빨간 깜빡임, (3) 2+콤보 달성 시 화면 중앙 팝업 텍스트.
+
+### Added
+
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_selectedRecipeId`, `_highlightRects` (Map<tableIdx, Rectangle>), `_urgentTweens` (Map<tableIdx, {tween, rect}>) 상태 변수 (create 시 초기화)
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_clearHighlightRects()` 전체 골든 테두리 해제 헬퍼
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_clearHighlightRect(tableIdx)` 단일 테이블 골든 테두리 해제 헬퍼
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_onRecipeTap()` 내 골든 테두리 생성 로직 (Recipe.id 매칭 테이블에 strokeStyle 3px 0xffd700 Rectangle, depth=cont.depth+1)
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_updateTableUI()` 내 긴급 빨간 깜빡임 블록 (ratio<0.3 시 98x78px Rectangle, depth=cont.depth+2, onUpdate 콜백으로 0x333333/0xff0000 교대, alpha 0.6~1.0 500ms yoyo)
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_serveToCustomer()` 내 인라인 콤보 팝업 텍스트 (GAME_WIDTH/2, GAME_HEIGHT/2-50, fontSize 24px, color #ffd700, stroke #000000 thickness 4, depth 500, 1.2초 y-50 fade-out)
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_shutdown()` 내 `_highlightRects` destroy+clear, `_urgentTweens` stop+destroy+clear, `_selectedRecipeId=null` 정리
+
+### Changed
+
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_onTableTap()` — 서빙 성공 시 `_clearHighlightRect(tableIdx)` 호출 추가 (서빙된 테이블 골든 테두리 즉시 해제)
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_serveToCustomer()` — 콤보 팝업 임계값 `comboCount >= 3` → `comboCount >= 2`로 하향
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_serveToCustomer()` — `vfx.comboPopup()` + `sfx_combo` 호출 임계값도 동일하게 3 → 2로 변경
+
+### Fixed
+
+- `kitchen-chaos/js/scenes/ServiceScene.js`: `_updateTableUI()` 내 `!cust` 조건 블록에서 `return` 전 urgent tween 정리 코드 누락 → 추가 (손님 퇴장 시 빨간 깜빡임이 잔존하는 버그 방지)
+
+### 수치
+
+- 골든 테두리: 94x74px, strokeWidth 3px, color 0xffd700, depth cont.depth+1
+- 긴급 빨간 테두리: 98x78px, strokeWidth 3px, 0x333333/0xff0000 교대, depth cont.depth+2
+- 콤보 팝업: fontSize 24px, color #ffd700, stroke #000000 thickness 4, depth 500, y-50 fade 1200ms
+- 콤보 임계값: 3 → 2
+
+### AD 모드 3 검증
+
+APPROVED. FAIL 0개, WARN 7개 (전부 허용 사유 충족: stroke 3px 의도적 강조, 색상 하드코딩 기존 관행 일치, fontSize 24px 임팩트 요소, 팝업 하단 2px 초과 depth 분리로 무해, COMBO 영어 기존 관행 일치).
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase80-planner.md`
+- 목적 정의서: `.claude/specs/2026-04-28-kc-phase80-scope.md`
+- 리포트: `.claude/specs/2026-04-28-kc-phase80-coder-report.md`
+- AD 모드 3: `.claude/specs/2026-04-28-kc-phase80-ad3.md`
+
+---
+
 ## [Phase 79] 2026-04-28 -- 인터랙티브 온보딩 재설계
 
 ### 개요

@@ -1117,6 +1117,13 @@ export class ServiceScene extends Phaser.Scene {
       pBarFill.setVisible(false);
       custIconImg.setVisible(false);
       custIconText.setVisible(false);
+      // Phase 80: 손님 퇴장 시 긴급 tween 정리
+      if (this._urgentTweens?.has(idx)) {
+        const { tween, rect } = this._urgentTweens.get(idx);
+        tween.stop();
+        rect.destroy();
+        this._urgentTweens.delete(idx);
+      }
       return;
     }
 
