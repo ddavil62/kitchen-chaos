@@ -793,9 +793,15 @@ export class SaveManager {
    */
   static getSeasonPass() {
     const data = SaveManager.load();
-    return data.seasonPass ?? {
-      currentXP: 0, currentTier: 0, hasPaidPass: false,
-      claimedFree: [], claimedPaid: [], seasonId: 'S1',
+    const sp = data.seasonPass ?? {};
+    // Phase 90-A (A-3): 각 필드 누락 시 폴백값 적용 — undefined 노출 방지
+    return {
+      currentXP:   sp.currentXP   ?? 0,
+      currentTier: sp.currentTier ?? 0,
+      hasPaidPass: sp.hasPaidPass ?? false,
+      claimedFree: Array.isArray(sp.claimedFree) ? sp.claimedFree : [],
+      claimedPaid: Array.isArray(sp.claimedPaid) ? sp.claimedPaid : [],
+      seasonId:    sp.seasonId    ?? 'S1',
     };
   }
 

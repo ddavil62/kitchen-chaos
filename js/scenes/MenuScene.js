@@ -832,18 +832,25 @@ export class MenuScene extends Phaser.Scene {
     this._missionTabContent.removeAll(true);
 
     const state = SeasonManager.getState();
+    // Phase 90-A (A-3): state 필드 undefined 방어 — 구 세이브 또는 마이그레이션 타이밍 이슈 대비
+    const seasonId = state.seasonId ?? 'S1';
+    const currentTier = state.currentTier ?? 0;
+    const currentXP = state.currentXP ?? 0;
+    const hasPaidPass = state.hasPaidPass ?? false;
+    const claimedFree = Array.isArray(state.claimedFree) ? state.claimedFree : [];
+    const claimedPaid = Array.isArray(state.claimedPaid) ? state.claimedPaid : [];
     const { currentInTier, tierXP } = SeasonManager.getProgressInTier();
     const startY = cy - modalH / 2 + 70;
 
     // 시즌 타이틀
-    const titleText = this.add.text(cx, startY, `\uC2DC\uC98C \uD328\uC2A4 ${state.seasonId}`, {
+    const titleText = this.add.text(cx, startY, `\uC2DC\uC98C \uD328\uC2A4 ${seasonId}`, {
       fontSize: '15px', fontStyle: 'bold', color: '#ffdd88',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this._missionTabContent.add(titleText);
 
     // 단계 표시
-    const tierLabel = this.add.text(cx, startY + 20, `\uB2E8\uACC4 ${state.currentTier} / 50`, {
+    const tierLabel = this.add.text(cx, startY + 20, `\uB2E8\uACC4 ${currentTier} / 50`, {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5);
@@ -861,20 +868,20 @@ export class MenuScene extends Phaser.Scene {
     this._missionTabContent.add(barBg);
 
     // 바 채우기
-    if (state.currentTier < 50 && tierXP > 0) {
+    if (currentTier < 50 && tierXP > 0) {
       const ratio = Math.min(1, currentInTier / tierXP);
       if (ratio > 0) {
         const fillW = barW * ratio;
         const fillGfx = this.add.rectangle(barX + barW / 2 - (barW - fillW) / 2, barY, fillW, barH - 2, 0xffcc44).setOrigin(0.5);
         this._missionTabContent.add(fillGfx);
       }
-    } else if (state.currentTier >= 50) {
+    } else if (currentTier >= 50) {
       const fillGfx = this.add.rectangle(barX + barW / 2, barY, barW, barH - 2, 0x88ff88).setOrigin(0.5);
       this._missionTabContent.add(fillGfx);
     }
 
     // XP 텍스트
-    const xpText = state.currentTier >= 50
+    const xpText = currentTier >= 50
       ? 'MAX'
       : `${currentInTier} / ${tierXP} XP`;
     const xpLabel = this.add.text(cx, barY, xpText, {
@@ -885,7 +892,7 @@ export class MenuScene extends Phaser.Scene {
 
     // 유료 패스 구매 버튼 (미보유 시만)
     let buyBtnH = 0;
-    if (!state.hasPaidPass) {
+    if (!hasPaidPass) {
       const btnY = startY + 65;
       buyBtnH = 28;
       const buyBg = NineSliceFactory.raw(this, cx, btnY, 160, buyBtnH, 'btn_primary_normal');
@@ -910,7 +917,7 @@ export class MenuScene extends Phaser.Scene {
     // 보상 목록 (현재 단계 기준 +-5 범위, 최대 11행)
     const listStartY = startY + (buyBtnH > 0 ? 90 : 70);
     const ROW_H = 30;
-    const minTier = Math.max(1, state.currentTier - 3);
+    const minTier = Math.max(1, currentTier - 3);
     const maxTier = Math.min(50, minTier + 10);
     const visibleTiers = [];
     for (let t = minTier; t <= maxTier; t++) visibleTiers.push(t);
@@ -925,14 +932,14 @@ export class MenuScene extends Phaser.Scene {
       const rewardDef = SeasonManager.getRewardDef(tier);
       if (!rewardDef) continue;
 
-      const reached = state.currentTier >= tier;
-      const freeClaimed = state.claimedFree.includes(tier);
-      const paidClaimed = state.claimedPaid.includes(tier);
+      const reached = currentTier >= tier;
+      const freeClaimed = claimedFree.includes(tier);
+      const paidClaimed = claimedPaid.includes(tier);
 
       // 행 배경
-      const rowTint = reached ? (tier === state.currentTier ? 0x443300 : 0x2a2a2a) : 0x1a1a22;
+      const rowTint = reached ? (tier === currentTier ? 0x443300 : 0x2a2a2a) : 0x1a1a22;
       const rowBg = this.add.rectangle(cx, rowY, modalW - 30, ROW_H - 2, rowTint, 0.7);
-      rowBg.setStrokeStyle(tier === state.currentTier ? 1 : 0, 0xffcc44, 0.5);
+      rowBg.setStrokeStyle(tier === currentTier ? 1 : 0, 0xffcc44, 0.5);
       this._missionTabContent.add(rowBg);
 
       // 단계 번호
@@ -954,7 +961,7 @@ export class MenuScene extends Phaser.Scene {
 
       // 유료 보상 라벨
       const paidLabel = this._getSeasonRewardShort(rewardDef.paid);
-      const paidColor = !state.hasPaidPass ? '#555555' : paidClaimed ? '#88ff88' : reached ? '#ffaa44' : '#555555';
+      const paidColor = !hasPaidPass ? '#555555' : paidClaimed ? '#88ff88' : reached ? '#ffaa44' : '#555555';
       const paidText = this.add.text(cx + 50, rowY, paidLabel, {
         fontSize: '10px', color: paidColor,
         stroke: '#000', strokeThickness: 1,
@@ -977,7 +984,7 @@ export class MenuScene extends Phaser.Scene {
       }
 
       // 수령 버튼 (유료)
-      if (reached && !paidClaimed && state.hasPaidPass) {
+      if (reached && !paidClaimed && hasPaidPass) {
         const claimPaidBtn = this.add.text(cx + modalW / 2 - 40, rowY + 8, '\uC218\uB839', {
           fontSize: '9px', fontStyle: 'bold', color: '#ffaa44',
           backgroundColor: '#553300', padding: { x: 4, y: 2 },

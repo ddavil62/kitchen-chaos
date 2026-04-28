@@ -149,6 +149,7 @@ export class ShopScene extends Phaser.Scene {
     const tabW = Math.floor((GAME_WIDTH - 10) / tabCount);
 
     // Phase 60-14: 탭 rectangle → NineSliceFactory.tab (active/inactive 텍스처 스왑)
+    // Phase 90-A: TutorialManager 오버레이(depth=1010)보다 높게 설정하여 탭 클릭 차단 방지
     tabs.forEach((tab, i) => {
       const x = 5 + i * tabW;
       const w = tabW - 2;
@@ -157,6 +158,9 @@ export class ShopScene extends Phaser.Scene {
         this, x + w / 2, tabY, w, 28, tab.label,
         { active: tab.key === this._activeTab, textStyle: { fontSize: '11px', fontStyle: 'bold' } }
       );
+      // Phase 90-A (A-1): 탭 NineSlice depth를 TutorialManager PANEL_DEPTH(1010)보다 높게 설정
+      tabContainer.setDepth(1020);
+      if (tabContainer._label) tabContainer._label.setDepth(1021);
       const tabHitArea = new Phaser.Geom.Rectangle(-w / 2, -14, w, 28);
       tabContainer.setInteractive(tabHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 

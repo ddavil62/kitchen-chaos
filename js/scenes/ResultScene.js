@@ -735,26 +735,34 @@ export class ResultScene extends Phaser.Scene {
 
   /**
    * 버튼 그룹을 비활성화한다. DialogueScene이 열려 있는 동안 입력을 차단한다.
+   * Phase 90-A (A-2): visible 유지 + disableInteractive + alpha=0.3으로 변경.
+   * 기존의 alpha=0.4만 적용하던 방식에서는 DialogueScene 오버레이 뒤에 버튼이 가려져
+   * 유저가 버튼 존재를 인식하지 못하는 문제가 있었다.
    * @private
    */
   _lockButtons() {
     this._buttonsLocked = true;
     if (this._buttonObjects) {
       for (const obj of this._buttonObjects) {
-        obj.setAlpha(0.4);
+        obj.setAlpha(0.3);
+        // interactive 비활성화 (visible은 유지)
+        if (obj.disableInteractive) obj.disableInteractive();
       }
     }
   }
 
   /**
    * 버튼 그룹을 복원한다. DialogueScene 종료 후 호출한다.
+   * Phase 90-A (A-2): alpha=1.0 복원 + setInteractive 재활성화.
    * @private
    */
   _unlockButtons() {
     this._buttonsLocked = false;
     if (this._buttonObjects) {
       for (const obj of this._buttonObjects) {
-        obj.setAlpha(1);
+        obj.setAlpha(1.0);
+        // interactive 재활성화 — NineSlice bg만 interactive 대상이므로 타입 체크
+        if (obj.input && obj.setInteractive) obj.setInteractive();
       }
     }
   }

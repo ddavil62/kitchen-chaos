@@ -455,6 +455,16 @@ export class ServiceScene extends Phaser.Scene {
     // ── Phase 51-2: 유랑 미력사 패시브 스킬 적용 ──
     this._applyWanderingChefSkills();
 
+    // ── Phase 90-A (A-4): 재료 0개 진입 방어 ──
+    // create() 완료 후 다음 프레임에서 인벤토리 총량을 체크하여,
+    // 재료가 0개이면 즉시 영업 종료(stock)로 전환한다.
+    // delayedCall(0)은 현재 프레임 렌더링 완료 후 실행되므로 UI 생성 이후 안전하게 동작한다.
+    this.time.delayedCall(0, () => {
+      if (this.inventoryManager.getTotal() === 0) {
+        this._endService('stock');
+      }
+    });
+
     // 씬 종료 시 정리
     this.events.once('shutdown', this._shutdown, this);
   }
