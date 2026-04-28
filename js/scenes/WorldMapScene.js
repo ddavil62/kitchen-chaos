@@ -12,12 +12,14 @@
 import Phaser from 'phaser';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { NS_KEYS } from '../ui/UITheme.js';
-import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION, ENDLESS_LOCK_LABEL } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION, ENDLESS_LOCK_LABEL, ENERGY_MAX } from '../config.js';
 import { STAGES } from '../data/stageData.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { StoryManager } from '../managers/StoryManager.js';
+import { EnergyManager } from '../managers/EnergyManager.js';
+import { AdManager } from '../managers/AdManager.js';
 
 // ── 챕터별 스테이지 분류 (Phase 24-2: 24챕터 3그룹 체계) ──
 
@@ -634,6 +636,13 @@ export class WorldMapScene extends Phaser.Scene {
 
       endlessBtn.on('pointerdown', () => {
         SoundManager.playSFX('sfx_ui_tap');
+        // Phase 87: 에너지 게이트 — 에너지 부족 시 충전 모달 표시
+        EnergyManager.applyAutoRecharge();
+        if (!EnergyManager.canPlay()) {
+          this._openEnergyModal();
+          return;
+        }
+        EnergyManager.consume();
         this.cameras.main.fadeOut(300, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
           this.scene.start('ChefSelectScene', { stageId: 'endless' });
@@ -830,6 +839,139 @@ export class WorldMapScene extends Phaser.Scene {
     });
   }
 
+  // ── Phase 87: 에너지 부족 모달 ──────────────────────────────────────────
+
+  /**
+   * 에너지 부족 시 충전 모달을 표시한다.
+   * "광고 보기" 버튼 탭 -> AdManager.showRewardedAd -> 완료 후 에너지 +1.
+   * @private
+   */
+  _openEnergyModal() {
+    // 이미 모달이 열려 있으면 무시
+    if (this._energyModalContainer) return;
+
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+    const container = this.add.container(0, 0).setDepth(200);
+    this._energyModalContainer = container;
+
+    // 반투명 오버레이 (전체화면 dim)
+    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.75);
+    overlay.setInteractive();
+    overlay.on('pointerdown', () => this._closeEnergyModal());
+    container.add(overlay);
+
+    // 패널 배경
+    const panelBg = NineSliceFactory.panel(this, cx, cy, 280, 220, 'dark');
+    panelBg.setInteractive(); // 패널 클릭이 오버레이로 전파되지 않도록 차단
+    container.add(panelBg);
+
+    // 제목 텍스트
+    const titleText = this.add.text(cx, cy - 80, '\u26A1 \uC5D0\uB108\uC9C0 \uBD80\uC871', {
+      fontSize: '17px',
+      fontStyle: 'bold',
+      color: '#ff6b35',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(titleText);
+
+    // 현재 에너지 표시
+    const currentEnergy = EnergyManager.getEnergy();
+    const energyText = this.add.text(cx, cy - 52, `\u26A1 ${currentEnergy} / ${ENERGY_MAX}`, {
+      fontSize: '14px',
+      color: '#ffaa55',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(energyText);
+
+    // 안내 텍스트
+    const infoText = this.add.text(cx, cy - 30, '30\uBD84\uB9C8\uB2E4 1\uAC1C\uC529 \uCDA9\uC804\uB429\uB2C8\uB2E4.', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      stroke: '#000000',
+      strokeThickness: 1,
+    }).setOrigin(0.5);
+    container.add(infoText);
+
+    // "광고 보기 (+1)" 버튼
+    const adBtnBg = NineSliceFactory.raw(this, cx, cy + 10, 200, 44, 'btn_primary_normal');
+    adBtnBg.setTint(0x6622cc);
+    const adBtnHit = new Phaser.Geom.Rectangle(-100, -22, 200, 44);
+    adBtnBg.setInteractive(adBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    container.add(adBtnBg);
+
+    const adBtnText = this.add.text(cx, cy + 10, '\uD83D\uDCFA \uAD11\uACE0 \uBCF4\uAE30 (+1)', {
+      fontSize: '15px',
+      fontStyle: 'bold',
+      color: '#cc88ff',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(adBtnText);
+
+    adBtnBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      adBtnBg.disableInteractive();
+      AdManager.showRewardedAd(
+        () => {
+          // 광고 시청 완료 -> 에너지 +1
+          EnergyManager.addEnergy(1);
+          energyText.setText(`\u26A1 ${EnergyManager.getEnergy()} / ${ENERGY_MAX}`);
+          // 300ms 후 버튼 재활성화 (연속 클릭 방지)
+          this.time.delayedCall(300, () => {
+            if (adBtnBg && adBtnBg.active) {
+              adBtnBg.setInteractive(adBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+            }
+          });
+        },
+        () => {
+          // 광고 로드 실패
+          console.warn('[EnergyModal] \uAD11\uACE0 \uB85C\uB4DC \uC2E4\uD328');
+          if (adBtnBg && adBtnBg.active) {
+            adBtnBg.setInteractive(adBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+          }
+        },
+      );
+    });
+    adBtnBg.on('pointerover', () => { adBtnBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); adBtnBg.setTint(0x8833ee); });
+    adBtnBg.on('pointerout', () => { adBtnBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); adBtnBg.setTint(0x6622cc); });
+
+    // "닫기" 버튼
+    const closeBtnBg = NineSliceFactory.raw(this, cx, cy + 64, 120, 36, 'btn_secondary_normal');
+    closeBtnBg.setTint(0x444444);
+    const closeBtnHit = new Phaser.Geom.Rectangle(-60, -18, 120, 36);
+    closeBtnBg.setInteractive(closeBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    container.add(closeBtnBg);
+
+    const closeBtnText = this.add.text(cx, cy + 64, '\uB2EB\uAE30', {
+      fontSize: '13px',
+      color: '#aaaaaa',
+      stroke: '#000000',
+      strokeThickness: 1,
+    }).setOrigin(0.5);
+    container.add(closeBtnText);
+
+    closeBtnBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._closeEnergyModal();
+    });
+    closeBtnBg.on('pointerover', () => { closeBtnBg.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); closeBtnBg.setTint(0x555555); });
+    closeBtnBg.on('pointerout', () => { closeBtnBg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); closeBtnBg.setTint(0x444444); });
+  }
+
+  /**
+   * 에너지 부족 모달을 닫는다.
+   * @private
+   */
+  _closeEnergyModal() {
+    if (this._energyModalContainer) {
+      this._energyModalContainer.destroy();
+      this._energyModalContainer = null;
+    }
+  }
+
   // ── 패널 내 스테이지 항목 ──────────────────────────────────────────────
 
   /**
@@ -861,6 +1003,13 @@ export class WorldMapScene extends Phaser.Scene {
 
       bg.on('pointerdown', () => {
         SoundManager.playSFX('sfx_ui_tap');
+        // Phase 87: 에너지 게이트 — 에너지 부족 시 충전 모달 표시
+        EnergyManager.applyAutoRecharge();
+        if (!EnergyManager.canPlay()) {
+          this._openEnergyModal();
+          return;
+        }
+        EnergyManager.consume();
         this.cameras.main.fadeOut(300, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
           this.scene.start('ChefSelectScene', { stageId });

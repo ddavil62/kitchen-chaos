@@ -35,12 +35,14 @@
  * Phase 77: v27 마이그레이션 — 엔드리스 해금 조건 24-6 → 6-6 완화.
  * Phase 82: clearStage() 재클리어 코인 지급 0으로 변경 (최초 달성·별점 상향 시만 보상).
  * Phase 84: v28 마이그레이션 — unlockedSkins, equippedSkin 추가.
+ * Phase 87: v29 마이그레이션 — energy, energyLastRecharge 필드 추가.
+ *           getEnergy, setEnergyState 헬퍼 메서드 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 28;
+const SAVE_VERSION = 29;
 
 // ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
 const BACKUP_KEYS = [
@@ -182,6 +184,9 @@ function createDefault() {
     // ── Phase 84 추가: 스킨 시스템 ──
     unlockedSkins: { mimi_chef: ['default'] },  // { [chefId]: skinId[] }
     equippedSkin:  { mimi_chef: 'default' },    // { [chefId]: skinId }
+    // ── Phase 87 추가: 에너지 시스템 ──
+    energy: 5,                      // 현재 보유 에너지 (최대 5)
+    energyLastRecharge: Date.now(), // 마지막 에너지 충전 기록 시각 (Unix ms)
   };
 }
 
@@ -740,6 +745,28 @@ export class SaveManager {
     data.mireukEssence -= amount;
     SaveManager.save(data);
     return true;
+  }
+
+  // ── 에너지 시스템 (Phase 87) ──
+
+  /**
+   * 현재 에너지 반환.
+   * @returns {number}
+   */
+  static getEnergy() {
+    return SaveManager.load().energy ?? 5;
+  }
+
+  /**
+   * 에너지 값을 직접 설정한다 (EnergyManager 전용 -- 직접 호출 금지).
+   * @param {number} energy
+   * @param {number} energyLastRecharge
+   */
+  static setEnergyState(energy, energyLastRecharge) {
+    const data = SaveManager.load();
+    data.energy = energy;
+    data.energyLastRecharge = energyLastRecharge;
+    SaveManager.save(data);
   }
 
   // ── 엔드리스 확장 통계 (Phase 55-4) ──
@@ -1640,6 +1667,14 @@ export class SaveManager {
         data.equippedSkin.mimi_chef = 'default';
       }
       data.version = 28;
+    }
+
+    // v28 → v29: 에너지 시스템 추가 (Phase 87)
+    if (data.version < 29) {
+      // 기존 유저는 에너지 만충(5) + 현재 시각을 lastRecharge 기준으로 초기화
+      data.energy = data.energy ?? 5;
+      data.energyLastRecharge = data.energyLastRecharge ?? Date.now();
+      data.version = 29;
     }
 
     // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)

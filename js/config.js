@@ -249,6 +249,10 @@ export const FONT_FAMILY = '"NeoDunggeunmoPro", "Noto Sans KR", sans-serif';
 export const STARTING_LIVES = 15;       // 라운드 시작 생명 수 (GatheringScene, EndlessScene)
 export const FRESHNESS_WINDOW_MS = 5000; // 재료 신선도 유지 시간 (ms) (Enemy, IngredientManager)
 
+// ── Phase 87: 에너지 시스템 상수 ──
+export const ENERGY_MAX             = 5;   // 최대 보유 에너지
+export const ENERGY_RECHARGE_MINUTES = 30; // 에너지 1개 충전에 필요한 분
+
 // ── Phase 69 (P1-4): 엔드리스 해금 조건 상수화 ──
 // SaveManager.commitStageResult()가 stageId === ENDLESS_UNLOCK_STAGE && stars > 0에서 해금하므로
 // UI 문구도 이 조건과 1:1 일치해야 한다. Phase 77: 24-6 → 6-6 완화.

@@ -10,18 +10,20 @@
  * Phase 75B: "오늘의 미션" 배너 + 미션/캘린더 통합 팝업 모달 추가.
  *            기존 요소 y좌표 +60px 하향 조정.
  * Phase 82: 리소스 HUD 추가 (골드/코인/미력의 정수 상시 표시, y=100).
+ * Phase 87: 에너지 HUD 2행 추가 (에너지 N/5 + 충전 카운트다운).
  */
 
 import Phaser from 'phaser';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { NS_KEYS } from '../ui/UITheme.js';
-import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION, ENDLESS_LOCK_LABEL } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, APP_VERSION, ENDLESS_LOCK_LABEL, ENERGY_MAX } from '../config.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { RecipeManager } from '../managers/RecipeManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { redeemCoupon, getCheatCodeHints } from '../managers/CouponRegistry.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 import { LoginBonusManager, LOGIN_REWARDS } from '../managers/LoginBonusManager.js';
+import { EnergyManager } from '../managers/EnergyManager.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -32,6 +34,9 @@ export class MenuScene extends Phaser.Scene {
     // ── Phase 75B: 일일 미션/로그인 보너스 리셋 체크 (fadeIn 전에 실행) ──
     DailyMissionManager.checkAndReset();
     LoginBonusManager.checkAndGrantDaily();
+
+    // ── Phase 87: MenuScene 진입 시 에너지 자동 충전 적용 ──
+    EnergyManager.applyAutoRecharge();
 
     // ── BGM 재생 (Phase 10-4) ──
     SoundManager.playBGM('bgm_menu');
@@ -238,12 +243,16 @@ export class MenuScene extends Phaser.Scene {
   // ── Phase 82: 리소스 HUD ─────────────────────────────────────────
 
   /**
-   * 메뉴 상단(배너 하단)에 골드·코인·미력의 정수 보유량을 표시하는 정적 HUD를 생성한다.
-   * 미션 배너(y=72 하단)와 타이틀 로고(y≈230) 사이 여백(y=100)에 배치한다.
+   * 메뉴 상단(배너 하단)에 골드·코인·미력의 정수 보유량 + 에너지를 표시하는 HUD를 생성한다.
+   * 미션 배너(y=72 하단)와 타이틀 로고(y~280) 사이에 2행으로 배치한다.
+   * Phase 87: 2행에 에너지 표시 + 카운트다운 타이머 추가.
    * @private
    */
   _createResourceHUD() {
-    const HUD_Y = 100;
+    const HUD_Y1 = 92;   // 1행: 기존 리소스 (y=100 -> 92로 소폭 상향)
+    const HUD_Y2 = 112;  // 2행: 에너지 표시
+
+    // 1행: 기존 리소스
     const gold = SaveManager.getGold();
     const coins = SaveManager.getCoins();
     const essence = SaveManager.getMireukEssence();
@@ -257,13 +266,71 @@ export class MenuScene extends Phaser.Scene {
     const colors = ['#ffd700', '#aaddff', '#cc88ff'];
 
     labels.forEach((text, i) => {
-      this.add.text(colXs[i], HUD_Y, text, {
+      this.add.text(colXs[i], HUD_Y1, text, {
         fontSize: '12px',
         color: colors[i],
         stroke: '#000000',
         strokeThickness: 2,
       }).setOrigin(0.5);
     });
+
+    // 2행: 에너지 표시
+    const energy = EnergyManager.getEnergy();
+    const energyStr = `\u26A1 ${energy}/${ENERGY_MAX}`;
+    this._energyHudText = this.add.text(GAME_WIDTH / 2 - 60, HUD_Y2, energyStr, {
+      fontSize: '12px',
+      color: '#ffdd55',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    // 에너지 미만 시 카운트다운 타이머 표시
+    if (energy < ENERGY_MAX) {
+      this._energyCountdownText = this.add.text(GAME_WIDTH / 2 + 30, HUD_Y2, '', {
+        fontSize: '11px',
+        color: '#aaaaaa',
+        stroke: '#000000',
+        strokeThickness: 1,
+      }).setOrigin(0, 0.5);
+
+      // 초기 카운트다운 표시
+      const initSecs = EnergyManager.getRechargeCountdown();
+      if (initSecs > 0) {
+        const mm = String(Math.floor(initSecs / 60)).padStart(2, '0');
+        const ss = String(initSecs % 60).padStart(2, '0');
+        this._energyCountdownText.setText(`\uCDA9\uC804\uAE4C\uC9C0 ${mm}:${ss}`);
+      }
+
+      // 1초 주기 갱신 타이머
+      this._energyCountdownEvent = this.time.addEvent({
+        delay: 1000,
+        loop: true,
+        callback: () => {
+          // 자동 충전 적용 후 에너지 상태 갱신
+          EnergyManager.applyAutoRecharge();
+          const curEnergy = EnergyManager.getEnergy();
+          if (this._energyHudText && this._energyHudText.active) {
+            this._energyHudText.setText(`\u26A1 ${curEnergy}/${ENERGY_MAX}`);
+          }
+          const secs = EnergyManager.getRechargeCountdown();
+          if (secs <= 0) {
+            if (this._energyCountdownText && this._energyCountdownText.active) {
+              this._energyCountdownText.setText('');
+            }
+            if (this._energyCountdownEvent) {
+              this._energyCountdownEvent.remove();
+              this._energyCountdownEvent = null;
+            }
+          } else {
+            const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+            const ss = String(secs % 60).padStart(2, '0');
+            if (this._energyCountdownText && this._energyCountdownText.active) {
+              this._energyCountdownText.setText(`\uCDA9\uC804\uAE4C\uC9C0 ${mm}:${ss}`);
+            }
+          }
+        },
+      });
+    }
   }
 
   // ── Phase 75B: 오늘의 미션 배너 ──────────────────────────────────
