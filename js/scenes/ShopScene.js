@@ -272,6 +272,7 @@ export class ShopScene extends Phaser.Scene {
       );
 
       // Phase 60-14: 구매 버튼 rectangle → NineSliceFactory.button 'primary'
+      // Phase 90-B (B-7): 버튼 너비 60→76px 확대 (코인 아이콘+숫자 잘림 방지)
       if (!isMax) {
         const coins = SaveManager.getCoins();
         const canBuy = coins >= cost;
@@ -279,7 +280,7 @@ export class ShopScene extends Phaser.Scene {
         const btnY = y + 42;
 
         const btn = NineSliceFactory.button(
-          this, btnX, btnY, 60, 24, `${cost} 🪙`,
+          this, btnX, btnY, 76, 24, `${cost} 🪙`,
           {
             variant: 'primary',
             disabled: !canBuy,

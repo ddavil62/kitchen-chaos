@@ -122,7 +122,11 @@ export class WorldMapScene extends Phaser.Scene {
     this._panelContainer = null;
 
     // 8. 대화 트리거
-    StoryManager.checkTriggers(this, 'worldmap_enter');
+    // Phase 90-B (B-2): fadeIn(300ms) 완료 후 대화 시작하도록 지연 실행
+    // 모든 worldmap_enter 트리거는 once:true + DialogueManager.hasSeen() 체크 적용됨
+    this.time.delayedCall(350, () => {
+      StoryManager.checkTriggers(this, 'worldmap_enter');
+    });
   }
 
   // ── 하드웨어 백버튼 (Phase 12) ──────────────────────────────────
@@ -592,17 +596,41 @@ export class WorldMapScene extends Phaser.Scene {
 
     // 총 별점 (Phase 24-2: 그룹별 필터)
     const { current, max } = SaveManager.getTotalStars(this._currentGroup);
-    this._hudStarText = this.add.text(170, 20, `\u2B50 ${current}/${max}`, {
+    this._hudStarText = this.add.text(140, 20, `\u2B50 ${current}/${max}`, {
       fontSize: '13px',
       color: '#ffd700',
     }).setOrigin(0.5).setDepth(51);
 
+    // Phase 90-B (B-1): 에너지 표시 추가 — 현재 에너지 / 최대치
+    EnergyManager.applyAutoRecharge();
+    const curEnergy = EnergyManager.getEnergy();
+    const energyColor = curEnergy <= 0 ? '#ff4444' : '#ffffff';
+    this._hudEnergyText = this.add.text(220, 20, `\u26A1 ${curEnergy}/${ENERGY_MAX}`, {
+      fontSize: '12px',
+      color: energyColor,
+      stroke: '#000000',
+      strokeThickness: 1,
+    }).setOrigin(0.5).setDepth(51);
+
     // 레시피 수집률
     const { unlocked, total } = RecipeManager.getCollectionProgress();
-    this.add.text(300, 20, `\uD83D\uDCD6 ${unlocked}/${total}`, {
+    this.add.text(310, 20, `\uD83D\uDCD6 ${unlocked}/${total}`, {
       fontSize: '12px',
       color: '#88ccff',
     }).setOrigin(0.5).setDepth(51);
+  }
+
+  /**
+   * HUD 에너지 텍스트를 현재 에너지 상태로 갱신한다.
+   * Phase 90-B (B-1): 스테이지 패널 열림, scene resume 시 호출.
+   * @private
+   */
+  _refreshEnergyHUD() {
+    if (!this._hudEnergyText) return;
+    EnergyManager.applyAutoRecharge();
+    const curEnergy = EnergyManager.getEnergy();
+    this._hudEnergyText.setText(`\u26A1 ${curEnergy}/${ENERGY_MAX}`);
+    this._hudEnergyText.setColor(curEnergy <= 0 ? '#ff4444' : '#ffffff');
   }
 
   // ── 하단 엔드리스 섹션 ──────────────────────────────────────────────
@@ -685,6 +713,9 @@ export class WorldMapScene extends Phaser.Scene {
    * @private
    */
   _openStagePanel(chapterIdx) {
+    // Phase 90-B (B-1): 패널 열릴 때 에너지 HUD 갱신
+    this._refreshEnergyHUD();
+
     // 기존 패널 존재 시 즉시 파괴
     if (this._panelContainer) {
       this._panelContainer.destroy();
@@ -970,6 +1001,8 @@ export class WorldMapScene extends Phaser.Scene {
       this._energyModalContainer.destroy();
       this._energyModalContainer = null;
     }
+    // Phase 90-B (B-1): 모달 닫힌 후 에너지 HUD 갱신
+    this._refreshEnergyHUD();
   }
 
   // ── 패널 내 스테이지 항목 ──────────────────────────────────────────────

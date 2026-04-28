@@ -643,6 +643,22 @@ export class MenuScene extends Phaser.Scene {
         this._missionTabContent.add(fillGfx);
       }
     }
+
+    // Phase 90-B (B-5): 미션 카드 하단에 안내 문구 추가 (빈 공간 개선)
+    const infoY = startY + missions.length * 100 + 20;
+    const infoText = this.add.text(cx, infoY, `\uC624\uB298\uC758 \uBBF8\uC158\uC740 ${missions.length}\uAC1C\uC785\uB2C8\uB2E4.`, {
+      fontSize: '12px', color: '#666666', align: 'center',
+    }).setOrigin(0.5);
+    this._missionTabContent.add(infoText);
+
+    // 완료된 미션 개수 표시
+    const completedCount = missions.filter(m => m.completed).length;
+    if (completedCount > 0) {
+      const completeInfo = this.add.text(cx, infoY + 18, `\u2714 ${completedCount}\uAC1C \uC644\uB8CC`, {
+        fontSize: '11px', color: '#88ff88',
+      }).setOrigin(0.5);
+      this._missionTabContent.add(completeInfo);
+    }
   }
 
   /**

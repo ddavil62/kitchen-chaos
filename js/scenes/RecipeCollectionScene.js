@@ -302,6 +302,13 @@ export class RecipeCollectionScene extends Phaser.Scene {
         .setStrokeStyle(1, 0xffffff, 0.4);
       this._gridContainer.add(colorBox);
 
+      // Phase 90-B (B-4): 색상 박스 위에 이모지 아이콘 오버레이 (식별성 강화)
+      const toolEmoji = RecipeCollectionScene.TOOL_ICONS[toolId] || '\uD83D\uDD27';
+      const emojiOverlay = this.add.text(x, y - 10, toolEmoji, {
+        fontSize: '24px',
+      }).setOrigin(0.5);
+      this._gridContainer.add(emojiOverlay);
+
       // 도구 이름
       const nameTxt = this.add.text(x, y + 22, def.nameKo, {
         fontSize: '11px', fontStyle: 'bold', color: '#ffffff',

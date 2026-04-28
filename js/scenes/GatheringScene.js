@@ -991,10 +991,11 @@ export class GatheringScene extends Phaser.Scene {
       const row = Math.floor(i / perRow);
       const col = i % perRow;
       const x = 15 + col * slotW;
-      const y = INGREDIENT_BAR_Y + 18 + row * 16;
+      const y = INGREDIENT_BAR_Y + 18 + row * 18;
 
+      // Phase 90-B (B-3): 아이콘 크기 상향 (11px → 14px, 식별성 개선)
       const text = this.add.text(x, y, `${INGREDIENT_TYPES[id].icon}0`, {
-        fontSize: '11px', color: '#888888',
+        fontSize: '14px', color: '#888888',
       }).setDepth(1001).setScrollFactor(0);
 
       this._ingredientBarTexts.push({ id, text });

@@ -366,22 +366,24 @@ export class MerchantScene extends Phaser.Scene {
     const canSell = tool.count > 0;
     const sellPrice = canSell ? Math.floor(def.buyCost[tool.count - 1] * def.sellRate) : 0;
 
+    // Phase 90-B (B-6): 판매 버튼 색상 주황 계열로 변경 + 레이블 명확화
     let label, color;
     if (canSell) {
-      label = `\uD310\uB9E4 ${sellPrice}g`;
-      color = 0x773322;
+      label = `\u21A9 ${sellPrice}g \uD310\uB9E4`;
+      color = 0x996622;
     } else {
       label = '\uD310\uB9E4 -';
       color = 0x333333;
     }
 
     // Phase 60-13: 판매 버튼 rectangle → NineSliceFactory.raw 'btn_danger_normal'
-    const btn = NineSliceFactory.raw(this, x + 55, y + 12, 110, 24, 'btn_danger_normal');
+    // Phase 90-B (B-6): btn_danger → btn_secondary (주황 중립 톤으로 변경)
+    const btn = NineSliceFactory.raw(this, x + 55, y + 12, 110, 24, 'btn_secondary_normal');
     btn.setTint(color);
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 55, y + 12, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canSell ? '#ffcccc' : '#666666',
+      fontSize: '12px', fontStyle: 'bold', color: canSell ? '#ffd699' : '#666666',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
@@ -407,8 +409,9 @@ export class MerchantScene extends Phaser.Scene {
         ToolManager.sellTool(toolId);
         this._refreshUI();
       });
-      btn.on('pointerover', () => btn.setTexture(NS_KEYS.BTN_DANGER_PRESSED));
-      btn.on('pointerout', () => { btn.setTexture(NS_KEYS.BTN_DANGER_NORMAL); btn.setTint(color); });
+      // Phase 90-B (B-6): btn_danger → btn_secondary 텍스처 키 교체
+      btn.on('pointerover', () => btn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED));
+      btn.on('pointerout', () => { btn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); btn.setTint(color); });
     }
   }
 
