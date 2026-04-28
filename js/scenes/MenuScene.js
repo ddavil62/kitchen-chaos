@@ -24,6 +24,7 @@ import { redeemCoupon, getCheatCodeHints } from '../managers/CouponRegistry.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 import { LoginBonusManager, LOGIN_REWARDS } from '../managers/LoginBonusManager.js';
 import { EnergyManager } from '../managers/EnergyManager.js';
+import { WeeklyEventManager } from '../managers/WeeklyEventManager.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -50,6 +51,9 @@ export class MenuScene extends Phaser.Scene {
 
     // ── Phase 75B: "오늘의 미션" 배너 (y=30~60 영역) ──
     this._createMissionBanner();
+
+    // ── Phase 88: 주간 이벤트 배너 (이벤트 활성 시만 표시) ──
+    this._createWeeklyEventBanner();
 
     // ── Phase 82: 리소스 HUD (배너 하단 y=72 → y=100) ──
     this._createResourceHUD();
@@ -370,6 +374,34 @@ export class MenuScene extends Phaser.Scene {
     });
     bannerBg.on('pointerover', () => bannerBg.setTint(0xdd7700));
     bannerBg.on('pointerout', () => bannerBg.setTint(0xcc6600));
+  }
+
+  // ── Phase 88: 주간 이벤트 배너 ─────────────────────────────────
+
+  /**
+   * 현재 활성 주간 이벤트 배너를 메뉴 상단에 표시한다.
+   * 이벤트가 없는 날은 아무것도 생성하지 않는다.
+   * @private
+   */
+  _createWeeklyEventBanner() {
+    const event = WeeklyEventManager.getActiveEvent();
+    if (!event) return; // 이벤트 없는 날 — 미표시
+
+    const BANNER_W = GAME_WIDTH - 20;
+    const BANNER_H = 20;
+    // 미션 배너(BANNER_Y=50, H=44) 하단인 y=72 + 2px 여백 = y=74
+    const BANNER_Y = 74;
+
+    const bg = NineSliceFactory.raw(this, GAME_WIDTH / 2, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
+    bg.setTint(0x228844);
+
+    this.add.text(GAME_WIDTH / 2, BANNER_Y, `${event.nameKo} -- ${event.descKo}`, {
+      fontSize: '11px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
   }
 
   // ── Phase 75B: 미션/캘린더 통합 팝업 ──────────────────────────────

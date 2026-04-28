@@ -23,6 +23,7 @@ import { AchievementManager } from '../managers/AchievementManager.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 import { AdManager } from '../managers/AdManager.js';
+import { WeeklyEventManager } from '../managers/WeeklyEventManager.js';
 
 // ── Phase 74: 셰프별 장보기 실패 대사 (P2-5) ──
 // 셰프 ID → 바리에이션 3줄 배열. 매 호출 시 Math.floor(Math.random() * 3)으로 선택.
@@ -97,6 +98,8 @@ export class ResultScene extends Phaser.Scene {
 
     this.marketResult = data?.marketResult || { totalIngredients: 0, livesRemaining: 0, livesMax: 15 };
     this.serviceResult = data?.serviceResult || null;
+    // Phase 88: 이벤트 보너스 골드 (serviceResult 내부에 포함됨)
+    this._eventBonusGold = data?.serviceResult?.eventBonusGold ?? 0;
     this.isMarketFailed = data?.isMarketFailed || false;
 
     // ── Phase 78: 부분 성공 플래그 ──
@@ -470,7 +473,18 @@ export class ResultScene extends Phaser.Scene {
       this.add.text(40, y, `콤보 최대: ${maxCombo}연속`, {
         fontSize: '14px', color: '#ffffff',
       });
-      y += 30;
+      y += 22;
+
+      // ── Phase 88: 이벤트 보너스 골드 항목 (bonus_gold 이벤트 활성 시만 표시) ──
+      if (this._eventBonusGold > 0) {
+        this.add.text(40, y, `이벤트 보너스: +${this._eventBonusGold} 골드`, {
+          fontSize: '14px', color: '#ffaa00',
+          stroke: '#000', strokeThickness: 2,
+        });
+        y += 22;
+      }
+
+      y += 8;
     }
 
     // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH

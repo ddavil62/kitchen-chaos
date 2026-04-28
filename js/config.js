@@ -253,6 +253,33 @@ export const FRESHNESS_WINDOW_MS = 5000; // 재료 신선도 유지 시간 (ms) 
 export const ENERGY_MAX             = 5;   // 최대 보유 에너지
 export const ENERGY_RECHARGE_MINUTES = 30; // 에너지 1개 충전에 필요한 분
 
+// ── Phase 88: 주간 이벤트 풀 ──
+/**
+ * 7일 주기 이벤트 정의.
+ * days: new Date().getDay() 값 배열 (0=일, 1=월, ..., 6=토).
+ * @type {Array<{ id: string, nameKo: string, descKo: string, days: number[] }>}
+ */
+export const WEEKLY_EVENT_POOL = [
+  {
+    id: 'bonus_gold',
+    nameKo: '황금 주방 주간',
+    descKo: '영업 수입 +50% 보너스!',
+    days: [5, 6, 0],   // 금, 토, 일
+  },
+  {
+    id: 'double_mission',
+    nameKo: '미션 더블 위크',
+    descKo: '일일 미션 보상 2배!',
+    days: [2, 3, 4],   // 화, 수, 목
+  },
+  {
+    id: 'energy_festival',
+    nameKo: '에너지 축제',
+    descKo: '스테이지 진입 에너지 무료!',
+    days: [1],          // 월
+  },
+];
+
 // ── Phase 69 (P1-4): 엔드리스 해금 조건 상수화 ──
 // SaveManager.commitStageResult()가 stageId === ENDLESS_UNLOCK_STAGE && stars > 0에서 해금하므로
 // UI 문구도 이 조건과 1:1 일치해야 한다. Phase 77: 24-6 → 6-6 완화.

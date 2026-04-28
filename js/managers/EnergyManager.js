@@ -8,6 +8,7 @@
 
 import { SaveManager } from './SaveManager.js';
 import { IAPManager } from './IAPManager.js';
+import { WeeklyEventManager } from './WeeklyEventManager.js';
 import { ENERGY_MAX, ENERGY_RECHARGE_MINUTES } from '../config.js';
 
 /** 1회 충전에 필요한 밀리초 */
@@ -97,6 +98,9 @@ export class EnergyManager {
    */
   static consume() {
     if (IAPManager.isAdsRemoved()) return true;
+
+    // ── Phase 88: 에너지 축제 이벤트 활성 시 소비 면제 ──
+    if (WeeklyEventManager.isActive('energy_festival')) return true;
 
     const state = EnergyManager._getState();
     if (state.energy < 1) return false;

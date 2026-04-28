@@ -46,6 +46,7 @@ import { AchievementManager } from '../managers/AchievementManager.js';
 import { WANDERING_CHEFS, getWanderingChefById } from '../data/wanderingChefData.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
+import { WeeklyEventManager } from '../managers/WeeklyEventManager.js';
 import { getCustomerProfile, CUSTOMER_PROFILE_MAP } from '../data/customerProfileData.js';
 
 // ── 레이아웃 상수 ──
@@ -2982,6 +2983,15 @@ export class ServiceScene extends Phaser.Scene {
       this.tipTotal  = Math.floor(this.tipTotal * goldMultiplier);
     }
 
+    // ── Phase 88: 황금 주방 주간 이벤트 — 영업 수입 +50% 보너스 ──
+    let eventBonusGold = 0;
+    if (WeeklyEventManager.isActive('bonus_gold')) {
+      eventBonusGold = Math.floor((this.totalGold + this.tipTotal) * 0.5);
+      if (eventBonusGold > 0) {
+        ToolManager.addGold(eventBonusGold);
+      }
+    }
+
     // Phase 13-2: 영업 수입을 영구 골드에 누적
     const earnedGold = this.totalGold + this.tipTotal;
     if (earnedGold > 0) {
@@ -3046,6 +3056,8 @@ export class ServiceScene extends Phaser.Scene {
             // ── Phase 76: 평론가/단골 결과 ──
             criticAvgScore: criticAvgScore,             // null이면 평론가 미등장
             regularAchieved: this._regularServedCount >= 5,
+            // ── Phase 88: 이벤트 보너스 골드 (0이면 미표시) ──
+            eventBonusGold: eventBonusGold,
           },
           isMarketFailed: false,
         });

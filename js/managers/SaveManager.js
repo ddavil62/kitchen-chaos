@@ -37,12 +37,13 @@
  * Phase 84: v28 마이그레이션 — unlockedSkins, equippedSkin 추가.
  * Phase 87: v29 마이그레이션 — energy, energyLastRecharge 필드 추가.
  *           getEnergy, setEnergyState 헬퍼 메서드 추가.
+ * Phase 88: v30 마이그레이션 — weeklyEvent.lastSeenEventId 필드 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 29;
+const SAVE_VERSION = 30;
 
 // ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
 const BACKUP_KEYS = [
@@ -187,6 +188,10 @@ function createDefault() {
     // ── Phase 87 추가: 에너지 시스템 ──
     energy: 5,                      // 현재 보유 에너지 (최대 5)
     energyLastRecharge: Date.now(), // 마지막 에너지 충전 기록 시각 (Unix ms)
+    // ── Phase 88 추가: 주간 이벤트 ──
+    weeklyEvent: {
+      lastSeenEventId: null,   // 향후 이벤트 팝업 기능용 예약 필드 (Phase 89+)
+    },
   };
 }
 
@@ -1675,6 +1680,16 @@ export class SaveManager {
       data.energy = data.energy ?? 5;
       data.energyLastRecharge = data.energyLastRecharge ?? Date.now();
       data.version = 29;
+    }
+
+    // v29 → v30: 주간 이벤트 시스템 추가 (Phase 88)
+    if (data.version < 30) {
+      if (!data.weeklyEvent) {
+        data.weeklyEvent = { lastSeenEventId: null };
+      } else if (data.weeklyEvent.lastSeenEventId === undefined) {
+        data.weeklyEvent.lastSeenEventId = null;
+      }
+      data.version = 30;
     }
 
     // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)
