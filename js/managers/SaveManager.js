@@ -38,12 +38,14 @@
  * Phase 87: v29 마이그레이션 — energy, energyLastRecharge 필드 추가.
  *           getEnergy, setEnergyState 헬퍼 메서드 추가.
  * Phase 88: v30 마이그레이션 — weeklyEvent.lastSeenEventId 필드 추가.
+ * Phase 89: v31 마이그레이션 — seasonPass 필드 추가.
+ *           getSeasonPass(), updateSeasonXP() 헬퍼 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 30;
+const SAVE_VERSION = 31;
 
 // ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
 const BACKUP_KEYS = [
@@ -191,6 +193,15 @@ function createDefault() {
     // ── Phase 88 추가: 주간 이벤트 ──
     weeklyEvent: {
       lastSeenEventId: null,   // 향후 이벤트 팝업 기능용 예약 필드 (Phase 89+)
+    },
+    // ── Phase 89 추가: 시즌 패스 ──
+    seasonPass: {
+      currentXP: 0,
+      currentTier: 0,
+      hasPaidPass: false,
+      claimedFree: [],
+      claimedPaid: [],
+      seasonId: 'S1',
     },
   };
 }
@@ -771,6 +782,35 @@ export class SaveManager {
     const data = SaveManager.load();
     data.energy = energy;
     data.energyLastRecharge = energyLastRecharge;
+    SaveManager.save(data);
+  }
+
+  // ── 시즌 패스 (Phase 89) ──
+
+  /**
+   * 시즌 패스 데이터를 반환한다.
+   * @returns {{ currentXP: number, currentTier: number, hasPaidPass: boolean, claimedFree: number[], claimedPaid: number[], seasonId: string }}
+   */
+  static getSeasonPass() {
+    const data = SaveManager.load();
+    return data.seasonPass ?? {
+      currentXP: 0, currentTier: 0, hasPaidPass: false,
+      claimedFree: [], claimedPaid: [], seasonId: 'S1',
+    };
+  }
+
+  /**
+   * 시즌 XP와 단계를 저장한다 (SeasonManager 전용 -- 직접 호출 금지).
+   * @param {number} currentXP
+   * @param {number} currentTier
+   */
+  static updateSeasonXP(currentXP, currentTier) {
+    const data = SaveManager.load();
+    if (!data.seasonPass) {
+      data.seasonPass = { currentXP: 0, currentTier: 0, hasPaidPass: false, claimedFree: [], claimedPaid: [], seasonId: 'S1' };
+    }
+    data.seasonPass.currentXP   = currentXP;
+    data.seasonPass.currentTier = currentTier;
     SaveManager.save(data);
   }
 
@@ -1690,6 +1730,29 @@ export class SaveManager {
         data.weeklyEvent.lastSeenEventId = null;
       }
       data.version = 30;
+    }
+
+    // v30 → v31: 시즌 패스 시스템 추가 (Phase 89)
+    if (data.version < 31) {
+      if (!data.seasonPass) {
+        data.seasonPass = {
+          currentXP: 0,
+          currentTier: 0,
+          hasPaidPass: false,
+          claimedFree: [],
+          claimedPaid: [],
+          seasonId: 'S1',
+        };
+      } else {
+        // 필드 누락 방어 (부분 마이그레이션 세이브 대비)
+        data.seasonPass.currentXP    = data.seasonPass.currentXP    ?? 0;
+        data.seasonPass.currentTier  = data.seasonPass.currentTier  ?? 0;
+        data.seasonPass.hasPaidPass  = data.seasonPass.hasPaidPass  ?? false;
+        data.seasonPass.claimedFree  = Array.isArray(data.seasonPass.claimedFree)  ? data.seasonPass.claimedFree  : [];
+        data.seasonPass.claimedPaid  = Array.isArray(data.seasonPass.claimedPaid)  ? data.seasonPass.claimedPaid  : [];
+        data.seasonPass.seasonId     = data.seasonPass.seasonId     ?? 'S1';
+      }
+      data.version = 31;
     }
 
     // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)

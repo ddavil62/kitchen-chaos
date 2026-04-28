@@ -22,6 +22,7 @@ import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
+import { SeasonManager } from '../managers/SeasonManager.js';
 import { AdManager } from '../managers/AdManager.js';
 
 // ── Phase 74: 셰프별 장보기 실패 대사 (P2-5) ──
@@ -372,6 +373,9 @@ export class ResultScene extends Phaser.Scene {
       if (satisfaction >= 95) {
         try { DailyMissionManager.recordProgress('perfect_satisfaction', 1); } catch { /* noop */ }
       }
+
+      // ── Phase 89: 시즌 패스 -- 스테이지 클리어 XP ──
+      try { SeasonManager.addXP('stage_clear', stars); } catch { /* noop */ }
 
       // ── Phase 58-3: 축복 'exp_gain' — 클리어 코인 +value 적용 ──
       // 활성 축복이 'exp_gain'일 때만 value(고정 +N)를 추가 지급한다. 없으면 0.

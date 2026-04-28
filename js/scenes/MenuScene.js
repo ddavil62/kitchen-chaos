@@ -25,6 +25,9 @@ import { DailyMissionManager } from '../managers/DailyMissionManager.js';
 import { LoginBonusManager, LOGIN_REWARDS } from '../managers/LoginBonusManager.js';
 import { EnergyManager } from '../managers/EnergyManager.js';
 import { WeeklyEventManager } from '../managers/WeeklyEventManager.js';
+import { SeasonManager } from '../managers/SeasonManager.js';
+import { IAPManager } from '../managers/IAPManager.js';
+import { SEASON_REWARD_ICON_MAP } from '../config.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -457,9 +460,9 @@ export class MenuScene extends Phaser.Scene {
       this._closeMissionModal();
     });
 
-    // ── 탭 버튼 ──
+    // ── 탭 버튼 (Phase 89: 2탭 → 3탭 확장) ──
     const TAB_Y = cy - MODAL_H / 2 + 36;
-    const TAB_W = 130;
+    const TAB_W = 90;
     const TAB_H = 28;
 
     // 컨텐츠 컨테이너 (탭 전환용)
@@ -467,43 +470,69 @@ export class MenuScene extends Phaser.Scene {
     container.add(this._missionTabContent);
 
     // 미션 탭
-    const missionTabBg = NineSliceFactory.raw(this, cx - 70, TAB_Y, TAB_W, TAB_H, 'tab_active');
-    const missionTabText = this.add.text(cx - 70, TAB_Y, '\uC624\uB298\uC758 \uBBF8\uC158', {
-      fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
+    const missionTabBg = NineSliceFactory.raw(this, cx - 100, TAB_Y, TAB_W, TAB_H, 'tab_active');
+    const missionTabText = this.add.text(cx - 100, TAB_Y, '\uBBF8\uC158', {
+      fontSize: '11px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5);
     container.add(missionTabBg);
     container.add(missionTabText);
 
     // 캘린더 탭
-    const calendarTabBg = NineSliceFactory.raw(this, cx + 70, TAB_Y, TAB_W, TAB_H, 'tab_inactive');
-    const calendarTabText = this.add.text(cx + 70, TAB_Y, '\uB85C\uADF8\uC778 \uBCF4\uB108\uC2A4', {
-      fontSize: '12px', fontStyle: 'bold', color: '#aaaaaa',
+    const calendarTabBg = NineSliceFactory.raw(this, cx, TAB_Y, TAB_W, TAB_H, 'tab_inactive');
+    const calendarTabText = this.add.text(cx, TAB_Y, '\uB85C\uADF8\uC778', {
+      fontSize: '11px', fontStyle: 'bold', color: '#aaaaaa',
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5);
     container.add(calendarTabBg);
     container.add(calendarTabText);
+
+    // 시즌 패스 탭 (Phase 89)
+    const seasonTabBg = NineSliceFactory.raw(this, cx + 100, TAB_Y, TAB_W, TAB_H, 'tab_inactive');
+    const seasonTabText = this.add.text(cx + 100, TAB_Y, '\uC2DC\uC98C \uD328\uC2A4', {
+      fontSize: '11px', fontStyle: 'bold', color: '#aaaaaa',
+      stroke: '#000', strokeThickness: 1,
+    }).setOrigin(0.5);
+    container.add(seasonTabBg);
+    container.add(seasonTabText);
 
     // 탭 상호작용
     const missionTabHit = new Phaser.Geom.Rectangle(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H);
     missionTabBg.setInteractive(missionTabHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     const calendarTabHit = new Phaser.Geom.Rectangle(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H);
     calendarTabBg.setInteractive(calendarTabHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    const seasonTabHit = new Phaser.Geom.Rectangle(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H);
+    seasonTabBg.setInteractive(seasonTabHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
 
-    const showMissionTab = () => {
-      missionTabBg.setTexture('ui_ns_tab_active');
-      missionTabText.setColor('#ffffff');
+    // 탭 활성/비활성 토글 헬퍼
+    const deactivateAllTabs = () => {
+      missionTabBg.setTexture('ui_ns_tab_inactive');
+      missionTabText.setColor('#aaaaaa');
       calendarTabBg.setTexture('ui_ns_tab_inactive');
       calendarTabText.setColor('#aaaaaa');
+      seasonTabBg.setTexture('ui_ns_tab_inactive');
+      seasonTabText.setColor('#aaaaaa');
+    };
+
+    const showMissionTab = () => {
+      deactivateAllTabs();
+      missionTabBg.setTexture('ui_ns_tab_active');
+      missionTabText.setColor('#ffffff');
       this._renderMissionTabContent(cx, cy, MODAL_W, MODAL_H);
     };
 
     const showCalendarTab = () => {
+      deactivateAllTabs();
       calendarTabBg.setTexture('ui_ns_tab_active');
       calendarTabText.setColor('#ffffff');
-      missionTabBg.setTexture('ui_ns_tab_inactive');
-      missionTabText.setColor('#aaaaaa');
       this._renderCalendarTabContent(cx, cy, MODAL_W, MODAL_H);
+    };
+
+    const showSeasonTab = () => {
+      deactivateAllTabs();
+      seasonTabBg.setTexture('ui_ns_tab_active');
+      seasonTabText.setColor('#ffffff');
+      this._renderSeasonPassTabContent(cx, cy, MODAL_W, MODAL_H);
     };
 
     missionTabBg.on('pointerdown', () => {
@@ -513,6 +542,10 @@ export class MenuScene extends Phaser.Scene {
     calendarTabBg.on('pointerdown', () => {
       SoundManager.playSFX('sfx_ui_tap');
       showCalendarTab();
+    });
+    seasonTabBg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      showSeasonTab();
     });
 
     // 기본 탭: 미션
@@ -781,6 +814,212 @@ export class MenuScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5);
     this._missionTabContent.add(dayLabel);
+  }
+
+  // ── Phase 89: 시즌 패스 탭 콘텐츠 ──────────────────────────────
+
+  /**
+   * 시즌 패스 탭 콘텐츠를 렌더링한다.
+   * 현재 단계, XP 진행 바, 보상 목록(현재 단계 +-5 범위), 유료 패스 구매 버튼을 표시한다.
+   * @param {number} cx - 모달 중심 X
+   * @param {number} cy - 모달 중심 Y
+   * @param {number} modalW - 모달 너비
+   * @param {number} modalH - 모달 높이
+   * @private
+   */
+  _renderSeasonPassTabContent(cx, cy, modalW, modalH) {
+    if (!this._missionTabContent) return;
+    this._missionTabContent.removeAll(true);
+
+    const state = SeasonManager.getState();
+    const { currentInTier, tierXP } = SeasonManager.getProgressInTier();
+    const startY = cy - modalH / 2 + 70;
+
+    // 시즌 타이틀
+    const titleText = this.add.text(cx, startY, `\uC2DC\uC98C \uD328\uC2A4 ${state.seasonId}`, {
+      fontSize: '15px', fontStyle: 'bold', color: '#ffdd88',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    this._missionTabContent.add(titleText);
+
+    // 단계 표시
+    const tierLabel = this.add.text(cx, startY + 20, `\uB2E8\uACC4 ${state.currentTier} / 50`, {
+      fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 1,
+    }).setOrigin(0.5);
+    this._missionTabContent.add(tierLabel);
+
+    // XP 진행 바
+    const barX = cx - 100;
+    const barY = startY + 40;
+    const barW = 200;
+    const barH = 14;
+
+    // 바 배경
+    const barBg = this.add.rectangle(barX + barW / 2, barY, barW, barH, 0x333333).setOrigin(0.5);
+    barBg.setStrokeStyle(1, 0x555555);
+    this._missionTabContent.add(barBg);
+
+    // 바 채우기
+    if (state.currentTier < 50 && tierXP > 0) {
+      const ratio = Math.min(1, currentInTier / tierXP);
+      if (ratio > 0) {
+        const fillW = barW * ratio;
+        const fillGfx = this.add.rectangle(barX + barW / 2 - (barW - fillW) / 2, barY, fillW, barH - 2, 0xffcc44).setOrigin(0.5);
+        this._missionTabContent.add(fillGfx);
+      }
+    } else if (state.currentTier >= 50) {
+      const fillGfx = this.add.rectangle(barX + barW / 2, barY, barW, barH - 2, 0x88ff88).setOrigin(0.5);
+      this._missionTabContent.add(fillGfx);
+    }
+
+    // XP 텍스트
+    const xpText = state.currentTier >= 50
+      ? 'MAX'
+      : `${currentInTier} / ${tierXP} XP`;
+    const xpLabel = this.add.text(cx, barY, xpText, {
+      fontSize: '10px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    this._missionTabContent.add(xpLabel);
+
+    // 유료 패스 구매 버튼 (미보유 시만)
+    let buyBtnH = 0;
+    if (!state.hasPaidPass) {
+      const btnY = startY + 60;
+      buyBtnH = 28;
+      const buyBg = NineSliceFactory.raw(this, cx, btnY, 160, buyBtnH, 'btn_primary_normal');
+      buyBg.setTint(0xcc6600);
+      const buyHit = new Phaser.Geom.Rectangle(-80, -buyBtnH / 2, 160, buyBtnH);
+      buyBg.setInteractive(buyHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      this._missionTabContent.add(buyBg);
+
+      const buyText = this.add.text(cx, btnY, '\uC720\uB8CC \uD328\uC2A4 \uAD6C\uB9E4', {
+        fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
+        stroke: '#000', strokeThickness: 1,
+      }).setOrigin(0.5);
+      this._missionTabContent.add(buyText);
+
+      buyBg.on('pointerdown', async () => {
+        SoundManager.playSFX('sfx_ui_tap');
+        await IAPManager.purchaseSeasonPass();
+        this._renderSeasonPassTabContent(cx, cy, modalW, modalH);
+      });
+    }
+
+    // 보상 목록 (현재 단계 기준 +-5 범위, 최대 11행)
+    const listStartY = startY + (buyBtnH > 0 ? 90 : 70);
+    const ROW_H = 30;
+    const minTier = Math.max(1, state.currentTier - 3);
+    const maxTier = Math.min(50, minTier + 10);
+    const visibleTiers = [];
+    for (let t = minTier; t <= maxTier; t++) visibleTiers.push(t);
+
+    for (let i = 0; i < visibleTiers.length; i++) {
+      const tier = visibleTiers[i];
+      const rowY = listStartY + i * ROW_H;
+
+      // 현재 열의 범위를 넘으면 중단
+      if (rowY > cy + modalH / 2 - 30) break;
+
+      const rewardDef = SeasonManager.getRewardDef(tier);
+      if (!rewardDef) continue;
+
+      const reached = state.currentTier >= tier;
+      const freeClaimed = state.claimedFree.includes(tier);
+      const paidClaimed = state.claimedPaid.includes(tier);
+
+      // 행 배경
+      const rowTint = reached ? (tier === state.currentTier ? 0x443300 : 0x2a2a2a) : 0x1a1a22;
+      const rowBg = this.add.rectangle(cx, rowY, modalW - 30, ROW_H - 2, rowTint, 0.7);
+      rowBg.setStrokeStyle(tier === state.currentTier ? 1 : 0, 0xffcc44, 0.5);
+      this._missionTabContent.add(rowBg);
+
+      // 단계 번호
+      const tierColor = reached ? '#ffcc44' : '#666666';
+      const tierNum = this.add.text(cx - modalW / 2 + 28, rowY, `${tier}`, {
+        fontSize: '11px', fontStyle: 'bold', color: tierColor,
+        stroke: '#000', strokeThickness: 1,
+      }).setOrigin(0.5);
+      this._missionTabContent.add(tierNum);
+
+      // 무료 보상 라벨
+      const freeLabel = this._getSeasonRewardShort(rewardDef.free);
+      const freeColor = freeClaimed ? '#88ff88' : reached ? '#ffffff' : '#888888';
+      const freeText = this.add.text(cx - 50, rowY, freeLabel, {
+        fontSize: '10px', color: freeColor,
+        stroke: '#000', strokeThickness: 1,
+      }).setOrigin(0.5);
+      this._missionTabContent.add(freeText);
+
+      // 유료 보상 라벨
+      const paidLabel = this._getSeasonRewardShort(rewardDef.paid);
+      const paidColor = !state.hasPaidPass ? '#555555' : paidClaimed ? '#88ff88' : reached ? '#ffaa44' : '#555555';
+      const paidText = this.add.text(cx + 50, rowY, paidLabel, {
+        fontSize: '10px', color: paidColor,
+        stroke: '#000', strokeThickness: 1,
+      }).setOrigin(0.5);
+      this._missionTabContent.add(paidText);
+
+      // 수령 버튼 (무료)
+      if (reached && !freeClaimed) {
+        const claimFreeBtn = this.add.text(cx + modalW / 2 - 40, rowY - 6, '\uC218\uB839', {
+          fontSize: '9px', fontStyle: 'bold', color: '#88ff88',
+          backgroundColor: '#225522', padding: { x: 4, y: 2 },
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        this._missionTabContent.add(claimFreeBtn);
+
+        claimFreeBtn.on('pointerdown', () => {
+          SoundManager.playSFX('sfx_ui_tap');
+          SeasonManager.claimReward(tier, 'free');
+          this._renderSeasonPassTabContent(cx, cy, modalW, modalH);
+        });
+      }
+
+      // 수령 버튼 (유료)
+      if (reached && !paidClaimed && state.hasPaidPass) {
+        const claimPaidBtn = this.add.text(cx + modalW / 2 - 40, rowY + 6, '\uC218\uB839', {
+          fontSize: '9px', fontStyle: 'bold', color: '#ffaa44',
+          backgroundColor: '#553300', padding: { x: 4, y: 2 },
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        this._missionTabContent.add(claimPaidBtn);
+
+        claimPaidBtn.on('pointerdown', () => {
+          SoundManager.playSFX('sfx_ui_tap');
+          SeasonManager.claimReward(tier, 'paid');
+          this._renderSeasonPassTabContent(cx, cy, modalW, modalH);
+        });
+      }
+    }
+
+    // 최하단 안내 텍스트
+    const guideY = cy + modalH / 2 - 18;
+    const guideText = this.add.text(cx, guideY, '\uC2A4\uD14C\uC774\uC9C0 \uD074\uB9AC\uC5B4 \u00B7 \uC77C\uC77C \uBBF8\uC158\uC73C\uB85C XP \uD68D\uB4DD', {
+      fontSize: '9px', color: '#888888',
+    }).setOrigin(0.5);
+    this._missionTabContent.add(guideText);
+  }
+
+  /**
+   * 시즌 보상을 짧은 라벨로 변환한다.
+   * @param {{ type: string, amount: number, extra?: object }} reward
+   * @returns {string}
+   * @private
+   */
+  _getSeasonRewardShort(reward) {
+    const TYPE_LABELS = {
+      gold: '\uACE8\uB4DC',
+      kitchenCoins: '\uCF54\uC778',
+      mireukEssence: '\uC815\uC218',
+      mimiSkinCoupon: '\uC2A4\uD0A8\uCFE0\uD3F0',
+    };
+    const label = TYPE_LABELS[reward.type] || reward.type;
+    let str = `${label} ${reward.amount}`;
+    if (reward.extra) {
+      const extraLabel = TYPE_LABELS[reward.extra.type] || reward.extra.type;
+      str += ` +${extraLabel} ${reward.extra.amount}`;
+    }
+    return str;
   }
 
   /**

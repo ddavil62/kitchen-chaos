@@ -285,3 +285,17 @@ export const WEEKLY_EVENT_POOL = [
 // UI 문구도 이 조건과 1:1 일치해야 한다. Phase 77: 24-6 → 6-6 완화.
 export const ENDLESS_UNLOCK_STAGE = '6-6';
 export const ENDLESS_LOCK_LABEL = `\uD83D\uDD12 \uC5D4\uB4DC\uB9AC\uC2A4 (${ENDLESS_UNLOCK_STAGE} \uD074\uB9AC\uC5B4 \uD544\uC694)`;
+
+// ── Phase 89: 시즌 패스 상품 ID 상수 ──
+// IAPManager에서 import하여 사용. 실제 스토어 등록 시 이 두 상수를 교체한다.
+export const SEASON_PASS_PRODUCT_ID = 'com.lazyslime.kitchenchaos.seasonpass';
+export const COIN_PACK_PRODUCT_ID   = 'com.lazyslime.kitchenchaos.coins.pack1';
+
+// ── Phase 89: 시즌 패스 보상 타입 → 아이콘 텍스처 키 맵 ──
+/** 시즌 패스 보상 타입 → 아이콘 텍스처 키 */
+export const SEASON_REWARD_ICON_MAP = {
+  gold:           'mission_icon_gold',
+  kitchenCoins:   'icon_reward_kitchencoin',
+  mireukEssence:  'icon_reward_mireuk',
+  mimiSkinCoupon: 'icon_reward_coupon',
+};

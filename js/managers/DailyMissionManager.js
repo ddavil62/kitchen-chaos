@@ -8,6 +8,7 @@
 
 import { SaveManager } from './SaveManager.js';
 import { WeeklyEventManager } from './WeeklyEventManager.js';
+import { SeasonManager } from './SeasonManager.js';
 
 // ── 일일 미션 풀 (20종) ──
 
@@ -214,5 +215,8 @@ export class DailyMissionManager {
       default:
         console.warn(`[DailyMissionManager] 알 수 없는 보상 타입: ${reward.type}`);
     }
+
+    // ── Phase 89: 시즌 패스 -- 일일 미션 완료 XP ──
+    try { SeasonManager.addXP('daily_mission', 1); } catch { /* noop */ }
   }
 }
