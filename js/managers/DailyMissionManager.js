@@ -137,6 +137,10 @@ export class DailyMissionManager {
       if (!dm || !dm.selected || dm.selected.length === 0) return;
 
       let changed = false;
+      // Phase 89: addXP는 SaveManager.save() 이후에 호출해야 data race를 방지한다.
+      // _grantReward가 data를 in-place 수정한 뒤 save가 일어나기 전에 addXP가
+      // 저장하면, 이후 save(data)가 addXP 결과를 덮어쓴다.
+      let completedCount = 0;
 
       for (const id of dm.selected) {
         const def = DAILY_MISSION_POOL.find((m) => m.id === id);
@@ -156,6 +160,7 @@ export class DailyMissionManager {
           dm.completed[id] = true;
           dm.claimed[id] = true;
           DailyMissionManager._grantReward(data, def.reward);
+          completedCount++;
           changed = true;
         } else {
           changed = true;
@@ -164,6 +169,11 @@ export class DailyMissionManager {
 
       if (changed) {
         SaveManager.save(data);
+      }
+
+      // save 이후에 addXP를 호출해야 data race 없이 XP가 올바르게 누적된다
+      for (let i = 0; i < completedCount; i++) {
+        try { SeasonManager.addXP('daily_mission', 1); } catch { /* noop */ }
       }
     } catch (e) {
       // 기존 흐름에 영향 없도록 조용히 실패
@@ -186,6 +196,8 @@ export class DailyMissionManager {
         DailyMissionManager._grantReward(data, def.reward);
         dm.claimed[missionId] = true;
         SaveManager.save(data);
+        // Phase 89: save 이후 addXP 호출 (data race 방지)
+        try { SeasonManager.addXP('daily_mission', 1); } catch { /* noop */ }
       }
     }
   }
@@ -216,7 +228,8 @@ export class DailyMissionManager {
         console.warn(`[DailyMissionManager] 알 수 없는 보상 타입: ${reward.type}`);
     }
 
-    // ── Phase 89: 시즌 패스 -- 일일 미션 완료 XP ──
-    try { SeasonManager.addXP('daily_mission', 1); } catch { /* noop */ }
+    // Phase 89: addXP는 save 이후 호출 측(recordProgress/claimReward)에서 처리한다.
+    // 여기서 호출하면 호출 측 SaveManager.save(data)가 addXP 결과를 덮어쓰는
+    // data race가 발생한다.
   }
 }
