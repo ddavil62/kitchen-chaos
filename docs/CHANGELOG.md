@@ -1,5 +1,53 @@
 # Changelog
 
+## [Phase 87] 2026-04-28 -- 에너지 시스템 도입
+
+### 개요
+
+스테이지/엔드리스 진입 시 에너지 1개를 소비하는 게이트 시스템 도입. EnergyManager 신규 생성, SaveManager v28→v29 마이그레이션, WorldMapScene 에너지 게이트 + 충전 모달, MenuScene HUD 2행 확장(에너지 표시 + 카운트다운 타이머).
+
+### Added
+
+- `js/managers/EnergyManager.js`: 신규 생성. 정적 클래스 패턴. `_getState`/`_saveState`, `applyAutoRecharge`, `getEnergy`, `getMax`, `canPlay`, `consume`, `addEnergy`, `getRechargeCountdown` 메서드
+- `js/config.js`: `ENERGY_MAX=5`, `ENERGY_RECHARGE_MINUTES=30` 상수 추가
+- `js/scenes/WorldMapScene.js`: `_openEnergyModal()`/`_closeEnergyModal()` 신규 메서드. 스테이지 시작 버튼 + 엔드리스 버튼에 에너지 게이트 로직 삽입. 충전 모달(광고 보기 버튼 + 닫기 버튼, 300ms debounce, 오버레이 클릭 닫기)
+- `js/scenes/MenuScene.js`: 리소스 HUD 2행 레이아웃 확장 (1행: 골드/코인/정수 y=92, 2행: 에너지 ⚡ N/5 y=112 + 카운트다운 타이머). `create()`에서 `EnergyManager.applyAutoRecharge()` 호출
+
+### Changed
+
+- `js/managers/SaveManager.js`: `SAVE_VERSION` 28→29. `createDefault()`에 `energy: 5`, `energyLastRecharge: Date.now()` 추가. v28→v29 마이그레이션 블록 추가. `getEnergy()`/`setEnergyState()` 헬퍼 메서드 추가
+
+### Fixed
+
+- `js/managers/EnergyManager.js:53,136`: `|| Date.now()` 연산자 사용으로 `energyLastRecharge === 0` 시 자동 충전 계산 우회되는 버그 수정 (`_getState()`가 이미 `??`로 null/undefined 처리하므로 `||` 폴백 제거, 직접 참조로 변경)
+
+### 스펙 대비 구현 차이
+
+- 없음 (AC-1~AC-7 전항 스펙과 일치)
+
+### 주요 수치
+
+- 에너지 최대: 5개 (`ENERGY_MAX`)
+- 자동 충전 주기: 30분 (`ENERGY_RECHARGE_MINUTES`)
+- 충전 방식: 재진입 시 경과 시간 일괄 계산 (리얼타임 인터벌 불사용)
+- IAPManager.isAdsRemoved() === true: 에너지 소비 면제
+- 카운트다운: MenuScene HUD에서 1초 주기 갱신 (Phaser time.addEvent)
+- v29 마이그레이션 기본값: energy=5, energyLastRecharge=Date.now()
+
+### QA 결과
+
+PASS (BUG-1 수정 후 최종 판정). 19건 (정상 12 + 예외 7). Playwright 13 통과 / 6 실패. AC-1~AC-7 전항 PASS (코드 리뷰 + Playwright 병행). 실패 6건: 테스트 인프라 클릭 좌표 불안정 4건 + BUG-1 수정 전 1건 + 기존 이슈(seenDialogues) 1건.
+
+BUG-1: `EnergyManager.js:53,136`의 `|| Date.now()` → `state.energyLastRecharge` 직접 참조로 수정 완료.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase87-scope.md`
+- 리포트: `.claude/specs/2026-04-28-kc-phase87-coder-report.md`
+- QA: `.claude/specs/2026-04-28-kc-phase87-qa.md`
+
+---
+
 ## [Phase 86] 2026-04-28 -- 미션 아이콘 완성 + updateMode 리팩토링
 
 ### 개요

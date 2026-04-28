@@ -50,7 +50,7 @@ export class EnergyManager {
     const state = EnergyManager._getState();
     if (state.energy >= ENERGY_MAX) return 0;
 
-    const elapsedMs = Date.now() - (state.energyLastRecharge || Date.now());
+    const elapsedMs = Date.now() - state.energyLastRecharge;
     const elapsedCharge = Math.floor(elapsedMs / RECHARGE_MS);
     if (elapsedCharge <= 0) return 0;
 
@@ -133,7 +133,7 @@ export class EnergyManager {
     const state = EnergyManager._getState();
     if (state.energy >= ENERGY_MAX) return 0;
 
-    const elapsedMs = Date.now() - (state.energyLastRecharge || Date.now());
+    const elapsedMs = Date.now() - state.energyLastRecharge;
     const remainMs = RECHARGE_MS - (elapsedMs % RECHARGE_MS);
     return Math.max(0, Math.ceil(remainMs / 1000));
   }
