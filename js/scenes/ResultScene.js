@@ -8,6 +8,7 @@
  *
  * 화면 구성:
  *   타이틀 → 장보기 결과 → 영업 결과 → 평가(별점) → 보상 → 버튼
+ * Phase 82: 재클리어(totalCoinsEarned=0) 시 "재클리어 (추가 보상 없음)" 문구 표시.
  */
 
 import Phaser from 'phaser';
@@ -516,13 +517,19 @@ export class ResultScene extends Phaser.Scene {
     });
     y += 26;
 
-    let rewardText = `+${totalCoinsEarned} 코인`;
-    if (isFirstClear && stars > 0) {
-      rewardText += ' (첫 클리어 보너스 포함!)';
-    }
-    // Phase 58-3: 축복 경험치 보너스 표시
-    if (blessingCoinBonus > 0) {
-      rewardText += ` [미력의 축복 +${blessingCoinBonus}]`;
+    // Phase 82: 재클리어(동일·하위 별점) 시 보상 없음 문구 분기
+    let rewardText;
+    if (totalCoinsEarned === 0 && stars > 0) {
+      rewardText = '재클리어 (추가 보상 없음)';
+    } else {
+      rewardText = `+${totalCoinsEarned} 코인`;
+      if (isFirstClear && stars > 0) {
+        rewardText += ' (첫 클리어 보너스 포함!)';
+      }
+      // Phase 58-3: 축복 경험치 보너스 표시
+      if (blessingCoinBonus > 0) {
+        rewardText += ` [미력의 축복 +${blessingCoinBonus}]`;
+      }
     }
     this.add.text(40, y, rewardText, {
       fontSize: '15px', fontStyle: 'bold', color: '#ffcc00',

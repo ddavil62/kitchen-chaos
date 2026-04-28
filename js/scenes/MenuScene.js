@@ -9,6 +9,7 @@
  * Phase 73: 설정 패널에 세이브 복구 버튼 + 백업 목록/확인 모달 추가.
  * Phase 75B: "오늘의 미션" 배너 + 미션/캘린더 통합 팝업 모달 추가.
  *            기존 요소 y좌표 +60px 하향 조정.
+ * Phase 82: 리소스 HUD 추가 (골드/코인/미력의 정수 상시 표시, y=100).
  */
 
 import Phaser from 'phaser';
@@ -44,6 +45,9 @@ export class MenuScene extends Phaser.Scene {
 
     // ── Phase 75B: "오늘의 미션" 배너 (y=30~60 영역) ──
     this._createMissionBanner();
+
+    // ── Phase 82: 리소스 HUD (배너 하단 y=72 → y=100) ──
+    this._createResourceHUD();
 
     // Phase 61: 타이틀 로고 이미지로 교체 (기존 텍스트 3줄 titleBlock 제거)
     // Phase 62: 후광 번짐 완화를 위해 최대 폭 320 → 296 (0.925배 축소)
@@ -229,6 +233,37 @@ export class MenuScene extends Phaser.Scene {
 
     // ── Phase 11-3b: 씬 전환 fadeIn 일관 적용 (300ms) ──
     this.cameras.main.fadeIn(300, 0, 0, 0);
+  }
+
+  // ── Phase 82: 리소스 HUD ─────────────────────────────────────────
+
+  /**
+   * 메뉴 상단(배너 하단)에 골드·코인·미력의 정수 보유량을 표시하는 정적 HUD를 생성한다.
+   * 미션 배너(y=72 하단)와 타이틀 로고(y≈230) 사이 여백(y=100)에 배치한다.
+   * @private
+   */
+  _createResourceHUD() {
+    const HUD_Y = 100;
+    const gold = SaveManager.getGold();
+    const coins = SaveManager.getCoins();
+    const essence = SaveManager.getMireukEssence();
+
+    const colXs = [GAME_WIDTH / 6, GAME_WIDTH / 2, GAME_WIDTH * 5 / 6];
+    const labels = [
+      `\uD83D\uDCB0 ${gold.toLocaleString()}`,
+      `\uD83E\uDE99 ${coins}`,
+      `\u2728 ${essence}`,
+    ];
+    const colors = ['#ffd700', '#aaddff', '#cc88ff'];
+
+    labels.forEach((text, i) => {
+      this.add.text(colXs[i], HUD_Y, text, {
+        fontSize: '12px',
+        color: colors[i],
+        stroke: '#000000',
+        strokeThickness: 2,
+      }).setOrigin(0.5);
+    });
   }
 
   // ── Phase 75B: 오늘의 미션 배너 ──────────────────────────────────

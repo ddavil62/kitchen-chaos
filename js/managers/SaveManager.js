@@ -33,6 +33,7 @@
  * Phase 76: v26 마이그레이션 — 손님 프로필 시스템 (regularCustomerProgress, criticPenaltyActive).
  *           getRegularProgress, setRegularProgress, getCriticPenalty, setCriticPenalty 헬퍼 추가.
  * Phase 77: v27 마이그레이션 — 엔드리스 해금 조건 24-6 → 6-6 완화.
+ * Phase 82: clearStage() 재클리어 코인 지급 0으로 변경 (최초 달성·별점 상향 시만 보상).
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
@@ -288,6 +289,7 @@ export class SaveManager {
    *   - ★ +5, ★★ +10, ★★★ +15
    *   - 첫 클리어 보너스: +5
    *   - 이미 획득한 별점분은 중복 지급하지 않음
+   *   - Phase 82: 재클리어(동일·하위 별점) 시 지급 없음 (0)
    * @param {string} stageId
    * @param {number} stars - 1~3
    * @returns {number} 이번에 지급된 코인 수
@@ -314,8 +316,8 @@ export class SaveManager {
       // 더 높은 별점: 차이분 보상
       coinsEarned = (coinByStars[stars] || 0) - (coinByStars[prevStars] || 0);
     } else {
-      // 재클리어: 별점 기반 소량 보상
-      coinsEarned = Math.max(1, Math.floor((coinByStars[stars] || 0) * 0.2));
+      // Phase 82: 재클리어 — 보상 없음 (최초 달성·별점 상향 시만 보상)
+      coinsEarned = 0;
     }
 
     // ── Phase 11-1: 엔드리스 해금 기준 스테이지(6-6) 클리어 시 엔드리스 해금 ──
