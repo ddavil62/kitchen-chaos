@@ -1,5 +1,45 @@
 # Changelog
 
+## [Phase 86] 2026-04-28 -- 미션 아이콘 완성 + updateMode 리팩토링
+
+### 개요
+
+Phase 85에서 추가된 신규 미션 타입 3종(vip_serve, combo_reach, gold_single_run)에 전용 아이콘 3종을 생성하여 BootScene/MenuScene에 등록. DailyMissionManager의 recordProgress 내부 하드코딩 includes 배열을 POOL 항목의 updateMode 필드 참조 방식으로 리팩토링.
+
+### Added
+
+- `assets/sprites/ui/missions/mission_icon_vip_serve.png`: VIP 손님 전용 아이콘 (32x32 금색 왕관, 투명 배경, 픽셀아트)
+- `assets/sprites/ui/missions/mission_icon_combo.png`: 콤보 도달 전용 아이콘 (32x32 번개 볼트, 투명 배경, 픽셀아트)
+- `assets/sprites/ui/missions/mission_icon_gold_run.png`: 한 판 골드 전용 아이콘 (32x32 금화, 투명 배경, 픽셀아트)
+- `js/scenes/BootScene.js`: MISSION_ICONS 배열에 `mission_icon_vip_serve`, `mission_icon_combo`, `mission_icon_gold_run` 3종 키 등록 (preload 연동, 라인 74~75)
+- `js/scenes/MenuScene.js`: ICON_MAP에 `vip_serve: 'mission_icon_vip_serve'`, `combo_reach: 'mission_icon_combo'`, `gold_single_run: 'mission_icon_gold_run'` 3종 타입-텍스처 매핑 추가 (라인 444~447)
+
+### Changed
+
+- `js/managers/DailyMissionManager.js`: DAILY_MISSION_POOL 전체 20개 항목에 `updateMode` 필드 추가 (max 4종: endless_wave_5/endless_wave_10/combo_reach_5/gold_single_run_800, sum 16종: 나머지)
+- `js/managers/DailyMissionManager.js`: recordProgress 갱신 방식 리팩토링 -- `['endless_wave', 'combo_reach', 'gold_single_run'].includes(def.type)` 하드코딩 배열 제거 → `(def.updateMode ?? 'sum') === 'max'` 필드 참조로 교체 (라인 146). nullish coalescing 방어 로직으로 updateMode 미설정 시 'sum' 폴백
+- `js/managers/DailyMissionManager.js`: JSDoc @type 어노테이션에 `updateMode: string` 추가
+
+### 스펙 대비 구현 차이
+
+- 없음 (스펙과 정확히 일치)
+
+### QA 결과
+
+PASS. 12건 (정상 8 + 예외 4) + 코드 정적 분석 5항목. Playwright 6 통과 / 6 실패 (전부 인프라 타임아웃+기존 이슈). AC-1~AC-5 전항 PASS. 코드 버그 0건.
+
+Phase 85 QA에서 지적된 LOW 이슈 2건 해결:
+- MenuScene ICON_MAP에 신규 타입 3종 미등록 → Phase 86에서 전용 아이콘 매핑 추가
+- recordProgress max 갱신 타입 하드코딩 → Phase 86에서 updateMode 필드 기반 리팩토링 완료
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase86-scope.md`
+- 리포트: `.claude/specs/2026-04-28-kc-phase86-coder-report.md`
+- QA: `.claude/specs/2026-04-28-kc-phase86-qa.md`
+
+---
+
 ## [Phase 85] 2026-04-28 -- 일일 미션 풀 확장
 
 ### 개요

@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon — 로드맵
 
-> 최종 업데이트: 2026-04-28 (Phase 85 완료)
+> 최종 업데이트: 2026-04-28 (Phase 86 완료)
 
 ---
 
@@ -99,6 +99,7 @@
 | Phase 83 | TD 씬 배치 피드백 개선 (배치 가능 셀 하이라이트, 사거리 미리보기, 웨이브 카운트다운) | ✅ |
 | Phase 84 | 셰프 스킨 시스템 (SkinManager, 미미 스킨 3종, ChefSelectScene UI, IAP 스텁) | ✅ |
 | Phase 85 | 일일 미션 풀 확장 (DAILY_MISSION_POOL 10종 → 20종, vip_serve/combo_reach/gold_single_run 타입 추가) | ✅ |
+| Phase 86 | 미션 아이콘 완성 + updateMode 리팩토링 (신규 3종 전용 아이콘, recordProgress 필드 기반 갱신) | ✅ |
 
 ---
 
@@ -106,7 +107,6 @@
 
 | Phase | 트랙 | 내용 |
 |-------|------|------|
-| Phase 86 | P6 | 메타 업그레이드 확장 (4종 → 20종, 채집/영업/경제 3카테고리 탭) |
 | Phase 87 | P6 | 에너지 시스템 도입 (최대 5개, 30분 자동 충전, 리워드 광고 즉시 충전) |
 | Phase 88 | P6 | 주간 이벤트 시스템 프레임워크 (WeeklyEventManager, 이벤트 3종) |
 | Phase 89 | P6 | 시즌 패스 + IAP 팩 (SeasonManager 50단계, IAP 5종, 메뉴 진행 배너) |

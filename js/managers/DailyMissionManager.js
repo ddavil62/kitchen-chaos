@@ -10,29 +10,29 @@ import { SaveManager } from './SaveManager.js';
 
 // ── 일일 미션 풀 (20종) ──
 
-/** @type {Array<{id: string, type: string, descKo: string, target: number, reward: {type: string, amount: number}}>} */
+/** @type {Array<{id: string, type: string, updateMode: string, descKo: string, target: number, reward: {type: string, amount: number}}>} */
 const DAILY_MISSION_POOL = [
-  { id: 'stage_clear_3',          type: 'stage_clear',          descKo: '스테이지 3회 클리어',       target: 3,    reward: { type: 'gold', amount: 200 } },
-  { id: 'stage_clear_5',          type: 'stage_clear',          descKo: '스테이지 5회 클리어',       target: 5,    reward: { type: 'gold', amount: 400 } },
-  { id: 'gold_earn_500',          type: 'gold_earn',            descKo: '골드 500 획득',             target: 500,  reward: { type: 'kitchenCoins', amount: 3 } },
-  { id: 'gold_earn_1000',         type: 'gold_earn',            descKo: '골드 1000 획득',            target: 1000, reward: { type: 'kitchenCoins', amount: 6 } },
-  { id: 'orders_complete_10',     type: 'orders_complete',      descKo: '주문 10건 완료',            target: 10,   reward: { type: 'kitchenCoins', amount: 2 } },
-  { id: 'orders_complete_20',     type: 'orders_complete',      descKo: '주문 20건 완료',            target: 20,   reward: { type: 'kitchenCoins', amount: 5 } },
-  { id: 'perfect_satisfaction_1', type: 'perfect_satisfaction', descKo: '만족도 95% 이상 1회 달성', target: 1,    reward: { type: 'mireukEssence', amount: 5 } },
-  { id: 'endless_wave_5',         type: 'endless_wave',         descKo: '엔드리스 웨이브 5 이상 도달', target: 5, reward: { type: 'mireukEssence', amount: 10 } },
-  { id: 'gather_run_2',           type: 'gather_run',           descKo: '장보기 2회 진행',           target: 2,    reward: { type: 'kitchenCoins', amount: 3 } },
-  { id: 'three_star_1',           type: 'three_star',           descKo: '별 3개 클리어 1회',         target: 1,    reward: { type: 'gold', amount: 150 } },
+  { id: 'stage_clear_3',          type: 'stage_clear',          updateMode: 'sum', descKo: '스테이지 3회 클리어',       target: 3,    reward: { type: 'gold', amount: 200 } },
+  { id: 'stage_clear_5',          type: 'stage_clear',          updateMode: 'sum', descKo: '스테이지 5회 클리어',       target: 5,    reward: { type: 'gold', amount: 400 } },
+  { id: 'gold_earn_500',          type: 'gold_earn',            updateMode: 'sum', descKo: '골드 500 획득',             target: 500,  reward: { type: 'kitchenCoins', amount: 3 } },
+  { id: 'gold_earn_1000',         type: 'gold_earn',            updateMode: 'sum', descKo: '골드 1000 획득',            target: 1000, reward: { type: 'kitchenCoins', amount: 6 } },
+  { id: 'orders_complete_10',     type: 'orders_complete',      updateMode: 'sum', descKo: '주문 10건 완료',            target: 10,   reward: { type: 'kitchenCoins', amount: 2 } },
+  { id: 'orders_complete_20',     type: 'orders_complete',      updateMode: 'sum', descKo: '주문 20건 완료',            target: 20,   reward: { type: 'kitchenCoins', amount: 5 } },
+  { id: 'perfect_satisfaction_1', type: 'perfect_satisfaction', updateMode: 'sum', descKo: '만족도 95% 이상 1회 달성', target: 1,    reward: { type: 'mireukEssence', amount: 5 } },
+  { id: 'endless_wave_5',         type: 'endless_wave',         updateMode: 'max', descKo: '엔드리스 웨이브 5 이상 도달', target: 5, reward: { type: 'mireukEssence', amount: 10 } },
+  { id: 'gather_run_2',           type: 'gather_run',           updateMode: 'sum', descKo: '장보기 2회 진행',           target: 2,    reward: { type: 'kitchenCoins', amount: 3 } },
+  { id: 'three_star_1',           type: 'three_star',           updateMode: 'sum', descKo: '별 3개 클리어 1회',         target: 1,    reward: { type: 'gold', amount: 150 } },
   // ── 추가 10종 (Phase 85) ──
-  { id: 'stage_clear_7',          type: 'stage_clear',          descKo: '스테이지 7회 클리어',             target: 7,    reward: { type: 'gold', amount: 600 } },
-  { id: 'stage_clear_10',         type: 'stage_clear',          descKo: '스테이지 10회 클리어',            target: 10,   reward: { type: 'kitchenCoins', amount: 10 } },
-  { id: 'orders_complete_30',     type: 'orders_complete',      descKo: '주문 30건 완료',                  target: 30,   reward: { type: 'kitchenCoins', amount: 8 } },
-  { id: 'orders_complete_50',     type: 'orders_complete',      descKo: '주문 50건 완료',                  target: 50,   reward: { type: 'mireukEssence', amount: 15 } },
-  { id: 'three_star_3',           type: 'three_star',           descKo: '별 3개 클리어 3회',               target: 3,    reward: { type: 'gold', amount: 300 } },
-  { id: 'endless_wave_10',        type: 'endless_wave',         descKo: '엔드리스 웨이브 10 이상 도달',    target: 10,   reward: { type: 'mireukEssence', amount: 20 } },
-  { id: 'vip_serve_3',            type: 'vip_serve',            descKo: 'VIP 손님 3명 서빙',              target: 3,    reward: { type: 'gold', amount: 250 } },
-  { id: 'vip_serve_5',            type: 'vip_serve',            descKo: 'VIP 손님 5명 서빙',              target: 5,    reward: { type: 'kitchenCoins', amount: 5 } },
-  { id: 'combo_reach_5',          type: 'combo_reach',          descKo: '콤보 5 이상 달성',               target: 5,    reward: { type: 'kitchenCoins', amount: 4 } },
-  { id: 'gold_single_run_800',    type: 'gold_single_run',      descKo: '영업 한 판에 골드 800 이상 획득', target: 800,  reward: { type: 'kitchenCoins', amount: 6 } },
+  { id: 'stage_clear_7',          type: 'stage_clear',          updateMode: 'sum', descKo: '스테이지 7회 클리어',             target: 7,    reward: { type: 'gold', amount: 600 } },
+  { id: 'stage_clear_10',         type: 'stage_clear',          updateMode: 'sum', descKo: '스테이지 10회 클리어',            target: 10,   reward: { type: 'kitchenCoins', amount: 10 } },
+  { id: 'orders_complete_30',     type: 'orders_complete',      updateMode: 'sum', descKo: '주문 30건 완료',                  target: 30,   reward: { type: 'kitchenCoins', amount: 8 } },
+  { id: 'orders_complete_50',     type: 'orders_complete',      updateMode: 'sum', descKo: '주문 50건 완료',                  target: 50,   reward: { type: 'mireukEssence', amount: 15 } },
+  { id: 'three_star_3',           type: 'three_star',           updateMode: 'sum', descKo: '별 3개 클리어 3회',               target: 3,    reward: { type: 'gold', amount: 300 } },
+  { id: 'endless_wave_10',        type: 'endless_wave',         updateMode: 'max', descKo: '엔드리스 웨이브 10 이상 도달',    target: 10,   reward: { type: 'mireukEssence', amount: 20 } },
+  { id: 'vip_serve_3',            type: 'vip_serve',            updateMode: 'sum', descKo: 'VIP 손님 3명 서빙',              target: 3,    reward: { type: 'gold', amount: 250 } },
+  { id: 'vip_serve_5',            type: 'vip_serve',            updateMode: 'sum', descKo: 'VIP 손님 5명 서빙',              target: 5,    reward: { type: 'kitchenCoins', amount: 5 } },
+  { id: 'combo_reach_5',          type: 'combo_reach',          updateMode: 'max', descKo: '콤보 5 이상 달성',               target: 5,    reward: { type: 'kitchenCoins', amount: 4 } },
+  { id: 'gold_single_run_800',    type: 'gold_single_run',      updateMode: 'max', descKo: '영업 한 판에 골드 800 이상 획득', target: 800,  reward: { type: 'kitchenCoins', amount: 6 } },
 ];
 
 /** 오늘 선정할 미션 수 */
@@ -123,7 +123,7 @@ export class DailyMissionManager {
   /**
    * 미션 진행도를 기록한다.
    * type string으로 호출하며, 당일 선정 미션 중 해당 type 항목에 delta를 적용한다.
-   * endless_wave/combo_reach/gold_single_run type은 Math.max 갱신 방식, 그 외는 += 누적.
+   * updateMode: 'max' 항목은 Math.max 갱신 방식, 'sum' 항목은 += 누적.
    * 목표 달성 시 자동으로 완료 처리 + 보상 즉시 지급.
    * @param {string} missionType - 미션 type (예: 'stage_clear', 'gold_earn')
    * @param {number} delta - 진행도 증가량 (endless_wave는 현재 웨이브 번호)
@@ -142,8 +142,8 @@ export class DailyMissionManager {
         if (dm.completed[id]) continue; // 이미 완료된 미션은 건너뜀
 
         // 진행도 갱신
-        // combo_reach, gold_single_run은 누적 합산이 아닌 최고값(max) 갱신 방식
-        if (['endless_wave', 'combo_reach', 'gold_single_run'].includes(def.type)) {
+        // updateMode가 없는 항목은 방어적으로 'sum'으로 처리
+        if ((def.updateMode ?? 'sum') === 'max') {
           dm.progress[id] = Math.max(dm.progress[id] || 0, delta);
         } else {
           dm.progress[id] = (dm.progress[id] || 0) + delta;

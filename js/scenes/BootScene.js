@@ -71,6 +71,8 @@ export class BootScene extends Phaser.Scene {
       'mission_icon_recipe', 'mission_icon_endless', 'mission_icon_satisfaction',
       'mission_icon_three_star', 'calendar_slot_locked', 'calendar_slot_claimed',
       'calendar_slot_today',
+      // Phase 86 — 신규 미션 타입 아이콘
+      'mission_icon_vip_serve', 'mission_icon_combo', 'mission_icon_gold_run',
       // Phase 75B 핫픽스 — 보상 카드 아이콘 (20×20)
       'icon_reward_kitchencoin', 'icon_reward_mireuk', 'icon_reward_coupon',
     ];

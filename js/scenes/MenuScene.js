@@ -441,6 +441,10 @@ export class MenuScene extends Phaser.Scene {
       endless_wave: 'mission_icon_endless',
       gather_run: 'mission_icon_recipe',
       three_star: 'mission_icon_three_star',
+      // Phase 86 — 신규 미션 타입
+      vip_serve: 'mission_icon_vip_serve',
+      combo_reach: 'mission_icon_combo',
+      gold_single_run: 'mission_icon_gold_run',
     };
 
     if (missions.length === 0) {
