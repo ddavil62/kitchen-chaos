@@ -1,5 +1,61 @@
 # Changelog
 
+## [Phase 83] 2026-04-28 -- TD 씬 배치 피드백 개선
+
+### 개요
+
+GatheringScene에 3가지 배치 피드백 UX 개선을 추가: 팔레트 도구 선택 시 배치 가능 셀 하이라이트, 배치된 도구 탭 시 사거리 미리보기 링, 웨이브 시작 전 카운트다운 애니메이션.
+
+### Added
+
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_showPlaceableOverlay()` / `_hidePlaceableOverlay()` 메서드 추가. 팔레트 도구 선택 시 비경로/비점유 셀 전체에 초록 다이아몬드 오버레이(0x44ff88, fill alpha 0.20, line alpha 0.55) 표시. depth 5 (기존 `_showMoveOverlay`와 동일, 상호 배타). `this._placeableOverlays` 배열로 관리
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_showRangeRing(tower)` / `_hideRangeRing()` 메서드 추가. 배치된 도구 탭 선택 시 `tower.range * rangeMultiplier` 반경의 반투명 사거리 원(stroke 0x88ffcc alpha 0.55, fill 0x44ff88 alpha 0.06) 표시. depth 4. `this._rangeRingGfx` Graphics 오브젝트로 관리
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_startCountdown(callback)` 메서드 추가. steps=['3','2','1','GO!'], STEP_DURATION=800ms. 스케일 1.4->1.0 + alpha 페이드 tween 애니메이션. 카운트다운 중 `_setWaveButtonEnabled(false)` 비활성화, 완료 후 callback 호출
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_countdownText` UI 오브젝트 생성 (fontSize 64px bold, color #ffffff, stroke #000000/6px, depth 3000, setScrollFactor(0), 평소 숨김)
+
+### Changed
+
+- `kitchen-chaos/js/scenes/GatheringScene.js`: 팔레트 버튼 pointerdown 핸들러에 `_showPlaceableOverlay()` / `_hidePlaceableOverlay()` 호출 추가 (도구 선택/해제 연동)
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_placeTower()` 배치 성공 후 수량 소진 시 `_hidePlaceableOverlay()` 호출, 잔여 수량 시 `_showPlaceableOverlay()` 재계산
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_selectTower()` 내 `_showMoveOverlay()` 뒤에 `_showRangeRing(tower)` 호출 추가
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_deselectTower()` 내 `_hideMoveOverlay()` 뒤에 `_hidePlaceableOverlay()` + `_hideRangeRing()` 호출 추가
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `_createWaveButton()` 내 pointerdown 핸들러를 `_startCountdown()` 래핑으로 변경 (직접 `startNextWave()` 호출 -> 카운트다운 완료 후 호출)
+- `kitchen-chaos/js/scenes/GatheringScene.js`: shutdown 정리에 `_hidePlaceableOverlay()` + `_hideRangeRing()` + `_countdownText.destroy()` 추가
+
+### 수치
+
+- 배치 가능 오버레이: fill 0x44ff88 alpha 0.20, line 0x44ff88 alpha 0.55, depth 5
+- 이동 가능 오버레이(기존): fill 0x44ff88 alpha 0.25, line 0x44ff88 alpha 0.6, depth 5 (미수정)
+- 사거리 링: stroke 0x88ffcc alpha 0.55 lineWidth 1.5, fill 0x44ff88 alpha 0.06, depth 4
+- 카운트다운: 64px bold, stroke 6px, depth 3000, Y=GAME_HEIGHT/2-30=290
+- 카운트다운 총 소요: 약 3.2초 (800ms x 4 steps)
+- Tower.range 범위: 90~150px (gameData.js 기준)
+
+### 스펙 대비 구현 차이
+
+- 없음 (플래너 스펙과 정확히 일치)
+
+### QA 결과
+
+PASS. 36건 (정상 19 + 예외 6 + 시각 3 + depth/안정성 4 + 상호배타 2). 36/36 통과. AC-1~AC-5 전항 PASS. 제품 코드 버그 0건.
+
+LOW 이슈 2건 (수정 불필요):
+- `_countdownText` destroyed 오브젝트 접근 극단적 타이밍 가능성 (`tweens.killAll()` 선행으로 실질적 위험 없음)
+- strokeThickness 6px 기존 최대 4px 불일치 (64px 폰트 대비 허용 범위)
+
+### AD 모드 3
+
+APPROVED. 11 PASS / 2 WARN. WARN: strokeThickness 6px (기존 패턴 4px, 카운트다운 특수 목적으로 허용), 색상 하드코딩 (기존 `_showMoveOverlay` 동일 패턴, 일관성 유지). 배치 오버레이/사거리 링/카운트다운 depth 계층 정합성 검증 완료. 상호 배타 로직 코드 레벨 검증 완료.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase83-scope.md`
+- 플랜: `.claude/specs/2026-04-28-kc-phase83-planner.md`
+- AD3: `.claude/specs/2026-04-28-kc-phase83-ad3.md`
+- QA: `.claude/specs/2026-04-28-kc-phase83-qa.md`
+
+---
+
 ## [Phase 82] 2026-04-28 -- MenuScene 리소스 HUD + 별점 보상 코인 정책 정비
 
 ### 개요
