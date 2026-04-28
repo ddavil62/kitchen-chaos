@@ -83,11 +83,13 @@ export class EnergyManager {
 
   /**
    * 플레이 가능 여부를 반환한다.
-   * 광고 제거 구매자이거나 에너지가 1 이상이면 true.
+   * 광고 제거 구매자, 에너지 축제 이벤트 활성, 또는 에너지가 1 이상이면 true.
    * @returns {boolean}
    */
   static canPlay() {
     if (IAPManager.isAdsRemoved()) return true;
+    // Phase 88: 에너지 축제 이벤트 활성 시 에너지 0이어도 진입 가능
+    if (WeeklyEventManager.isActive('energy_festival')) return true;
     return EnergyManager._getState().energy >= 1;
   }
 

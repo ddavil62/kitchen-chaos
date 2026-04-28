@@ -1,5 +1,58 @@
 # Changelog
 
+## [Phase 88] 2026-04-28 -- 주간 이벤트 시스템 프레임워크
+
+### 개요
+
+7일 주기 주간 이벤트 시스템 도입. WeeklyEventManager 정적 클래스 신규 생성, config.js에 WEEKLY_EVENT_POOL 이벤트 3종 정의(bonus_gold/double_mission/energy_festival). EnergyManager, DailyMissionManager, ServiceScene과 연동. MenuScene 이벤트 배너, ResultScene 이벤트 보너스 골드 표시. SaveManager v29->v30 마이그레이션(weeklyEvent 필드).
+
+### Added
+
+- `js/managers/WeeklyEventManager.js`: 신규 생성. 정적 클래스, `getActiveEvent()`/`isActive()` 메서드. config.js `WEEKLY_EVENT_POOL`만 참조 (순환 참조 없음)
+- `js/config.js`: `WEEKLY_EVENT_POOL` 상수 추가 (이벤트 3종 정의)
+- `js/scenes/MenuScene.js`: `_createWeeklyEventBanner()` 메서드 신규 추가 (y=74 소형 배너, 녹색 0x228844 tint, 11px bold 흰색 텍스트)
+- `js/scenes/ResultScene.js`: 이벤트 보너스 골드 항목 조건부 표시 (`eventBonusGold > 0` 시 "이벤트 보너스: +N 골드")
+- `js/scenes/ServiceScene.js`: `_endService()`에 bonus_gold 보너스 계산 (totalGold * 0.5), `eventBonusGold` 필드 ResultScene 전환 데이터에 추가
+
+### Changed
+
+- `js/managers/SaveManager.js`: `SAVE_VERSION` 29->30. `createDefault()`에 `weeklyEvent: { lastSeenEventId: null }` 추가. `_migrate()`에 v30 블록 삽입
+- `js/managers/EnergyManager.js`: `consume()` + `canPlay()`에 `energy_festival` 활성 시 에너지 소비 면제 로직 추가
+- `js/managers/DailyMissionManager.js`: `_grantReward()`에 `double_mission` 활성 시 보상 2배 배율(multiplier=2) 적용
+
+### Fixed
+
+- `EnergyManager.js:canPlay()`: `energy_festival` 이벤트 면제 로직 누락 수정 (BUG-1). 월요일 + 에너지 0 상태에서 canPlay()가 false를 반환하여 플레이 불가했던 문제
+- `ResultScene.js`: 미사용 WeeklyEventManager import 제거
+
+### 스펙 대비 구현 차이
+
+- 없음 (AC-1~AC-6 전항 스펙과 일치)
+
+### 주요 수치
+
+- 이벤트 스케줄: 일(bonus_gold), 월(energy_festival), 화~목(double_mission), 금~토(bonus_gold)
+- bonus_gold 보너스: 영업 종료 시 골드 수입(totalGold) * 0.5 추가 지급 (gold 화폐)
+- double_mission 배율: 일일 미션 보상 2배 (mireukEssence 999 캡 유지)
+- energy_festival: 스테이지 진입 에너지 소비 면제 (canPlay + consume 양쪽)
+- MenuScene 이벤트 배너: y=74, H=20, 미션 배너(y=50, H=44) 아래 / HUD 1행(y=92) 위
+- weeklyEvent.lastSeenEventId: 향후 팝업 기능용 예약 필드 (이번 페이즈에서는 저장만)
+- v30 마이그레이션 기본값: weeklyEvent = { lastSeenEventId: null }
+
+### QA 결과
+
+PASS (BUG-1 수정 후 최종 판정). 21건 (정상 15 + 예외 6). Playwright 21 통과 / 0 실패. AC-1~AC-6 전항 PASS.
+
+BUG-1: `EnergyManager.canPlay()`에 `WeeklyEventManager.isActive('energy_festival')` 체크 추가로 수정 완료.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase88-scope.md`
+- 리포트: `.claude/specs/2026-04-28-kc-phase88-coder-report.md`
+- QA: `.claude/specs/2026-04-28-kc-phase88-qa.md`
+
+---
+
 ## [Phase 87] 2026-04-28 -- 에너지 시스템 도입
 
 ### 개요

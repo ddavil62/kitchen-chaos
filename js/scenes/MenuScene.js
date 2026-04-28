@@ -253,8 +253,11 @@ export class MenuScene extends Phaser.Scene {
    * @private
    */
   _createResourceHUD() {
-    const HUD_Y1 = 92;   // 1행: 기존 리소스 (y=100 -> 92로 소폭 상향)
-    const HUD_Y2 = 112;  // 2행: 에너지 표시
+    // 주간 이벤트 배너 활성 시 HUD를 아래로 내려 겹침 방지
+    // 이벤트 배너(center y=84, H=20) 하단 y=94 + 여백 4 + 텍스트 H/2=6 = 104
+    const hasEvent = !!WeeklyEventManager.getActiveEvent();
+    const HUD_Y1 = hasEvent ? 104 : 92;  // 1행: 기존 리소스
+    const HUD_Y2 = hasEvent ? 120 : 112; // 2행: 에너지 표시
 
     // 1행: 기존 리소스
     const gold = SaveManager.getGold();
@@ -389,8 +392,8 @@ export class MenuScene extends Phaser.Scene {
 
     const BANNER_W = GAME_WIDTH - 20;
     const BANNER_H = 20;
-    // 미션 배너(BANNER_Y=50, H=44) 하단인 y=72 + 2px 여백 = y=74
-    const BANNER_Y = 74;
+    // 미션 배너(center y=50, H=44) 하단 y=72 + 여백 2 + 배너 H/2=10 = center y=84
+    const BANNER_Y = 84;
 
     const bg = NineSliceFactory.raw(this, GAME_WIDTH / 2, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
     bg.setTint(0x228844);
