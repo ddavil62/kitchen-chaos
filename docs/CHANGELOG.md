@@ -1,5 +1,55 @@
 # Changelog
 
+## [Phase 85] 2026-04-28 -- 일일 미션 풀 확장
+
+### 개요
+
+DAILY_MISSION_POOL을 10종에서 20종으로 확장. 신규 미션 타입 3가지(vip_serve, combo_reach, gold_single_run) 추가. ServiceScene에 미션 연동 훅 3종 삽입.
+
+### Added
+
+- `kitchen-chaos/js/managers/DailyMissionManager.js`: DAILY_MISSION_POOL 10종 → 20종 확장. 신규 미션 10개 추가:
+  - `stage_clear_7` (stage_clear, target 7, gold 600)
+  - `stage_clear_10` (stage_clear, target 10, kitchenCoins 10)
+  - `orders_complete_30` (orders_complete, target 30, kitchenCoins 8)
+  - `orders_complete_50` (orders_complete, target 50, mireukEssence 15)
+  - `three_star_3` (three_star, target 3, gold 300)
+  - `endless_wave_10` (endless_wave, target 10, mireukEssence 20)
+  - `vip_serve_3` (vip_serve, target 3, gold 250)
+  - `vip_serve_5` (vip_serve, target 5, kitchenCoins 5)
+  - `combo_reach_5` (combo_reach, target 5, kitchenCoins 4)
+  - `gold_single_run_800` (gold_single_run, target 800, kitchenCoins 6)
+- `kitchen-chaos/js/scenes/ServiceScene.js`: 미션 연동 훅 3종 삽입:
+  - `vip_serve` 훅 (L2705-2708): VIP 서빙 완료 시 `recordProgress('vip_serve', 1)` 누적 합산
+  - `combo_reach` 훅 (L2827-2828): 서빙 후 `recordProgress('combo_reach', this.comboCount)` max 갱신
+  - `gold_single_run` 훅 (L2991-2992): 영업 세션 종료 시 `recordProgress('gold_single_run', earnedGold)` max 갱신
+
+### Changed
+
+- `kitchen-chaos/js/managers/DailyMissionManager.js`: `recordProgress` 내 max 갱신 분기 확장. 기존 `endless_wave` 단일 조건 → `['endless_wave', 'combo_reach', 'gold_single_run']` includes 배열로 변경 (L146)
+
+### 스펙 대비 구현 차이
+
+- 없음 (스펙과 정확히 일치)
+
+### QA 결과
+
+PASS. 15건 (정상 9 + 예외 6). Playwright 8 통과 / 7 실패 (전부 인프라 타임아웃+기존 이슈). AC-1~AC-7 전항 PASS. 코드 버그 0건.
+
+LOW 이슈 1건 (Phase 85 스코프 외):
+- MenuScene ICON_MAP에 신규 타입 3종(vip_serve, combo_reach, gold_single_run) 미등록. fallback 아이콘 정상 동작. 후속 Phase에서 전용 아이콘 추가 권장
+
+INFO 소견:
+- DailyMissionManager recordProgress max 갱신 타입 배열 하드코딩 — 향후 미션 정의에 `updateMode` 필드 추가 권장
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase85-scope.md`
+- 리포트: `.claude/specs/2026-04-28-kc-phase85-coder-report.md`
+- QA: `.claude/specs/2026-04-28-kc-phase85-qa.md`
+
+---
+
 ## [Phase 84] 2026-04-28 -- 셰프 스킨 시스템
 
 ### 개요
