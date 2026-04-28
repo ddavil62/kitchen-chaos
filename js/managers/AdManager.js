@@ -4,12 +4,26 @@
  * window.Capacitor 유무로 앱/웹 환경을 감지하여
  * DEV(웹) 환경에서는 광고 없이 즉시 onReward 콜백을 실행한다.
  * IAPManager.isAdsRemoved()가 true이면 항상 DEV 폴백과 동일하게 동작한다.
+ *
+ * REVISE-2: 동적 import('@capacitor-community/admob') 제거.
+ * Vite dev 서버에서 해당 패키지를 resolve할 수 없어 500 에러가 발생하므로
+ * window.Capacitor.Plugins.AdMob 전역 객체를 직접 참조한다.
  */
 
 import { IAPManager } from './IAPManager.js';
 
 // Phase 81: 테스트 Unit ID (실 배포 전 교체 필요)
 const REWARDED_AD_UNIT_ID_ANDROID = 'ca-app-pub-3940256099942544/5224354917'; // 구글 테스트 ID
+
+/**
+ * Capacitor 전역 플러그인에서 AdMob 객체를 가져온다.
+ * 패키지 미설치 환경(dev 서버 등)에서는 null을 반환한다.
+ * @returns {object|null}
+ * @private
+ */
+function _getAdMobPlugin() {
+  return window?.Capacitor?.Plugins?.AdMob ?? null;
+}
 
 export class AdManager {
   /** @private 광고 준비 완료 여부 (앱 환경에서만 유효) */
@@ -36,12 +50,17 @@ export class AdManager {
       return;
     }
 
+    const adMob = _getAdMobPlugin();
+    if (!adMob) {
+      console.warn('[AdManager] AdMob 플러그인 미등록 — initAds 스킵');
+      return;
+    }
+
     try {
-      const { AdMob } = await import('@capacitor-community/admob');
-      await AdMob.initialize({ initializeForTesting: true });
+      await adMob.initialize({ initializeForTesting: true });
 
       // 리워드 광고 사전 로드
-      await AdMob.prepareRewardVideoAd({
+      await adMob.prepareRewardVideoAd({
         adId: REWARDED_AD_UNIT_ID_ANDROID,
       });
       AdManager._adReady = true;
@@ -86,16 +105,21 @@ export class AdManager {
     }
 
     // 앱 환경: AdMob 리워드 광고 노출
+    const adMob = _getAdMobPlugin();
+    if (!adMob) {
+      console.warn('[AdManager] AdMob 플러그인 미등록 — onFail 호출');
+      if (onFail) onFail();
+      return;
+    }
+
     (async () => {
       try {
-        const { AdMob } = await import('@capacitor-community/admob');
-
         // 리워드 리스너 등록
-        AdMob.addListener('onRewardedVideoAdReward', () => {
+        adMob.addListener('onRewardedVideoAdReward', () => {
           if (onReward) onReward();
           // 다음 광고 사전 로드
           AdManager._adReady = false;
-          AdMob.prepareRewardVideoAd({
+          adMob.prepareRewardVideoAd({
             adId: REWARDED_AD_UNIT_ID_ANDROID,
           }).then(() => {
             AdManager._adReady = true;
@@ -104,12 +128,12 @@ export class AdManager {
           });
         });
 
-        AdMob.addListener('onRewardedVideoAdFailedToLoad', () => {
+        adMob.addListener('onRewardedVideoAdFailedToLoad', () => {
           AdManager._adReady = false;
           if (onFail) onFail();
         });
 
-        await AdMob.showRewardVideoAd();
+        await adMob.showRewardVideoAd();
       } catch (e) {
         console.warn('[AdManager] showRewardedAd 실패:', e);
         AdManager._adReady = false;
