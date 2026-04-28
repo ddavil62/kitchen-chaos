@@ -2702,6 +2702,10 @@ export class ServiceScene extends Phaser.Scene {
     this.servedCount++;
     // ── Phase 75B: 일일 미션 -- 주문 완료 진행도 ──
     try { DailyMissionManager.recordProgress('orders_complete', 1); } catch { /* noop */ }
+    // ── Phase 85: 일일 미션 -- VIP 서빙 진행도 ──
+    if (cust.customerType === 'vip') {
+      try { DailyMissionManager.recordProgress('vip_serve', 1); } catch { /* noop */ }
+    }
     SoundManager.playSFX('sfx_serve');
 
     // 팁 추적 (기본 보상 초과분이 팁)
@@ -2820,6 +2824,8 @@ export class ServiceScene extends Phaser.Scene {
     if (this.comboCount >= 5) {
       this.vfx.comboBurst(GAME_WIDTH / 2, 320);
     }
+    // ── Phase 85: 일일 미션 -- 콤보 달성 진행도 (max 갱신) ──
+    try { DailyMissionManager.recordProgress('combo_reach', this.comboCount); } catch { /* noop */ }
 
     // 자동 서빙 시 직원 아이콘 반짝 애니메이션
     if (isAutoServe && this._waiterIcon) {
@@ -2982,6 +2988,8 @@ export class ServiceScene extends Phaser.Scene {
       ToolManager.addGold(earnedGold);
       // ── Phase 75B: 일일 미션 -- 골드 획득 진행도 ──
       try { DailyMissionManager.recordProgress('gold_earn', earnedGold); } catch { /* noop */ }
+      // ── Phase 85: 일일 미션 -- 단일 세션 골드 (max 갱신) ──
+      try { DailyMissionManager.recordProgress('gold_single_run', earnedGold); } catch { /* noop */ }
 
       // ── 업적: 누적 골드 카운터 + 체크 (Phase 42) ──
       AchievementManager.increment('total_gold_earned', earnedGold);
