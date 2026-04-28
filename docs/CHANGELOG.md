@@ -1,5 +1,55 @@
 # Changelog
 
+## [Phase 82] 2026-04-28 -- MenuScene 리소스 HUD + 별점 보상 코인 정책 정비
+
+### 개요
+
+MenuScene 상단(y=100)에 골드/코인/미력의 정수 보유량을 표시하는 정적 HUD를 추가. SaveManager clearStage() 재클리어 분기 코인 지급을 0으로 변경하여 "최초 달성 시만 보상" 원칙 일관 적용. ResultScene에서 재클리어(totalCoinsEarned=0) 시 "재클리어 (추가 보상 없음)" 문구 표시.
+
+### Added
+
+- `kitchen-chaos/js/scenes/MenuScene.js`: `_createResourceHUD()` 메서드 추가. y=100에 3열 텍스트 HUD(💰골드/🪙코인/✨미력의 정수). x = GAME_WIDTH/6, GAME_WIDTH/2, GAME_WIDTH*5/6 균등 3분할 배치. 색상: 골드 #ffd700, 코인 #aaddff, 미력 #cc88ff. fontSize 12px, stroke #000000/2px. `create()` 내 `_createMissionBanner()` 직후 호출
+- `kitchen-chaos/js/scenes/ResultScene.js`: rewardText 3-way 분기 추가 (totalCoinsEarned===0 && stars>0 -> "재클리어 (추가 보상 없음)")
+
+### Changed
+
+- `kitchen-chaos/js/managers/SaveManager.js`: `clearStage()` 재클리어 분기 `coinsEarned = Math.max(1, Math.floor((coinByStars[stars] || 0) * 0.2))` -> `coinsEarned = 0`
+
+### 수치
+
+- 재클리어(동일/하위 별점) 코인 지급: 기존 `Math.max(1, floor(coinByStars * 0.2))` -> **0**
+- 최초 클리어/별점 상향 보상: 변경 없음 (1스타 10, 2스타 15, 3스타 20, 상향 차이분 지급)
+- HUD 배치: y=100, 배너 하단(y=72)에서 20px 아래
+- HUD 폰트: fontSize 12px (배너 13px보다 작음, 계층 유지)
+
+### 스펙 대비 구현 차이
+
+- **HUD x 좌표**: 사용자 제안 x=52/180/308 -> planner 스펙 GAME_WIDTH/6, /2, *5/6 (=60/180/300) 균등 3분할 채택
+- **HUD 스타일**: 사용자 제안 fontSize 13px+흰색 -> planner 스펙 fontSize 12px + 색상별 차별화(#ffd700/#aaddff/#cc88ff) + stroke 채택
+- **배경 패널**: 사용자 제안 반투명 rectangle -> planner 스펙대로 패널 없이 stroke로 가독성 확보
+
+### QA 결과
+
+PASS. 33건 (정상 23 + 예외 3 + 시각적 3 + UI 안정성 2 + 통합 2). 31 통과 / 2 flaky (Vite HMR WebSocket 타임아웃, 테스트 인프라 이슈). AC-1~AC-6 전항 PASS.
+
+LOW 이슈 2건 (수정 불필요):
+- coins/essence에 `toLocaleString()` 미적용 (현재 1000 초과 케이스 드묾)
+- HUD 색상 하드코딩 (프로젝트 전역 관행과 일치)
+
+### AD 모드 3
+
+APPROVED. 11 PASS / 1 WARN (색상 하드코딩, 전역 관행). 배너-HUD 분리 20px, HUD-로고 여백 122px, 3열 겹침 없음(99,999 기준), 색상 대비 충분, 기존 레이아웃 비파괴.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase82-scope.md`
+- 플랜: `.claude/specs/2026-04-28-kc-phase82-planner.md`
+- 코더 리포트: `.claude/specs/2026-04-28-kc-phase82-coder-report.md`
+- AD3: `.claude/specs/2026-04-28-kc-phase82-ad3.md`
+- QA: `.claude/specs/2026-04-28-kc-phase82-qa.md`
+
+---
+
 ## [Phase 81] 2026-04-28 -- 리워드 광고 + IAP 수익화 기반 구조
 
 ### 개요
