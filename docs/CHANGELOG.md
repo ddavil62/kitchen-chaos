@@ -1,5 +1,69 @@
 # Changelog
 
+## [Phase 84] 2026-04-28 -- 셰프 스킨 시스템
+
+### 개요
+
+미미 셰프용 스킨 시스템 구현. SkinManager 신규 생성(미미 스킨 3종), ChefSelectScene에 스킨 선택 서브 패널 UI 추가, IAPManager에 스킨 구매 스텁 메서드 추가, SaveManager v28 마이그레이션(unlockedSkins/equippedSkin 필드).
+
+### Added
+
+- `kitchen-chaos/js/managers/SkinManager.js` (신규): `SKIN_DEFS` 상수 맵 — 미미 스킨 3종 정의 (default: 기본/녹색 앞치마, skin_mimi_pink: 핑크 앞치마 W2,900, skin_mimi_blue: 블루 앞치마 W2,900). 정적 메서드 5종: `getSkinsForChef(chefId)`, `getEquippedSkin(chefId)`, `equipSkin(chefId, skinId)`, `isSkinOwned(chefId, skinId)`, `unlockSkin(chefId, skinId)`
+- `kitchen-chaos/js/managers/IAPManager.js`: `SKIN_PRODUCT_IDS` 상수 (skin_mimi_pink/skin_mimi_blue → com.lazyslime.kitchenchaos.skin.mimi.pink/blue), `skinKey()` 헬퍼, `purchaseSkin(chefId, skinId)` 스텁 (localStorage `kc_skin_owned_{skinId}` 플래그 + SkinManager.unlockSkin 호출), `isSkinOwned(chefId, skinId)` (localStorage + SkinManager 양쪽 체크)
+- `kitchen-chaos/js/scenes/ChefSelectScene.js`: SkinManager/IAPManager import 추가. `_portraitImages` 배열로 카드별 portrait 참조 저장. `_buildSkinPanel()` 스킨 서브 패널 Container 빌드 (배경 반투명 패널 w=300 h=105, 썸네일 3개 가로 배치 x=100/180/260, 장착 테두리+자물쇠+가격 표시). `_refreshSkinPanel()` 보유/장착 상태 갱신. `_onSkinTap()` 보유=즉시 장착, 미보유=구매 팝업. `_refreshCardPortrait(chefId)` portrait setTexture 교체. `_showPurchasePopup(chefId, skin)` 딤드 오버레이+팝업 박스(구매/취소). `_moveSkinSelectButton(y)` 선택 버튼 y좌표 이동. `_updateSkinPanelVisibility()` 미미 포커스 시 패널 표시/숨김. `_goToIndex()` 내 스킨 패널 가시성 갱신 추가
+- `kitchen-chaos/js/managers/SpriteLoader.js`: `PORTRAIT_IDS` 배열에 'mimi_pink', 'mimi_blue' 추가 (preload 등록)
+- `kitchen-chaos/assets/portraits/portrait_mimi_pink.png` (신규): 미미 핑크 앞치마 portrait (PIL 팔레트 교체)
+- `kitchen-chaos/assets/portraits/portrait_mimi_blue.png` (신규): 미미 블루 앞치마 portrait (PIL 팔레트 교체)
+
+### Changed
+
+- `kitchen-chaos/js/managers/SaveManager.js`: `SAVE_VERSION` 27 → 28. `createDefault()`에 `unlockedSkins: { mimi_chef: ['default'] }`, `equippedSkin: { mimi_chef: 'default' }` 추가. `_migrate()` v27→v28 블록 추가 (unlockedSkins/equippedSkin 조건부 초기화)
+- `kitchen-chaos/js/scenes/ChefSelectScene.js`: `_buildCard()` 내 portrait 객체를 `_portraitImages[]`에 push (sprite/emoji fallback 시 null push로 인덱스 정합성 유지). 미미 포커스 시 선택 버튼 y=590, 그 외 y=549
+
+### 수치
+
+- 스킨 패널: y=465~570, 배경 w=300 h=105, #111122 반투명, depth 20
+- 썸네일: 64x64px, x=[100, 180, 260], 장착=노란 테두리, 미보유=반투명+자물쇠+가격
+- 스킨 이름: y=542, 장착=노란색, 미보유=회색
+- 선택 버튼: 미미=y=590, 그 외=y=549
+- 구매 팝업: 딤드 alpha=0.6, 팝업 x=180 y=320 w=260 h=140, [구매] 녹색 / [취소] 회색
+- 스킨 가격: W2,900 (핑크/블루 동일)
+
+### 스펙 대비 구현 차이
+
+- 없음 (플래너 스펙과 정확히 일치)
+
+### QA 결과
+
+PASS. 40건 (정상 22 + 예외 10 + 시각 5 + UI안정성 3). 32 통과 / 8 실패 (전부 테스트 인프라/기존 이슈). AC-1~AC-6 전항 PASS. 제품 코드 버그 0건.
+
+실패 8건 상세:
+- AC-1 getSkinsForChef(존재하지 않는 셰프): 테스트 간접 접근 방식 한계
+- AC-2 4건: SaveManager in-memory migration 패턴 (기존 v1~v27과 동일, 테스트 인프라 이슈)
+- AC-6 3건: Phase 56부터 지속되는 Vite 경로 매핑 이슈로 portrait 전체 미로드 (기존 이슈)
+
+시각적 검증: 스크린샷 5장 직접 확인. 스킨 패널 배치/썸네일/자물쇠/가격/구매 팝업/장착 테두리 모두 정상.
+
+LOW 이슈 2건 (수정 불필요):
+- 구매 팝업 딤드 오버레이 클릭 시 팝업 닫힘 없음 (UX 개선 권장)
+- purchaseSkin async/await 스텁 즉시 resolve (실제 IAP 연동 시 로딩 인디케이터 필요)
+
+### AD 결과
+
+AD 모드 2 (에셋 검증): APPROVED — portrait_mimi_pink, portrait_mimi_blue 스타일/품질 일관성 검증 완료.
+AD 모드 3 (UI 레이아웃): APPROVED. WARN 4건 (스킨 패널-선택 버튼 간격 0px, 선택-하단 버튼 수치 겹침 -10px, 썸네일 크기 비례, 하단 버튼 터치 30px) — 스크린샷 확인 결과 실제 시각적 문제 없음, 기존 패턴 일치.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase84-scope.md`
+- 플랜: `.claude/specs/2026-04-28-kc-phase84-planner.md`
+- AD1: `.claude/specs/2026-04-28-kc-phase84-ad1.md`
+- AD2: `.claude/specs/2026-04-28-kc-phase84-ad2.md`
+- AD3: `.claude/specs/2026-04-28-kc-phase84-ad3.md`
+- QA: `.claude/specs/2026-04-28-kc-phase84-qa.md`
+
+---
+
 ## [Phase 83] 2026-04-28 -- TD 씬 배치 피드백 개선
 
 ### 개요

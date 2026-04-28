@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon — 로드맵
 
-> 최종 업데이트: 2026-04-28 (Phase 83 완료)
+> 최종 업데이트: 2026-04-28 (Phase 84 완료)
 
 ---
 
@@ -97,6 +97,7 @@
 | Phase 81 | 리워드 광고 + 광고 제거 IAP 기반 구조 (AdManager, 리워드 3포인트, IAPManager 스텁) | ✅ |
 | Phase 82 | MenuScene 리소스 HUD + 별점 보상 코인 정책 정비 (재클리어 코인 0, ResultScene 문구) | ✅ |
 | Phase 83 | TD 씬 배치 피드백 개선 (배치 가능 셀 하이라이트, 사거리 미리보기, 웨이브 카운트다운) | ✅ |
+| Phase 84 | 셰프 스킨 시스템 (SkinManager, 미미 스킨 3종, ChefSelectScene UI, IAP 스텁) | ✅ |
 
 ---
 
@@ -104,7 +105,6 @@
 
 | Phase | 트랙 | 내용 |
 |-------|------|------|
-| Phase 84 | P5 | 셰프 스킨 시스템 (SkinManager, 미미 스킨 3종, ChefSelectScene UI, IAP 스텁) |
 | Phase 85 | P5 | 일일 미션 타입 다양화 (미션 풀 10종 → 20종, VIP 서빙/콤보/골드 획득 타입 추가) |
 | Phase 86 | P6 | 메타 업그레이드 확장 (4종 → 20종, 채집/영업/경제 3카테고리 탭) |
 | Phase 87 | P6 | 에너지 시스템 도입 (최대 5개, 30분 자동 충전, 리워드 광고 즉시 충전) |
