@@ -98,6 +98,12 @@ export class GatheringScene extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Graphics[]} 이동 가능 셀 오버레이 목록 */
     this._movableOverlays = [];
 
+    /** @type {Phaser.GameObjects.Graphics[]} 배치 가능 셀 오버레이 목록 */
+    this._placeableOverlays = [];
+
+    /** @type {Phaser.GameObjects.Graphics|null} 선택 도구 사거리 링 */
+    this._rangeRingGfx = null;
+
     // ── 그룹 ──
     this.enemies = this.add.group();
     this.towers = this.add.group();
@@ -785,9 +791,15 @@ export class GatheringScene extends Phaser.Scene {
           this._showMessage('남은 수량 없음', 800);
           return;
         }
-        this._deselectTower(); // 재배치 모드 해제
+        this._deselectTower(); // 재배치 모드 해제 + _hideMoveOverlay 내부 호출
         this.selectedTowerType = this.selectedTowerType === id ? null : id;
         this._updateTowerBarSelection();
+        // 배치 가능 오버레이 갱신
+        if (this.selectedTowerType) {
+          this._showPlaceableOverlay();
+        } else {
+          this._hidePlaceableOverlay();
+        }
         // 튜토리얼 1단계: 도구 선택 완료
         if (this._tutorial?.isActive() && this.selectedTowerType) this._tutorial.advance();
       });
@@ -1228,6 +1240,12 @@ export class GatheringScene extends Phaser.Scene {
     if (this._getAvailableCount(typeId) <= 0) {
       this.selectedTowerType = null;
       this._updateTowerBarSelection();
+      this._hidePlaceableOverlay();
+    } else {
+      // 셀 하나 배치됐으므로 점유 상태 반영하여 오버레이 재계산
+      if (this.selectedTowerType) {
+        this._showPlaceableOverlay();
+      }
     }
 
     this.tweens.add({
@@ -1276,6 +1294,7 @@ export class GatheringScene extends Phaser.Scene {
     }
     this._showTowerActionPanel(tower);
     this._showMoveOverlay(tower);
+    this._showRangeRing(tower);
   }
 
   /**
@@ -1292,6 +1311,8 @@ export class GatheringScene extends Phaser.Scene {
     }
     this._hideTowerActionPanel();
     this._hideMoveOverlay();
+    this._hidePlaceableOverlay();
+    this._hideRangeRing();
   }
 
   /**
@@ -1351,6 +1372,73 @@ export class GatheringScene extends Phaser.Scene {
     if (this._moveLabel) { this._moveLabel.destroy(); this._moveLabel = null; }
     if (this._recallBg) { this._recallBg.destroy(); this._recallBg = null; }
     if (this._recallLabel) { this._recallLabel.destroy(); this._recallLabel = null; }
+  }
+
+  /**
+   * 선택된 타워의 사거리 링(반투명 원)을 화면에 표시한다.
+   * @param {Tower} tower
+   * @private
+   */
+  _showRangeRing(tower) {
+    this._hideRangeRing();
+    const radius = (tower.range || tower.data_?.range || 0) * (tower.rangeMultiplier || 1);
+    if (radius <= 0) return;
+
+    this._rangeRingGfx = this.add.graphics().setDepth(4);
+    this._rangeRingGfx.lineStyle(1.5, 0x88ffcc, 0.55);
+    this._rangeRingGfx.strokeCircle(tower.x, tower.y, radius);
+    this._rangeRingGfx.fillStyle(0x44ff88, 0.06);
+    this._rangeRingGfx.fillCircle(tower.x, tower.y, radius);
+  }
+
+  /**
+   * 사거리 링 제거.
+   * @private
+   */
+  _hideRangeRing() {
+    if (this._rangeRingGfx) {
+      this._rangeRingGfx.destroy();
+      this._rangeRingGfx = null;
+    }
+  }
+
+  /**
+   * 팔레트 도구 선택 시 배치 가능한 셀(비경로·비점유)에
+   * 초록 다이아몬드 오버레이를 표시한다.
+   * @private
+   */
+  _showPlaceableOverlay() {
+    this._hidePlaceableOverlay();
+    const cols = this.stageData?.gridCols || GRID_COLS;
+    const rows = this.stageData?.gridRows || GRID_ROWS;
+    const occupiedKeys = new Set(this.towers.getChildren().map(t => t._cellKey));
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const key = `${col},${row}`;
+        if (this.stagePathCells.has(key)) continue;   // 경로 셀 제외
+        if (occupiedKeys.has(key)) continue;           // 점유 셀 제외
+
+        const d = cellDiamond(col, row);
+        const gfx = this.add.graphics().setDepth(5);
+        gfx.fillStyle(0x44ff88, 0.20);
+        gfx.fillPoints([d.top, d.right, d.bottom, d.left], true);
+        gfx.lineStyle(1, 0x44ff88, 0.55);
+        gfx.strokePoints([d.top, d.right, d.bottom, d.left], true);
+        this._placeableOverlays.push(gfx);
+      }
+    }
+  }
+
+  /**
+   * 배치 가능 셀 오버레이 전체 제거.
+   * @private
+   */
+  _hidePlaceableOverlay() {
+    for (const gfx of this._placeableOverlays) {
+      gfx.destroy();
+    }
+    this._placeableOverlays = [];
   }
 
   /**
@@ -2426,9 +2514,11 @@ export class GatheringScene extends Phaser.Scene {
 
     this._waveBtnBg.on('pointerdown', () => {
       if (!this._waveBtnEnabled) return;
-      this.waveManager.startNextWave();
-      // 튜토리얼 3단계 완료
-      if (this._tutorial?.isActive()) this._tutorial.advance();
+      this._startCountdown(() => {
+        this.waveManager.startNextWave();
+        // 튜토리얼 3단계 완료
+        if (this._tutorial?.isActive()) this._tutorial.advance();
+      });
     });
     this._waveBtnBg.on('pointerover', () => {
       if (this._waveBtnEnabled) {
@@ -2446,6 +2536,59 @@ export class GatheringScene extends Phaser.Scene {
     this._waveBtnEnabled = true;
     this._waveBtnPulse = null;
     this._setWaveButtonEnabled(true);
+
+    // 카운트다운 텍스트 (평소 숨김)
+    this._countdownText = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30, '', {
+      fontSize: '64px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 6,
+      fontFamily: FONT_FAMILY,
+    }).setOrigin(0.5).setDepth(3000).setScrollFactor(0).setVisible(false);
+  }
+
+  /**
+   * 3→2→1→GO! 카운트다운을 실행한 뒤 callback을 호출한다.
+   * 카운트다운 중 웨이브 버튼은 비활성화된다.
+   * 도구 배치/재배치는 허용(버튼만 비활성화).
+   * @param {function} callback - 카운트다운 완료 후 실행할 함수
+   * @private
+   */
+  _startCountdown(callback) {
+    this._setWaveButtonEnabled(false);
+
+    const steps = ['3', '2', '1', 'GO!'];
+    const STEP_DURATION = 800; // ms per step
+
+    const showStep = (index) => {
+      if (index >= steps.length) {
+        // 카운트다운 완료
+        this._countdownText.setVisible(false);
+        callback();
+        return;
+      }
+
+      this._countdownText
+        .setText(steps[index])
+        .setAlpha(1)
+        .setVisible(true)
+        .setScale(1.4);
+
+      // 스케일 애니메이션 (1.4 → 1.0 페이드)
+      this.tweens.add({
+        targets: this._countdownText,
+        scale: 1.0,
+        alpha: index === steps.length - 1 ? 1 : 0.3, // GO!는 남겨두고 나머지는 페이드
+        duration: STEP_DURATION,
+        ease: 'Sine.Out',
+        onComplete: () => {
+          this.time.delayedCall(0, () => showStep(index + 1));
+        },
+      });
+    };
+
+    showStep(0);
   }
 
   /**
@@ -2828,6 +2971,9 @@ export class GatheringScene extends Phaser.Scene {
     this._tutorial?.end?.();
     this._hideTowerActionPanel();
     this._hideMoveOverlay();
+    this._hidePlaceableOverlay();
+    this._hideRangeRing();
+    if (this._countdownText) { this._countdownText.destroy(); this._countdownText = null; }
 
     // Phase 11-3c: 씬 전환 시 Tween/Timer 명시적 정리
     this.tweens.killAll();
