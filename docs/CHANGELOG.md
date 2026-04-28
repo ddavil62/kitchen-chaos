@@ -1,5 +1,77 @@
 # Changelog
 
+## [Phase 81] 2026-04-28 -- 리워드 광고 + IAP 수익화 기반 구조
+
+### 개요
+
+AdManager.js와 IAPManager.js를 신규 생성하고, ResultScene(AD-1, AD-3)과 GatheringScene(AD-2)에 리워드 광고 삽입 포인트 3개를 추가하여 수익화 기반 구조를 도입. DEV(웹) 환경에서는 모든 광고 플로우가 즉시 onReward 폴백으로 동작한다.
+
+### Added
+
+- `kitchen-chaos/js/managers/AdManager.js`: 신규 생성. Capacitor AdMob 래퍼. `initAds()`, `showRewardedAd(onReward, onFail)`, `isAdReady()` 정적 메서드. `_isApp()` false 또는 `IAPManager.isAdsRemoved()` true 시 즉시 onReward 폴백. `_getAdMobPlugin()`로 `window.Capacitor.Plugins.AdMob` 전역 객체 직접 참조 (동적 import 미사용)
+- `kitchen-chaos/js/managers/IAPManager.js`: 신규 생성. `REMOVE_ADS_PRODUCT_ID = 'com.lazyslime.kitchenchaos.removeads'` 상수, `purchaseRemoveAds()` 스텁(console.log만 출력), `isAdsRemoved()` localStorage `kc_ads_removed` 기반 조회
+- `kitchen-chaos/js/scenes/ResultScene.js`: AD-1 "광고 보고 재도전" 버튼 — `_createMarketFailedView()` (완전 실패)에 녹색(0x22aa55) 버튼 추가. 탭 시 동일 stageId + overrideLives=8로 GatheringScene 직접 진입
+- `kitchen-chaos/js/scenes/ResultScene.js`: AD-1 "광고 보고 재도전" 버튼 — `_createResultView()` partialFail 분기에 동일 녹색 버튼 추가
+- `kitchen-chaos/js/scenes/ResultScene.js`: AD-3 "광고 보고 보상 2배" 버튼 — `stars <= 2 && totalCoinsEarned >= 1` 조건에서 주황(0xcc6600) 버튼 노출. 탭 시 totalCoinsEarned만큼 코인 추가 지급, `_ad3Used` 플래그 + `disableInteractive()` + "보상 수령 완료" 텍스트 갱신으로 1회 제한
+- `kitchen-chaos/js/scenes/ResultScene.js`: `_createButton()` 반환값 `{ bg, label }` 추가 (기존 호출부 영향 없음)
+- `kitchen-chaos/js/scenes/GatheringScene.js`: AD-2 `_toggleSpeed()` 1x->2x 전환 시 `AdManager.showRewardedAd()` 선행, 시청 완료 후 2x 적용. 2x->1x는 즉시 토글. `isAdReady()` false 시 버튼 alpha 0.5 + 1.5초 후 복귀
+- `kitchen-chaos/js/scenes/GatheringScene.js`: `create(data)` — `overrideLives` 파라미터 지원 (`data?.overrideLives != null` 체크, 0도 허용)
+- `kitchen-chaos/js/scenes/BootScene.js`: `create()` 내 `AdManager.initAds()` 호출 추가
+
+### Changed
+
+- `kitchen-chaos/js/scenes/ResultScene.js`: `_createResultView()` 구분선 후 여백 `y += 18` -> `y += 12` (6px 절약)
+- `kitchen-chaos/js/scenes/ResultScene.js`: 버튼 간격 조건부 축소 — AD-1 또는 AD-3 표시 시 `btnGap = 44` (기본 54), 4버튼 케이스 Y 오버플로우 방지
+- `kitchen-chaos/vite.config.js`: `rollupOptions.external`에 `@capacitor-community/admob` 추가 (웹 빌드 시 동적 import 해소)
+
+### 수치
+
+- AD-1 재도전 HP: `ceil(STARTING_LIVES / 2)` = `ceil(15 / 2)` = **8**
+- AD-3 보상 2배: `totalCoinsEarned`만큼 추가 코인 지급
+- 버튼 간격: AD 버튼 표시 시 btnGap 54 -> 44 (10px 축소)
+- 구분선 여백: 18 -> 12 (6px 축소)
+- AD-1 버튼 색상: 0x22aa55 (녹색)
+- AD-3 버튼 색상: 0xcc6600 (주황)
+- AD-3 비활성 alpha: 0.4
+
+### 수익화 포인트 정리
+
+| 포인트 | 위치 | 조건 | 리워드 |
+|--------|------|------|--------|
+| AD-1 | ResultScene 완전/부분 실패 화면 | isMarketFailed 또는 partialFail | HP 8로 GatheringScene 재시작 |
+| AD-2 | GatheringScene 배속 버튼 | 1x -> 2x 전환 시 | 2x 배속 해제 |
+| AD-3 | ResultScene 결과 화면 | stars <= 2 && totalCoinsEarned >= 1 | 코인 보상 2배 (1회 제한) |
+
+### 스펙 대비 구현 차이
+
+- **IAPManager.purchaseRemoveAds()**: 스펙은 localStorage 저장 스텁이었으나, 사용자 지시로 console.log만 출력하도록 변경. 실제 구매 플로우 미구현
+- **IAPManager localStorage 키**: 플래너 스펙 `kitchenChaos_adsRemoved` -> 사용자 지시 `kc_ads_removed`로 변경
+- **AD-1 chefId 미전달**: GatheringScene.create()가 내부적으로 ChefManager.getChefData()를 호출하므로 불필요하여 생략
+- **vite.config.js external 추가**: 스펙 미명시. @capacitor-community/admob 동적 import가 Rollup 빌드를 실패시켜 추가
+- **AdManager 동적 import 제거 (REVISE-2)**: `import('@capacitor-community/admob')` -> `window.Capacitor.Plugins.AdMob` 전역 참조. Vite dev 서버 500 에러 해소
+- **btnGap 48 -> 44 (REVISE-1)**: AD 모드3 검수에서 4버튼 Y 오버플로우 발견, 44로 추가 축소
+
+### QA 결과
+
+PASS. 27건 (정상 16 + 예외 7 + UI 안정성 4). Playwright 20 통과 / 7 인프라 타임아웃 (코드 버그 0건). 부분 재실행에서 5/7 즉시 통과 확인.
+
+LOW 이슈 2건 (수정 불필요):
+- `ResultScene._unlockButtons()`가 AD-3 비활성 버튼의 alpha를 복원할 수 있음 (DialogueScene 후 시각적 불일치, `disableInteractive()`로 기능 차단됨)
+- `AdManager.js` 앱 환경 `addListener` 누적 가능성 (DEV 무관, 앱 배포 시 개선 권장)
+
+INFO 2건:
+- `REMOVE_ADS_PRODUCT_ID` 값 미세 차이 (스텁 상태, 스토어 등록 시 통일)
+- `purchaseRemoveAds()` localStorage 미설정 (의도된 스텁 동작)
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase81-planner.md`
+- 목적 정의서: `.claude/specs/2026-04-28-kc-phase81-scope.md`
+- 리포트: `.claude/specs/2026-04-28-kc-phase81-coder-report.md`
+- QA: `.claude/specs/2026-04-28-kc-phase81-qa.md`
+
+---
+
 ## [Phase 80] 2026-04-28 -- 영업 씬 서빙 인터랙션 강화
 
 ### 개요

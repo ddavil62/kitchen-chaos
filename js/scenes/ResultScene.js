@@ -543,8 +543,8 @@ export class ResultScene extends Phaser.Scene {
     const showAd3 = stars <= 2 && totalCoinsEarned >= 1;
     const showAdRetry = this.partialFail;
     // 버튼 4개 이상일 때 간격 축소 (화면 이탈 방지)
-    // REVISE-1: 4버튼 케이스 Y 오버플로우 방지 (48→44)
-    const btnGap = (showAd3 || showAdRetry) ? 44 : 54;
+    // REVISE-1: 4버튼 케이스 Y 오버플로우 방지 (44→38, bottom <= 620)
+    const btnGap = (showAd3 || showAdRetry) ? 38 : 54;
 
     // ── Phase 81: AD-1 부분 실패 시 광고 재도전 버튼 ──
     if (showAdRetry) {
