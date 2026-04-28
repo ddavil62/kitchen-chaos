@@ -1,5 +1,59 @@
 # Changelog
 
+## [Phase 90] 2026-04-29 -- 플레이테스트 이슈 20건 수정
+
+### 개요
+
+플레이테스트 리포트에서 도출된 P0 4건 / P1 7건 / P2 9건 총 20건의 UI/UX 이슈를 3개 서브 페이즈(90-A, 90-B, 90-C)로 나누어 수정했다. 신규 에셋 생성 없이 기존 코드의 depth, alpha, 크기, 색상, 방어 로직 등을 조정. 세이브 버전 변경 없음(v31 유지).
+
+### 수정 (P0 크리티컬 4건)
+
+- `js/scenes/ShopScene.js`: A-1 탭 NineSlice depth=1020, 레이블 depth=1021 적용. TutorialManager 오버레이(depth=1010) 위에서 탭 전환 가능
+- `js/scenes/ResultScene.js`: A-2 `_lockButtons()` visible 유지 + `disableInteractive()` + alpha=0.3. 대화 종료 시 alpha=1.0 + `setInteractive()` 복원
+- `js/scenes/MenuScene.js` + `js/managers/SaveManager.js`: A-3 시즌 패스 탭 undefined 방어. `getSeasonPass()` 필드별 `??` 폴백 + 렌더링 레이어 null 가드 (`seasonId ?? 'S1'`, `currentTier ?? 0`)
+- `js/scenes/ServiceScene.js`: A-4 `create()` 직후 `delayedCall(0)` 패턴으로 인벤토리 총량 0 체크, 즉시 `_endService('stock')` 호출
+
+### 변경 (P1 중요 7건)
+
+- `js/scenes/WorldMapScene.js`: B-1 HUD에 에너지 텍스트 추가 (`_refreshEnergyHUD()` 메서드 신설, 에너지 0 시 #ff4444 빨간색). B-2 대화 트리거 `delayedCall(350ms)` 지연 실행, `once:true` + `hasSeen()` 체크 확인
+- `js/scenes/GatheringScene.js`: B-3 수집 현황 아이콘 fontSize 11px -> 14px, 행간 16px -> 18px. 채집 시작 버튼 미작동은 자동화 환경 한계로 코드 변경 없음
+- `js/scenes/RecipeCollectionScene.js`: B-4 도구 탭 색상 박스(38x38) 위에 TOOL_ICONS 이모지 24px 오버레이 추가
+- `js/scenes/MenuScene.js`: B-5 미션 카드 하단에 "오늘의 미션은 N개입니다." 안내 문구 + 완료 카운트 표시
+- `js/scenes/MerchantScene.js`: B-6 판매 버튼 색상 0x773322(빨강) -> 0x996622(주황), 텍스처 btn_danger -> btn_secondary, 레이블 "N g 판매". 3색 체계(구매=초록/판매=주황/업그레이드=파랑)
+- `js/scenes/ShopScene.js`: B-7 업그레이드 탭 구매 버튼 너비 60px -> 76px
+
+### 변경 (P2 개선 9건)
+
+- `js/scenes/ChefSelectScene.js`: C-1 화살표 ARROW_W 36->44, ARROW_H 60->64, fontSize 22->24px
+- `js/data/achievementData.js`: C-2 battle_100kills 아이콘 교차검(중복) -> 폭발 아이콘
+- `js/scenes/AchievementScene.js`: C-3 업적 설명 텍스트 `wordWrap: { width: 240 }` 추가
+- `js/scenes/MerchantScene.js`: C-4 분기 카드 CARD_WIDTH 100->96, CARD_GAP 10->8, 양쪽 28px 여백 확보, wordWrap 패딩 CARD_WIDTH-12
+- `js/scenes/WorldMapScene.js`: C-5 챕터 노드 별점 라벨 y+36 -> y+44 (+8px 여백)
+- `js/scenes/ServiceScene.js`: C-6 레시피 재료 아이콘 fontSize 10->12px, 3종 이상 시 "외 N종" 축약 표시
+- `js/scenes/MenuScene.js`: C-7 배경 이미지 이벤트 분기 코드 구조 준비 (에셋 미존재 시 기존 menu_bg 폴백). C-8 시즌 패스 바로가기 텍스트 버튼 ("시즌 패스 >") + `_openDailyMissionModal('season_pass')` defaultTab 파라미터
+- `js/scenes/ResultScene.js`: C-9 재클리어 문구 색상 #888888, fontStyle italic, fontSize 12px + 안내 문구 변경
+
+### 스펙 대비 구현 차이
+
+- 없음 (A-1~C-9 전항 스펙과 일치)
+
+### 잔여 이슈
+
+- C-7: `menu_bg_default` 에셋 미존재로 코드 구조만 준비. 실제 배경 교체는 별도 AD Phase 필요
+- B-3: GatheringScene 채집 시작 버튼 미작동 여부를 실기기에서 확인 필요 (자동화 환경 한계)
+
+### QA 결과
+
+PASS (23/23 Playwright 테스트 통과, 15건 스크린샷 시각 검증 통과, 5건 예외 시나리오 추가 검증 통과). 잠재적 위험 요소 3건(LOW) 식별, 모두 현재 영향 없음.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-29-kc-phase90-scope.md`
+- 리포트: `.claude/specs/2026-04-29-kc-phase90-coder-report.md`
+- QA: `.claude/specs/2026-04-29-kc-phase90-qa.md`
+
+---
+
 ## [Phase 89] 2026-04-28 -- 시즌 패스 + IAP 팩
 
 ### 개요
