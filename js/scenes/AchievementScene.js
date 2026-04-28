@@ -240,10 +240,12 @@ export class AchievementScene extends Phaser.Scene {
     //   claimed(#1a2a1a 다크그린): 설명 밝은 녹색 계열
     //   unlocked(#2a2200 어두운 금색): 설명 옅은 금색
     //   default(#222222 어두운 회색): 설명 기존 연회색 유지하되 채도 상향
+    // Phase 90-C (C-3): wordWrap 추가하여 긴 설명 텍스트 잘림 방지
     const descColor = item.claimed ? '#c8e6c8' : (item.unlocked ? '#ffe0a8' : '#d8d8d8');
     const desc = this.add.text(cardX + 48, y + 36, item.descKo, {
       fontSize: '10px', color: descColor,
       stroke: '#000000', strokeThickness: 1,
+      wordWrap: { width: 240 },
     }).setOrigin(0, 0.5);
     container.add(desc);
 

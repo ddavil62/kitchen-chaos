@@ -138,7 +138,8 @@ export const ACHIEVEMENTS = [
     nameKo: '킬 100',
     descKo: '적을 100마리 처치한다',
     category: 'battle',
-    icon: '\u2694\uFE0F',
+    // Phase 90-C (C-2): battle_first_kill과 아이콘 중복 해소 (⚔️ → 💥)
+    icon: '\uD83D\uDCA5',
     condition: { type: 'enemy_total_killed', threshold: 100 },
     reward: { coin: 10 },
   },

@@ -46,7 +46,23 @@ export class MenuScene extends Phaser.Scene {
     SoundManager.playBGM('bgm_menu');
 
     // Phase 61: 메뉴 배경 이미지 (depth -1, 배경 최하단)
-    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'menu_bg').setDepth(-1);
+    // Phase 90-C (C-7): 이벤트 유형에 따른 배경 분기 구조 (에셋 미존재 시 기존 menu_bg 폴백)
+    const activeEvent = WeeklyEventManager.getActiveEvent();
+    let menuBgKey = 'menu_bg'; // 기본 배경 (폴백)
+    if (activeEvent) {
+      // 이벤트 활성 시: 이벤트 유형별 배경 키 시도
+      const eventBgKey = `menu_bg_${activeEvent.id}`;
+      if (this.textures.exists(eventBgKey)) {
+        menuBgKey = eventBgKey;
+      }
+      // 에셋 미존재 시 기존 menu_bg 유지
+    } else {
+      // 이벤트 비활성 시: 기본 배경 시도 (menu_bg_default가 있으면 사용)
+      if (this.textures.exists('menu_bg_default')) {
+        menuBgKey = 'menu_bg_default';
+      }
+    }
+    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, menuBgKey).setDepth(-1);
 
     // Phase 60-15 → Phase 61: panel 'dark' 알파 0.5로 낮춰 배경 이미지가 비치도록 조정
     const darkPanel = NineSliceFactory.panel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 'dark');
@@ -57,6 +73,9 @@ export class MenuScene extends Phaser.Scene {
 
     // ── Phase 88: 주간 이벤트 배너 (이벤트 활성 시만 표시) ──
     this._createWeeklyEventBanner();
+
+    // ── Phase 90-C (C-8): 시즌 패스 바로가기 버튼 ──
+    this._createSeasonPassShortcut();
 
     // ── Phase 82: 리소스 HUD (배너 하단 y=72 → y=100) ──
     this._createResourceHUD();
@@ -410,14 +429,44 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
   }
 
+  // ── Phase 90-C (C-8): 시즌 패스 바로가기 ──────────────────────────
+
+  /**
+   * 미션 배너 우측 하단에 "시즌 패스" 바로가기 텍스트 버튼을 생성한다.
+   * 탭 시 미션 모달을 시즌 패스 탭으로 직접 연다.
+   * @private
+   */
+  _createSeasonPassShortcut() {
+    // 미션 배너(center y=50, H=44)의 우측 하단 근처에 작은 텍스트 버튼 배치
+    const SP_X = GAME_WIDTH - 18;
+    const SP_Y = 73;  // 미션 배너 하단(y=72) + 1px
+
+    const spText = this.add.text(SP_X, SP_Y, '\uD83C\uDFC6 \uC2DC\uC98C \uD328\uC2A4 >', {
+      fontSize: '10px',
+      fontStyle: 'bold',
+      color: '#ffcc88',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+
+    spText.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._openDailyMissionModal('season_pass');
+    });
+    spText.on('pointerover', () => spText.setColor('#ffee44'));
+    spText.on('pointerout', () => spText.setColor('#ffcc88'));
+  }
+
   // ── Phase 75B: 미션/캘린더 통합 팝업 ──────────────────────────────
 
   /**
-   * 미션/캘린더 통합 팝업 모달을 연다.
-   * 탭 전환으로 "오늘의 미션" / "로그인 보너스" 뷰를 전환한다.
+   * 미션/캘린더/시즌 패스 통합 팝업 모달을 연다.
+   * 탭 전환으로 "오늘의 미션" / "로그인 보너스" / "시즌 패스" 뷰를 전환한다.
+   * Phase 90-C (C-8): defaultTab 파라미터 추가 — 'mission' | 'calendar' | 'season_pass'
+   * @param {string} [defaultTab='mission'] - 기본 활성 탭
    * @private
    */
-  _openDailyMissionModal() {
+  _openDailyMissionModal(defaultTab = 'mission') {
     if (this._missionModalContainer) return;
 
     const cx = GAME_WIDTH / 2;
@@ -548,8 +597,14 @@ export class MenuScene extends Phaser.Scene {
       showSeasonTab();
     });
 
-    // 기본 탭: 미션
-    showMissionTab();
+    // Phase 90-C (C-8): defaultTab 파라미터에 따라 초기 탭 결정
+    if (defaultTab === 'season_pass') {
+      showSeasonTab();
+    } else if (defaultTab === 'calendar') {
+      showCalendarTab();
+    } else {
+      showMissionTab();
+    }
   }
 
   /**

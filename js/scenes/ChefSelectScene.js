@@ -333,13 +333,14 @@ export class ChefSelectScene extends Phaser.Scene {
    */
   _buildArrowButtons() {
     // Phase 60-19: 왼쪽 화살표 rect → NineSliceFactory.raw 'btn_icon_normal' + setTint
-    const ARROW_W = 36, ARROW_H = 60;
+    // Phase 90-C (C-1): 터치 타깃 확대 (36x60 → 44x64, fontSize 22→24)
+    const ARROW_W = 44, ARROW_H = 64;
     const leftBtn = NineSliceFactory.raw(this, 22, CARD_CY, ARROW_W, ARROW_H, 'btn_icon_normal');
     leftBtn.setTint(0x333344).setAlpha(0.8);
     const leftHit = new Phaser.Geom.Rectangle(-ARROW_W / 2, -ARROW_H / 2, ARROW_W, ARROW_H);
     leftBtn.setInteractive(leftHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(22, CARD_CY, '<', {
-      fontSize: '22px', fontStyle: 'bold', color: '#ffffff',
+      fontSize: '24px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5);
 
     leftBtn.on('pointerdown', () => {
@@ -351,12 +352,13 @@ export class ChefSelectScene extends Phaser.Scene {
     leftBtn.on('pointerout', () => { leftBtn.setTexture(NS_KEYS.BTN_ICON_NORMAL); leftBtn.setTint(0x333344); });
 
     // Phase 60-19: 오른쪽 화살표 rect → NineSliceFactory.raw 'btn_icon_normal' + setTint
+    // Phase 90-C (C-1): 터치 타깃 확대 (ARROW_W/H 재사용, fontSize 24px)
     const rightBtn = NineSliceFactory.raw(this, 338, CARD_CY, ARROW_W, ARROW_H, 'btn_icon_normal');
     rightBtn.setTint(0x333344).setAlpha(0.8);
     const rightHit = new Phaser.Geom.Rectangle(-ARROW_W / 2, -ARROW_H / 2, ARROW_W, ARROW_H);
     rightBtn.setInteractive(rightHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(338, CARD_CY, '>', {
-      fontSize: '22px', fontStyle: 'bold', color: '#ffffff',
+      fontSize: '24px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5);
 
     rightBtn.on('pointerdown', () => {

@@ -1501,15 +1501,24 @@ export class ServiceScene extends Phaser.Scene {
       bg.on('pointerout',  () => bg.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL));
 
       // 레시피 이름 + 재료 요약
-      const ingStr = Object.entries(recipe.ingredients)
-        .map(([t, n]) => `${INGREDIENT_TYPES[t]?.icon || t}${n}`)
-        .join('');
+      // Phase 90-C (C-6): 재료 3종 이상 시 최대 2개 + "외 N종" 축약, 최소 12px 보장
+      const ingEntries = Object.entries(recipe.ingredients);
+      let ingStr;
+      if (ingEntries.length > 2) {
+        const shown = ingEntries.slice(0, 2)
+          .map(([t, n]) => `${INGREDIENT_TYPES[t]?.icon || t}${n}`).join('');
+        ingStr = `${shown} 외 ${ingEntries.length - 2}종`;
+      } else {
+        ingStr = ingEntries
+          .map(([t, n]) => `${INGREDIENT_TYPES[t]?.icon || t}${n}`).join('');
+      }
       // Phase 19-6: 텍스트 색상 웜 앰버로 통합
       const label = this.add.text(x, y - 6, recipe.nameKo, {
         fontSize: '10px', color: '#e8c87a', fontStyle: 'bold',
       }).setOrigin(0.5).setDepth(11);
+      // Phase 90-C (C-6): 재료 아이콘 최소 12px 보장
       const subLabel = this.add.text(x, y + 10, ingStr, {
-        fontSize: '10px', color: '#b89a5a',
+        fontSize: '12px', color: '#b89a5a',
       }).setOrigin(0.5).setDepth(11);
 
       bg.on('pointerdown', () => this._onRecipeTap(recipe));

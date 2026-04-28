@@ -494,8 +494,9 @@ export class WorldMapScene extends Phaser.Scene {
       this._mapContainer.add(labelText);
 
       // 5. 별점 표시 (해금된 경우) — Phase 63: y+30 → y+36 (반경 확대 반영)
+      // Phase 90-C (C-5): y+36 → y+44 (노드 원과 라벨 사이 여백 +8px 확보)
       if (state.unlocked) {
-        const starText = this.add.text(x, y + 36, `\u2605 ${state.currentStars}/${state.maxStars}`, {
+        const starText = this.add.text(x, y + 44, `\u2605 ${state.currentStars}/${state.maxStars}`, {
           fontSize: '9px',
           color: '#ffd700',
         }).setOrigin(0.5);

@@ -46,12 +46,13 @@ const MARGIN_X = 20;
 const ITEM_HEIGHT = 110;
 // ── Phase 58-2: 분기 카드 영역 ──
 const CARD_AREA_TOP = LIST_TOP;       // 카드 영역도 탭 아래에서 시작
-const CARD_WIDTH = 100;
+// Phase 90-C (C-4): 카드 폭 100→96, 갭 10→8로 조정하여 좌우 패딩 확보
+const CARD_WIDTH = 96;
 const CARD_HEIGHT = 160;
-const CARD_GAP = 10;
-// 카드 3장의 가로 합 = 100*3 + 10*2 = 320. 360 중앙 정렬 시 좌측 20px 여백.
+const CARD_GAP = 8;
+// 카드 3장의 가로 합 = 96*3 + 8*2 = 304. 360 중앙 정렬 시 좌측 28px 여백.
 const CARD_TOTAL_W = CARD_WIDTH * 3 + CARD_GAP * 2;
-const CARD_START_X = (GAME_WIDTH - CARD_TOTAL_W) / 2;    // 20
+const CARD_START_X = (GAME_WIDTH - CARD_TOTAL_W) / 2;    // 28
 // Phase 58-2 AD3 REVISE: helpText~카드 공백 과다 해소 (310 → 250)
 const CARD_CENTER_Y = 250;     // 탭 아래 전체 영역의 상단 근처 (helpText 여백 28px)
 
@@ -1156,18 +1157,20 @@ export class MerchantScene extends Phaser.Scene {
     this._branchTabElements.push(catText);
 
     // 중앙 titleKo (14px bold)
+    // Phase 90-C (C-4): wordWrap 패딩 확대 (CARD_WIDTH - 10 → CARD_WIDTH - 12)
     const title = this.add.text(cx, topY + 55, cardDef.titleKo || '', {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
-      wordWrap: { width: CARD_WIDTH - 10 },
+      wordWrap: { width: CARD_WIDTH - 12 },
       align: 'center',
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(title);
 
-    // 하단 descKo (F-3 Fix: 10px → 12px, wordWrap 너비 94px으로 미세 확장)
+    // 하단 descKo (F-3 Fix: 10px → 12px)
+    // Phase 90-C (C-4): wordWrap 패딩 확대 (CARD_WIDTH - 6 → CARD_WIDTH - 12)로 좌측 잘림 방지
     const desc = this.add.text(cx, topY + 82, cardDef.descKo || '', {
       fontSize: '12px', color: '#bbbbbb',
-      wordWrap: { width: CARD_WIDTH - 6 },
+      wordWrap: { width: CARD_WIDTH - 12 },
       align: 'center', lineSpacing: 2,
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(desc);

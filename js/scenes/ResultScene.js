@@ -535,9 +535,16 @@ export class ResultScene extends Phaser.Scene {
     y += 26;
 
     // Phase 82: 재클리어(동일·하위 별점) 시 보상 없음 문구 분기
+    // Phase 90-C (C-9): 재클리어 문구를 회색 + 이탤릭으로 시각 구분
     let rewardText;
+    let rewardColor = '#ffcc00';
+    let rewardStyle = 'bold';
+    let rewardFontSize = '15px';
     if (totalCoinsEarned === 0 && stars > 0) {
-      rewardText = '재클리어 (추가 보상 없음)';
+      rewardText = '재클리어 — 최초 클리어 시에만 보상이 지급됩니다';
+      rewardColor = '#888888';
+      rewardStyle = 'italic';
+      rewardFontSize = '12px';
     } else {
       rewardText = `+${totalCoinsEarned} 코인`;
       if (isFirstClear && stars > 0) {
@@ -549,7 +556,7 @@ export class ResultScene extends Phaser.Scene {
       }
     }
     this.add.text(40, y, rewardText, {
-      fontSize: '15px', fontStyle: 'bold', color: '#ffcc00',
+      fontSize: rewardFontSize, fontStyle: rewardStyle, color: rewardColor,
       stroke: '#000', strokeThickness: 2,
     });
     y += 32;
