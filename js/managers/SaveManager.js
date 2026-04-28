@@ -34,12 +34,13 @@
  *           getRegularProgress, setRegularProgress, getCriticPenalty, setCriticPenalty 헬퍼 추가.
  * Phase 77: v27 마이그레이션 — 엔드리스 해금 조건 24-6 → 6-6 완화.
  * Phase 82: clearStage() 재클리어 코인 지급 0으로 변경 (최초 달성·별점 상향 시만 보상).
+ * Phase 84: v28 마이그레이션 — unlockedSkins, equippedSkin 추가.
  */
 
 import { STAGE_ORDER } from '../data/stageData.js';
 
 const SAVE_KEY = 'kitchenChaosTycoon_save';
-const SAVE_VERSION = 27;
+const SAVE_VERSION = 28;
 
 // ── Phase 73: 세이브 백업 슬롯 키 (3개 롤링) ──
 const BACKUP_KEYS = [
@@ -178,6 +179,9 @@ function createDefault() {
       // ── Phase 58-2 추가: 방문별 선택 완료 상태 ──
       lastVisit: null,            // { stageId: string, selectedCardId: string } | null — 마지막 행상인 방문에서 이미 선택한 카드
     },
+    // ── Phase 84 추가: 스킨 시스템 ──
+    unlockedSkins: { mimi_chef: ['default'] },  // { [chefId]: skinId[] }
+    equippedSkin:  { mimi_chef: 'default' },    // { [chefId]: skinId }
   };
 }
 
@@ -1619,6 +1623,23 @@ export class SaveManager {
         data.endless.unlocked = true;
       }
       data.version = 27;
+    }
+
+    // v27 → v28: 스킨 시스템 추가 (Phase 84)
+    if (data.version < 28) {
+      if (!data.unlockedSkins) {
+        data.unlockedSkins = { mimi_chef: ['default'] };
+      } else if (!data.unlockedSkins.mimi_chef) {
+        data.unlockedSkins.mimi_chef = ['default'];
+      } else if (!data.unlockedSkins.mimi_chef.includes('default')) {
+        data.unlockedSkins.mimi_chef.unshift('default');
+      }
+      if (!data.equippedSkin) {
+        data.equippedSkin = { mimi_chef: 'default' };
+      } else if (!data.equippedSkin.mimi_chef) {
+        data.equippedSkin.mimi_chef = 'default';
+      }
+      data.version = 28;
     }
 
     // Phase 72: recipeRepeatCounts 필드 누락 방어 (기존 v24 세이브 호환)

@@ -8,6 +8,7 @@
  * Phase 56: 7종 Named 셰프 카드, 압축 레이아웃, 잠금 조건 7종 분기, unlockHint 사용.
  * Phase 57: 세로 목록 → 가로 캐러셀 전면 개편. 중앙 카드 260x380px,
  *           좌우 스와이프 + 화살표 버튼, 순환(wrap) 탐색, portrait 통합.
+ * Phase 84: 미미 스킨 선택 서브 패널 추가 (썸네일 3종, 장착/미보유 표시, IAP 구매 팝업).
  * 360x640 레이아웃: 가로 캐러셀 카드 + "이 셰프로 시작" + "셰프 없이 시작" + 뒤로가기.
  */
 
@@ -21,6 +22,8 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { STAGES } from '../data/stageData.js';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
 import { isChefUnlocked } from '../data/chefUnlockHelper.js';
+import { SkinManager } from '../managers/SkinManager.js';
+import { IAPManager } from '../managers/IAPManager.js';
 
 // ── 셰프 ID → portrait 텍스처 키 매핑 (Phase 57) ──
 const CHEF_PORTRAIT_MAP = {
@@ -56,6 +59,16 @@ const PEEK_ALPHA = 0.45;           // 비활성 카드 투명도
 const SWIPE_THRESHOLD = 50;        // 스와이프 임계값 (px)
 const TWEEN_DURATION = 220;        // 카드 전환 tween 시간 (ms)
 const CARD_RADIUS = 12;            // 카드 모서리 라운드
+
+// ── Phase 84: 스킨 패널 레이아웃 상수 ──
+const SKIN_PANEL_Y = 465;          // 스킨 패널 상단 y
+const SKIN_PANEL_H = 105;          // 스킨 패널 높이
+const SKIN_THUMB_Y = 502;          // 썸네일 중심 y (씬 절대 좌표)
+const SKIN_NAME_Y = 542;           // 스킨 이름 텍스트 y (씬 절대 좌표)
+const SKIN_THUMB_XS = [100, 180, 260]; // 썸네일 x 좌표 배열
+const SKIN_THUMB_SIZE = 48;        // 썸네일 표시 크기 (px)
+const SELECT_BTN_Y_DEFAULT = 549;  // 선택 버튼 기본 y
+const SELECT_BTN_Y_SKIN = 590;     // 미미 카드 포커스 시 선택 버튼 y
 
 export class ChefSelectScene extends Phaser.Scene {
   constructor() {
@@ -128,8 +141,18 @@ export class ChefSelectScene extends Phaser.Scene {
     // ── 하단 컨트롤 ──
     this._buildBottomControls();
 
+    // ── Phase 84: 스킨 서브 패널 빌드 (초기 hidden) ──
+    this._buildSkinPanel();
+
     // ── 스와이프 이벤트 ──
     this._setupSwipe();
+
+    // ── 씬 진입 시 이미 장착된 스킨을 카드 portrait에 적용 ──
+    CHEF_ORDER.forEach((chefId) => {
+      if (chefId === 'mimi_chef') {
+        this._refreshCardPortrait(chefId);
+      }
+    });
 
     // ── 초기 위치 설정 (애니메이션 없이) ──
     this._goToIndex(this._currentIndex, false);
@@ -159,6 +182,8 @@ export class ChefSelectScene extends Phaser.Scene {
   _buildCarouselCards() {
     /** @type {Phaser.GameObjects.Container[]} */
     this._cards = [];
+    /** @type {(Phaser.GameObjects.Image|null)[]} Phase 84: portrait 이미지 참조 배열 */
+    this._portraitImages = [];
 
     for (let i = 0; i < this._chefList.length; i++) {
       const { chef, locked } = this._chefList[i];
@@ -209,12 +234,16 @@ export class ChefSelectScene extends Phaser.Scene {
       portrait.setScale(scale);
       if (isLocked) portrait.setAlpha(0.3);
       container.add(portrait);
+      // Phase 84: portrait 참조 저장
+      this._portraitImages.push(portrait);
     } else if (SpriteLoader.hasTexture(this, chefSpriteKey)) {
       // 스프라이트 fallback — 80px 고정 폭
       const sprite = this.add.image(0, portraitY, chefSpriteKey);
       sprite.setScale(80 / sprite.width);
       if (isLocked) sprite.setAlpha(0.3);
       container.add(sprite);
+      // Phase 84: 스프라이트 fallback은 portrait 교체 불가이므로 null
+      this._portraitImages.push(null);
     } else {
       // 이모지 fallback
       const iconText = this.add.text(0, portraitY, chef.icon, {
@@ -222,6 +251,8 @@ export class ChefSelectScene extends Phaser.Scene {
       }).setOrigin(0.5);
       if (isLocked) iconText.setAlpha(0.3);
       container.add(iconText);
+      // Phase 84: 이모지 fallback은 portrait 교체 불가이므로 null
+      this._portraitImages.push(null);
     }
 
     // ── 셰프 이름 (y = -33) ──
@@ -346,11 +377,11 @@ export class ChefSelectScene extends Phaser.Scene {
   _buildSelectButton() {
     // Phase 60-19: 선택 버튼 rect → NineSliceFactory.raw 'btn_primary_normal' + setTint
     const SELECT_W = 200, SELECT_H = 40;
-    this._selectBtnBg = NineSliceFactory.raw(this, CX, 549, SELECT_W, SELECT_H, 'btn_primary_normal');
+    this._selectBtnBg = NineSliceFactory.raw(this, CX, SELECT_BTN_Y_DEFAULT, SELECT_W, SELECT_H, 'btn_primary_normal');
     this._selectBtnBg.setTint(0x44cc44);
     const selectHit = new Phaser.Geom.Rectangle(-SELECT_W / 2, -SELECT_H / 2, SELECT_W, SELECT_H);
     this._selectBtnBg.setInteractive(selectHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this._selectBtnText = this.add.text(CX, 549, '\uC774 \uC170\uD504\uB85C \uC2DC\uC791', {
+    this._selectBtnText = this.add.text(CX, SELECT_BTN_Y_DEFAULT, '\uC774 \uC170\uD504\uB85C \uC2DC\uC791', {
       fontSize: '14px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -393,6 +424,16 @@ export class ChefSelectScene extends Phaser.Scene {
       const selectHit = new Phaser.Geom.Rectangle(-SELECT_W / 2, -SELECT_H / 2, SELECT_W, SELECT_H);
       this._selectBtnBg.setInteractive(selectHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     }
+  }
+
+  /**
+   * 선택 버튼의 y 좌표를 즉시 이동한다.
+   * @param {number} y - 목표 y 좌표
+   * @private
+   */
+  _moveSkinSelectButton(y) {
+    this._selectBtnBg.setY(y);
+    this._selectBtnText.setY(y);
   }
 
   // ── 하단 컨트롤 ──
@@ -439,6 +480,275 @@ export class ChefSelectScene extends Phaser.Scene {
     // Phase 60-19: setFillStyle → setTexture + setTint
     backBtn.on('pointerover', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_PRESSED); backBtn.setTint(0xaaaaaa); });
     backBtn.on('pointerout', () => { backBtn.setTexture(NS_KEYS.BTN_SECONDARY_NORMAL); backBtn.setTint(0x888888); });
+  }
+
+  // ── Phase 84: 스킨 서브 패널 ──
+
+  /**
+   * 미미 스킨 선택 서브 패널을 생성한다 (초기 hidden).
+   * 씬 절대 좌표 기준으로 배치하며 depth=20으로 카드 위에 표시한다.
+   * @private
+   */
+  _buildSkinPanel() {
+    this._skinPanel = this.add.container(0, 0);
+    this._skinPanel.setDepth(20);
+
+    // ── 배경 패널: 반투명 둥근 사각형 ──
+    const panelBg = this.add.graphics();
+    panelBg.fillStyle(0x111122, 0.85);
+    panelBg.fillRoundedRect(CX - 150, SKIN_PANEL_Y, 300, SKIN_PANEL_H, 8);
+    panelBg.lineStyle(1, 0x444466, 0.6);
+    panelBg.strokeRoundedRect(CX - 150, SKIN_PANEL_Y, 300, SKIN_PANEL_H, 8);
+    this._skinPanel.add(panelBg);
+
+    // ── 스킨 항목 배열 ──
+    const skins = SkinManager.getSkinsForChef('mimi_chef');
+    /** @type {Array<{ thumb: Phaser.GameObjects.Image|null, selectBorder: Phaser.GameObjects.Graphics, lockOverlay: Phaser.GameObjects.Text, priceText: Phaser.GameObjects.Text, nameText: Phaser.GameObjects.Text, skinDef: object }>} */
+    this._skinItems = [];
+
+    skins.forEach((skin, i) => {
+      const x = SKIN_THUMB_XS[i];
+
+      // ── 썸네일 이미지 ──
+      let thumb = null;
+      if (SpriteLoader.hasTexture(this, skin.portraitKey)) {
+        thumb = this.add.image(x, SKIN_THUMB_Y, skin.portraitKey);
+        const scale = SKIN_THUMB_SIZE / Math.max(thumb.width, thumb.height);
+        thumb.setScale(scale);
+        this._skinPanel.add(thumb);
+      } else {
+        // 텍스처 없을 경우 플레이스홀더 사각형
+        const ph = this.add.graphics();
+        ph.fillStyle(0x333355, 1);
+        ph.fillRect(x - SKIN_THUMB_SIZE / 2, SKIN_THUMB_Y - SKIN_THUMB_SIZE / 2, SKIN_THUMB_SIZE, SKIN_THUMB_SIZE);
+        this._skinPanel.add(ph);
+      }
+
+      // ── 장착 테두리 (노란색 2px stroke) ──
+      const selectBorder = this.add.graphics();
+      selectBorder.lineStyle(2, 0xffcc00, 1);
+      selectBorder.strokeRect(
+        x - SKIN_THUMB_SIZE / 2 - 2,
+        SKIN_THUMB_Y - SKIN_THUMB_SIZE / 2 - 2,
+        SKIN_THUMB_SIZE + 4,
+        SKIN_THUMB_SIZE + 4
+      );
+      selectBorder.setVisible(false);
+      this._skinPanel.add(selectBorder);
+
+      // ── 자물쇠 오버레이 (미보유 시) ──
+      const lockOverlay = this.add.text(x, SKIN_THUMB_Y, '\uD83D\uDD12', {
+        fontSize: '22px',
+      }).setOrigin(0.5);
+      lockOverlay.setVisible(false);
+      this._skinPanel.add(lockOverlay);
+
+      // ── 가격 텍스트 (미보유 시) ──
+      const priceText = this.add.text(x, SKIN_THUMB_Y + 18, `\u20A9${skin.price.toLocaleString()}`, {
+        fontSize: '9px', color: '#ffaa44',
+      }).setOrigin(0.5);
+      priceText.setVisible(false);
+      this._skinPanel.add(priceText);
+
+      // ── 스킨 이름 텍스트 ──
+      const nameText = this.add.text(x, SKIN_NAME_Y, skin.nameKo, {
+        fontSize: '10px', color: '#cccccc',
+      }).setOrigin(0.5);
+      this._skinPanel.add(nameText);
+
+      // ── 탭 히트 영역 ──
+      const hitZone = this.add.zone(x, SKIN_THUMB_Y, SKIN_THUMB_SIZE + 8, SKIN_THUMB_SIZE + 24)
+        .setInteractive({ useHandCursor: true });
+      hitZone.on('pointerdown', () => {
+        this._onSkinTap('mimi_chef', skin);
+      });
+      this._skinPanel.add(hitZone);
+
+      this._skinItems.push({
+        thumb,
+        selectBorder,
+        lockOverlay,
+        priceText,
+        nameText,
+        skinDef: skin,
+      });
+    });
+
+    this._skinPanel.setVisible(false);
+  }
+
+  /**
+   * 스킨 패널의 보유/장착 상태를 갱신한다.
+   * @private
+   */
+  _refreshSkinPanel() {
+    if (!this._skinItems) return;
+    const equippedId = SkinManager.getEquippedSkin('mimi_chef');
+
+    this._skinItems.forEach((item) => {
+      const owned = SkinManager.isSkinOwned('mimi_chef', item.skinDef.id);
+      const equipped = item.skinDef.id === equippedId;
+
+      // 장착 테두리
+      item.selectBorder.setVisible(equipped);
+
+      // 자물쇠 + 가격
+      if (item.skinDef.unlockType === 'iap' && !owned) {
+        item.lockOverlay.setVisible(true);
+        item.priceText.setVisible(true);
+        if (item.thumb) item.thumb.setAlpha(0.4);
+      } else {
+        item.lockOverlay.setVisible(false);
+        item.priceText.setVisible(false);
+        if (item.thumb) item.thumb.setAlpha(1);
+      }
+
+      // 이름 색상: 장착 시 노란색, 보유 시 흰색, 미보유 시 회색
+      if (equipped) {
+        item.nameText.setColor('#ffcc00');
+      } else if (owned) {
+        item.nameText.setColor('#cccccc');
+      } else {
+        item.nameText.setColor('#777777');
+      }
+    });
+  }
+
+  /**
+   * 스킨 썸네일 탭 핸들러.
+   * 보유 스킨이면 장착, 미보유 스킨이면 구매 팝업을 표시한다.
+   * @param {string} chefId - 셰프 ID
+   * @param {object} skin - 스킨 정의 객체
+   * @private
+   */
+  _onSkinTap(chefId, skin) {
+    const owned = SkinManager.isSkinOwned(chefId, skin.id);
+    if (owned) {
+      SkinManager.equipSkin(chefId, skin.id);
+      this._refreshSkinPanel();
+      this._refreshCardPortrait(chefId);
+    } else {
+      this._showPurchasePopup(chefId, skin);
+    }
+  }
+
+  /**
+   * 카드의 portrait 이미지를 현재 장착 스킨에 맞게 교체한다.
+   * @param {string} chefId - 셰프 ID
+   * @private
+   */
+  _refreshCardPortrait(chefId) {
+    const idx = CHEF_ORDER.indexOf(chefId);
+    if (idx < 0) return;
+    const portraitImg = this._portraitImages?.[idx];
+    if (!portraitImg) return;
+
+    const equippedSkinId = SkinManager.getEquippedSkin(chefId);
+    const skins = SkinManager.getSkinsForChef(chefId);
+    const skinDef = skins.find(s => s.id === equippedSkinId) || skins[0];
+    if (!skinDef) return;
+
+    // 텍스처 교체 후 스케일 재계산
+    if (SpriteLoader.hasTexture(this, skinDef.portraitKey)) {
+      portraitImg.setTexture(skinDef.portraitKey);
+      const targetSize = 120;
+      const scaleX = targetSize / portraitImg.width;
+      const scaleY = targetSize / portraitImg.height;
+      portraitImg.setScale(Math.min(scaleX, scaleY));
+    }
+  }
+
+  /**
+   * 스킨 구매 확인 팝업을 표시한다.
+   * @param {string} chefId - 셰프 ID
+   * @param {object} skin - 스킨 정의 객체
+   * @private
+   */
+  _showPurchasePopup(chefId, skin) {
+    // 기존 팝업이 있으면 제거
+    if (this._purchasePopup) {
+      this._purchasePopup.destroy();
+      this._purchasePopup = null;
+    }
+
+    const popup = this.add.container(0, 0);
+    popup.setDepth(100);
+
+    // ── 딤드 오버레이 ──
+    const dim = this.add.graphics();
+    dim.fillStyle(0x000000, 0.6);
+    dim.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    dim.setInteractive(new Phaser.Geom.Rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT), Phaser.Geom.Rectangle.Contains);
+    popup.add(dim);
+
+    // ── 팝업 박스 ──
+    const boxW = 260, boxH = 140;
+    const boxX = CX, boxY = 320;
+    const boxBg = this.add.graphics();
+    boxBg.fillStyle(0x1a1a2e, 1);
+    boxBg.fillRoundedRect(boxX - boxW / 2, boxY - boxH / 2, boxW, boxH, 10);
+    boxBg.lineStyle(2, 0x555577, 1);
+    boxBg.strokeRoundedRect(boxX - boxW / 2, boxY - boxH / 2, boxW, boxH, 10);
+    popup.add(boxBg);
+
+    // ── 스킨 이름 ──
+    const titleText = this.add.text(boxX, boxY - 40, skin.nameKo, {
+      fontSize: '16px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000', strokeThickness: 2,
+    }).setOrigin(0.5);
+    popup.add(titleText);
+
+    // ── 가격 표시 ──
+    const priceStr = `\uAC00\uACA9: \u20A9${skin.price.toLocaleString()}`;
+    const priceLabel = this.add.text(boxX, boxY - 15, priceStr, {
+      fontSize: '13px', color: '#ffaa44',
+    }).setOrigin(0.5);
+    popup.add(priceLabel);
+
+    // ── 구매 버튼 ──
+    const BUY_W = 90, BUY_H = 34;
+    const buyBtn = this.add.graphics();
+    buyBtn.fillStyle(0x44cc44, 1);
+    buyBtn.fillRoundedRect(boxX - 70 - BUY_W / 2, boxY + 20 - BUY_H / 2, BUY_W, BUY_H, 6);
+    popup.add(buyBtn);
+    const buyText = this.add.text(boxX - 70, boxY + 20, '\uAD6C\uB9E4', {
+      fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
+    }).setOrigin(0.5);
+    popup.add(buyText);
+    const buyZone = this.add.zone(boxX - 70, boxY + 20, BUY_W, BUY_H)
+      .setInteractive({ useHandCursor: true });
+    buyZone.on('pointerdown', async () => {
+      await IAPManager.purchaseSkin(chefId, skin.id);
+      this._refreshSkinPanel();
+      this._refreshCardPortrait(chefId);
+      if (this._purchasePopup) {
+        this._purchasePopup.destroy();
+        this._purchasePopup = null;
+      }
+    });
+    popup.add(buyZone);
+
+    // ── 취소 버튼 ──
+    const CANCEL_W = 90, CANCEL_H = 34;
+    const cancelBtn = this.add.graphics();
+    cancelBtn.fillStyle(0x555555, 1);
+    cancelBtn.fillRoundedRect(boxX + 70 - CANCEL_W / 2, boxY + 20 - CANCEL_H / 2, CANCEL_W, CANCEL_H, 6);
+    popup.add(cancelBtn);
+    const cancelText = this.add.text(boxX + 70, boxY + 20, '\uCDE8\uC18C', {
+      fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
+    }).setOrigin(0.5);
+    popup.add(cancelText);
+    const cancelZone = this.add.zone(boxX + 70, boxY + 20, CANCEL_W, CANCEL_H)
+      .setInteractive({ useHandCursor: true });
+    cancelZone.on('pointerdown', () => {
+      if (this._purchasePopup) {
+        this._purchasePopup.destroy();
+        this._purchasePopup = null;
+      }
+    });
+    popup.add(cancelZone);
+
+    this._purchasePopup = popup;
   }
 
   // ── 스와이프 처리 ──
@@ -536,6 +846,7 @@ export class ChefSelectScene extends Phaser.Scene {
     if (!animate) {
       this._applyCardPositions(0);
       this._updateSelectButton();
+      this._updateSkinPanelVisibility();
       return;
     }
 
@@ -563,8 +874,26 @@ export class ChefSelectScene extends Phaser.Scene {
         onComplete: i === this._currentIndex ? () => {
           this._tweening = false;
           this._updateSelectButton();
+          this._updateSkinPanelVisibility();
         } : undefined,
       });
+    }
+  }
+
+  /**
+   * 현재 포커스된 셰프에 따라 스킨 패널 가시성과 선택 버튼 y를 갱신한다.
+   * @private
+   */
+  _updateSkinPanelVisibility() {
+    if (!this._skinPanel) return;
+    const currentChefId = this._chefList[this._currentIndex]?.chef?.id;
+    if (currentChefId === 'mimi_chef') {
+      this._skinPanel.setVisible(true);
+      this._refreshSkinPanel();
+      this._moveSkinSelectButton(SELECT_BTN_Y_SKIN);
+    } else {
+      this._skinPanel.setVisible(false);
+      this._moveSkinSelectButton(SELECT_BTN_Y_DEFAULT);
     }
   }
 

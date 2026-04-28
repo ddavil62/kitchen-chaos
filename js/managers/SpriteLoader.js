@@ -287,7 +287,7 @@ const DEATH_DIR_FALLBACK = {
 const DEATH_FRAME_COUNT = 7;
 
 // ── 초상화 ID 목록 (Phase 14-2b, Phase 19-1: yuki, lao 추가, Phase 27-1: andre, Phase 32-4: masala_guide, Phase 57: arjun 추가) ──
-const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'arjun'];
+const PORTRAIT_IDS = ['mimi', 'poco', 'rin', 'mage', 'yuki', 'lao', 'andre', 'arjun', 'mimi_pink', 'mimi_blue'];
 
 // ── 타일셋 ID 목록 (15종, Phase 33-2: cactus_cantina 추가) ──
 const TILESET_IDS = [
