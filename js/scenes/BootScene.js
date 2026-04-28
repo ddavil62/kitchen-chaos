@@ -16,6 +16,7 @@ import Phaser from 'phaser';
 import { SpriteLoader } from '../managers/SpriteLoader.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
+import { AdManager } from '../managers/AdManager.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -161,6 +162,9 @@ export class BootScene extends Phaser.Scene {
 
     // ── 앱 백그라운드/포그라운드 전환 리스너 (Phase 12) ──
     this._setupAppStateListener();
+
+    // ── Phase 81: AdManager 초기화 (DEV 환경에서는 즉시 반환) ──
+    AdManager.initAds().catch(e => console.warn('[AdManager] init 실패:', e));
 
     // ── 폰트 로드가 끝난 뒤 메뉴 씬으로 전환 (Canvas 렌더 폴백 방지) ──
     const proceed = () => this._startGame();

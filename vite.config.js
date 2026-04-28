@@ -74,6 +74,8 @@ export default defineConfig({
     outDir: 'dist',
     assetsInlineLimit: 0,
     rollupOptions: {
+      // Phase 81: Capacitor 전용 플러그인은 웹 빌드에서 제외 (앱 빌드에서만 해석됨)
+      external: ['@capacitor-community/admob'],
       output: {
         // Android WebView 청크 로딩 순서 문제 방지 — 단일 번들로 빌드
         manualChunks: () => 'index',

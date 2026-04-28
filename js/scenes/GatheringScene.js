@@ -40,6 +40,7 @@ import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
+import { AdManager } from '../managers/AdManager.js';
 
 export class GatheringScene extends Phaser.Scene {
   constructor() {
@@ -77,7 +78,8 @@ export class GatheringScene extends Phaser.Scene {
       : null;
 
     // ── 게임 상태 (골드 제거, 도구 배치 카운트 추가) ──
-    this.lives = STARTING_LIVES;
+    // Phase 81: AD-1 광고 재도전 시 overrideLives 적용
+    this.lives = (data?.overrideLives != null) ? data.overrideLives : STARTING_LIVES;
     this.score = 0;
     this.selectedTowerType = null;
     this._activeTowerCategory = 'attack';
@@ -457,11 +459,31 @@ export class GatheringScene extends Phaser.Scene {
    * @private
    */
   _toggleSpeed() {
-    this._speedMultiplier = this._speedMultiplier === 1 ? 2 : 1;
-    const ts = this._speedMultiplier;
-    this.time.timeScale = ts;
-    // 버튼 레이블 갱신 (NineSliceFactory.button의 setLabel API 사용)
-    this._speedBtn?.setLabel(`${ts}\u00d7`);
+    if (this._speedMultiplier === 1) {
+      // 1x -> 2x 전환: 리워드 광고 시청 후 적용
+      if (!AdManager.isAdReady()) {
+        // 광고 미준비 시 버튼 일시 비활성화 후 복귀
+        this._speedBtn?.setAlpha(0.5);
+        this.time.delayedCall(1500, () => this._speedBtn?.setAlpha(1));
+        return;
+      }
+      AdManager.showRewardedAd(
+        () => {
+          // 광고 시청 완료 후 2x 적용
+          this._speedMultiplier = 2;
+          this.time.timeScale = 2;
+          this._speedBtn?.setLabel('2\u00d7');
+        },
+        () => {
+          // 광고 실패/취소 — 아무 변경 없음
+        }
+      );
+    } else {
+      // 2x -> 1x 전환: 즉시 토글 (광고 없음)
+      this._speedMultiplier = 1;
+      this.time.timeScale = 1;
+      this._speedBtn?.setLabel('1\u00d7');
+    }
   }
 
   // ── 셰프 스킬 버튼 (HUD 영역, 도구수 옆) ───────────────────────

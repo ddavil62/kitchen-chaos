@@ -11,7 +11,7 @@
  */
 
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { GAME_WIDTH, GAME_HEIGHT, STARTING_LIVES } from '../config.js';
 import { NineSliceFactory } from '../ui/NineSliceFactory.js';
 import { NS_KEYS } from '../ui/UITheme.js';
 import { STAGES, STAGE_ORDER } from '../data/stageData.js';
@@ -21,6 +21,7 @@ import { StoryManager } from '../managers/StoryManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { BranchEffects } from '../managers/BranchEffects.js';
 import { DailyMissionManager } from '../managers/DailyMissionManager.js';
+import { AdManager } from '../managers/AdManager.js';
 
 // ── Phase 74: 셰프별 장보기 실패 대사 (P2-5) ──
 // 셰프 ID → 바리에이션 3줄 배열. 매 호출 시 Math.floor(Math.random() * 3)으로 선택.
@@ -267,6 +268,29 @@ export class ResultScene extends Phaser.Scene {
       }).setOrigin(0.5);
     y += 80;
 
+    // ── Phase 81: AD-1 광고 보고 재도전 버튼 ──
+    const adRetryBtn = this._createButton(y, '\uD83C\uDFAC \uAD11\uACE0 \uBCF4\uACE0 \uC7AC\uB3C4\uC804', 0x22aa55, () => {
+      AdManager.showRewardedAd(
+        () => {
+          // onReward: stageId 유지, HP = ceil(STARTING_LIVES / 2)로 GatheringScene 직접 진입
+          SaveManager.clearCurrentRun();
+          this.cameras.main.fadeOut(300, 0, 0, 0);
+          this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.scene.start('GatheringScene', {
+              stageId: this.stageId,
+              overrideLives: Math.ceil(STARTING_LIVES / 2),
+            });
+          });
+        },
+        () => { /* 광고 실패 — 무동작 */ }
+      );
+    });
+    if (!AdManager.isAdReady()) {
+      adRetryBtn?.bg?.setAlpha(0.5);
+      adRetryBtn?.label?.setAlpha(0.5);
+    }
+    y += 70;
+
     // 버튼
     this._createButton(y, '다시 하기', 0xff6b35, () => {
       this._fadeToScene('ChefSelectScene', { stageId: this.stageId });
@@ -508,12 +532,43 @@ export class ResultScene extends Phaser.Scene {
 
     // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
     NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 40, 2);
-    y += 18;
+    y += 12;
 
     // ── Phase 68: P0-3 modal lock — 버튼 그룹 ──
     /** @type {Phaser.GameObjects.GameObject[]} 버튼 오브젝트 목록 (lock/unlock 대상) */
     this._buttonObjects = [];
     this._buttonsLocked = false;
+
+    // ── Phase 81: AD-3 조건 사전 판별 (버튼 간격 조정용) ──
+    const showAd3 = stars <= 2 && totalCoinsEarned >= 1;
+    const showAdRetry = this.partialFail;
+    // 버튼 4개 이상일 때 간격 축소 (화면 이탈 방지)
+    const btnGap = (showAd3 || showAdRetry) ? 48 : 54;
+
+    // ── Phase 81: AD-1 부분 실패 시 광고 재도전 버튼 ──
+    if (showAdRetry) {
+      const adRetryBtn = this._createButton(y, '\uD83C\uDFAC \uAD11\uACE0 \uBCF4\uACE0 \uC7AC\uB3C4\uC804', 0x22aa55, () => {
+        if (this._buttonsLocked) return;
+        AdManager.showRewardedAd(
+          () => {
+            SaveManager.clearCurrentRun();
+            this.cameras.main.fadeOut(300, 0, 0, 0);
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+              this.scene.start('GatheringScene', {
+                stageId: this.stageId,
+                overrideLives: Math.ceil(STARTING_LIVES / 2),
+              });
+            });
+          },
+          () => { /* 광고 실패 — 무동작 */ }
+        );
+      });
+      if (!AdManager.isAdReady()) {
+        adRetryBtn?.bg?.setAlpha(0.5);
+        adRetryBtn?.label?.setAlpha(0.5);
+      }
+      y += btnGap;
+    }
 
     // ── 버튼 ──
     // Phase 13-2: 영업 성공 시 행상인 방문 버튼 (MerchantScene 경유)
@@ -528,14 +583,41 @@ export class ResultScene extends Phaser.Scene {
           isMarketFailed: false,
         });
       });
-      y += 54;
+      y += btnGap;
     }
 
     this._createButton(y, '\uB2E4\uC2DC \uD558\uAE30', 0xff6b35, () => {
       if (this._buttonsLocked) return;
       this._fadeToScene('ChefSelectScene', { stageId: this.stageId });
     });
-    y += 54;
+    y += btnGap;
+
+    // ── Phase 81: AD-3 보상 2배 버튼 (stars <= 2 && 코인 1개 이상 획득 시) ──
+    if (showAd3) {
+      this._ad3Used = false;
+      const ad3Btn = this._createButton(y, '\uD83C\uDFAC \uAD11\uACE0 \uBCF4\uACE0 \uBCF4\uC0C1 2\uBC30', 0xcc6600, () => {
+        if (this._buttonsLocked || this._ad3Used) return;
+        AdManager.showRewardedAd(
+          () => {
+            this._ad3Used = true;
+            // 코인 추가 지급 (사실상 2배)
+            const saveData = SaveManager.load();
+            saveData.kitchenCoins = (saveData.kitchenCoins || 0) + totalCoinsEarned;
+            SaveManager.save(saveData);
+            // 버튼 비활성화 (시각적 피드백)
+            ad3Btn?.bg?.setAlpha(0.4);
+            ad3Btn?.bg?.disableInteractive();
+            ad3Btn?.label?.setText('\uBCF4\uC0C1 \uC218\uB839 \uC644\uB8CC');
+          },
+          () => { /* 광고 실패 — 무동작 */ }
+        );
+      });
+      if (!AdManager.isAdReady()) {
+        ad3Btn?.bg?.setAlpha(0.5);
+        ad3Btn?.label?.setAlpha(0.5);
+      }
+      y += btnGap;
+    }
 
     this._createButton(y, '\uC6D4\uB4DC\uB9F5\uC73C\uB85C', 0x444444, () => {
       if (this._buttonsLocked) return;
@@ -622,6 +704,8 @@ export class ResultScene extends Phaser.Scene {
     if (this._buttonObjects) {
       this._buttonObjects.push(btnBg, labelText);
     }
+    // Phase 81: AD-1/AD-3에서 버튼 참조가 필요하므로 반환
+    return { bg: btnBg, label: labelText };
   }
 
   /**
