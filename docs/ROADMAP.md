@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon — 로드맵
 
-> 최종 업데이트: 2026-04-28 (Phase 88 완료)
+> 최종 업데이트: 2026-04-28 (Phase 89 완료)
 
 ---
 
@@ -102,11 +102,10 @@
 | Phase 86 | 미션 아이콘 완성 + updateMode 리팩토링 (신규 3종 전용 아이콘, recordProgress 필드 기반 갱신) | ✅ |
 | Phase 87 | 에너지 시스템 도입 (최대 5개, 30분 자동 충전, 리워드 광고 즉시 충전, 광고 제거 구매자 면제) | ✅ |
 | Phase 88 | 주간 이벤트 시스템 프레임워크 (WeeklyEventManager, 이벤트 3종: bonus_gold/double_mission/energy_festival) | ✅ |
+| Phase 89 | 시즌 패스 + IAP 팩 (SeasonManager 50단계, IAP 5종, 미션 모달 시즌 패스 탭) | ✅ |
 
 ---
 
 ## 계획
 
-| Phase | 트랙 | 내용 |
-|-------|------|------|
-| Phase 89 | P6 | 시즌 패스 + IAP 팩 (SeasonManager 50단계, IAP 5종, 메뉴 진행 배너) |
+(현재 계획된 Phase 없음)

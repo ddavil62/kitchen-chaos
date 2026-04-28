@@ -438,8 +438,8 @@ export class MenuScene extends Phaser.Scene {
     container.add(panelBg);
 
     // 닫기 버튼
-    const closeBtn = this.add.text(cx + MODAL_W / 2 - 18, cy - MODAL_H / 2 + 18, '\u2715', {
-      fontSize: '20px', fontStyle: 'bold', color: '#ff6666',
+    const closeBtn = this.add.text(cx + MODAL_W / 2 - 18, cy - MODAL_H / 2 + 14, '\u2715', {
+      fontSize: '16px', fontStyle: 'bold', color: '#ff6666',
       stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     closeBtn.on('pointerdown', () => {
@@ -461,7 +461,7 @@ export class MenuScene extends Phaser.Scene {
     });
 
     // ── 탭 버튼 (Phase 89: 2탭 → 3탭 확장) ──
-    const TAB_Y = cy - MODAL_H / 2 + 36;
+    const TAB_Y = cy - MODAL_H / 2 + 40;
     const TAB_W = 90;
     const TAB_H = 28;
 
@@ -886,7 +886,7 @@ export class MenuScene extends Phaser.Scene {
     // 유료 패스 구매 버튼 (미보유 시만)
     let buyBtnH = 0;
     if (!state.hasPaidPass) {
-      const btnY = startY + 60;
+      const btnY = startY + 65;
       buyBtnH = 28;
       const buyBg = NineSliceFactory.raw(this, cx, btnY, 160, buyBtnH, 'btn_primary_normal');
       buyBg.setTint(0xcc6600);
@@ -963,7 +963,7 @@ export class MenuScene extends Phaser.Scene {
 
       // 수령 버튼 (무료)
       if (reached && !freeClaimed) {
-        const claimFreeBtn = this.add.text(cx + modalW / 2 - 40, rowY - 6, '\uC218\uB839', {
+        const claimFreeBtn = this.add.text(cx + modalW / 2 - 40, rowY - 8, '\uC218\uB839', {
           fontSize: '9px', fontStyle: 'bold', color: '#88ff88',
           backgroundColor: '#225522', padding: { x: 4, y: 2 },
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
@@ -978,7 +978,7 @@ export class MenuScene extends Phaser.Scene {
 
       // 수령 버튼 (유료)
       if (reached && !paidClaimed && state.hasPaidPass) {
-        const claimPaidBtn = this.add.text(cx + modalW / 2 - 40, rowY + 6, '\uC218\uB839', {
+        const claimPaidBtn = this.add.text(cx + modalW / 2 - 40, rowY + 8, '\uC218\uB839', {
           fontSize: '9px', fontStyle: 'bold', color: '#ffaa44',
           backgroundColor: '#553300', padding: { x: 4, y: 2 },
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });

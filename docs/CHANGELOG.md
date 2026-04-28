@@ -1,5 +1,51 @@
 # Changelog
 
+## [Phase 89] 2026-04-28 -- 시즌 패스 + IAP 팩
+
+### 개요
+
+SeasonManager(50단계 XP 진행 시스템)를 신규 생성하고, IAPManager를 5종 체계로 확장하며, SaveManager v31 마이그레이션을 추가했다. MenuScene 미션 모달에 시즌 패스 탭을 3번째 탭으로 추가하여 단계 N/50과 XP 진행 바를 표시한다. ResultScene과 DailyMissionManager에 XP 훅을 삽입하여 기존 플레이 행동이 시즌 XP로 집계되도록 했다.
+
+### Added
+
+- `js/managers/SeasonManager.js`: 신규 생성. SEASON_REWARDS 50단계 보상 데이터, addXP(), claimReward(), getState(), getClaimable(), _grantSeasonReward(), _calcTier(), _getCumulativeXPForTier(), getProgressInTier() 메서드
+- `js/config.js`: SEASON_PASS_PRODUCT_ID, COIN_PACK_PRODUCT_ID, SEASON_REWARD_ICON_MAP 상수 3개 추가
+- `js/managers/IAPManager.js`: purchaseSeasonPass()/isSeasonPassOwned()/purchaseCoinPack() 3개 메서드 추가, SEASON_PASS_PRODUCT_ID/COIN_PACK_PRODUCT_ID/SEASON_PASS_KEY/COIN_PACK_AMOUNT 상수 추가
+- `js/scenes/MenuScene.js`: 미션 모달 2탭->3탭 확장 (TAB_W 130->90, x좌표 재배치), _renderSeasonPassTabContent() 메서드 추가, _getSeasonRewardShort() 헬퍼 추가. "시즌 패스 S1" 헤더, "단계 N / 50", "N / M XP" 진행 바, 유료 패스 구매 버튼, 보상 행 렌더링
+
+### Changed
+
+- `js/managers/SaveManager.js`: `SAVE_VERSION` 30->31. `createDefault()`에 `seasonPass: { currentXP: 0, currentTier: 0, hasPaidPass: false, claimedFree: [], claimedPaid: [], seasonId: 'S1' }` 추가. v31 마이그레이션 블록 추가. `getSeasonPass()`/`updateSeasonXP()` 헬퍼 2개 추가
+- `js/scenes/ResultScene.js`: SeasonManager import 추가, 스테이지 클리어 구간에 `SeasonManager.addXP('stage_clear', stars)` 훅 삽입 (stars별 1~2별→10 XP, 3별→30 XP)
+- `js/managers/DailyMissionManager.js`: SeasonManager import 추가, `_grantReward()` 끝에 `SeasonManager.addXP('daily_mission', 1)` 훅 삽입 (20 XP)
+
+### 스펙 대비 구현 차이
+
+- 없음 (AC-1~AC-7 전항 스펙과 일치)
+
+### 주요 수치
+
+- 50단계 XP 임계값: tier 1=100, tier 10=1,000, tier 25=3,250, tier 40=6,250, tier 50=8,750
+- XP 소스: stage_clear(1~2별 10 XP, 3별 30 XP), daily_mission(20 XP)
+- IAP 5종: 광고 제거, 미미 핑크 스킨, 미미 블루 스킨, 시즌 패스, 코인 팩(30개)
+- 시즌 패스 구매: localStorage kc_season_pass_owned + SaveManager seasonPass.hasPaidPass 이중 저장
+- 50단계 초과 시 XP 적립 중단 (`if (sp.currentTier >= 50) return`)
+- MenuScene 탭 너비: 130px -> 90px (3탭 대응)
+- v31 마이그레이션 기본값: seasonPass = { currentXP: 0, currentTier: 0, hasPaidPass: false, claimedFree: [], claimedPaid: [], seasonId: 'S1' }
+- WeeklyEventManager 'season_xp_bonus' 이벤트: 훅 준비됨, 현재 이벤트 풀에 미등록 (항상 +0)
+
+### QA 결과
+
+PASS (AC-1~AC-7 전항 통과, 이슈 없음). 브라우저 테스트 빌드 13.74s, 76 modules, 콘솔 에러 없음.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-28-kc-phase89-scope.md`
+- 리포트: `.claude/specs/2026-04-28-kc-phase89-coder-report.md`
+- QA: `.claude/specs/2026-04-28-kc-phase89-qa.md`
+
+---
+
 ## [Phase 88] 2026-04-28 -- 주간 이벤트 시스템 프레임워크
 
 ### 개요
