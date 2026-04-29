@@ -1137,10 +1137,10 @@ export class MenuScene extends Phaser.Scene {
       ];
     }
 
-    // 최하단 안내 텍스트 (목록 바로 아래 고정)
-    const guideY = listStartY + viewportH + 14;
+    // 최하단 안내 텍스트 — 목록 하단과 모달 하단의 가운데 배치
+    const guideY = (listStartY + viewportH + modalBottom) / 2;
     const guideText = this.add.text(cx, guideY, '\uC2A4\uD14C\uC774\uC9C0 \uD074\uB9AC\uC5B4 \u00B7 \uC77C\uC77C \uBBF8\uC158\uC73C\uB85C XP \uD68D\uB4DD', {
-      fontSize: '9px', color: '#888888',
+      fontSize: '12px', color: '#888888',
     }).setOrigin(0.5);
     this._missionTabContent.add(guideText);
   }
