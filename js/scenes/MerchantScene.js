@@ -1172,7 +1172,8 @@ export class MerchantScene extends Phaser.Scene {
     // 하단 descKo (F-3 Fix: 10px → 12px)
     // Phase 90-C (C-4): wordWrap 패딩 확대 (CARD_WIDTH - 6 → CARD_WIDTH - 12)로 좌측 잘림 방지
     const desc = this.add.text(cx, topY + 82, cardDef.descKo || '', {
-      fontSize: '13px', color: '#cccccc', // Phase 92-b: 12px #bbbbbb → 13px #cccccc (카드 설명 가독성)
+      fontSize: '13px', color: '#ffeecc', // Phase 92-b fix2: stroke 추가 + 색상 밝게 (배경 묻힘 해소)
+      stroke: '#331100', strokeThickness: 1,
       wordWrap: { width: CARD_WIDTH - 12 },
       align: 'center', lineSpacing: 2,
       maxLines: 4,  // Phase 91: 카드 하단 경계 overflow 방지
