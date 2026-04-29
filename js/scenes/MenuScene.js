@@ -97,11 +97,11 @@ export class MenuScene extends Phaser.Scene {
       color: '#cccccc',
     }).setOrigin(0.5);
 
-    // Phase 92-D AD: 버튼 레이아웃 재설계 (안 B — 계층형 간격)
-    // BTN_START_Y 450→430, 상점 508→488, 도감 546→522, 업적 582→556, 엔드리스 618→600
-    const BTN_START_W = 200;
-    const BTN_START_H = 60;
-    const BTN_START_Y = 430;
+    // Phase 92-D AD: 버튼 레이아웃 재설계 (안 C — 2+1 그리드)
+    // 게임시작 240×56 Y=415 / 상점+도감 116×40 Y=480 (2열) / 업적 116×40 Y=528 (중앙) / 엔드리스 220×40 Y=584
+    const BTN_START_W = 240;
+    const BTN_START_H = 56;
+    const BTN_START_Y = 415;
     const btn = NineSliceFactory.raw(this, GAME_WIDTH / 2, BTN_START_Y, BTN_START_W, BTN_START_H, 'btn_primary_normal');
     btn.setTint(0xff6b35);
     const btnHit = new Phaser.Geom.Rectangle(-BTN_START_W / 2, -BTN_START_H / 2, BTN_START_W, BTN_START_H);
@@ -137,16 +137,17 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.InOut',
     });
 
-    // Phase 92-D AD: y 508→488, H 40→36
-    const SHOP_W = 160;
-    const SHOP_H = 36;
-    const SHOP_Y = 488;
-    const shopBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, SHOP_Y, SHOP_W, SHOP_H, 'btn_primary_normal');
+    // Phase 92-D AD안C: 주방 상점 — 2열 좌측 (cx=118, W=116, H=40, Y=480)
+    const SHOP_W = 116;
+    const SHOP_H = 40;
+    const SHOP_Y = 480;
+    const SHOP_X = GAME_WIDTH / 2 - SHOP_W / 2 - 4; // 118
+    const shopBtn = NineSliceFactory.raw(this, SHOP_X, SHOP_Y, SHOP_W, SHOP_H, 'btn_primary_normal');
     shopBtn.setTint(0x886600);
     const shopHit = new Phaser.Geom.Rectangle(-SHOP_W / 2, -SHOP_H / 2, SHOP_W, SHOP_H);
     shopBtn.setInteractive(shopHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, SHOP_Y, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
-      fontSize: '16px', fontStyle: 'bold', color: '#ffcc00',
+    this.add.text(SHOP_X, SHOP_Y, '\uD83E\uDE99 \uC8FC\uBC29 \uC0C1\uC810', {
+      fontSize: '13px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     shopBtn.on('pointerdown', () => {
@@ -159,16 +160,17 @@ export class MenuScene extends Phaser.Scene {
     shopBtn.on('pointerover', () => { shopBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); shopBtn.setTint(0xaa8800); });
     shopBtn.on('pointerout', () => { shopBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); shopBtn.setTint(0x886600); });
 
-    // Phase 92-D AD: y 546→522
-    const BOOK_W = 160;
-    const BOOK_H = 36;
-    const BOOK_Y = 522;
-    const bookBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, BOOK_Y, BOOK_W, BOOK_H, 'btn_primary_normal');
+    // Phase 92-D AD안C: 레시피 도감 — 2열 우측 (cx=242, W=116, H=40, Y=480)
+    const BOOK_W = 116;
+    const BOOK_H = 40;
+    const BOOK_Y = 480;
+    const BOOK_X = GAME_WIDTH / 2 + BOOK_W / 2 + 4; // 242
+    const bookBtn = NineSliceFactory.raw(this, BOOK_X, BOOK_Y, BOOK_W, BOOK_H, 'btn_primary_normal');
     bookBtn.setTint(0x886600);
     const bookHit = new Phaser.Geom.Rectangle(-BOOK_W / 2, -BOOK_H / 2, BOOK_W, BOOK_H);
     bookBtn.setInteractive(bookHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, BOOK_Y, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
-      fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
+    this.add.text(BOOK_X, BOOK_Y, '\uD83D\uDCD6 \uB808\uC2DC\uD53C \uB3C4\uAC10', {
+      fontSize: '12px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     bookBtn.on('pointerdown', () => {
@@ -181,16 +183,16 @@ export class MenuScene extends Phaser.Scene {
     bookBtn.on('pointerover', () => { bookBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); bookBtn.setTint(0xaa8800); });
     bookBtn.on('pointerout', () => { bookBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); bookBtn.setTint(0x886600); });
 
-    // Phase 92-D AD: y 582→556
-    const ACHIEVE_W = 160;
-    const ACHIEVE_H = 36;
-    const ACHIEVE_Y = 556;
+    // Phase 92-D AD안C: 업적 — 중앙 단독 행 (cx=180, W=116, H=40, Y=528)
+    const ACHIEVE_W = 116;
+    const ACHIEVE_H = 40;
+    const ACHIEVE_Y = 528;
     const achieveBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, ACHIEVE_Y, ACHIEVE_W, ACHIEVE_H, 'btn_primary_normal');
     achieveBtn.setTint(0x886600);
     const achieveHit = new Phaser.Geom.Rectangle(-ACHIEVE_W / 2, -ACHIEVE_H / 2, ACHIEVE_W, ACHIEVE_H);
     achieveBtn.setInteractive(achieveHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, ACHIEVE_Y, '\uD83C\uDFC6 \uC5C5\uC801', {
-      fontSize: '14px', fontStyle: 'bold', color: '#ffcc00',
+      fontSize: '13px', fontStyle: 'bold', color: '#ffcc00',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     achieveBtn.on('pointerdown', () => {
@@ -203,18 +205,18 @@ export class MenuScene extends Phaser.Scene {
     achieveBtn.on('pointerover', () => { achieveBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); achieveBtn.setTint(0xaa8800); });
     achieveBtn.on('pointerout', () => { achieveBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); achieveBtn.setTint(0x886600); });
 
-    // Phase 92-D AD: secondary/tertiary 계층 구분선 (업적 하단 574 + 3px)
+    // Phase 92-D AD안C: 구분선 (업적 하단 548 + 8px = 556)
     const dividerGfx = this.add.graphics();
     dividerGfx.fillStyle(0xffa500, 0.4);
-    dividerGfx.fillRect(GAME_WIDTH / 2 - 70, 577, 140, 1);
+    dividerGfx.fillRect(GAME_WIDTH / 2 - 70, 556, 140, 1);
 
-    // ── 엔드리스 모드 버튼 (Phase 92-D AD: y 618→600) ──
+    // ── 엔드리스 모드 버튼 (Phase 92-D AD안C: W=220, H=40, Y=584) ──
     const isEndlessUnlocked = SaveManager.isEndlessUnlocked();
     const endlessRecord = SaveManager.getEndlessRecord();
 
-    const ENDLESS_W = 180;
-    const ENDLESS_H = 36;
-    const ENDLESS_Y = 600; // Phase 92-D AD: 618→600
+    const ENDLESS_W = 220;
+    const ENDLESS_H = 40;
+    const ENDLESS_Y = 584;
     const endlessColor = isEndlessUnlocked ? 0x6622cc : 0x555555;
     const endlessBtn = NineSliceFactory.raw(this, GAME_WIDTH / 2, ENDLESS_Y, ENDLESS_W, ENDLESS_H, 'btn_primary_normal');
     endlessBtn.setTint(endlessColor);
