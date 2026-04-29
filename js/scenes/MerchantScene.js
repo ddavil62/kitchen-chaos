@@ -300,8 +300,8 @@ export class MerchantScene extends Phaser.Scene {
         badgeBg.setTint(badgeTint);
         this.listContainer.add(badgeBg);
         const badgeTxt = this.add.text(badgeX, badgeY, badgeLabel, {
-          fontSize: '9px', fontStyle: 'bold', color: '#ffffff',
-          stroke: '#000000', strokeThickness: 1,
+          fontSize: '10px', fontStyle: 'bold', color: '#ffffff',
+          stroke: '#000000', strokeThickness: 2, // Phase 92-b: 1→2 (가독성)
         }).setOrigin(0.5);
         this.listContainer.add(badgeTxt);
       }

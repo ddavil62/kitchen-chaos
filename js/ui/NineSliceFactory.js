@@ -157,29 +157,36 @@ function createNineSlice(scene, x, y, width, height, textureKey, manifestKey, or
     const x0 = Math.round(-w * oX);
     const y0 = Math.round(-h * oY);
 
-    // 코너는 원본 크기 유지
-    tl.setPosition(x0,             y0);
-    tr.setPosition(x0 + w - R,     y0);
-    bl.setPosition(x0,             y0 + h - B);
-    br.setPosition(x0 + w - R,     y0 + h - B);
-    tl.setDisplaySize(L, T);
-    tr.setDisplaySize(R, T);
-    bl.setDisplaySize(L, B);
-    br.setDisplaySize(R, B);
+    // 코너 크기 — 작은 버튼에서 겹칠 경우 비례 축소 (깨짐 방지)
+    const cornerT = cH < 0 ? Math.round(h * T / (T + B)) : T;
+    const cornerB = cH < 0 ? (h - cornerT) : B;
+    const cornerL = cW < 0 ? Math.round(w * L / (L + R)) : L;
+    const cornerR = cW < 0 ? (w - cornerL) : R;
+    const edgeW = Math.max(0, w - cornerL - cornerR);
+    const edgeH = Math.max(0, h - cornerT - cornerB);
+
+    tl.setPosition(x0,                 y0);
+    tr.setPosition(x0 + w - cornerR,   y0);
+    bl.setPosition(x0,                 y0 + h - cornerB);
+    br.setPosition(x0 + w - cornerR,   y0 + h - cornerB);
+    tl.setDisplaySize(cornerL, cornerT);
+    tr.setDisplaySize(cornerR, cornerT);
+    bl.setDisplaySize(cornerL, cornerB);
+    br.setDisplaySize(cornerR, cornerB);
 
     // 엣지
-    te.setPosition(x0 + L, y0);
-    be.setPosition(x0 + L, y0 + h - B);
-    le.setPosition(x0,             y0 + T);
-    re.setPosition(x0 + w - R,     y0 + T);
-    te.setDisplaySize(cW, T);
-    be.setDisplaySize(cW, B);
-    le.setDisplaySize(L, cH);
-    re.setDisplaySize(R, cH);
+    te.setPosition(x0 + cornerL, y0);
+    be.setPosition(x0 + cornerL, y0 + h - cornerB);
+    le.setPosition(x0,           y0 + cornerT);
+    re.setPosition(x0 + w - cornerR, y0 + cornerT);
+    te.setDisplaySize(edgeW, cornerT);
+    be.setDisplaySize(edgeW, cornerB);
+    le.setDisplaySize(cornerL, edgeH);
+    re.setDisplaySize(cornerR, edgeH);
 
     // 센터
-    ce.setPosition(x0 + L, y0 + T);
-    ce.setDisplaySize(cW, cH);
+    ce.setPosition(x0 + cornerL, y0 + cornerT);
+    ce.setDisplaySize(edgeW, edgeH);
 
     // cW/cH가 0이면 숨김 (1px 이하)
     ce.setVisible(cW > 0 && cH > 0);
