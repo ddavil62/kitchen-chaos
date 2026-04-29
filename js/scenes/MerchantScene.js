@@ -335,7 +335,7 @@ export class MerchantScene extends Phaser.Scene {
       color = 0x227722;
     } else {
       label = `\uAD6C\uB9E4 ${cost}g`;
-      color = 0x555555;
+      color = 0x554433; // Phase 92-b: 0x555555 → 0x554433 (배경 밝게 — 텍스트 대비 향상)
     }
 
     // Phase 60-13: 구매 버튼 rectangle → NineSliceFactory.raw 'btn_primary_normal'
@@ -344,7 +344,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 50, y + 12, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#ffffff' : '#888888',
+      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#ffffff' : '#cccccc', // Phase 92-b: '#888888' → '#cccccc'
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
@@ -377,7 +377,7 @@ export class MerchantScene extends Phaser.Scene {
       color = 0x996622;
     } else {
       label = '\uD310\uB9E4 -';
-      color = 0x333333;
+      color = 0x554433; // Phase 92-b: 0x333333 → 0x554433 (배경 밝게)
     }
 
     // Phase 60-13: 판매 버튼 rectangle → NineSliceFactory.raw 'btn_danger_normal'
@@ -387,7 +387,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 55, y + 12, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canSell ? '#ffd699' : '#666666',
+      fontSize: '12px', fontStyle: 'bold', color: canSell ? '#ffd699' : '#aaaaaa', // Phase 92-b: '#666666' → '#aaaaaa'
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
@@ -432,16 +432,16 @@ export class MerchantScene extends Phaser.Scene {
     let label, color;
     if (atMaxLv) {
       label = '\uC5C5\uADF8\uB808\uC774\uB4DC MAX';
-      color = 0x333333;
+      color = 0x554433; // Phase 92-b: 0x333333 → 0x554433
     } else if (noTool) {
       label = '\uC5C5\uADF8\uB808\uC774\uB4DC -';
-      color = 0x333333;
+      color = 0x554433; // Phase 92-b: 0x333333 → 0x554433
     } else if (canAfford) {
       label = `\u2B06 \uC5C5\uADF8\uB808\uC774\uB4DC ${cost}g`;
       color = 0x224488;
     } else {
       label = `\u2B06 \uC5C5\uADF8\uB808\uC774\uB4DC ${cost}g`;
-      color = 0x333355;
+      color = 0x334466; // Phase 92-b: 0x333355 → 0x334466 (밝게)
     }
 
     // Phase 60-13: 업그레이드 버튼 rectangle → NineSliceFactory.raw 'btn_secondary_normal'
@@ -450,7 +450,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 70, y + 12, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#88ccff' : '#666666',
+      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#88ccff' : '#aaaaaa', // Phase 92-b: '#666666' → '#aaaaaa'
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
@@ -514,7 +514,7 @@ export class MerchantScene extends Phaser.Scene {
         // Phase 62: previewParts 최대 2개로 제한하고 wordWrap 적용 — 우측 화면 초과 방지
         const previewStr = previewParts.slice(0, 2).join(', ');
         const previewTxt = this.add.text(x + 150, y + 12, previewStr, {
-          fontSize: '10px', color: '#aaaaaa',
+          fontSize: '11px', color: '#cccccc', // Phase 92-b: 10px #aaaaaa → 11px #cccccc (가독성 향상)
           wordWrap: { width: GAME_WIDTH - (x + 150) - 8 },
         }).setOrigin(0, 0.5);
         this.listContainer.add(previewTxt);
@@ -1009,8 +1009,8 @@ export class MerchantScene extends Phaser.Scene {
 
     // 탭 스타일 갱신
     const isTools = tabId === 'tools';
-    this._tabToolsText.setColor(isTools ? '#ffcc88' : '#888888');
-    this._tabBranchText.setColor(!isTools ? '#ffcc88' : '#888888');
+    this._tabToolsText.setColor(isTools ? '#ffcc88' : '#aaaaaa'); // Phase 92-b: '#888888' → '#aaaaaa' (비활성 탭 가독성)
+    this._tabBranchText.setColor(!isTools ? '#ffcc88' : '#aaaaaa'); // Phase 92-b: '#888888' → '#aaaaaa'
     this._tabToolsUnderline.setVisible(isTools);
     this._tabBranchUnderline.setVisible(!isTools);
 
@@ -1154,7 +1154,7 @@ export class MerchantScene extends Phaser.Scene {
     // 카테고리 한국어명
     const catLabel = meta ? meta.labelKo : cardDef.category;
     const catText = this.add.text(cx, topY + 34, catLabel, {
-      fontSize: '10px', color: '#cccccc',
+      fontSize: '11px', color: '#dddddd', // Phase 92-b: 10px #cccccc → 11px #dddddd (카드 카테고리 가독성)
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(catText);
@@ -1172,7 +1172,7 @@ export class MerchantScene extends Phaser.Scene {
     // 하단 descKo (F-3 Fix: 10px → 12px)
     // Phase 90-C (C-4): wordWrap 패딩 확대 (CARD_WIDTH - 6 → CARD_WIDTH - 12)로 좌측 잘림 방지
     const desc = this.add.text(cx, topY + 82, cardDef.descKo || '', {
-      fontSize: '12px', color: '#bbbbbb',
+      fontSize: '13px', color: '#cccccc', // Phase 92-b: 12px #bbbbbb → 13px #cccccc (카드 설명 가독성)
       wordWrap: { width: CARD_WIDTH - 12 },
       align: 'center', lineSpacing: 2,
       maxLines: 4,  // Phase 91: 카드 하단 경계 overflow 방지
