@@ -400,8 +400,8 @@ export class MenuScene extends Phaser.Scene {
       SoundManager.playSFX('sfx_ui_tap');
       this._openDailyMissionModal();
     });
-    bannerBg.on('pointerover', () => bannerBg.setTint(0xdd7700));
-    bannerBg.on('pointerout', () => bannerBg.setTint(0xcc6600));
+    bannerBg.on('pointerover', () => { bannerBg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); bannerBg.setTint(0xdd7700); });
+    bannerBg.on('pointerout', () => { bannerBg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); bannerBg.setTint(0xcc6600); });
   }
 
   // ── Phase 88: 주간 이벤트 배너 ─────────────────────────────────
@@ -433,6 +433,16 @@ export class MenuScene extends Phaser.Scene {
       maxLines: 1,
       wordWrap: { width: 160 },
     }).setOrigin(0.5);
+
+    // 상호작용: 클릭 시 미션 모달 오픈
+    const bgHit = new Phaser.Geom.Rectangle(-BANNER_W / 2, -BANNER_H / 2, BANNER_W, BANNER_H);
+    bg.setInteractive(bgHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    bg.on('pointerdown', () => {
+      SoundManager.playSFX('sfx_ui_tap');
+      this._openDailyMissionModal('mission');
+    });
+    bg.on('pointerover', () => { bg.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); bg.setTint(0x33aa55); });
+    bg.on('pointerout', () => { bg.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); bg.setTint(0x228844); });
   }
 
   // ── Phase 90-C (C-8): 시즌 패스 바로가기 ──────────────────────────
@@ -608,14 +618,22 @@ export class MenuScene extends Phaser.Scene {
       SoundManager.playSFX('sfx_ui_tap');
       showMissionTab();
     });
+    missionTabBg.on('pointerover', () => missionTabBg.setTint(0xddddff));
+    missionTabBg.on('pointerout', () => missionTabBg.clearTint());
+
     calendarTabBg.on('pointerdown', () => {
       SoundManager.playSFX('sfx_ui_tap');
       showCalendarTab();
     });
+    calendarTabBg.on('pointerover', () => calendarTabBg.setTint(0xddddff));
+    calendarTabBg.on('pointerout', () => calendarTabBg.clearTint());
+
     seasonTabBg.on('pointerdown', () => {
       SoundManager.playSFX('sfx_ui_tap');
       showSeasonTab();
     });
+    seasonTabBg.on('pointerover', () => seasonTabBg.setTint(0xddddff));
+    seasonTabBg.on('pointerout', () => seasonTabBg.clearTint());
 
     // Phase 90-C (C-8): defaultTab 파라미터에 따라 초기 탭 결정
     if (defaultTab === 'season_pass') {
