@@ -1,5 +1,41 @@
 # Changelog
 
+## [Phase 91] 2026-04-29 -- UI 과밀/침범 이슈 7건 수정
+
+### 개요
+
+ResultScene, MerchantScene, ChefSelectScene, MenuScene 4개 씬의 UI 레이아웃 수치를 조정하여 텍스트 중복, 요소 겹침, overflow 등 7건의 UI 과밀/침범 이슈를 수정했다. 신규 에셋 생성 없이 기존 코드의 Y좌표, 간격, 모달 너비, maxLines 등 수치만 조정. 세이브 버전 변경 없음(v31 유지).
+
+### 수정
+
+- `js/scenes/ResultScene.js`: Issue 1 -- stageId와 nameKo가 동일할 때 "stage_1_1 stage_1_1" 중복 표시되던 버그 수정. `stageName !== stageId` 조건 분기로 단일 표시 또는 "ID -- 이름" 포맷 적용
+- `js/scenes/ResultScene.js`: Issue 2 -- 섹션 간 여백 축소(총 ~30px 절약). 타이틀 y+=26->22, 서브라인 y+=24->18, 구분선 5곳 y+=12->10, 장보기 헤더 y+=28->22, 영업 헤더 y+=24->20, 평가 헤더 y+=28->22, 별점 y+=40->36, 보상 헤더 y+=26->22, 보상 텍스트 y+=32->26. 버튼 3~4개가 640px 이내에 수용됨
+- `js/scenes/MerchantScene.js`: Issue 3 -- TAB_Y 72->80, LIST_TOP 100->108(+8px 연동). 골드 텍스트와 탭 바 사이 시각적 분리 확보
+- `js/scenes/MerchantScene.js`: Issue 4 -- CARD_HEIGHT 160->180, CARD_CENTER_Y 250->262, desc 텍스트에 maxLines:4 추가. 분기 카드 descKo 텍스트가 카드 경계 밖으로 overflow되지 않음
+- `js/scenes/ChefSelectScene.js`: Issue 5 -- SELECT_BTN_Y_DEFAULT 549->530, SELECT_BTN_Y_SKIN 590->568, backBtn/skipBtn y 615->610. 일반/미미 카드 모두에서 하단 버튼 3개 겹침 해소
+- `js/scenes/MenuScene.js`: Issue 6 -- MODAL_W 300->320, 탭 cx 오프셋 100->106. "시즌 패스" 탭 레이블 잘림 해소
+- `js/scenes/MenuScene.js`: Issue 7 -- BANNER_Y 84->96, HUD_Y1 hasEvent 104->116, HUD_Y2 hasEvent 120->132. 이벤트 배너 텍스트에 wordWrap width 160px + maxLines 1 추가 (AD3 재수정). 이벤트 배너와 시즌 패스 숏컷 겹침 해소
+
+### 스펙 대비 구현 차이
+
+- 스펙: "구분선 후 y+=12 (4곳 모두)" -- 실제 코드 구분선 5곳이어서 5곳 모두 y+=10 적용
+- 스펙: 보상 텍스트 y+=32->28 -- 실제 y+=32->26 적용
+- Issue 7: 스펙의 Y좌표 조정 + AD3 재수정에서 wordWrap 160px + maxLines 1 추가 적용 (시즌 패스 숏컷과의 X축 bounding box 겹침 해소)
+
+### QA 결과
+
+PASS (20/20 Playwright 테스트 통과, 13건 스크린샷 시각 검증 통과, 3건 예외 시나리오 추가 검증 통과). LOW 소견 1건: 이벤트 배너 텍스트 일부 잘림(wordWrap 160px 제한, 의도적 트레이드오프).
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-29-kc-phase91-scope.md`
+- 리포트: `.claude/specs/2026-04-29-kc-phase91-coder-report.md`
+- Issue 7 재수정: `.claude/specs/2026-04-29-kc-phase91-issue7-refix-report.md`
+- AD3: `.claude/specs/2026-04-29-kc-phase91-ad3.md`
+- QA: `.claude/specs/2026-04-29-kc-phase91-qa.md`
+
+---
+
 ## [Phase 90] 2026-04-29 -- 플레이테스트 이슈 20건 수정
 
 ### 개요
