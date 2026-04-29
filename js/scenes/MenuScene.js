@@ -926,7 +926,7 @@ export class MenuScene extends Phaser.Scene {
     const claimedFree = Array.isArray(state.claimedFree) ? state.claimedFree : [];
     const claimedPaid = Array.isArray(state.claimedPaid) ? state.claimedPaid : [];
     const { currentInTier, tierXP } = SeasonManager.getProgressInTier();
-    const startY = cy - modalH / 2 + 70;
+    const startY = cy - modalH / 2 + 76; // Phase 92-D: +6px 상단 여백
 
     // 시즌 타이틀
     const titleText = this.add.text(cx, startY, `\uC2DC\uC98C \uD328\uC2A4 ${seasonId}`, {
@@ -936,7 +936,7 @@ export class MenuScene extends Phaser.Scene {
     this._missionTabContent.add(titleText);
 
     // 단계 표시
-    const tierLabel = this.add.text(cx, startY + 20, `\uB2E8\uACC4 ${currentTier} / 50`, {
+    const tierLabel = this.add.text(cx, startY + 25, `\uB2E8\uACC4 ${currentTier} / 50`, {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5);
@@ -944,7 +944,7 @@ export class MenuScene extends Phaser.Scene {
 
     // XP 진행 바
     const barX = cx - 100;
-    const barY = startY + 40;
+    const barY = startY + 50;
     const barW = 200;
     const barH = 14;
 
@@ -979,7 +979,7 @@ export class MenuScene extends Phaser.Scene {
     // 유료 패스 구매 버튼 (미보유 시만)
     let buyBtnH = 0;
     if (!hasPaidPass) {
-      const btnY = startY + 65;
+      const btnY = startY + 78;
       buyBtnH = 28;
       const buyBg = NineSliceFactory.raw(this, cx, btnY, 160, buyBtnH, 'btn_primary_normal');
       buyBg.setTint(0xcc6600);
@@ -1003,9 +1003,9 @@ export class MenuScene extends Phaser.Scene {
     // ── Phase 92-D: 스크롤 가능한 보상 목록 ──
     const ROW_H = 30;
     const modalBottom = cy + modalH / 2;
-    const GUIDE_H = 20;                                    // 하단 안내 문구 예약 높이
-    const listStartY = startY + (buyBtnH > 0 ? 92 : 72);  // 고정 헤더 아래 시작
-    const viewportH = modalBottom - listStartY - GUIDE_H;  // 클립 뷰포트 높이
+    // Phase 92-D: 목록 영역 상하 축소 — 헤더/하단에 여유 확보
+    const listStartY = startY + (buyBtnH > 0 ? 110 : 88); // 헤더 아래 여백 확대
+    const viewportH = 195;                                  // 고정 6.5행 뷰포트 (이전: ~258)
 
     // 표시할 티어 전체 범위 (1~50, 현재 단계 기준 앞뒤 범위)
     const minTier = Math.max(1, currentTier - 3);
@@ -1137,8 +1137,8 @@ export class MenuScene extends Phaser.Scene {
       ];
     }
 
-    // 최하단 안내 텍스트 (스크롤 영역 밖 고정)
-    const guideY = modalBottom - 10;
+    // 최하단 안내 텍스트 (목록 바로 아래 고정)
+    const guideY = listStartY + viewportH + 14;
     const guideText = this.add.text(cx, guideY, '\uC2A4\uD14C\uC774\uC9C0 \uD074\uB9AC\uC5B4 \u00B7 \uC77C\uC77C \uBBF8\uC158\uC73C\uB85C XP \uD68D\uB4DD', {
       fontSize: '9px', color: '#888888',
     }).setOrigin(0.5);
