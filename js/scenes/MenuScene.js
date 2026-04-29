@@ -467,8 +467,8 @@ export class MenuScene extends Phaser.Scene {
       SoundManager.playSFX('sfx_ui_tap');
       this._openDailyMissionModal('season_pass');
     });
-    spBtn.on('pointerover', () => spBtn.setTint(0xaa8800));
-    spBtn.on('pointerout', () => spBtn.setTint(0x886600));
+    spBtn.on('pointerover', () => { spBtn.setTexture(NS_KEYS.BTN_PRIMARY_PRESSED); spBtn.setTint(0xaa8800); });
+    spBtn.on('pointerout', () => { spBtn.setTexture(NS_KEYS.BTN_PRIMARY_NORMAL); spBtn.setTint(0x886600); });
   }
 
   // ── Phase 75B: 미션/캘린더 통합 팝업 ──────────────────────────────

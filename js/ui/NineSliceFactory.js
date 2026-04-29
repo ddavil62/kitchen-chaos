@@ -142,6 +142,14 @@ function createNineSlice(scene, x, y, width, height, textureKey, manifestKey, or
   container._nsOriginX = originX;
   container._nsOriginY = originY;
 
+  // Phase 92-D bugfix: 클릭 영역 불일치 수정.
+  // Phaser의 pointWithinHitArea()는 hitArea 검사 전 좌표에 displayOriginX/Y를 더한다.
+  // 이 Phaser 버전의 Container는 displayOriginX getter가 "return this.width * 0.5"로
+  // 하드코딩되어 있어, hitArea Rectangle(-w/2,-h/2,w,h)가 실제로 좌상단으로 이동한다.
+  // 인스턴스 레벨에서 getter를 0 반환으로 오버라이드하여 hitArea 보정을 무효화한다.
+  Object.defineProperty(container, 'displayOriginX', { get: () => 0, configurable: true });
+  Object.defineProperty(container, 'displayOriginY', { get: () => 0, configurable: true });
+
   /**
    * 9조각을 현재 container.width × container.height에 맞춰 재배치/스케일한다.
    */
@@ -406,6 +414,9 @@ export const NineSliceFactory = {
 
     const container = scene.add.container(x, y, [bg, labelText]);
     container.setSize(width, height);
+    // Phase 92-D bugfix: displayOriginX/Y getter 오버라이드 (createNineSlice와 동일한 이유)
+    Object.defineProperty(container, 'displayOriginX', { get: () => 0, configurable: true });
+    Object.defineProperty(container, 'displayOriginY', { get: () => 0, configurable: true });
     container._bg = bg;
     container._label = labelText;
     container._variant = variant;
