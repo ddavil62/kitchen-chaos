@@ -203,6 +203,11 @@ export class WanderingChefModal extends Phaser.Scene {
           upgBtn.setTint(canUpg ? 0x774400 : 0x333333);
           const upgHit = new Phaser.Geom.Rectangle(-UPG_W / 2, -UPG_H / 2, UPG_W, UPG_H);
           upgBtn.setInteractive(upgHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: canUpg });
+          // Phase 93: 강화 버튼 hover 피드백
+          if (canUpg) {
+            upgBtn.on('pointerover', () => upgBtn.setTint(0x886611));
+            upgBtn.on('pointerout', () => upgBtn.setTint(0x774400));
+          }
           this._listContainer.add(upgBtn);
           this._listContainer.add(
             this.add.text(GAME_WIDTH - 85, y + CARD_H - 18, `\uAC15\uD654 \uD83D\uDCA0${upgCost}`, {
@@ -230,6 +235,9 @@ export class WanderingChefModal extends Phaser.Scene {
         fireBtn.setTint(0x440022);
         const fireHit = new Phaser.Geom.Rectangle(-FIRE_W / 2, -FIRE_H / 2, FIRE_W, FIRE_H);
         fireBtn.setInteractive(fireHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+        // Phase 93: 해고 버튼 hover 피드백
+        fireBtn.on('pointerover', () => fireBtn.setTint(0x550033));
+        fireBtn.on('pointerout', () => fireBtn.setTint(0x440022));
         this._listContainer.add(fireBtn);
         this._listContainer.add(
           this.add.text(GAME_WIDTH - 18, y + CARD_H - 18, '\uD574\uACE0', {
@@ -258,6 +266,11 @@ export class WanderingChefModal extends Phaser.Scene {
         hireBtn.setTint(hireBtnColor);
         const hireHit = new Phaser.Geom.Rectangle(-HIRE_W / 2, -HIRE_H / 2, HIRE_W, HIRE_H);
         hireBtn.setInteractive(hireHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: canHire });
+        // Phase 93: 고용 버튼 hover 피드백
+        if (canHire) {
+          hireBtn.on('pointerover', () => hireBtn.setTint(0x553377));
+          hireBtn.on('pointerout', () => hireBtn.setTint(hireBtnColor));
+        }
         this._listContainer.add(hireBtn);
 
         let hireBtnLabel;

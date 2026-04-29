@@ -426,6 +426,9 @@ export class ChefSelectScene extends Phaser.Scene {
       const SELECT_W = 200, SELECT_H = 40;
       const selectHit = new Phaser.Geom.Rectangle(-SELECT_W / 2, -SELECT_H / 2, SELECT_W, SELECT_H);
       this._selectBtnBg.setInteractive(selectHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      // Phase 93: 선택 버튼 hover 피드백
+      this._selectBtnBg.on('pointerover', () => this._selectBtnBg.setTint(0xccccff));
+      this._selectBtnBg.on('pointerout', () => this._selectBtnBg.setTint(chef.color));
     }
   }
 
@@ -722,6 +725,9 @@ export class ChefSelectScene extends Phaser.Scene {
     popup.add(buyText);
     const buyZone = this.add.zone(boxX - 70, boxY + 20, BUY_W, BUY_H)
       .setInteractive({ useHandCursor: true });
+    // Phase 93: 구매 버튼 hover 피드백 (텍스트 색상 변경)
+    buyZone.on('pointerover', () => buyText.setColor('#ffff88'));
+    buyZone.on('pointerout', () => buyText.setColor('#ffffff'));
     buyZone.on('pointerdown', async () => {
       await IAPManager.purchaseSkin(chefId, skin.id);
       this._refreshSkinPanel();
@@ -745,6 +751,9 @@ export class ChefSelectScene extends Phaser.Scene {
     popup.add(cancelText);
     const cancelZone = this.add.zone(boxX + 70, boxY + 20, CANCEL_W, CANCEL_H)
       .setInteractive({ useHandCursor: true });
+    // Phase 93: 취소 버튼 hover 피드백 (텍스트 색상 변경)
+    cancelZone.on('pointerover', () => cancelText.setColor('#ffaaaa'));
+    cancelZone.on('pointerout', () => cancelText.setColor('#ffffff'));
     cancelZone.on('pointerdown', () => {
       if (this._purchasePopup) {
         this._purchasePopup.destroy();

@@ -78,6 +78,9 @@ export class RecipeCollectionScene extends Phaser.Scene {
         textStyle: { fontSize: '11px', color: isActive ? '#ffffff' : '#888888' },
       });
       tab.setInteractive(new Phaser.Geom.Rectangle(-w / 2, -10, w, 20), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      // Phase 93: 카테고리 탭 hover 피드백
+      tab.on('pointerover', () => tab.setTint(0xddddff));
+      tab.on('pointerout', () => tab.clearTint());
 
       tab.on('pointerdown', () => {
         this._currentCategory = cat.id;
@@ -98,6 +101,9 @@ export class RecipeCollectionScene extends Phaser.Scene {
       textStyle: { fontSize: '11px', color: isToolActive ? '#ffffff' : '#888888' },
     });
     toolTabNs.setInteractive(new Phaser.Geom.Rectangle(-tw / 2, -10, tw, 20), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    // Phase 93: 도구 탭 hover 피드백
+    toolTabNs.on('pointerover', () => toolTabNs.setTint(0xddddff));
+    toolTabNs.on('pointerout', () => toolTabNs.clearTint());
 
     toolTabNs.on('pointerdown', () => {
       this._currentCategory = 'tools';
@@ -173,6 +179,9 @@ export class RecipeCollectionScene extends Phaser.Scene {
 
       // 클릭 → 상세
       border.setInteractive({ useHandCursor: true });
+      // Phase 93: 레시피 셀 hover 피드백
+      border.on('pointerover', () => border.setStrokeStyle(2, 0xffffff));
+      border.on('pointerout', () => border.setStrokeStyle(2, tierColor));
       border.on('pointerup', () => this._showDetail(recipe, unlocked));
     });
   }
@@ -324,6 +333,9 @@ export class RecipeCollectionScene extends Phaser.Scene {
 
       // 셀 클릭 → 상세 팝업 (Phase 60-17: Container hitArea 명시)
       cellBg.setInteractive(new Phaser.Geom.Rectangle(-40, -40, 80, 80), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      // Phase 93: 도구 셀 hover 피드백
+      cellBg.on('pointerover', () => cellBg.setTint(0xddddff));
+      cellBg.on('pointerout', () => cellBg.clearTint());
       cellBg.on('pointerup', () => this._showToolDetail(def));
     });
   }

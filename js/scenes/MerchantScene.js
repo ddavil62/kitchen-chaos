@@ -680,6 +680,9 @@ export class MerchantScene extends Phaser.Scene {
     const sellBtnHit = new Phaser.Geom.Rectangle(-50, -15, 100, 30);
     sellBtn.setInteractive(sellBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     if (sellBtn.input) sellBtn.input.cursor = 'pointer';
+    // Phase 93: 판매 버튼 hover 피드백
+    sellBtn.on('pointerover', () => sellBtn.setTint(0x994433));
+    sellBtn.on('pointerout', () => sellBtn.setTint(0x883322));
     const sellTxt = this.add.text(GAME_WIDTH / 2 - 60, GAME_HEIGHT / 2 + 50,
       '\uADF8\uB798\uB3C4 \uD310\uB9E4', {
         fontSize: '12px', fontStyle: 'bold', color: '#ffaaaa',
@@ -694,6 +697,9 @@ export class MerchantScene extends Phaser.Scene {
     const cancelBtnHit = new Phaser.Geom.Rectangle(-50, -15, 100, 30);
     cancelBtn.setInteractive(cancelBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     if (cancelBtn.input) cancelBtn.input.cursor = 'pointer';
+    // Phase 93: 취소 버튼 hover 피드백
+    cancelBtn.on('pointerover', () => cancelBtn.setTint(0x999999));
+    cancelBtn.on('pointerout', () => cancelBtn.setTint(0x888888));
     const cancelTxt = this.add.text(GAME_WIDTH / 2 + 60, GAME_HEIGHT / 2 + 50,
       '\uCDE8\uC18C', {
         fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
@@ -962,6 +968,9 @@ export class MerchantScene extends Phaser.Scene {
     // 좌측: 도구 구매
     this._tabToolsBg = this.add.rectangle(halfW / 2 + 10, TAB_Y, tabW, TAB_HEIGHT, 0x1a0a00, 0)
       .setInteractive({ useHandCursor: true });
+    // Phase 93: 도구 탭 hover 피드백
+    this._tabToolsBg.on('pointerover', () => this._tabToolsBg.setFillStyle(0x2a1a11, 0.3));
+    this._tabToolsBg.on('pointerout', () => this._tabToolsBg.setFillStyle(0x1a0a00, 0));
     this._tabToolsText = this.add.text(halfW / 2 + 10, TAB_Y,
       '\uD83D\uDED2 \uB3C4\uAD6C \uAD6C\uB9E4', {
         fontSize: '14px', fontStyle: 'bold', color: '#888888',
@@ -975,6 +984,9 @@ export class MerchantScene extends Phaser.Scene {
     // 우측: 분기 선택
     this._tabBranchBg = this.add.rectangle(halfW + halfW / 2 - 10, TAB_Y, tabW, TAB_HEIGHT, 0x1a0a00, 0)
       .setInteractive({ useHandCursor: true });
+    // Phase 93: 분기 탭 hover 피드백
+    this._tabBranchBg.on('pointerover', () => this._tabBranchBg.setFillStyle(0x2a1a11, 0.3));
+    this._tabBranchBg.on('pointerout', () => this._tabBranchBg.setFillStyle(0x1a0a00, 0));
     this._tabBranchText = this.add.text(halfW + halfW / 2 - 10, TAB_Y,
       '\uD83C\uDCCF \uBD84\uAE30 \uC120\uD0DD', {
         fontSize: '14px', fontStyle: 'bold', color: '#888888',
@@ -1334,6 +1346,9 @@ export class MerchantScene extends Phaser.Scene {
     const okBtnHit = new Phaser.Geom.Rectangle(-50, -20, 100, 40);
     okBtn.setInteractive(okBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     if (okBtn.input) okBtn.input.cursor = 'pointer';
+    // Phase 93: 확인 버튼 hover 피드백
+    okBtn.on('pointerover', () => okBtn.setTint(0x339933));
+    okBtn.on('pointerout', () => okBtn.setTint(0x227722));
     const okTxt = this.add.text(cx - 60, cy + popupH / 2 - 30, '\uD655\uC778', {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
@@ -1347,6 +1362,9 @@ export class MerchantScene extends Phaser.Scene {
     const cancelBtnHit2 = new Phaser.Geom.Rectangle(-50, -20, 100, 40);
     cancelBtn.setInteractive(cancelBtnHit2, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     if (cancelBtn.input) cancelBtn.input.cursor = 'pointer';
+    // Phase 93: 취소 버튼 hover 피드백
+    cancelBtn.on('pointerover', () => cancelBtn.setTint(0x999999));
+    cancelBtn.on('pointerout', () => cancelBtn.setTint(0x888888));
     const cancelTxt = this.add.text(cx + 60, cy + popupH / 2 - 30, '\uCDE8\uC18C', {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,

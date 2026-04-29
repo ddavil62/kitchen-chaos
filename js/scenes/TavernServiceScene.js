@@ -967,6 +967,10 @@ export class TavernServiceScene extends Phaser.Scene {
       padding: { x: 4, y: 2 },
     }).setOrigin(0, 0).setDepth(9999).setInteractive();
 
+    // Phase 93: Back 버튼 hover 피드백
+    btn.on('pointerover', () => btn.setColor('#ffff88'));
+    btn.on('pointerout', () => btn.setColor('#ffffff'));
+
     btn.on('pointerdown', () => {
       this.scene.start('MenuScene');
     });

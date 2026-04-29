@@ -516,6 +516,9 @@ export class GatheringScene extends Phaser.Scene {
     this._skillBtnBg.setInteractive(this._skillBtnHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     // setInteractive(hitArea, cb, opts) 시그니처가 useHandCursor 옵션을 안 받는 환경 대비
     if (this._skillBtnBg.input) this._skillBtnBg.input.cursor = 'pointer';
+    // Phase 93: 스킬 버튼 hover 피드백
+    this._skillBtnBg.on('pointerover', () => this._skillBtnBg.setTint(0xffffff));
+    this._skillBtnBg.on('pointerout', () => this._skillBtnBg.setTint(this._chefData.color));
 
     // 셰프 아이콘
     this._skillBtnIcon = this.add.text(btnX, btnY + 6, this._chefData.icon, {
@@ -703,6 +706,9 @@ export class GatheringScene extends Phaser.Scene {
         Phaser.Geom.Rectangle.Contains,
         { useHandCursor: true },
       );
+      // Phase 93: 카테고리 탭 hover 피드백
+      tab.on('pointerover', () => tab.setTint(0xddddff));
+      tab.on('pointerout', () => tab.clearTint());
 
       tab.on('pointerdown', () => {
         if (this._activeTowerCategory === cat.id) return;
@@ -769,13 +775,17 @@ export class GatheringScene extends Phaser.Scene {
       const cx = btnWidth * i + btnWidth / 2;
 
       // Phase 60-20: rect → NineSliceFactory.raw btn_secondary_normal + setTint
+      const baseTint = available > 0 ? 0x333355 : 0x222233;
       const bg = NineSliceFactory.raw(this, cx, btnY, btnWidth - 4, 30, 'btn_secondary_normal')
-        .setDepth(1001).setTint(available > 0 ? 0x333355 : 0x222233);
+        .setDepth(1001).setTint(baseTint);
       bg.setInteractive(
         new Phaser.Geom.Rectangle(-(btnWidth - 4) / 2, -15, btnWidth - 4, 30),
         Phaser.Geom.Rectangle.Contains,
         { useHandCursor: true },
       );
+      // Phase 93: 도구 버튼 hover 피드백
+      bg.on('pointerover', () => bg.setTint(0xccccff));
+      bg.on('pointerout', () => bg.setTint(baseTint));
 
       const name = this.add.text(cx, btnY - 5, def.nameKo, {
         fontSize: '11px', color: available > 0 ? '#ffffff' : '#666666',
@@ -831,13 +841,17 @@ export class GatheringScene extends Phaser.Scene {
       const canCraft = this.inventoryManager.hasEnough(recipe.ingredients);
 
       // Phase 60-20: rect → NineSliceFactory.raw btn_secondary_normal + setTint
+      const buffBaseTint = canCraft ? 0x335533 : 0x333333;
       const bg = NineSliceFactory.raw(this, cx, btnY, btnWidth - 4, 30, 'btn_secondary_normal')
-        .setDepth(1001).setTint(canCraft ? 0x335533 : 0x333333);
+        .setDepth(1001).setTint(buffBaseTint);
       bg.setInteractive(
         new Phaser.Geom.Rectangle(-(btnWidth - 4) / 2, -15, btnWidth - 4, 30),
         Phaser.Geom.Rectangle.Contains,
         { useHandCursor: true },
       );
+      // Phase 93: 버프 버튼 hover 피드백
+      bg.on('pointerover', () => bg.setTint(0xccccff));
+      bg.on('pointerout', () => bg.setTint(buffBaseTint));
 
       const name = this.add.text(cx, btnY - 5, recipe.nameKo, {
         fontSize: '10px', color: canCraft ? '#88ff88' : '#666666',
@@ -1337,6 +1351,9 @@ export class GatheringScene extends Phaser.Scene {
       Phaser.Geom.Rectangle.Contains,
       { useHandCursor: true },
     );
+    // Phase 93: 이동 버튼 hover 피드백
+    this._moveBg.on('pointerover', () => this._moveBg.setTint(0x3366bb));
+    this._moveBg.on('pointerout', () => this._moveBg.setTint(0x2255aa));
     this._moveLabel = this.add.text(cx - btnW / 2 - gap / 2, btnY, '이동', {
       fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(2001);
@@ -1349,6 +1366,9 @@ export class GatheringScene extends Phaser.Scene {
       Phaser.Geom.Rectangle.Contains,
       { useHandCursor: true },
     );
+    // Phase 93: 회수 버튼 hover 피드백
+    this._recallBg.on('pointerover', () => this._recallBg.setTint(0xbb4444));
+    this._recallBg.on('pointerout', () => this._recallBg.setTint(0xaa3333));
     this._recallLabel = this.add.text(cx + btnW / 2 + gap / 2, btnY, '회수', {
       fontSize: '11px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(2001);
@@ -2762,6 +2782,9 @@ export class GatheringScene extends Phaser.Scene {
       Phaser.Geom.Rectangle.Contains,
       { useHandCursor: true },
     );
+    // Phase 93: 계속하기 버튼 hover 피드백
+    resumeBg.on('pointerover', () => resumeBg.setTint(0x336633));
+    resumeBg.on('pointerout', () => resumeBg.setTint(0x225522));
     const resumeLabel = this.add.text(cx, cy - 4, '계속하기', {
       fontSize: '13px', color: '#88ff88',
     }).setOrigin(0.5).setDepth(5002);
@@ -2774,6 +2797,9 @@ export class GatheringScene extends Phaser.Scene {
       Phaser.Geom.Rectangle.Contains,
       { useHandCursor: true },
     );
+    // Phase 93: 메뉴로 나가기 ���튼 hover 피드백
+    exitBg.on('pointerover', () => exitBg.setTint(0x663333));
+    exitBg.on('pointerout', () => exitBg.setTint(0x552222));
     const exitLabel = this.add.text(cx, cy + 30, '메뉴로 나가기', {
       fontSize: '13px', color: '#ff8888',
     }).setOrigin(0.5).setDepth(5002);

@@ -1012,6 +1012,9 @@ export class MenuScene extends Phaser.Scene {
       buyBg.setTint(0xcc6600);
       const buyHit = new Phaser.Geom.Rectangle(-80, -buyBtnH / 2, 160, buyBtnH);
       buyBg.setInteractive(buyHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      // Phase 93: 유료 패스 구매 버튼 hover 피드백
+      buyBg.on('pointerover', () => buyBg.setTint(0xdd7711));
+      buyBg.on('pointerout', () => buyBg.setTint(0xcc6600));
       this._missionTabContent.add(buyBg);
 
       const buyText = this.add.text(cx, btnY, '\uC720\uB8CC \uD328\uC2A4 \uAD6C\uB9E4', {
@@ -1106,6 +1109,9 @@ export class MenuScene extends Phaser.Scene {
           fontSize: '9px', fontStyle: 'bold', color: '#88ff88',
           backgroundColor: '#225522', padding: { x: 4, y: 2 },
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        // Phase 93: 무료 수령 버튼 hover 피드백
+        claimFreeBtn.on('pointerover', () => claimFreeBtn.setColor('#bbffbb'));
+        claimFreeBtn.on('pointerout', () => claimFreeBtn.setColor('#88ff88'));
         listCont.add(claimFreeBtn);
 
         claimFreeBtn.on('pointerdown', () => {
@@ -1121,6 +1127,9 @@ export class MenuScene extends Phaser.Scene {
           fontSize: '9px', fontStyle: 'bold', color: '#ffaa44',
           backgroundColor: '#553300', padding: { x: 4, y: 2 },
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        // Phase 93: 유료 수령 버튼 hover 피드백
+        claimPaidBtn.on('pointerover', () => claimPaidBtn.setColor('#ffcc77'));
+        claimPaidBtn.on('pointerout', () => claimPaidBtn.setColor('#ffaa44'));
         listCont.add(claimPaidBtn);
 
         claimPaidBtn.on('pointerdown', () => {
@@ -2051,6 +2060,10 @@ export class MenuScene extends Phaser.Scene {
     container.add(muteText);
 
     let muted = initMuted;
+
+    // Phase 93: 음소거 토글 hover 피드백 (muted 변수 참조를 위해 선언 후 등록)
+    toggleBg.on('pointerover', () => toggleBg.setTint(0xccccff));
+    toggleBg.on('pointerout', () => toggleBg.setTint(muted ? 0x882222 : 0x335533));
 
     toggleBg.on('pointerdown', () => {
       muted = !muted;

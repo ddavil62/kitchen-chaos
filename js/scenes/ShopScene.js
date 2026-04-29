@@ -163,6 +163,9 @@ export class ShopScene extends Phaser.Scene {
       if (tabContainer._label) tabContainer._label.setDepth(1021);
       const tabHitArea = new Phaser.Geom.Rectangle(-w / 2, -14, w, 28);
       tabContainer.setInteractive(tabHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      // Phase 93: 탭 hover 피드백
+      tabContainer.on('pointerover', () => tabContainer.setTint(0xddddff));
+      tabContainer.on('pointerout', () => tabContainer.clearTint());
 
       tabContainer.on('pointerdown', () => {
         const prevTab = this._activeTab;
@@ -317,6 +320,9 @@ export class ShopScene extends Phaser.Scene {
       );
       const hitArea = new Phaser.Geom.Rectangle(-(catW - 4) / 2, -11, catW - 4, 22);
       filterTab.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+      // Phase 93: 필터 탭 hover 피드백
+      filterTab.on('pointerover', () => filterTab.setTint(0xddddff));
+      filterTab.on('pointerout', () => filterTab.clearTint());
       this._contentContainer.add(filterTab);
 
       filterTab.on('pointerdown', () => {
@@ -834,6 +840,9 @@ export class ShopScene extends Phaser.Scene {
     wCardBg.setTint(0xaa88cc);
     const wCardHit = new Phaser.Geom.Rectangle(-170, -26, 340, 52);
     wCardBg.setInteractive(wCardHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    // Phase 93: 유랑 미력사 카드 hover 피드백
+    wCardBg.on('pointerover', () => wCardBg.setTint(0xbb99dd));
+    wCardBg.on('pointerout', () => wCardBg.setTint(0xaa88cc));
     this._contentContainer.add(wCardBg);
 
     this._contentContainer.add(

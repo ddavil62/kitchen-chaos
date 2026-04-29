@@ -170,6 +170,9 @@ export class DialogueScene extends Phaser.Scene {
         hitAreaCallback: Phaser.Geom.Rectangle.Contains,
         useHandCursor: true,
       });
+      // Phase 93: 건너뛰기 버튼 hover 피드백
+      this._skipBtn.on('pointerover', () => this._skipBtn.setColor('#ffffff'));
+      this._skipBtn.on('pointerout', () => this._skipBtn.setColor('#aaaaaa'));
       this._skipBtn.on('pointerdown', () => this._endDialogue());
     }
 
