@@ -1159,7 +1159,7 @@ export class MerchantScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(catText);
 
-    // 중앙 titleKo (14px bold)
+    // 중앙 titleKo (13px bold)
     // Phase 90-C (C-4): wordWrap 패딩 확대 (CARD_WIDTH - 10 → CARD_WIDTH - 12)
     const title = this.add.text(cx, topY + 55, cardDef.titleKo || '', {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
@@ -1169,14 +1169,17 @@ export class MerchantScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(title);
 
-    // 하단 descKo (F-3 Fix: 10px → 12px)
-    // Phase 90-C (C-4): wordWrap 패딩 확대 (CARD_WIDTH - 6 → CARD_WIDTH - 12)로 좌측 잘림 방지
-    const desc = this.add.text(cx, topY + 82, cardDef.descKo || '', {
-      fontSize: '13px', color: '#ffeecc', // Phase 92-b fix2: stroke 추가 + 색상 밝게 (배경 묻힘 해소)
-      stroke: '#331100', strokeThickness: 1,
+    // 하단 descKo — Phase 92-b fix3: title 하단 동적 배치 + 흰색+검정 테두리로 대비 강화
+    // title이 2줄로 wrap될 때 desc가 겹치는 문제 해소 (고정 topY+82 → 동적 계산)
+    const descY = topY + 55 + title.height + 4;
+    const cardBottom = topY + CARD_HEIGHT - 6;  // 카드 하단 여백 6px
+    const descAvailH = Math.max(30, cardBottom - descY);
+    const desc = this.add.text(cx, descY, cardDef.descKo || '', {
+      fontSize: '11px', color: '#ffffff',
+      stroke: '#000000', strokeThickness: 2,
       wordWrap: { width: CARD_WIDTH - 12 },
       align: 'center', lineSpacing: 2,
-      maxLines: 4,  // Phase 91: 카드 하단 경계 overflow 방지
+      fixedHeight: descAvailH,
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(desc);
 
