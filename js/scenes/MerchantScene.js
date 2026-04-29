@@ -345,7 +345,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 50, y + 16, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#ffffff' : '#cccccc',
+      fontSize: '14px', fontStyle: 'bold', color: canAfford ? '#ffffff' : '#cccccc', // Phase 92-b: 12→14px
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
@@ -389,7 +389,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 55, y + 16, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canSell ? '#ffd699' : '#aaaaaa',
+      fontSize: '14px', fontStyle: 'bold', color: canSell ? '#ffd699' : '#aaaaaa', // Phase 92-b: 12→14px
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
@@ -453,7 +453,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 70, y + 16, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#88ccff' : '#aaaaaa',
+      fontSize: '14px', fontStyle: 'bold', color: canAfford ? '#88ccff' : '#aaaaaa', // Phase 92-b: 12→14px
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
