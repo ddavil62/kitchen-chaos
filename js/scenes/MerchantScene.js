@@ -351,7 +351,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(txt);
 
     if (canAfford && !atMax) {
-      const btnHit = new Phaser.Geom.Rectangle(-50, -16, 100, 32);
+      const btnHit = new Phaser.Geom.Rectangle(-50, -18, 100, 36); // Phase 92-b AD3: hitArea 32→36px
       btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       if (btn.input) btn.input.cursor = 'pointer';
       btn.on('pointerdown', () => {
@@ -375,7 +375,7 @@ export class MerchantScene extends Phaser.Scene {
     let label, color;
     if (canSell) {
       label = `\u21A9 ${sellPrice}g \uD310\uB9E4`;
-      color = 0x996622;
+      color = 0xaa7711; // Phase 92-b AD3: 0x996622→0xaa7711 (밝게, 판매 불가 0x554433과 구분 강화)
     } else {
       label = '\uD310\uB9E4 -';
       color = 0x554433; // Phase 92-b: 0x333333 → 0x554433 (배경 밝게)
@@ -395,7 +395,7 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(txt);
 
     if (canSell) {
-      const btnHit = new Phaser.Geom.Rectangle(-55, -16, 110, 32);
+      const btnHit = new Phaser.Geom.Rectangle(-55, -18, 110, 36); // Phase 92-b AD3: hitArea 32→36px
       btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       if (btn.input) btn.input.cursor = 'pointer';
       btn.on('pointerdown', () => {
@@ -453,13 +453,13 @@ export class MerchantScene extends Phaser.Scene {
     this.listContainer.add(btn);
 
     const txt = this.add.text(x + 70, y + 16, label, {
-      fontSize: '14px', fontStyle: 'bold', color: canAfford ? '#88ccff' : '#aaaaaa', // Phase 92-b: 12→14px
+      fontSize: '14px', fontStyle: 'bold', color: canAfford ? '#ffeebb' : '#aaaaaa', // Phase 92-b: #88ccff→#ffeebb (AD3: 파란색→크림색, 테마 일치)
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
 
     if (canAfford) {
-      const btnHit = new Phaser.Geom.Rectangle(-70, -16, 140, 32);
+      const btnHit = new Phaser.Geom.Rectangle(-70, -18, 140, 36); // Phase 92-b AD3: hitArea 32→36px
       btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       if (btn.input) btn.input.cursor = 'pointer';
       btn.on('pointerdown', () => {
@@ -1131,12 +1131,19 @@ export class MerchantScene extends Phaser.Scene {
   _renderBranchCard(cardDef, cx, cy, isSelected) {
     const meta = BRANCH_CATEGORY_META[cardDef.category];
     const outlineColor = isSelected ? 0x22aa44 : (meta ? meta.color : 0x888888);
-    const bgColor = isSelected ? 0x112200 : 0x1a1000;
+    // Phase 92-b AD3: 카드 tint를 씬 배경(0x1a0a00)보다 충분히 밝게 설정 (명도 차이 확보)
+    const bgColor = isSelected ? 0x112200 : 0x3a2800;
 
     // 카드 배경 (Phase 60-13: rectangle → NineSliceFactory.panel 'parchment' + tint)
     const card = NineSliceFactory.panel(this, cx, cy, CARD_WIDTH, CARD_HEIGHT, 'parchment');
     card.setTint(bgColor);
     this._branchTabElements.push(card);
+
+    // 카드 외곽선 (Phase 92-b AD3: tint에 묻히는 NineSlice 테두리 보완)
+    const outlineGraphics = this.add.graphics();
+    outlineGraphics.lineStyle(1.5, outlineColor, 0.65);
+    outlineGraphics.strokeRect(cx - CARD_WIDTH / 2, cy - CARD_HEIGHT / 2, CARD_WIDTH, CARD_HEIGHT);
+    this._branchTabElements.push(outlineGraphics);
 
     const topY = cy - CARD_HEIGHT / 2;
 
