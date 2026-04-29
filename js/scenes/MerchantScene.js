@@ -38,13 +38,13 @@ const LIST_TOP = 108;
 const LIST_BOTTOM = 500;
 const LIST_HEIGHT = LIST_BOTTOM - LIST_TOP;
 // DialogueScene 초상화(Y=368~464, X=16~112)와의 겹침 방지:
-// ITEM_HEIGHT=110, LIST_TOP=100 기준 2개 아이템이 딱 맞는 높이(220)로 마스크 제한.
-// 3번째 아이템(화염 그릴, Y=372)의 구매 버튼이 초상화 영역과 겹치는 것을 방지.
-const VISIBLE_LIST_H = 220; // 2 * ITEM_HEIGHT = 2 * 110
+// Phase 92-b: ITEM_HEIGHT 110→130 (버튼 높이 확대), VISIBLE_LIST_H 220→260 (2아이템 유지)
+// 3번째 아이템(화염 그릴) 구매 버튼이 DialogueScene 초상화(Y=368~) 영역과 겹치는 것을 방지.
+const VISIBLE_LIST_H = 260; // 2 * ITEM_HEIGHT = 2 * 130
 const SUMMARY_Y = 540;
 const DEPART_BTN_Y = 595;
 const MARGIN_X = 20;
-const ITEM_HEIGHT = 110;
+const ITEM_HEIGHT = 130; // Phase 92-b: 110→130 (버튼 32px 높이 수용)
 // ── Phase 58-2: 분기 카드 영역 ──
 const CARD_AREA_TOP = LIST_TOP;       // 카드 영역도 탭 아래에서 시작
 // Phase 90-C (C-4): 카드 폭 100→96, 갭 10→8로 조정하여 좌우 패딩 확보
@@ -306,13 +306,13 @@ export class MerchantScene extends Phaser.Scene {
         this.listContainer.add(badgeTxt);
       }
 
-      // 2행: 구매 / 판매 버튼
-      const btnY = yOff + 30;
+      // 2행: 구매 / 판매 버튼 — Phase 92-b: btnY 30→38 (버튼 32px 여백 확보)
+      const btnY = yOff + 38;
       this._createToolBuyButton(toolId, def, tool, gold, MARGIN_X, btnY);
       this._createToolSellButton(toolId, def, tool, MARGIN_X + 120, btnY);
 
-      // 3행: 업그레이드 버튼 + 스탯 프리뷰
-      const upgY = yOff + 60;
+      // 3행: 업그레이드 버튼 + 스탯 프리뷰 — Phase 92-b: upgY 60→84
+      const upgY = yOff + 84;
       this._createToolUpgradeButton(toolId, def, tool, gold, MARGIN_X, upgY);
     });
   }
@@ -339,18 +339,19 @@ export class MerchantScene extends Phaser.Scene {
     }
 
     // Phase 60-13: 구매 버튼 rectangle → NineSliceFactory.raw 'btn_primary_normal'
-    const btn = NineSliceFactory.raw(this, x + 50, y + 12, 100, 24, 'btn_primary_normal');
+    // Phase 92-b: 높이 24→32, center offset 12→16
+    const btn = NineSliceFactory.raw(this, x + 50, y + 16, 100, 32, 'btn_primary_normal');
     btn.setTint(color);
     this.listContainer.add(btn);
 
-    const txt = this.add.text(x + 50, y + 12, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#ffffff' : '#cccccc', // Phase 92-b: '#888888' → '#cccccc'
+    const txt = this.add.text(x + 50, y + 16, label, {
+      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#ffffff' : '#cccccc',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
 
     if (canAfford && !atMax) {
-      const btnHit = new Phaser.Geom.Rectangle(-50, -12, 100, 24);
+      const btnHit = new Phaser.Geom.Rectangle(-50, -16, 100, 32);
       btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       if (btn.input) btn.input.cursor = 'pointer';
       btn.on('pointerdown', () => {
@@ -382,18 +383,19 @@ export class MerchantScene extends Phaser.Scene {
 
     // Phase 60-13: 판매 버튼 rectangle → NineSliceFactory.raw 'btn_danger_normal'
     // Phase 90-B (B-6): btn_danger → btn_secondary (주황 중립 톤으로 변경)
-    const btn = NineSliceFactory.raw(this, x + 55, y + 12, 110, 24, 'btn_secondary_normal');
+    // Phase 92-b: 높이 24→32, center offset 12→16
+    const btn = NineSliceFactory.raw(this, x + 55, y + 16, 110, 32, 'btn_secondary_normal');
     btn.setTint(color);
     this.listContainer.add(btn);
 
-    const txt = this.add.text(x + 55, y + 12, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canSell ? '#ffd699' : '#aaaaaa', // Phase 92-b: '#666666' → '#aaaaaa'
+    const txt = this.add.text(x + 55, y + 16, label, {
+      fontSize: '12px', fontStyle: 'bold', color: canSell ? '#ffd699' : '#aaaaaa',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
 
     if (canSell) {
-      const btnHit = new Phaser.Geom.Rectangle(-55, -12, 110, 24);
+      const btnHit = new Phaser.Geom.Rectangle(-55, -16, 110, 32);
       btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       if (btn.input) btn.input.cursor = 'pointer';
       btn.on('pointerdown', () => {
@@ -445,18 +447,19 @@ export class MerchantScene extends Phaser.Scene {
     }
 
     // Phase 60-13: 업그레이드 버튼 rectangle → NineSliceFactory.raw 'btn_secondary_normal'
-    const btn = NineSliceFactory.raw(this, x + 70, y + 12, 140, 24, 'btn_secondary_normal');
+    // Phase 92-b: 높이 24→32, center offset 12→16
+    const btn = NineSliceFactory.raw(this, x + 70, y + 16, 140, 32, 'btn_secondary_normal');
     btn.setTint(color);
     this.listContainer.add(btn);
 
-    const txt = this.add.text(x + 70, y + 12, label, {
-      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#88ccff' : '#aaaaaa', // Phase 92-b: '#666666' → '#aaaaaa'
+    const txt = this.add.text(x + 70, y + 16, label, {
+      fontSize: '12px', fontStyle: 'bold', color: canAfford ? '#88ccff' : '#aaaaaa',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     this.listContainer.add(txt);
 
     if (canAfford) {
-      const btnHit = new Phaser.Geom.Rectangle(-70, -12, 140, 24);
+      const btnHit = new Phaser.Geom.Rectangle(-70, -16, 140, 32);
       btn.setInteractive(btnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
       if (btn.input) btn.input.cursor = 'pointer';
       btn.on('pointerdown', () => {
@@ -513,7 +516,7 @@ export class MerchantScene extends Phaser.Scene {
       if (previewParts.length > 0) {
         // Phase 62: previewParts 최대 2개로 제한하고 wordWrap 적용 — 우측 화면 초과 방지
         const previewStr = previewParts.slice(0, 2).join(', ');
-        const previewTxt = this.add.text(x + 150, y + 12, previewStr, {
+        const previewTxt = this.add.text(x + 150, y + 16, previewStr, {
           fontSize: '11px', color: '#cccccc', // Phase 92-b: 10px #aaaaaa → 11px #cccccc (가독성 향상)
           wordWrap: { width: GAME_WIDTH - (x + 150) - 8 },
         }).setOrigin(0, 0.5);
