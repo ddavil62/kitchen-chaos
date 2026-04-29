@@ -1159,14 +1159,17 @@ export class MerchantScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(catText);
 
-    // 중앙 titleKo (13px bold)
-    // Phase 90-C (C-4): wordWrap 패딩 확대 (CARD_WIDTH - 10 → CARD_WIDTH - 12)
+    // 중앙 titleKo — Phase 92-b fix4: 노란색 + 1줄 강제 (wordWrap 제거, 자동 축소 스케일)
     const title = this.add.text(cx, topY + 55, cardDef.titleKo || '', {
-      fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
+      fontSize: '13px', fontStyle: 'bold', color: '#ffdd44',
       stroke: '#000', strokeThickness: 2,
-      wordWrap: { width: CARD_WIDTH - 12 },
       align: 'center',
     }).setOrigin(0.5, 0);
+    // 카드 가로 내에 맞게 자동 축소 → 항상 1줄 유지
+    const titleMaxW = CARD_WIDTH - 10;
+    if (title.width > titleMaxW) {
+      title.setScale(titleMaxW / title.width);
+    }
     this._branchTabElements.push(title);
 
     // 하단 descKo — Phase 92-b fix3: title 하단 동적 배치 + 흰색+검정 테두리로 대비 강화
