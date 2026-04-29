@@ -552,6 +552,10 @@ export class MenuScene extends Phaser.Scene {
     container.add(seasonTabBg);
     container.add(seasonTabText);
 
+    // Phase 92-D: 탭 하단 구분선 (골드 톤, 충분한 대비)
+    const tabDivider = this.add.rectangle(cx, TAB_Y + TAB_H / 2 + 6, MODAL_W - 24, 3, 0xffcc44, 0.6);
+    container.add(tabDivider);
+
     // 탭 상호작용
     const missionTabHit = new Phaser.Geom.Rectangle(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H);
     missionTabBg.setInteractive(missionTabHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
@@ -623,6 +627,7 @@ export class MenuScene extends Phaser.Scene {
    * @private
    */
   _renderMissionTabContent(cx, cy, modalW, modalH) {
+    this._cleanupSeasonPassScroll();
     if (!this._missionTabContent) return;
     this._missionTabContent.removeAll(true);
 
@@ -732,6 +737,7 @@ export class MenuScene extends Phaser.Scene {
    * @private
    */
   _renderCalendarTabContent(cx, cy, modalW, modalH) {
+    this._cleanupSeasonPassScroll();
     if (!this._missionTabContent) return;
     this._missionTabContent.removeAll(true);
 
@@ -906,6 +912,8 @@ export class MenuScene extends Phaser.Scene {
    * @private
    */
   _renderSeasonPassTabContent(cx, cy, modalW, modalH) {
+    // Phase 92-D: 탭 전환 시 이전 스크롤 핸들러 정리
+    this._cleanupSeasonPassScroll();
     if (!this._missionTabContent) return;
     this._missionTabContent.removeAll(true);
 
@@ -992,20 +1000,39 @@ export class MenuScene extends Phaser.Scene {
       });
     }
 
-    // 보상 목록 (현재 단계 기준 +-5 범위, 최대 11행)
-    const listStartY = startY + (buyBtnH > 0 ? 90 : 70);
+    // ── Phase 92-D: 스크롤 가능한 보상 목록 ──
     const ROW_H = 30;
+    const modalBottom = cy + modalH / 2;
+    const GUIDE_H = 20;                                    // 하단 안내 문구 예약 높이
+    const listStartY = startY + (buyBtnH > 0 ? 92 : 72);  // 고정 헤더 아래 시작
+    const viewportH = modalBottom - listStartY - GUIDE_H;  // 클립 뷰포트 높이
+
+    // 표시할 티어 전체 범위 (1~50, 현재 단계 기준 앞뒤 범위)
     const minTier = Math.max(1, currentTier - 3);
     const maxTier = Math.min(50, minTier + 10);
     const visibleTiers = [];
     for (let t = minTier; t <= maxTier; t++) visibleTiers.push(t);
+    const totalListH = visibleTiers.length * ROW_H;
 
+    // 스크롤 컨테이너 (씬 좌표 기준, x=0 이므로 cx 그대로 사용)
+    const listCont = this.add.container(0, listStartY);
+    this._missionTabContent.add(listCont);
+    this._spListCont = listCont;
+
+    // 클립 마스크 — listStartY ~ listStartY+viewportH 씬 좌표 직사각형
+    this._spClipShape = this.make.graphics({ add: false });
+    this._spClipShape.fillRect(
+      cx - (modalW - 20) / 2,
+      listStartY,
+      modalW - 20,
+      viewportH
+    );
+    listCont.setMask(new Phaser.Display.Masks.GeometryMask(this, this._spClipShape));
+
+    // 행 렌더링 (컨테이너-로컬 Y 좌표: 행 중앙 = i * ROW_H + ROW_H/2)
     for (let i = 0; i < visibleTiers.length; i++) {
       const tier = visibleTiers[i];
-      const rowY = listStartY + i * ROW_H;
-
-      // 현재 열의 범위를 넘으면 중단
-      if (rowY > cy + modalH / 2 - 30) break;
+      const relY = i * ROW_H + ROW_H / 2; // 행 중앙 기준
 
       const rewardDef = SeasonManager.getRewardDef(tier);
       if (!rewardDef) continue;
@@ -1016,43 +1043,43 @@ export class MenuScene extends Phaser.Scene {
 
       // 행 배경
       const rowTint = reached ? (tier === currentTier ? 0x443300 : 0x2a2a2a) : 0x1a1a22;
-      const rowBg = this.add.rectangle(cx, rowY, modalW - 30, ROW_H - 2, rowTint, 0.7);
+      const rowBg = this.add.rectangle(cx, relY, modalW - 30, ROW_H - 2, rowTint, 0.7);
       rowBg.setStrokeStyle(tier === currentTier ? 1 : 0, 0xffcc44, 0.5);
-      this._missionTabContent.add(rowBg);
+      listCont.add(rowBg);
 
       // 단계 번호
       const tierColor = reached ? '#ffcc44' : '#666666';
-      const tierNum = this.add.text(cx - modalW / 2 + 28, rowY, `${tier}`, {
+      const tierNum = this.add.text(cx - modalW / 2 + 28, relY, `${tier}`, {
         fontSize: '11px', fontStyle: 'bold', color: tierColor,
         stroke: '#000', strokeThickness: 1,
       }).setOrigin(0.5);
-      this._missionTabContent.add(tierNum);
+      listCont.add(tierNum);
 
       // 무료 보상 라벨
       const freeLabel = this._getSeasonRewardShort(rewardDef.free);
       const freeColor = freeClaimed ? '#88ff88' : reached ? '#ffffff' : '#888888';
-      const freeText = this.add.text(cx - 50, rowY, freeLabel, {
+      const freeText = this.add.text(cx - 50, relY, freeLabel, {
         fontSize: '10px', color: freeColor,
         stroke: '#000', strokeThickness: 1,
       }).setOrigin(0.5);
-      this._missionTabContent.add(freeText);
+      listCont.add(freeText);
 
       // 유료 보상 라벨
       const paidLabel = this._getSeasonRewardShort(rewardDef.paid);
       const paidColor = !hasPaidPass ? '#555555' : paidClaimed ? '#88ff88' : reached ? '#ffaa44' : '#555555';
-      const paidText = this.add.text(cx + 50, rowY, paidLabel, {
+      const paidText = this.add.text(cx + 50, relY, paidLabel, {
         fontSize: '10px', color: paidColor,
         stroke: '#000', strokeThickness: 1,
       }).setOrigin(0.5);
-      this._missionTabContent.add(paidText);
+      listCont.add(paidText);
 
       // 수령 버튼 (무료)
       if (reached && !freeClaimed) {
-        const claimFreeBtn = this.add.text(cx + modalW / 2 - 40, rowY - 8, '\uC218\uB839', {
+        const claimFreeBtn = this.add.text(cx + modalW / 2 - 40, relY - 8, '\uC218\uB839', {
           fontSize: '9px', fontStyle: 'bold', color: '#88ff88',
           backgroundColor: '#225522', padding: { x: 4, y: 2 },
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-        this._missionTabContent.add(claimFreeBtn);
+        listCont.add(claimFreeBtn);
 
         claimFreeBtn.on('pointerdown', () => {
           SoundManager.playSFX('sfx_ui_tap');
@@ -1063,11 +1090,11 @@ export class MenuScene extends Phaser.Scene {
 
       // 수령 버튼 (유료)
       if (reached && !paidClaimed && hasPaidPass) {
-        const claimPaidBtn = this.add.text(cx + modalW / 2 - 40, rowY + 8, '\uC218\uB839', {
+        const claimPaidBtn = this.add.text(cx + modalW / 2 - 40, relY + 8, '\uC218\uB839', {
           fontSize: '9px', fontStyle: 'bold', color: '#ffaa44',
           backgroundColor: '#553300', padding: { x: 4, y: 2 },
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-        this._missionTabContent.add(claimPaidBtn);
+        listCont.add(claimPaidBtn);
 
         claimPaidBtn.on('pointerdown', () => {
           SoundManager.playSFX('sfx_ui_tap');
@@ -1077,8 +1104,41 @@ export class MenuScene extends Phaser.Scene {
       }
     }
 
-    // 최하단 안내 텍스트
-    const guideY = cy + modalH / 2 - 18;
+    // 드래그 스크롤 처리
+    this._spScrollY = 0;
+    const maxScroll = Math.max(0, totalListH - viewportH);
+
+    if (maxScroll > 0) {
+      let dragStartY = 0;
+      let isDragging = false;
+
+      const onDown = (p) => {
+        if (p.y < listStartY || p.y > listStartY + viewportH) return;
+        isDragging = true;
+        dragStartY = p.y;
+      };
+      const onMove = (p) => {
+        if (!isDragging) return;
+        const dy = dragStartY - p.y;
+        dragStartY = p.y;
+        this._spScrollY = Phaser.Math.Clamp(this._spScrollY + dy, 0, maxScroll);
+        listCont.y = listStartY - this._spScrollY;
+      };
+      const onUp = () => { isDragging = false; };
+
+      this.input.on('pointerdown', onDown);
+      this.input.on('pointermove', onMove);
+      this.input.on('pointerup', onUp);
+
+      this._spHandlers = [
+        { evt: 'pointerdown', fn: onDown },
+        { evt: 'pointermove', fn: onMove },
+        { evt: 'pointerup', fn: onUp },
+      ];
+    }
+
+    // 최하단 안내 텍스트 (스크롤 영역 밖 고정)
+    const guideY = modalBottom - 10;
     const guideText = this.add.text(cx, guideY, '\uC2A4\uD14C\uC774\uC9C0 \uD074\uB9AC\uC5B4 \u00B7 \uC77C\uC77C \uBBF8\uC158\uC73C\uB85C XP \uD68D\uB4DD', {
       fontSize: '9px', color: '#888888',
     }).setOrigin(0.5);
@@ -1126,7 +1186,26 @@ export class MenuScene extends Phaser.Scene {
    * 미션/캘린더 모달을 닫는다.
    * @private
    */
+  /**
+   * 시즌 패스 탭의 스크롤 핸들러와 마스크를 정리한다.
+   * 탭 전환 또는 모달 닫기 시 호출한다.
+   * @private
+   */
+  _cleanupSeasonPassScroll() {
+    if (this._spHandlers) {
+      this._spHandlers.forEach(({ evt, fn }) => this.input.off(evt, fn));
+      this._spHandlers = null;
+    }
+    if (this._spClipShape) {
+      this._spClipShape.destroy();
+      this._spClipShape = null;
+    }
+    this._spListCont = null;
+    this._spScrollY = 0;
+  }
+
   _closeMissionModal() {
+    this._cleanupSeasonPassScroll();
     if (this._missionTabContent) {
       this._missionTabContent.removeAll(true);
       this._missionTabContent = null;
