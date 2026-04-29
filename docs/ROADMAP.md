@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon — 로드맵
 
-> 최종 업데이트: 2026-04-29 (Phase 92 계획 추가)
+> 최종 업데이트: 2026-04-29 (Phase 93 버튼 인터랙션 전수 감사 계획 추가)
 
 ---
 
@@ -119,3 +119,4 @@
 | Phase 92-d | MenuScene (모달) — 피드백 반영 수정 | 🔲 |
 | Phase 92-e | MenuScene (메인) — 피드백 반영 수정 | 🔲 |
 | Phase 92-f | WorldMapScene / ServiceScene — 피드백 반영 수정 | 🔲 |
+| Phase 93 | 전체 씬 버튼 인터랙션 전수 감사 (hover 누락 / setInteractive 누락 / 클릭 무반응) | 🔲 |
