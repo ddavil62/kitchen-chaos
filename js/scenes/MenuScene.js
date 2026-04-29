@@ -422,12 +422,15 @@ export class MenuScene extends Phaser.Scene {
     const bg = NineSliceFactory.raw(this, GAME_WIDTH / 2, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
     bg.setTint(0x228844);
 
+    // Phase 91 재수정: 시즌 패스 숏컷(우측 X≈262~342)과 겹침 방지 — 텍스트 폭 160px 제한
     this.add.text(GAME_WIDTH / 2, BANNER_Y, `${event.nameKo} -- ${event.descKo}`, {
       fontSize: '11px',
       fontStyle: 'bold',
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 2,
+      maxLines: 1,
+      wordWrap: { width: 160 },
     }).setOrigin(0.5);
   }
 
