@@ -426,9 +426,7 @@ export class ChefSelectScene extends Phaser.Scene {
       const SELECT_W = 200, SELECT_H = 40;
       const selectHit = new Phaser.Geom.Rectangle(-SELECT_W / 2, -SELECT_H / 2, SELECT_W, SELECT_H);
       this._selectBtnBg.setInteractive(selectHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-      // Phase 93: 선택 버튼 hover 피드백
-      this._selectBtnBg.on('pointerover', () => this._selectBtnBg.setTint(0xccccff));
-      this._selectBtnBg.on('pointerout', () => this._selectBtnBg.setTint(chef.color));
+      // hover 핸들러는 _buildSelectButton()에서 이미 등록 — 재등록 불필요
     }
   }
 

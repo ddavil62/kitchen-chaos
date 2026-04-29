@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon — 로드맵
 
-> 최종 업데이트: 2026-04-29 (Phase 93 버튼 인터랙션 전수 감사 계획 추가)
+> 최종 업데이트: 2026-04-29 (Phase 93 완료)
 
 ---
 
@@ -105,6 +105,7 @@
 | Phase 89 | 시즌 패스 + IAP 팩 (SeasonManager 50단계, IAP 5종, 미션 모달 시즌 패스 탭) | ✅ |
 | Phase 90 | 플레이테스트 이슈 20건 수정 (P0 4건: 탭 depth/버튼 차단/시즌패스 undefined/재료0 방어, P1 7건: 에너지 HUD/대화 지연/아이콘/도구 이모지/미션 안내/판매 색상/업그레이드 버튼, P2 9건: 화살표/업적 아이콘/텍스트 wrap/카드 패딩/노드 라벨/레시피 아이콘/배경 stub/시즌패스 바로가기/재클리어 문구) | ✅ |
 | Phase 91 | UI 과밀/침범 이슈 7건 수정 (ResultScene 스테이지명 중복·섹션 여백, MerchantScene 헤더 겹침·분기 카드 overflow, ChefSelectScene 버튼 겹침, MenuScene 탭 레이블 잘림·배너 겹침) | ✅ |
+| Phase 93 | 전체 씬 버튼 인터랙션 전수 감사 (hover 누락 / setInteractive 누락 / 클릭 무반응) — 10개 씬 37개소 pointerover/pointerout 추가, 중복 4건 제거 | ✅ |
 
 ---
 
@@ -119,4 +120,3 @@
 | Phase 92-d | MenuScene (모달) — 피드백 반영 수정 | 🔲 |
 | Phase 92-e | MenuScene (메인) — 피드백 반영 수정 | 🔲 |
 | Phase 92-f | WorldMapScene / ServiceScene — 피드백 반영 수정 | 🔲 |
-| Phase 93 | 전체 씬 버튼 인터랙션 전수 감사 (hover 누락 / setInteractive 누락 / 클릭 무반응) | 🔲 |

@@ -516,9 +516,7 @@ export class GatheringScene extends Phaser.Scene {
     this._skillBtnBg.setInteractive(this._skillBtnHitArea, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     // setInteractive(hitArea, cb, opts) 시그니처가 useHandCursor 옵션을 안 받는 환경 대비
     if (this._skillBtnBg.input) this._skillBtnBg.input.cursor = 'pointer';
-    // Phase 93: 스킬 버튼 hover 피드백
-    this._skillBtnBg.on('pointerover', () => this._skillBtnBg.setTint(0xffffff));
-    this._skillBtnBg.on('pointerout', () => this._skillBtnBg.setTint(this._chefData.color));
+    // hover 핸들러는 아래 Phase 60-6 블록에서 texture-swap 방식으로 등록됨 — 여기서 재등록 불필요
 
     // 셰프 아이콘
     this._skillBtnIcon = this.add.text(btnX, btnY + 6, this._chefData.icon, {

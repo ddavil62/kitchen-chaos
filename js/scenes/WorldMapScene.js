@@ -665,9 +665,6 @@ export class WorldMapScene extends Phaser.Scene {
       endlessBtn.setTint(0x6622cc);
       const wmEndlessHit = new Phaser.Geom.Rectangle(-WM_ENDLESS_W / 2, -WM_ENDLESS_H / 2, WM_ENDLESS_W, WM_ENDLESS_H);
       endlessBtn.setInteractive(wmEndlessHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-      // Phase 93: 엔드리스 버튼 hover 피드백
-      endlessBtn.on('pointerover', () => endlessBtn.setTint(0x7733dd));
-      endlessBtn.on('pointerout', () => endlessBtn.setTint(0x6622cc));
       this.add.text(180, 575, '\u221E \uC5D4\uB4DC\uB9AC\uC2A4 \uBAA8\uB4DC', {
         fontSize: '15px',
         fontStyle: 'bold',
@@ -945,9 +942,7 @@ export class WorldMapScene extends Phaser.Scene {
     adBtnBg.setTint(0x6622cc);
     const adBtnHit = new Phaser.Geom.Rectangle(-100, -22, 200, 44);
     adBtnBg.setInteractive(adBtnHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    // Phase 93: 광고 버튼 hover 피드백
-    adBtnBg.on('pointerover', () => adBtnBg.setTint(0x7733dd));
-    adBtnBg.on('pointerout', () => adBtnBg.setTint(0x6622cc));
+    // hover 핸들러는 아래 Phase 60-16 블록에서 texture-swap 방식으로 등록됨
     container.add(adBtnBg);
 
     const adBtnText = this.add.text(cx, cy + 10, '\uD83D\uDCFA \uAD11\uACE0 \uBCF4\uAE30 (+1)', {

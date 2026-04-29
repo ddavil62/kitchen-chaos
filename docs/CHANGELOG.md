@@ -1,5 +1,59 @@
 # Changelog
 
+## [Phase 93] 2026-04-29 -- 버튼 인터랙션 전수 감사
+
+### 개요
+
+`kitchen-chaos/js/scenes/` 하위 10개 씬 파일에서 `setInteractive` 오브젝트에 누락된 `pointerover`/`pointerout` hover 핸들러를 총 37개소에 추가했다. QA에서 발견된 중복 hover 리스너 4건도 제거하여 코드 품질을 확보했다. 세이브 버전 변경 없음(v31 유지).
+
+### 추가
+
+- `js/scenes/WorldMapScene.js`: 탭1/탭2/탭3/엔드리스 버튼/에너지 모달 adBtnBg hover 추가 (5건)
+- `js/scenes/ShopScene.js`: 메인 탭/레시피 필터 탭/유랑 미력사 카드 hover 추가 (3건)
+- `js/scenes/WanderingChefModal.js`: 강화/해고/고용 버튼 hover 추가 (3건, 비활성 버튼 조건부 가드)
+- `js/scenes/MerchantScene.js`: 판매/취소 버튼, 도구/분기 탭(Rectangle setFillStyle 방식), 분기확인 확인/취소 버튼 hover 추가 (6건)
+- `js/scenes/RecipeCollectionScene.js`: 카테고리 탭(레시피+도구)/레시피 셀(Rectangle setStrokeStyle)/도구 셀(NineSlice setTint) hover 추가 (4건)
+- `js/scenes/GatheringScene.js`: 스킬 버튼/카테고리 탭/도구 버튼(baseTint 캡처)/버프 버튼(buffBaseTint 캡처)/이동+회수 패널/메뉴팝업 계속+나가기 hover 추가 (8건)
+- `js/scenes/DialogueScene.js`: 건너뛰기 버튼 hover 추가 (1건, 텍스트 setColor 방식)
+- `js/scenes/ChefSelectScene.js`: 선택 버튼/구매팝업 buyZone/cancelZone hover 추가 (3건)
+- `js/scenes/MenuScene.js`: 유료 패스 구매 버튼/무료 수령/유료 수령/음소거 토글 hover 추가 (4건, 음소거 토글은 muted 클로저 참조)
+- `js/scenes/TavernServiceScene.js`: Back 버튼 hover 추가 (1건, 텍스트 setColor 방식)
+
+### 수정
+
+- `js/scenes/ChefSelectScene.js`: `_updateSelectButton()`에서 pointerover/pointerout 리스너 중복 등록 제거. `_buildSelectButton()`에서 1회만 등록하도록 수정 (Issue #1, HIGH)
+- `js/scenes/WorldMapScene.js`: 엔드리스 버튼 Phase 93 중복 hover 제거, 기존 Phase 60-16 hover만 유지 (Issue #2, MEDIUM)
+- `js/scenes/WorldMapScene.js`: 에너지 모달 adBtnBg Phase 93 중복 hover 제거, 기존 Phase 60-16 hover만 유지 + 의도 명시 주석 추가 (Issue #2-sub, MEDIUM)
+- `js/scenes/GatheringScene.js`: 스킬 버튼 Phase 93 중복 hover(tint 변경) 제거, 기존 Phase 60-6 texture-swap hover만 유지 (Issue #3, MEDIUM)
+
+### hover 패턴 적용 규칙
+
+1. NineSlice raw 버튼: `pointerover` -> `setTint(밝은 변형)` / `pointerout` -> `setTint(원래값)`
+2. NineSlice tab 오브젝트: `pointerover` -> `setTint(0xddddff)` / `pointerout` -> `clearTint()`
+3. Rectangle 탭: `pointerover` -> `setFillStyle(0x2a1a11, 0.3)` / `pointerout` -> `setFillStyle(원래값)`
+4. Text 버튼: `pointerover` -> `setColor(밝은색)` / `pointerout` -> `setColor(원래색)`
+5. Zone + Graphics 버튼: `pointerover` -> 인접 텍스트 `setColor(밝은색)` / `pointerout` -> `setColor(원래색)`
+6. 비활성 버튼: hover 핸들러 미등록 (조건부 가드)
+7. 상태 추적 토글: 클로저로 현재 상태 참조하여 base tint 복원
+
+### 건너뛴 항목
+
+- overlay/dimOverlay 류 (클릭 차단 목적, hover 불필요)
+- 드래그/스크롤 히트 영역 (드래그 전용)
+- GatheringScene 쿨다운 후 setInteractive 재호출 (기존 리스너 유지됨)
+
+### QA 결과
+
+PASS (3차 최종 검증). 1차에서 이슈 4건 발견(HIGH 1 + MEDIUM 3), 2차에서 3건 수정 확인 + 1건 미수정(adBtnBg 중복), 3차에서 잔존 1건 수정 확인. Playwright 테스트 11개 + 재검증 7개 전수 통과. 시각 검증 7건 + 재검증 3건 통과.
+
+### 참고
+
+- 스펙: `.claude/specs/2026-04-29-kc-phase93-scope.md`
+- 리포트: `.claude/specs/2026-04-29-kc-phase93-coder-report.md`
+- QA: `.claude/specs/2026-04-29-kc-phase93-qa.md`
+
+---
+
 ## [Phase 91] 2026-04-29 -- UI 과밀/침범 이슈 7건 수정
 
 ### 개요
