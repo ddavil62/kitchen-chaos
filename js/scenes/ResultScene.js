@@ -594,6 +594,18 @@ export class ResultScene extends Phaser.Scene {
     // REVISE-1: 4버튼 케이스 Y 오버플로우 방지 (44→38, bottom <= 620)
     const btnGap = (showAd3 || showAdRetry) ? 38 : 54;
 
+    // ── Phase 92-a: 버튼 영역 하단 고정 ──
+    // 보상 텍스트 영역이 가변적(sr 없음/재클리어/첫클리어 보너스 등)이므로
+    // 콘텐츠 길이와 무관하게 버튼 그룹을 항상 화면 하단 고정 영역에 배치한다.
+    // Math.max로 콘텐츠가 길 때는 자연스럽게 y를 따르고,
+    // 콘텐츠가 짧을 때는 버튼이 하단으로 내려와 보상 구분선을 침범하지 않는다.
+    const _numBtns = 2 // 다시 하기 + 월드맵으로 (항상 존재)
+      + (isCleared ? 1 : 0)   // 행상인 방문
+      + (showAd3 ? 1 : 0)     // 광고 보상 2배
+      + (showAdRetry ? 1 : 0); // 광고 재도전
+    const _btnAreaH = (_numBtns - 1) * btnGap + 44 + 30; // 44=버튼높이, 30=하단여백
+    y = Math.max(y + 20, GAME_HEIGHT - _btnAreaH);
+
     // ── Phase 81: AD-1 부분 실패 시 광고 재도전 버튼 ──
     if (showAdRetry) {
       const adRetryBtn = this._createButton(y, '\uD83C\uDFAC \uAD11\uACE0 \uBCF4\uACE0 \uC7AC\uB3C4\uC804', 0x22aa55, () => {
