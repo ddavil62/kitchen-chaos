@@ -21,7 +21,10 @@ import { NS_KEYS, TINT, TEXT_STYLE } from './UITheme.js';
 let _manifestCache = null;
 
 /**
- * 씬의 cache에서 매니페스트를 가져온다 (1회만 파싱).
+ * 씬의 cache에서 매니페스트를 가져온다.
+ * 로드 성공 시 모듈 캐시에 저장하여 이후 호출은 즉시 반환한다.
+ * 로드 실패 시 캐시하지 않고 빈 객체를 반환한다 — 다음 호출에서 재시도.
+ * (BootScene.preload() 완료 전에 호출되면 실패할 수 있으므로 캐시 고정 금지)
  * @param {Phaser.Scene} scene
  * @returns {Record<string, any>}
  */
@@ -29,9 +32,10 @@ function getManifest(scene) {
   if (_manifestCache) return _manifestCache;
   const raw = scene.cache.json.get('ui_ns_manifest');
   if (!raw || !raw.assets) {
+    // 캐시에 없으면 빈 객체 반환만 하고 _manifestCache는 건드리지 않는다.
+    // 이후 호출에서 BootScene preload 완료 후 재시도된다.
     console.warn('[NineSliceFactory] manifest 로드 실패 - BootScene preload 확인');
-    _manifestCache = {};
-    return _manifestCache;
+    return {};
   }
   _manifestCache = raw.assets;
   return _manifestCache;
