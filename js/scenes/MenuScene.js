@@ -276,10 +276,11 @@ export class MenuScene extends Phaser.Scene {
    */
   _createResourceHUD() {
     // 주간 이벤트 배너 활성 시 HUD를 아래로 내려 겹침 방지
-    // 이벤트 배너(center y=84, H=20) 하단 y=94 + 여백 4 + 텍스트 H/2=6 = 104
+    // Phase 91: BANNER_Y가 84→96으로 변경되었으므로 HUD_Y도 연동 조정
+    // 이벤트 배너(center y=96, H=20) 하단 y=106 + 여백 4 + 텍스트 H/2=6 = 116
     const hasEvent = !!WeeklyEventManager.getActiveEvent();
-    const HUD_Y1 = hasEvent ? 104 : 92;  // 1행: 기존 리소스
-    const HUD_Y2 = hasEvent ? 120 : 112; // 2행: 에너지 표시
+    const HUD_Y1 = hasEvent ? 116 : 92;  // 1행: 기존 리소스
+    const HUD_Y2 = hasEvent ? 132 : 112; // 2행: 에너지 표시
 
     // 1행: 기존 리소스
     const gold = SaveManager.getGold();
@@ -415,7 +416,8 @@ export class MenuScene extends Phaser.Scene {
     const BANNER_W = GAME_WIDTH - 20;
     const BANNER_H = 20;
     // 미션 배너(center y=50, H=44) 하단 y=72 + 여백 2 + 배너 H/2=10 = center y=84
-    const BANNER_Y = 84;
+    // Phase 91: BANNER_Y 84 → 96 — 이벤트 배너와 시즌 패스 숏컷 겹침 해소
+    const BANNER_Y = 96;
 
     const bg = NineSliceFactory.raw(this, GAME_WIDTH / 2, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
     bg.setTint(0x228844);
@@ -471,7 +473,8 @@ export class MenuScene extends Phaser.Scene {
 
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
-    const MODAL_W = 300;
+    // Phase 91: MODAL_W 300 → 320 — "시즌 패스" 탭 레이블 잘림 해소
+    const MODAL_W = 320;
     const MODAL_H = 440;
 
     const container = this.add.container(0, 0).setDepth(1100);
@@ -518,9 +521,10 @@ export class MenuScene extends Phaser.Scene {
     this._missionTabContent = this.add.container(0, 0);
     container.add(this._missionTabContent);
 
+    // Phase 91: 탭 cx 오프셋 100 → 106 — 모달 확장에 따른 탭 배치 조정
     // 미션 탭
-    const missionTabBg = NineSliceFactory.raw(this, cx - 100, TAB_Y, TAB_W, TAB_H, 'tab_active');
-    const missionTabText = this.add.text(cx - 100, TAB_Y, '\uBBF8\uC158', {
+    const missionTabBg = NineSliceFactory.raw(this, cx - 106, TAB_Y, TAB_W, TAB_H, 'tab_active');
+    const missionTabText = this.add.text(cx - 106, TAB_Y, '\uBBF8\uC158', {
       fontSize: '11px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5);
@@ -537,8 +541,8 @@ export class MenuScene extends Phaser.Scene {
     container.add(calendarTabText);
 
     // 시즌 패스 탭 (Phase 89)
-    const seasonTabBg = NineSliceFactory.raw(this, cx + 100, TAB_Y, TAB_W, TAB_H, 'tab_inactive');
-    const seasonTabText = this.add.text(cx + 100, TAB_Y, '\uC2DC\uC98C \uD328\uC2A4', {
+    const seasonTabBg = NineSliceFactory.raw(this, cx + 106, TAB_Y, TAB_W, TAB_H, 'tab_inactive');
+    const seasonTabText = this.add.text(cx + 106, TAB_Y, '\uC2DC\uC98C \uD328\uC2A4', {
       fontSize: '11px', fontStyle: 'bold', color: '#aaaaaa',
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5);

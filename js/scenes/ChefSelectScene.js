@@ -67,8 +67,9 @@ const SKIN_THUMB_Y = 502;          // 썸네일 중심 y (씬 절대 좌표)
 const SKIN_NAME_Y = 542;           // 스킨 이름 텍스트 y (씬 절대 좌표)
 const SKIN_THUMB_XS = [100, 180, 260]; // 썸네일 x 좌표 배열
 const SKIN_THUMB_SIZE = 48;        // 썸네일 표시 크기 (px)
-const SELECT_BTN_Y_DEFAULT = 549;  // 선택 버튼 기본 y
-const SELECT_BTN_Y_SKIN = 590;     // 미미 카드 포커스 시 선택 버튼 y
+// Phase 91: 선택 버튼 Y 상향 (549→530, 590→568) — 하단 버튼 3개 겹침 해소
+const SELECT_BTN_Y_DEFAULT = 530;  // 선택 버튼 기본 y
+const SELECT_BTN_Y_SKIN = 568;     // 미미 카드 포커스 시 선택 버튼 y
 
 export class ChefSelectScene extends Phaser.Scene {
   constructor() {
@@ -447,12 +448,13 @@ export class ChefSelectScene extends Phaser.Scene {
   _buildBottomControls() {
     // Phase 60-19: "셰프 없이 시작" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
     // Phase 62: tint 0x444444 → 0x888888 (플레이스홀더 인지 해소), 텍스트도 승격
+    // Phase 91: skipBtn Y 615 → 610 — 하단 버튼 겹침 해소
     const SKIP_W = 160, SKIP_H = 30;
-    const skipBtn = NineSliceFactory.raw(this, 245, 615, SKIP_W, SKIP_H, 'btn_secondary_normal');
+    const skipBtn = NineSliceFactory.raw(this, 245, 610, SKIP_W, SKIP_H, 'btn_secondary_normal');
     skipBtn.setTint(0x888888);
     const skipHit = new Phaser.Geom.Rectangle(-SKIP_W / 2, -SKIP_H / 2, SKIP_W, SKIP_H);
     skipBtn.setInteractive(skipHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(245, 615, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
+    this.add.text(245, 610, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
       fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -466,12 +468,13 @@ export class ChefSelectScene extends Phaser.Scene {
 
     // Phase 60-19: "< 뒤로" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
     // Phase 62: tint 0x444444 → 0x888888, 텍스트 10px → 13px + #ffffff + 그림자
+    // Phase 91: backBtn Y 615 → 610 — 하단 버튼 겹침 해소
     const BACK_W = 84, BACK_H = 30;
-    const backBtn = NineSliceFactory.raw(this, 62, 615, BACK_W, BACK_H, 'btn_secondary_normal');
+    const backBtn = NineSliceFactory.raw(this, 62, 610, BACK_W, BACK_H, 'btn_secondary_normal');
     backBtn.setTint(0x888888);
     const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
     backBtn.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(62, 615, '\u2039 \uB4A4\uB85C', {
+    this.add.text(62, 610, '\u2039 \uB4A4\uB85C', {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);

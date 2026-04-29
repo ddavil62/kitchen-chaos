@@ -31,9 +31,10 @@ const TITLE_Y = 20;
 const GOLD_Y = 48;
 // Phase 58-2: 탭 바 삽입으로 LIST_TOP 80 → 95
 // Phase 58-2 AD3 REVISE: TAB_Y 67 → 72 (+5), LIST_TOP 95 → 100 (+5) — GOLD 하단 겹침 해소
-const TAB_Y = 72;              // 탭 바 중심 Y
+// Phase 91: TAB_Y 72 → 80, LIST_TOP 100 → 108 — 골드 텍스트와 탭 바 겹침 해소
+const TAB_Y = 80;              // 탭 바 중심 Y
 const TAB_HEIGHT = 36;         // Phase 58-2 AD3 REVISE: 20 → 36 (히트박스 ≥ 44px 기준 근접)
-const LIST_TOP = 100;
+const LIST_TOP = 108;
 const LIST_BOTTOM = 500;
 const LIST_HEIGHT = LIST_BOTTOM - LIST_TOP;
 // DialogueScene 초상화(Y=368~464, X=16~112)와의 겹침 방지:
@@ -48,13 +49,15 @@ const ITEM_HEIGHT = 110;
 const CARD_AREA_TOP = LIST_TOP;       // 카드 영역도 탭 아래에서 시작
 // Phase 90-C (C-4): 카드 폭 100→96, 갭 10→8로 조정하여 좌우 패딩 확보
 const CARD_WIDTH = 96;
-const CARD_HEIGHT = 160;
+// Phase 91: CARD_HEIGHT 160 → 180 — 분기 카드 descKo 텍스트 overflow 해소
+const CARD_HEIGHT = 180;
 const CARD_GAP = 8;
 // 카드 3장의 가로 합 = 96*3 + 8*2 = 304. 360 중앙 정렬 시 좌측 28px 여백.
 const CARD_TOTAL_W = CARD_WIDTH * 3 + CARD_GAP * 2;
 const CARD_START_X = (GAME_WIDTH - CARD_TOTAL_W) / 2;    // 28
 // Phase 58-2 AD3 REVISE: helpText~카드 공백 과다 해소 (310 → 250)
-const CARD_CENTER_Y = 250;     // 탭 아래 전체 영역의 상단 근처 (helpText 여백 28px)
+// Phase 91: CARD_CENTER_Y 250 → 262 — 카드 높이 확대에 따른 탭 경계 겹침 방지
+const CARD_CENTER_Y = 262;     // 탭 아래 전체 영역의 상단 근처 (helpText 여백 28px)
 
 /** 카테고리 → 폴백 이모지 (배지 텍스처 로드 실패 시 표시) */
 const BRANCH_CATEGORY_FALLBACK_ICON = {
@@ -1172,6 +1175,7 @@ export class MerchantScene extends Phaser.Scene {
       fontSize: '12px', color: '#bbbbbb',
       wordWrap: { width: CARD_WIDTH - 12 },
       align: 'center', lineSpacing: 2,
+      maxLines: 4,  // Phase 91: 카드 하단 경계 overflow 방지
     }).setOrigin(0.5, 0);
     this._branchTabElements.push(desc);
 

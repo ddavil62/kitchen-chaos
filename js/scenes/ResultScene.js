@@ -406,22 +406,30 @@ export class ResultScene extends Phaser.Scene {
       fontSize: '24px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5);
-    y += 26;
+    // Phase 91: 타이틀 후 여백 축소 (26 -> 22, 버튼 과밀 해소)
+    y += 22;
 
-    this.add.text(GAME_WIDTH / 2, y, `${this.stageId} ${stageName}`, {
+    // Phase 91: nameKo가 stageId와 동일하면 중복 표시 방지
+    const stageLabel = stageName !== this.stageId
+      ? `${this.stageId} \u2014 ${stageName}`
+      : this.stageId;
+    this.add.text(GAME_WIDTH / 2, y, stageLabel, {
       fontSize: '13px', color: '#aaaaaa',
     }).setOrigin(0.5);
-    y += 24;
+    // Phase 91: 서브라인 후 여백 축소 (24 -> 18, 버튼 과밀 해소)
+    y += 18;
 
     // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
     NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 40, 2);
-    y += 12;
+    // Phase 91: 구분선 후 여백 축소 (12 -> 10, 버튼 과밀 해소)
+    y += 10;
 
     // ── 장보기 섹션 ──
     this.add.text(30, y, '\uD83D\uDCE6 장보기', {
       fontSize: '16px', fontStyle: 'bold', color: '#88ccff',
     });
-    y += 28;
+    // Phase 91: 장보기 헤더 후 여백 축소 (28 -> 22, 버튼 과밀 해소)
+    y += 22;
 
     // ── Phase 78: 부분 성공 시 재료 표시에 50% 사용 문구 추가 ──
     const ingredientLabel = this.partialFail
@@ -440,14 +448,16 @@ export class ResultScene extends Phaser.Scene {
 
     // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
     NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 60, 2);
-    y += 12;
+    // Phase 91: 구분선 후 여백 축소 (12 -> 10, 버튼 과밀 해소)
+    y += 10;
 
     // ── 영업 섹션 ──
     if (sr) {
       this.add.text(30, y, '\uD83C\uDF7D 영업', {
         fontSize: '16px', fontStyle: 'bold', color: '#ffcc88',
       });
-      y += 24;
+      // Phase 91: 영업 헤더 후 여백 축소 (24 -> 20, 버튼 과밀 해소)
+      y += 20;
 
       // Phase 76-1: 필드 누락 방어 — undefined 텍스트 노출 방지 (BUG-M1)
       const servedCount = sr.servedCount ?? 0;
@@ -492,13 +502,15 @@ export class ResultScene extends Phaser.Scene {
 
     // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
     NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 60, 2);
-    y += 12;
+    // Phase 91: 구분선 후 여백 축소 (12 -> 10, 버튼 과밀 해소)
+    y += 10;
 
     // ── 평가 섹션 ──
     this.add.text(30, y, '\u2B50 평가', {
       fontSize: '16px', fontStyle: 'bold', color: '#ffdd44',
     });
-    y += 28;
+    // Phase 91: 평가 헤더 후 여백 축소 (28 -> 22, 버튼 과밀 해소)
+    y += 22;
 
     this.add.text(40, y, `만족도: ${Math.round(satisfaction)}%`, {
       fontSize: '14px', color: '#ffffff',
@@ -522,17 +534,20 @@ export class ResultScene extends Phaser.Scene {
       delay: 300,
       ease: 'Back.easeOut',
     });
-    y += 40;
+    // Phase 91: 별점 후 여백 축소 (40 -> 36, 버튼 과밀 해소)
+    y += 36;
 
     // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
     NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 60, 2);
-    y += 12;
+    // Phase 91: 구분선 후 여백 축소 (12 -> 10, 버튼 과밀 해소)
+    y += 10;
 
     // ── 보상 섹션 ──
     this.add.text(30, y, '\uD83D\uDCB0 보상', {
       fontSize: '16px', fontStyle: 'bold', color: '#44ff88',
     });
-    y += 26;
+    // Phase 91: 보상 헤더 후 여백 축소 (26 -> 22, 버튼 과밀 해소)
+    y += 22;
 
     // Phase 82: 재클리어(동일·하위 별점) 시 보상 없음 문구 분기
     // Phase 90-C (C-9): 재클리어 문구를 회색 + 이탤릭으로 시각 구분
@@ -559,11 +574,13 @@ export class ResultScene extends Phaser.Scene {
       fontSize: rewardFontSize, fontStyle: rewardStyle, color: rewardColor,
       stroke: '#000', strokeThickness: 2,
     });
-    y += 32;
+    // Phase 91: 보상 텍스트 후 여백 축소 (32 -> 26, 버튼 과밀 해소)
+    y += 26;
 
     // Phase 60-18: 구분선 rectangle → NineSliceFactory.dividerH
     NineSliceFactory.dividerH(this, GAME_WIDTH / 2, y, GAME_WIDTH - 40, 2);
-    y += 12;
+    // Phase 91: 구분선 후 여백 축소 (12 -> 10, 버튼 과밀 해소)
+    y += 10;
 
     // ── Phase 68: P0-3 modal lock — 버튼 그룹 ──
     /** @type {Phaser.GameObjects.GameObject[]} 버튼 오브젝트 목록 (lock/unlock 대상) */
