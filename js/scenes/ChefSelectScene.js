@@ -52,8 +52,8 @@ function toProgressState(save) {
 // ── 레이아웃 상수 ──
 const CX = GAME_WIDTH / 2;        // 180
 const CARD_W = 260;
-const CARD_H = 340;           // Phase 92: 하단 여백 40px 제거 (380→340)
-const CARD_CY = 270;               // 캐러셀 카드 세로 중심
+const CARD_H = 300;           // Phase 92b: 텍스트 확대+카드 압축 시안 (380→340→300)
+const CARD_CY = 257;               // 캐러셀 카드 세로 중심 (Phase 92b: 270→257)
 const CARD_GAP = 280;              // 좌우 카드 간격 (카드폭 260 + 간격 20)
 const PEEK_ALPHA = 0.45;           // 비활성 카드 투명도
 const SWIPE_THRESHOLD = 50;        // 스와이프 임계값 (px)
@@ -61,16 +61,15 @@ const TWEEN_DURATION = 220;        // 카드 전환 tween 시간 (ms)
 const CARD_RADIUS = 12;            // 카드 모서리 라운드
 
 // ── Phase 84: 스킨 패널 레이아웃 상수 ──
-const SKIN_PANEL_Y = 465;          // 스킨 패널 상단 y
-const SKIN_PANEL_H = 90;           // 스킨 패널 높이 (Phase 92: 105→90, 겹침 해소)
-const SKIN_THUMB_Y = 502;          // 썸네일 중심 y (씬 절대 좌표)
-const SKIN_NAME_Y = 542;           // 스킨 이름 텍스트 y (씬 절대 좌표)
+// Phase 92b: 카드 압축(bottom 440→407)에 맞춰 스킨패널+버튼 일괄 상향
+const SKIN_PANEL_Y = 415;          // 스킨 패널 상단 y (465→415)
+const SKIN_PANEL_H = 85;           // 스킨 패널 높이 (90→85)
+const SKIN_THUMB_Y = 452;          // 썸네일 중심 y (502→452)
+const SKIN_NAME_Y = 492;           // 스킨 이름 텍스트 y (542→492)
 const SKIN_THUMB_XS = [100, 180, 260]; // 썸네일 x 좌표 배열
 const SKIN_THUMB_SIZE = 48;        // 썸네일 표시 크기 (px)
-// Phase 91: 선택 버튼 Y 상향 (549→530, 590→568) — 하단 버튼 3개 겹침 해소
-// Phase 92: SKIN 모드 버튼 Y 568→580 — 스킨 패널 bottom(555)과 버튼 사이 여백 확보
-const SELECT_BTN_Y_DEFAULT = 530;  // 선택 버튼 기본 y
-const SELECT_BTN_Y_SKIN = 580;     // 미미 카드 포커스 시 선택 버튼 y
+const SELECT_BTN_Y_DEFAULT = 530;  // 선택 버튼 기본 y (비미미 카드)
+const SELECT_BTN_Y_SKIN = 525;     // 미미 카드 포커스 시 선택 버튼 y (580→525)
 
 export class ChefSelectScene extends Phaser.Scene {
   constructor() {
@@ -221,8 +220,8 @@ export class ChefSelectScene extends Phaser.Scene {
     bgGraphics.strokeRoundedRect(-CARD_W / 2, -CARD_H / 2, CARD_W, CARD_H, CARD_RADIUS);
     container.add(bgGraphics);
 
-    // ── Portrait / 스프라이트 / 이모지 (y = -100, 카드 상단 여백 확보) ──
-    const portraitY = -100;  // Phase 92: -95→-100 (이름 텍스트 겹침 해소)
+    // ── Portrait / 스프라이트 / 이모지 (y = -80, Phase 92b: 카드 압축에 맞춰 상향) ──
+    const portraitY = -80;
     const portraitKey = CHEF_PORTRAIT_MAP[chef.id];
     const chefSpriteKey = `chef_${chef.id}`;
 
@@ -257,50 +256,50 @@ export class ChefSelectScene extends Phaser.Scene {
       this._portraitImages.push(null);
     }
 
-    // ── 셰프 이름 (y = -22, Phase 92: -33→-22 portrait 겹침 해소) ──
-    const nameText = this.add.text(0, -22, chef.nameKo, {
-      fontSize: '18px', fontStyle: 'bold',
+    // ── 셰프 이름 (y = +4, Phase 92b: 카드 압축 재배치) ──
+    const nameText = this.add.text(0, 4, chef.nameKo, {
+      fontSize: '20px', fontStyle: 'bold',
       color: isLocked ? '#555555' : hexColor,
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
     container.add(nameText);
 
-    // ── 구분선 (y = -15) ──
+    // ── 구분선 (y = +22, Phase 92b) ──
     const divLine = this.add.graphics();
     divLine.fillStyle(chef.color, isLocked ? 0.2 : 0.4);
-    divLine.fillRect(-100, -15, 200, 1);
+    divLine.fillRect(-100, 22, 200, 1);
     container.add(divLine);
 
-    // ── 패시브 라벨 (y = -3) ──
-    const passiveLabel = this.add.text(0, -3, '\uD328\uC2DC\uBE0C:', {
+    // ── 패시브 라벨 (y = +32, Phase 92b) ──
+    const passiveLabel = this.add.text(0, 32, '\uD328\uC2DC\uBE0C:', {
       fontSize: '11px', color: isLocked ? '#444444' : '#88cc88',
     }).setOrigin(0.5);
     container.add(passiveLabel);
 
-    // ── 패시브 설명 (y = +15) ──
-    const passiveDesc = this.add.text(0, 15, chef.passiveDesc, {
+    // ── 패시브 설명 (y = +44, Phase 92b) ──
+    const passiveDesc = this.add.text(0, 44, chef.passiveDesc, {
       fontSize: '11px', color: isLocked ? '#444444' : '#cccccc',  // Phase 92: 10px→11px, #aaaaaa→#cccccc 가독성
       wordWrap: { width: 220 }, align: 'center',
     }).setOrigin(0.5, 0);
     container.add(passiveDesc);
 
-    // ── 스킬명 (y = +53) ──
-    const skillName = this.add.text(0, 53, chef.skillName, {
-      fontSize: '13px', fontStyle: 'bold',
+    // ── 스킬명 (y = +85, Phase 92b) ──
+    const skillName = this.add.text(0, 85, chef.skillName, {
+      fontSize: '14px', fontStyle: 'bold',
       color: isLocked ? '#444444' : '#ffcc44',
     }).setOrigin(0.5);
     container.add(skillName);
 
-    // ── 스킬 설명 (y = +73) ──
-    const skillDesc = this.add.text(0, 73, chef.skillDesc, {
-      fontSize: '10px', color: isLocked ? '#444444' : '#cccccc',
+    // ── 스킬 설명 (y = +100, Phase 92b) ──
+    const skillDesc = this.add.text(0, 100, chef.skillDesc, {
+      fontSize: '12px', color: isLocked ? '#444444' : '#cccccc',
       wordWrap: { width: 220 }, align: 'center',
     }).setOrigin(0.5, 0);
     container.add(skillDesc);
 
-    // ── 쿨다운 (y = +97) ──
+    // ── 쿨다운 (y = +135, Phase 92b) ──
     const cooldownSec = chef.skillCooldown / 1000;
-    const cooldownText = this.add.text(0, 97, `\uCFE8\uB2E4\uC6B4: ${cooldownSec}\uCD08`, {
+    const cooldownText = this.add.text(0, 135, `\uCFE8\uB2E4\uC6B4: ${cooldownSec}\uCD08`, {
       fontSize: '10px', color: isLocked ? '#444444' : '#aaaaaa',  // Phase 92: #888888→#aaaaaa 대비 개선
     }).setOrigin(0.5);
     container.add(cooldownText);
@@ -450,12 +449,12 @@ export class ChefSelectScene extends Phaser.Scene {
     // Phase 60-19: "셰프 없이 시작" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
     // Phase 62: tint 0x444444 → 0x888888 (플레이스홀더 인지 해소), 텍스트도 승격
     // Phase 91: skipBtn Y 615 → 610 — 하단 버튼 겹침 해소
-    const SKIP_W = 160, SKIP_H = 36;  // Phase 92: 30→36px 터치 타깃 확대
-    const skipBtn = NineSliceFactory.raw(this, 245, 610, SKIP_W, SKIP_H, 'btn_secondary_normal');
+    const SKIP_W = 160, SKIP_H = 36;
+    const skipBtn = NineSliceFactory.raw(this, 245, 578, SKIP_W, SKIP_H, 'btn_secondary_normal');  // Phase 92b: 610→578
     skipBtn.setTint(0x888888);
     const skipHit = new Phaser.Geom.Rectangle(-SKIP_W / 2, -SKIP_H / 2, SKIP_W, SKIP_H);
     skipBtn.setInteractive(skipHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(245, 610, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
+    this.add.text(245, 578, '\uC170\uD504 \uC5C6\uC774 \uC2DC\uC791', {
       fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
@@ -470,12 +469,12 @@ export class ChefSelectScene extends Phaser.Scene {
     // Phase 60-19: "< 뒤로" 버튼 rect → NineSliceFactory.raw 'btn_secondary_normal' + setTint
     // Phase 62: tint 0x444444 → 0x888888, 텍스트 10px → 13px + #ffffff + 그림자
     // Phase 91: backBtn Y 615 → 610 — 하단 버튼 겹침 해소
-    const BACK_W = 84, BACK_H = 36;  // Phase 92: 30→36px 터치 타깃 확대
-    const backBtn = NineSliceFactory.raw(this, 62, 610, BACK_W, BACK_H, 'btn_secondary_normal');
+    const BACK_W = 84, BACK_H = 36;
+    const backBtn = NineSliceFactory.raw(this, 62, 578, BACK_W, BACK_H, 'btn_secondary_normal');  // Phase 92b: 610→578
     backBtn.setTint(0x888888);
     const backHit = new Phaser.Geom.Rectangle(-BACK_W / 2, -BACK_H / 2, BACK_W, BACK_H);
     backBtn.setInteractive(backHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
-    this.add.text(62, 610, '\u2039 \uB4A4\uB85C', {
+    this.add.text(62, 578, '\u2039 \uB4A4\uB85C', {
       fontSize: '13px', fontStyle: 'bold', color: '#ffffff',
       stroke: '#000', strokeThickness: 2,
     }).setOrigin(0.5);
