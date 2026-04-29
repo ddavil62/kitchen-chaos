@@ -91,11 +91,7 @@ export class MenuScene extends Phaser.Scene {
       titleLogo.setScale(0.925);
     }
 
-    // 부제목 (Phase 75B: y=320 → y=380)
-    this.add.text(GAME_WIDTH / 2, 380, '\uC8FC\uBC29\uC744 \uC9C0\uCF1C\uB77C!', {
-      fontSize: '18px',
-      color: '#cccccc',
-    }).setOrigin(0.5);
+    // Phase 92-D: 부제목 제거 (게임 시작 버튼과 겹침)
 
     // Phase 92-D AD: 버튼 레이아웃 재설계 (안 C — 2+1 그리드)
     // 게임시작 240×56 Y=415 / 상점+도감 116×40 Y=480 (2열) / 업적 116×40 Y=528 (중앙) / 엔드리스 220×40 Y=584
@@ -279,11 +275,11 @@ export class MenuScene extends Phaser.Scene {
    */
   _createResourceHUD() {
     // 주간 이벤트 배너 활성 시 HUD를 아래로 내려 겹침 방지
-    // Phase 91: BANNER_Y가 84→96으로 변경되었으므로 HUD_Y도 연동 조정
-    // 이벤트 배너(center y=96, H=20) 하단 y=106 + 여백 4 + 텍스트 H/2=6 = 116
+    // Phase 92-D AD안B: 이벤트배너(center y=67, H=26) 하단y=80 + 여백14 = 94
+    //                   이벤트 없음 시: 행1 하단y=50 + 여백14 = 64
     const hasEvent = !!WeeklyEventManager.getActiveEvent();
-    const HUD_Y1 = hasEvent ? 116 : 92;  // 1행: 기존 리소스
-    const HUD_Y2 = hasEvent ? 132 : 112; // 2행: 에너지 표시
+    const HUD_Y1 = hasEvent ? 94 : 64;   // 1행: 기존 리소스
+    const HUD_Y2 = hasEvent ? 110 : 80;  // 2행: 에너지 표시
 
     // 1행: 기존 리소스
     const gold = SaveManager.getGold();
@@ -374,11 +370,14 @@ export class MenuScene extends Phaser.Scene {
    * @private
    */
   _createMissionBanner() {
-    const BANNER_W = GAME_WIDTH - 20;
-    const BANNER_H = 44;
-    const BANNER_Y = 50;
+    // Phase 92-D AD안B: 미션 배너를 좌측 절반으로 축소 (W=220, H=36, X=120, Y=32)
+    // 우측엔 시즌 패스 버튼이 나란히 위치 (_createSeasonPassShortcut 참고)
+    const BANNER_W = 220;
+    const BANNER_H = 36;
+    const BANNER_Y = 32;
+    const BANNER_X = 10 + BANNER_W / 2; // 120
 
-    const bannerBg = NineSliceFactory.raw(this, GAME_WIDTH / 2, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
+    const bannerBg = NineSliceFactory.raw(this, BANNER_X, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
     bannerBg.setTint(0xcc6600);
 
     // 미션 달성 상태 표시
@@ -386,7 +385,7 @@ export class MenuScene extends Phaser.Scene {
     const starStr = missions.map((m) => m.completed ? '\u2605' : '\u2606').join('');
     const bannerText = `\uD83D\uDCCB \uC624\uB298\uC758 \uBBF8\uC158  ${starStr}`;
 
-    this.add.text(GAME_WIDTH / 2, BANNER_Y, bannerText, {
+    this.add.text(BANNER_X, BANNER_Y, bannerText, {
       fontSize: '13px',
       fontStyle: 'bold',
       color: '#ffffff',
@@ -417,10 +416,9 @@ export class MenuScene extends Phaser.Scene {
     if (!event) return; // 이벤트 없는 날 — 미표시
 
     const BANNER_W = GAME_WIDTH - 20;
-    const BANNER_H = 20;
-    // 미션 배너(center y=50, H=44) 하단 y=72 + 여백 2 + 배너 H/2=10 = center y=84
-    // Phase 91: BANNER_Y 84 → 96 — 이벤트 배너와 시즌 패스 숏컷 겹침 해소
-    const BANNER_Y = 96;
+    // Phase 92-D AD안B: H=20→26, Y=96→67 (행1 하단y=50 + 여백4 + H/2=13 = 67)
+    const BANNER_H = 26;
+    const BANNER_Y = 67;
 
     const bg = NineSliceFactory.raw(this, GAME_WIDTH / 2, BANNER_Y, BANNER_W, BANNER_H, 'btn_primary_normal');
     bg.setTint(0x228844);
@@ -445,24 +443,32 @@ export class MenuScene extends Phaser.Scene {
    * @private
    */
   _createSeasonPassShortcut() {
-    // 미션 배너(center y=50, H=44)의 우측 하단 근처에 작은 텍스트 버튼 배치
-    const SP_X = GAME_WIDTH - 18;
-    const SP_Y = 73;  // 미션 배너 하단(y=72) + 1px
+    // Phase 92-D AD안B: NineSlice 버튼으로 교체 (W=96, H=36, X=292, Y=32)
+    // 미션 배너(X=120)와 같은 Y축에 나란히 배치. gap=14px
+    const SP_W = 96;
+    const SP_H = 36;
+    const SP_Y = 32;
+    const SP_X = GAME_WIDTH - 10 - SP_W / 2; // 292
 
-    const spText = this.add.text(SP_X, SP_Y, '\uD83C\uDFC6 \uC2DC\uC98C \uD328\uC2A4 >', {
-      fontSize: '10px',
+    const spBtn = NineSliceFactory.raw(this, SP_X, SP_Y, SP_W, SP_H, 'btn_primary_normal');
+    spBtn.setTint(0x886600);
+    const spHit = new Phaser.Geom.Rectangle(-SP_W / 2, -SP_H / 2, SP_W, SP_H);
+    spBtn.setInteractive(spHit, Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+
+    this.add.text(SP_X, SP_Y, '\uD83C\uDFC6 \uC2DC\uC98C \uD328\uC2A4 >', {
+      fontSize: '11px',
       fontStyle: 'bold',
       color: '#ffcc88',
       stroke: '#000000',
       strokeThickness: 2,
-    }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5);
 
-    spText.on('pointerdown', () => {
+    spBtn.on('pointerdown', () => {
       SoundManager.playSFX('sfx_ui_tap');
       this._openDailyMissionModal('season_pass');
     });
-    spText.on('pointerover', () => spText.setColor('#ffee44'));
-    spText.on('pointerout', () => spText.setColor('#ffcc88'));
+    spBtn.on('pointerover', () => spBtn.setTint(0xaa8800));
+    spBtn.on('pointerout', () => spBtn.setTint(0x886600));
   }
 
   // ── Phase 75B: 미션/캘린더 통합 팝업 ──────────────────────────────
