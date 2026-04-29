@@ -1,6 +1,6 @@
 # Kitchen Chaos Tycoon — 로드맵
 
-> 최종 업데이트: 2026-04-29 (Phase 91 완료)
+> 최종 업데이트: 2026-04-29 (Phase 92 계획 추가)
 
 ---
 
@@ -110,4 +110,12 @@
 
 ## 계획
 
-(현재 계획된 Phase 없음)
+| Phase | 내용 | 상태 |
+|-------|------|------|
+| Phase 92 | Phase 91 수정 씬 6개 스크린샷 기반 사용자 피드백 폴리싱 | 🔲 |
+| Phase 92-a | ResultScene — 피드백 반영 수정 | 🔲 |
+| Phase 92-b | MerchantScene — 피드백 반영 수정 | 🔲 |
+| Phase 92-c | ChefSelectScene — 피드백 반영 수정 | 🔲 |
+| Phase 92-d | MenuScene (모달) — 피드백 반영 수정 | 🔲 |
+| Phase 92-e | MenuScene (메인) — 피드백 반영 수정 | 🔲 |
+| Phase 92-f | WorldMapScene / ServiceScene — 피드백 반영 수정 | 🔲 |
