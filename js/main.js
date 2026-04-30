@@ -23,7 +23,6 @@ import { WorldMapScene } from './scenes/WorldMapScene.js';
 import { ChefSelectScene } from './scenes/ChefSelectScene.js';
 import { GatheringScene } from './scenes/GatheringScene.js';
 import { EndlessScene } from './scenes/EndlessScene.js';
-import { ServiceScene } from './scenes/ServiceScene.js';
 import { ResultScene } from './scenes/ResultScene.js';
 import { MerchantScene } from './scenes/MerchantScene.js';
 import { ShopScene } from './scenes/ShopScene.js';
@@ -49,7 +48,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, WorldMapScene, ChefSelectScene, GatheringScene, EndlessScene, ServiceScene, ResultScene, MerchantScene, ShopScene, RecipeCollectionScene, DialogueScene, AchievementScene, WanderingChefModal, TavernServiceScene, NineSliceSandbox],
+  scene: [BootScene, MenuScene, WorldMapScene, ChefSelectScene, GatheringScene, EndlessScene, TavernServiceScene, ResultScene, MerchantScene, ShopScene, RecipeCollectionScene, DialogueScene, AchievementScene, WanderingChefModal, NineSliceSandbox],
   input: {
     activePointers: 1,
   },

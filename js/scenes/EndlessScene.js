@@ -2,7 +2,7 @@
  * @fileoverview 엔드리스 모드 TD 씬.
  * Phase 11-1: 무한 웨이브 로직.
  * Phase 13-4: GatheringScene을 상속하여 도구 배치 시스템 연동.
- * 5웨이브마다 ServiceScene → MerchantScene → EndlessScene 복귀 루프.
+ * 5웨이브마다 TavernServiceScene → MerchantScene → EndlessScene 복귀 루프.
  * 라이프 0 시 엔드리스 결과 화면으로 전환.
  * Phase 11-3b: 보스 웨이브(10의 배수) BGM 전환 추가.
  * Phase 55-3: 미력 폭풍의 눈 이벤트 + EndlessMissionManager 연동.
@@ -245,7 +245,7 @@ export class EndlessScene extends GatheringScene {
 
   /**
    * 웨이브 클리어 판정. 엔드리스 모드에서는 오더 판정 없이
-   * 다음 웨이브로 진행하거나 ServiceScene으로 전환한다.
+   * 다음 웨이브로 진행하거나 TavernServiceScene으로 전환한다.
    * @override
    */
   _checkWaveProgress() {
@@ -260,7 +260,7 @@ export class EndlessScene extends GatheringScene {
   // ── 웨이브 클리어 처리 ──────────────────────────────────────────
 
   /**
-   * 엔드리스 웨이브 클리어 시 ServiceScene 전환 판단.
+   * 엔드리스 웨이브 클리어 시 TavernServiceScene 전환 판단.
    * Phase 13-4: 골드 보너스 제거 (영업에서만 골드 획득).
    * @private
    */
@@ -304,7 +304,7 @@ export class EndlessScene extends GatheringScene {
     }
     AchievementManager.check(this, 'endless_mission_success', 0);
 
-    // 5웨이브마다 ServiceScene으로 전환
+    // 5웨이브마다 TavernServiceScene으로 전환
     if (this.endlessWave % 5 === 0) {
       this._endlessServicePending = true;
       const transDelay = this._isStormWave ? 5500 : 2800;
@@ -327,10 +327,10 @@ export class EndlessScene extends GatheringScene {
     });
   }
 
-  // ── ServiceScene 전환 ───────────────────────────────────────────
+  // ── TavernServiceScene 전환 ───────────────────────────────────────────
 
   /**
-   * ServiceScene으로 전환. 엔드리스 상태를 모두 전달한다.
+   * TavernServiceScene으로 전환. 엔드리스 상태를 모두 전달한다.
    * Phase 13-4: gold 전달 제거 (영구 골드는 ToolManager/SaveManager가 관리).
    * @private
    */
@@ -339,7 +339,7 @@ export class EndlessScene extends GatheringScene {
     const inv = this.inventoryManager.getAll();
     this.cameras.main.fadeOut(500, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('ServiceScene', {
+      this.scene.start('TavernServiceScene', {
         inventory: inv,
         stageId: '1-1',
         lives: this.lives,

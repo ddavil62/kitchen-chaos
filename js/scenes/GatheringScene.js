@@ -8,7 +8,7 @@
  * - 도구 자유 재배치 (탭-탭 방식)
  *
  * 적 처치 → 재료 드롭 → 인벤토리 누적.
- * 전 웨이브 클리어 시 ServiceScene으로 전환.
+ * 전 웨이브 클리어 시 TavernServiceScene으로 전환.
  */
 
 import Phaser from 'phaser';
@@ -2413,7 +2413,7 @@ export class GatheringScene extends Phaser.Scene {
 
   /**
    * 게임오버 처리. 패배 연출 후 재료 유무에 따라 분기.
-   * - 재료 > 0: ServiceScene 경유 (부분 성공, 재료 50% 컷, 별점 최대 2개)
+   * - 재료 > 0: TavernServiceScene 경유 (부분 성공, 재료 50% 컷, 별점 최대 2개)
    * - 재료 = 0: ResultScene 직행 (완전 실패, 기존 동작 유지)
    * @private
    */
@@ -2428,10 +2428,10 @@ export class GatheringScene extends Phaser.Scene {
       const total = this.inventoryManager.getTotal();
 
       // ── Phase 78: 부분 성공 분기 ──
-      // 재료가 1개 이상이면 ServiceScene 경유 (재료 50% 컷, 별점 최대 2개)
+      // 재료가 1개 이상이면 TavernServiceScene 경유 (재료 50% 컷, 별점 최대 2개)
       // 재료가 0개이면 기존 완전 실패 경로 유지
       if (total > 0) {
-        this.scene.start('ServiceScene', {
+        this.scene.start('TavernServiceScene', {
           inventory: this.inventoryManager.getAll(),
           stageId: this.stageId,
           lives: 0,
@@ -2459,7 +2459,7 @@ export class GatheringScene extends Phaser.Scene {
   }
 
   /**
-   * 승리 처리. 인벤토리 요약 표시 후 ServiceScene으로 전환.
+   * 승리 처리. 인벤토리 요약 표시 후 TavernServiceScene으로 전환.
    * @private
    */
   _triggerVictory() {
@@ -2485,8 +2485,8 @@ export class GatheringScene extends Phaser.Scene {
       // 페이드 아웃 전환 연출
       this.cameras.main.fadeOut(500, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        // ServiceScene으로 전환 (골드 전달 제거)
-        this.scene.start('ServiceScene', {
+        // TavernServiceScene으로 전환 (골드 전달 제거)
+        this.scene.start('TavernServiceScene', {
           inventory: this.inventoryManager.getAll(),
           stageId: this.stageId,
           lives: this.lives,

@@ -563,6 +563,7 @@ export class TavernServiceScene extends Phaser.Scene {
 
   /** @private */
   _buildBenchSlots() {
+    if (!import.meta.env.DEV) return;
     const slotSize = 4;
     for (const set of this._seatingState) {
       for (const slot of set.front) {
