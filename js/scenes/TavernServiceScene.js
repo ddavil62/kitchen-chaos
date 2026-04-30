@@ -1049,7 +1049,8 @@ export class TavernServiceScene extends Phaser.Scene {
 
     TABLE_SET_ANCHORS.forEach((quad, idx) => {
       const barX = quad.quadLeft + BENCH_CONFIG.TABLE_LEFT;
-      const barY = quad.quadTop - 12;
+      // 벽 영역(ROOM_CONTENT_Y=56) 안으로 게이지가 침범하지 않도록 하한 보정
+      const barY = Math.max(quad.quadTop - 12, TAVERN_LAYOUT.ROOM_CONTENT_Y + 2);
       const barW = BENCH_CONFIG.TABLE_W;  // 100px
       const barH = 8;
 
