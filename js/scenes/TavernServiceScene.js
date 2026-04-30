@@ -1,5 +1,5 @@
 /**
- * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase H.
+ * @fileoverview Kitchen Chaos 태번(Tavern) 스타일 영업씬 -- Phase C.
  * A1~A4 통합 메인 씬: 레이아웃 영역 디버그, 가구 배치, 벤치 슬롯, 상태 전환 시연, Y축 깊이정렬.
  * V12~Phase D: 2분면(quad) 세로 테이블 배치.
  * Phase E: 착석 레이아웃 재설계 — y축 depth 착석 표현, seated_south 텍스처, 테이블 depth 고정.
@@ -10,6 +10,7 @@
  * B-5-1: 셰프 5명 walk_l/walk_r 스프라이트시트(4프레임 64x24) 10장 + 애니메이션 등록 + 데모 C/V 키.
  * B-6: 캐릭터 15명 size=48 재발주 + 32x48 후처리 + frameWidth/frameHeight 갱신 (16x24 -> 32x48).
  * Phase D: 손님 10종 64px 재처리 + 2 quad 1열 레이아웃 전환 + BENCH_CONFIG 전면 갱신.
+ * Phase C: g1 테마 바닥/벽 에셋 적용, 인내심 게이지, 주문 말풍선, 골드 플로팅 VFX, 영업 HUD 바.
  *
  * 기존 ServiceScene.js와 완전 독립. import/참조/코드 복사 없음.
  * 공용 import(Phaser, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY)만 사용.
@@ -126,6 +127,23 @@ const DEMO_CUSTOMER_TYPES = ['normal', 'vip', 'gourmet', 'rushed'];
 export class TavernServiceScene extends Phaser.Scene {
   constructor() {
     super({ key: 'TavernServiceScene' });
+
+    // ── Phase C: HUD/VFX 멤버 변수 ──
+
+    /** @type {Map<number, {bg: Phaser.GameObjects.Rectangle, fill: Phaser.GameObjects.Rectangle}>} 테이블별 인내심 게이지 */
+    this._patienceBarMap = new Map();
+
+    /** @type {Map<string, {bg: Phaser.GameObjects.Rectangle, text: Phaser.GameObjects.Text}>} 손님별 주문 말풍선 */
+    this._orderBubbleMap = new Map();
+
+    /** @type {Phaser.GameObjects.Text|null} 타이머 HUD 텍스트 */
+    this._timerText = null;
+
+    /** @type {Phaser.GameObjects.Text|null} 골드 HUD 텍스트 */
+    this._goldText = null;
+
+    /** @type {number} 현재 골드 누적 (Phase D에서 실 데이터 연결) */
+    this._goldAmount = 0;
   }
 
   // ── preload ──
@@ -286,6 +304,10 @@ export class TavernServiceScene extends Phaser.Scene {
     // Back 버튼 (좌상단)
     this._buildBackButton();
 
+    // ── Phase C: 영업 HUD + 인내심 게이지 초기화 ──
+    this._buildServiceHUD();
+    this._buildPatienceBars();
+
     // ── B-4: walk 애니메이션 등록 (ASSET_MODE='real'일 때만) ──
     // 10종 × 2방향 = 20개 애니메이션, 4프레임 × 8fps, 무한 반복.
     if (ASSET_MODE === 'real') {
@@ -429,6 +451,15 @@ export class TavernServiceScene extends Phaser.Scene {
       // Phase B-5-1: 셰프 walk 애니메이션 등록 키 목록 노출 (Playwright 테스트용)
       const chefAnimTypes = ['mage', 'yuki', 'lao', 'andre', 'arjun'];
       window.__tavernChefAnims = chefAnimTypes.flatMap(n => [`chef_${n}_walk_r`, `chef_${n}_walk_l`]);
+
+      // Phase C: HUD/VFX 진단 객체 노출 (Playwright 테스트용)
+      window.__tavernPhaseC = {
+        showBubble: (id) => this._buildOrderBubble(id, 180, 300),
+        hideBubble: (id) => this._destroyOrderBubble(id),
+        goldFloat: (x, y, amt) => this._showGoldFloat(x, y, amt),
+        updatePatience: (idx, ratio) => this._updatePatienceBar(idx, ratio),
+        updateGold: (amt) => this._updateGoldHUD(amt),
+      };
     }
   }
 
@@ -974,6 +1005,184 @@ export class TavernServiceScene extends Phaser.Scene {
     btn.on('pointerdown', () => {
       this.scene.start('MenuScene');
     });
+  }
+
+  // ── Phase C (C5): 영업 타이머 + 골드 HUD 바 ──
+
+  /**
+   * HUD 바를 생성한다 (y=0, h=32).
+   * 좌측에 타이머(MM:SS), 우측에 골드 합계 표시.
+   * Phase D에서 실제 countdown 연결 예정, Phase C는 정적 표시.
+   * @private
+   */
+  _buildServiceHUD() {
+    const L = TAVERN_LAYOUT;
+
+    // 타이머 텍스트 (좌측)
+    this._timerText = this.add.text(8, 8, '03:00', {
+      fontSize: '12px',
+      fontFamily: FONT_FAMILY,
+      color: '#ffffff',
+      backgroundColor: '#00000066',
+      padding: { x: 4, y: 2 },
+    }).setOrigin(0, 0).setDepth(9100);
+
+    // 골드 HUD 텍스트 (우측)
+    this._goldText = this.add.text(L.GAME_W - 8, 8, '\uD83D\uDCB0 0G', {
+      fontSize: '12px',
+      fontFamily: FONT_FAMILY,
+      color: '#ffd700',
+      backgroundColor: '#00000066',
+      padding: { x: 4, y: 2 },
+    }).setOrigin(1, 0).setDepth(9100);
+  }
+
+  // ── Phase C (C2): 인내심 게이지 HUD ──
+
+  /**
+   * 6테이블 각각에 인내심 게이지 바를 초기화한다.
+   * 게이지 크기: TABLE_W(100) x 8px, 테이블 quad 상단 y - 12px 위치.
+   * @private
+   */
+  _buildPatienceBars() {
+    this._patienceBarMap.clear();
+
+    TABLE_SET_ANCHORS.forEach((quad, idx) => {
+      const barX = quad.quadLeft + BENCH_CONFIG.TABLE_LEFT;
+      const barY = quad.quadTop - 12;
+      const barW = BENCH_CONFIG.TABLE_W;  // 100px
+      const barH = 8;
+
+      // 배경 (어두운 회색)
+      const bg = this.add.rectangle(barX, barY, barW, barH, 0x333333)
+        .setOrigin(0, 0)
+        .setDepth(9050);
+
+      // 채움 (초록 — 100% 시작)
+      const fill = this.add.rectangle(barX, barY, barW, barH, 0x44cc44)
+        .setOrigin(0, 0)
+        .setDepth(9051);
+
+      this._patienceBarMap.set(idx, { bg, fill });
+    });
+  }
+
+  /**
+   * 특정 테이블의 인내심 게이지를 갱신한다.
+   * 비율에 따라 너비와 색상을 조정한다.
+   * - 70% 이상: 초록(0x44cc44)
+   * - 30~70%: 노랑(0xffcc00)
+   * - 30% 미만: 빨강(0xff3333)
+   * @param {number} tableSetIdx - 테이블 인덱스 (0~5)
+   * @param {number} ratio - 인내심 비율 (0.0 ~ 1.0)
+   * @private
+   */
+  _updatePatienceBar(tableSetIdx, ratio) {
+    const bar = this._patienceBarMap.get(tableSetIdx);
+    if (!bar) return;
+
+    // 비율 클램핑
+    const r = Math.max(0, Math.min(1, ratio));
+
+    // 너비 갱신
+    bar.fill.width = BENCH_CONFIG.TABLE_W * r;
+
+    // 색상 3구간 전환
+    if (r >= 0.7) {
+      bar.fill.fillColor = 0x44cc44;  // 초록
+    } else if (r >= 0.3) {
+      bar.fill.fillColor = 0xffcc00;  // 노랑
+    } else {
+      bar.fill.fillColor = 0xff3333;  // 빨강
+    }
+  }
+
+  // ── Phase C (C3): 주문 말풍선 UI ──
+
+  /**
+   * 손님 위에 주문 말풍선을 생성한다.
+   * Phase D에서 실제 레시피 데이터로 교체 예정, Phase C는 더미 텍스트.
+   * @param {string} customerId - 손님 ID
+   * @param {number} x - 말풍선 x 좌표 (손님 위치)
+   * @param {number} y - 말풍선 y 좌표 (손님 위치)
+   * @private
+   */
+  _buildOrderBubble(customerId, x, y) {
+    // 이미 존재하면 제거 후 재생성
+    if (this._orderBubbleMap.has(customerId)) {
+      this._destroyOrderBubble(customerId);
+    }
+
+    const bubbleW = 70;
+    const bubbleH = 24;
+    const bubbleY = y - 72;
+
+    // 배경 사각형 (흰색, 약간 투명)
+    const bg = this.add.rectangle(x, bubbleY, bubbleW, bubbleH, 0xffffff, 0.9)
+      .setOrigin(0.5, 0.5)
+      .setDepth(9080);
+
+    // 텍스트 (더미 주문)
+    const text = this.add.text(x, bubbleY, '\uD83C\uDF5C \uC8FC\uBB38 \uC911...', {
+      fontSize: '9px',
+      fontFamily: FONT_FAMILY,
+      color: '#333333',
+      align: 'center',
+    }).setOrigin(0.5, 0.5).setDepth(9081);
+
+    this._orderBubbleMap.set(customerId, { bg, text });
+  }
+
+  /**
+   * 손님의 주문 말풍선을 제거한다.
+   * @param {string} customerId - 손님 ID
+   * @private
+   */
+  _destroyOrderBubble(customerId) {
+    const bubble = this._orderBubbleMap.get(customerId);
+    if (!bubble) return;
+
+    bubble.bg.destroy();
+    bubble.text.destroy();
+    this._orderBubbleMap.delete(customerId);
+  }
+
+  // ── Phase C (C4): 골드 플로팅 텍스트 VFX ──
+
+  /**
+   * 서빙 성공 시 '+NG' 플로팅 텍스트를 1초간 부상 후 fade-out한다.
+   * @param {number} x - 시작 x 좌표
+   * @param {number} y - 시작 y 좌표
+   * @param {number} amount - 골드 금액
+   * @private
+   */
+  _showGoldFloat(x, y, amount) {
+    const floatText = this.add.text(x, y, `+${amount}G`, {
+      fontSize: '14px',
+      fontFamily: FONT_FAMILY,
+      color: '#ffd700',
+    }).setOrigin(0.5, 1).setDepth(9090);
+
+    this.tweens.add({
+      targets: floatText,
+      y: y - 32,
+      alpha: { from: 1, to: 0 },
+      duration: 1000,
+      ease: 'Power1',
+      onComplete: () => floatText.destroy(),
+    });
+  }
+
+  /**
+   * 골드 HUD 텍스트를 갱신한다.
+   * @param {number} amount - 추가 골드 금액 (누적)
+   * @private
+   */
+  _updateGoldHUD(amount) {
+    this._goldAmount += amount;
+    if (this._goldText) {
+      this._goldText.setText(`\uD83D\uDCB0 ${this._goldAmount}G`);
+    }
   }
 
   // ── A4: Y축 깊이정렬 ──
