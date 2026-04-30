@@ -719,7 +719,8 @@ export class TavernServiceScene extends Phaser.Scene {
     this._cookSlotUIs = [];
     const slotW = 52, slotH = 52;
     for (let i = 0; i < MAX_COOKING_SLOTS; i++) {
-      const x = 14, y = 220 + i * 60;
+      // AD3 수정: 슬롯 간 4px 여백 확보 (60→64)
+      const x = 14, y = 220 + i * 64;
       const bg = this.add.rectangle(x + slotW / 2, y + slotH / 2, slotW, slotH, 0x444444, 0.8).setDepth(9010).setInteractive();
       const progressBg = this.add.rectangle(x, y + slotH, slotW, 8, 0x222222).setOrigin(0, 0).setDepth(9011);
       const progressFill = this.add.rectangle(x, y + slotH, 0, 8, 0x44cc44).setOrigin(0, 0).setDepth(9012);
@@ -796,12 +797,12 @@ export class TavernServiceScene extends Phaser.Scene {
     this._inventoryTexts = {};
     const startY = 360, colW = 60;
     let ix = 0;
-    for (const type of INGREDIENT_TYPES) {
+    for (const [type] of Object.entries(INGREDIENT_TYPES)) {
       const col = ix % 2, row = Math.floor(ix / 2);
       const x = 4 + col * colW, y = startY + row * 18;
-      const qty = this.inventoryManager.getAmount ? this.inventoryManager.getAmount(type) : (this.inventoryManager.inventory[type] || 0);
+      const qty = this.inventoryManager.inventory[type] || 0;
       const txt = this.add.text(x, y, `${type.substring(0, 4)}: ${qty}`, {
-        fontSize: '8px', fontFamily: FONT_FAMILY, color: qty > 0 ? '#ffffff' : '#666666',
+        fontSize: '9px', fontFamily: FONT_FAMILY, color: qty > 0 ? '#ffffff' : '#666666',
       }).setDepth(9020);
       this._inventoryTexts[type] = txt;
       ix++;
@@ -810,7 +811,7 @@ export class TavernServiceScene extends Phaser.Scene {
 
   /** @private */
   _updateInventoryPanel() {
-    for (const type of INGREDIENT_TYPES) {
+    for (const [type] of Object.entries(INGREDIENT_TYPES)) {
       const txt = this._inventoryTexts[type];
       if (!txt) continue;
       const qty = this.inventoryManager.inventory[type] || 0;
@@ -837,9 +838,10 @@ export class TavernServiceScene extends Phaser.Scene {
     const L = TAVERN_LAYOUT;
     const btnSize = 56, padding = 4;
     const startX = 4, startY = L.ROOM_BOTTOM_Y + 4;
-    const maxPerRow = Math.floor((L.GAME_W - 8) / (btnSize + padding));
+    // AD3 수정: 스킬 버튼 우측 동일 행 배치 — 레시피는 최대 4개(col 0~3)로 제한
+    const maxPerRow = 4;
 
-    this.availableRecipes.forEach((recipe, i) => {
+    this.availableRecipes.slice(0, maxPerRow).forEach((recipe, i) => {
       const col = i % maxPerRow, row = Math.floor(i / maxPerRow);
       const x = startX + col * (btnSize + padding);
       const y = startY + row * (btnSize + padding);
@@ -1299,8 +1301,10 @@ export class TavernServiceScene extends Phaser.Scene {
     const L = TAVERN_LAYOUT;
     const skill = ChefManager.getServiceSkill();
     const chefData = ChefManager.getChefData();
-    const btnW = 80, btnH = 28;
-    const x = L.GAME_W - btnW - 4, y = L.ROOM_BOTTOM_Y + L.CTRL_H - btnH - 4;
+    // AD3 수정: 레시피 4개(4*60=240px) 우측 76px 스킬 버튼 — 동일 행 배치
+    // 레시피 버튼 4개: 4 + 4*(56+4) = 244px 지점에서 시작
+    const btnW = 76, btnH = 56;
+    const x = 244, y = L.ROOM_BOTTOM_Y + 4;
 
     this._skillBtnBg = this.add.rectangle(x + btnW / 2, y + btnH / 2, btnW, btnH, 0x446688, 0.9)
       .setDepth(9040).setInteractive();
