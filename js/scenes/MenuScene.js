@@ -1277,7 +1277,8 @@ export class MenuScene extends Phaser.Scene {
    * @private
    */
   _createSettingsButton() {
-    const gearBtn = this.add.text(330, 30, '\u2699', {
+    // Phase 97: 우상단(330,30) → 우하단(335,584)으로 이동 — 시즌 패스 버튼과 겹침 해소
+    const gearBtn = this.add.text(335, 584, '\u2699', {
       fontSize: '28px',
       color: '#cccccc',
       stroke: '#000000',
