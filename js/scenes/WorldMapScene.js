@@ -1083,7 +1083,9 @@ export class WorldMapScene extends Phaser.Scene {
     // 스테이지 이름
     const nameText = this.add.text(cx - 60, localY - 8, stage.nameKo, {
       fontSize: '13px',
-      color: unlocked ? '#ffffff' : '#555555',
+      color: unlocked ? '#ffffff' : '#888888',
+      stroke: '#000000',
+      strokeThickness: 2,
     }).setOrigin(0, 0.5);
     container.add(nameText);
 
@@ -1091,7 +1093,9 @@ export class WorldMapScene extends Phaser.Scene {
     const waveCount = stage.waves?.length || '?';
     const waveText = this.add.text(cx - 60, localY + 10, `${waveCount} \uC6E8\uC774\uBE0C`, {
       fontSize: '10px',
-      color: unlocked ? '#aaaaaa' : '#444444',
+      color: unlocked ? '#cccccc' : '#666666',
+      stroke: '#000000',
+      strokeThickness: 1,
     }).setOrigin(0, 0.5);
     container.add(waveText);
 
@@ -1102,12 +1106,16 @@ export class WorldMapScene extends Phaser.Scene {
         const starText = this.add.text(cx + 120, localY - 4, starStr, {
           fontSize: '16px',
           color: '#ffd700',
+          stroke: '#000000',
+          strokeThickness: 2,
         }).setOrigin(1, 0.5);
         container.add(starText);
       } else {
         const unclearText = this.add.text(cx + 120, localY - 4, '\uBBF8\uD074\uB9AC\uC5B4', {
           fontSize: '10px',
-          color: '#888888',
+          color: '#cccccc',
+          stroke: '#000000',
+          strokeThickness: 1,
         }).setOrigin(1, 0.5);
         container.add(unclearText);
       }
