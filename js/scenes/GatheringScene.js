@@ -787,12 +787,12 @@ export class GatheringScene extends Phaser.Scene {
 
       const name = this.add.text(cx, btnY - 5, def.nameKo, {
         fontSize: '11px', color: available > 0 ? '#ffffff' : '#666666',
-      }).setOrigin(0.5).setDepth(1002);
+      }).setOrigin(0.5).setDepth(1002).setScrollFactor(0);
 
       // 잔여 수량 표시: "×2" 형태
       const countLabel = this.add.text(cx, btnY + 8, `\u00D7${available}`, {
         fontSize: '10px', color: available > 0 ? '#88ccff' : '#555555',
-      }).setOrigin(0.5).setDepth(1002);
+      }).setOrigin(0.5).setDepth(1002).setScrollFactor(0);
 
       bg.on('pointerdown', () => {
         if (available <= 0) {
@@ -853,7 +853,7 @@ export class GatheringScene extends Phaser.Scene {
 
       const name = this.add.text(cx, btnY - 5, recipe.nameKo, {
         fontSize: '10px', color: canCraft ? '#88ff88' : '#666666',
-      }).setOrigin(0.5).setDepth(1002);
+      }).setOrigin(0.5).setDepth(1002).setScrollFactor(0);
 
       // 재료 요약
       const ingText = Object.entries(recipe.ingredients)
@@ -861,7 +861,7 @@ export class GatheringScene extends Phaser.Scene {
         .join(' ');
       const ingLabel = this.add.text(cx, btnY + 8, ingText, {
         fontSize: '9px', color: canCraft ? '#ffd700' : '#555555',
-      }).setOrigin(0.5).setDepth(1002);
+      }).setOrigin(0.5).setDepth(1002).setScrollFactor(0);
 
       bg.on('pointerdown', () => {
         if (this.isGameOver || this.isVictory) return;
