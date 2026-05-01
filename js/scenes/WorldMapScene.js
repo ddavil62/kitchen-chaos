@@ -170,6 +170,7 @@ export class WorldMapScene extends Phaser.Scene {
     this._tab1Bg.setDepth(40);
     this._tab1Text = this.add.text(startX, tabY, '1~6\uC7A5', {
       fontSize: '12px', fontStyle: 'bold', color: '#ffffff',
+      stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5).setDepth(41);
 
     // Phase 93: 탭 hover 피드백
@@ -192,9 +193,10 @@ export class WorldMapScene extends Phaser.Scene {
     this._tab2Bg.setDepth(40);
 
     const tab2Label = tab2Locked ? '\uD83D\uDD12 7~15\uC7A5' : '7~15\uC7A5';
-    const tab2TextColor = tab2Locked ? '#555555' : '#aaaacc';
+    const tab2TextColor = tab2Locked ? '#aaaaaa' : '#ccddff';
     this._tab2Text = this.add.text(tab2X, tabY, tab2Label, {
       fontSize: '12px', fontStyle: 'bold', color: tab2TextColor,
+      stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5).setDepth(41);
 
     if (!tab2Locked) {
@@ -220,9 +222,10 @@ export class WorldMapScene extends Phaser.Scene {
     this._tab3Bg.setDepth(40);
 
     const tab3Label = tab3Locked ? '\uD83D\uDD12 16~24\uC7A5' : '16~24\uC7A5';
-    const tab3TextColor = tab3Locked ? '#555555' : '#aaaacc';
+    const tab3TextColor = tab3Locked ? '#aaaaaa' : '#ccddff';
     this._tab3Text = this.add.text(tab3X, tabY, tab3Label, {
       fontSize: '12px', fontStyle: 'bold', color: tab3TextColor,
+      stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5).setDepth(41);
 
     if (!tab3Locked) {
@@ -268,10 +271,10 @@ export class WorldMapScene extends Phaser.Scene {
         text.setColor('#ffffff');
       } else if (isLocked) {
         bg.setTint(0x222222);
-        text.setColor('#555555');
+        text.setColor('#aaaaaa');
       } else {
         bg.setTint(0x2a2a44);
-        text.setColor('#aaaacc');
+        text.setColor('#ccddff');
       }
     };
 
@@ -505,8 +508,9 @@ export class WorldMapScene extends Phaser.Scene {
 
       // 5. 별점 표시 (해금된 경우) — Phase 63: y+30 → y+36 (반경 확대 반영)
       // Phase 90-C (C-5): y+36 → y+44 (노드 원과 라벨 사이 여백 +8px 확보)
+      // Phase 97: y+44 → y+58 (반경 46px 원 바깥으로 이동, 가려짐 해소)
       if (state.unlocked) {
-        const starText = this.add.text(x, y + 44, `\u2605 ${state.currentStars}/${state.maxStars}`, {
+        const starText = this.add.text(x, y + 58, `\u2605 ${state.currentStars}/${state.maxStars}`, {
           fontSize: '9px',
           color: '#ffd700',
         }).setOrigin(0.5);
