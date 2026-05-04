@@ -1,5 +1,27 @@
 # Changelog
 
+## [2026-05-04] - 앱 아이콘 신규 적용
+### 추가
+- `assets/ui/app_icon_1024.png`: GPT Image 기반 1024px 원본 앱 아이콘 추가.
+- `assets/ui/app_icon_gpt_source.png`: 선택된 GPT Image 원본 보관.
+- `tests/screenshots/app-icon-size-preview.png`: 512/192/96/48px 축소 가독성 검증용 프리뷰 추가.
+
+### 변경
+- `assets/ui/app_icon_512.png`: 미미풍 셰프 캐릭터, 프라이팬, 요리 재료가 크게 보이는 신규 아이콘으로 교체.
+- `android/app/src/main/res/mipmap-*/ic_launcher*.png`: Android 런처/라운드/adaptive foreground 아이콘을 신규 원본 기반으로 갱신.
+- `android/app/src/main/res/values/ic_launcher_background.xml`: adaptive icon 배경색을 신규 아이콘의 어두운 주방 톤에 맞춘 `#130713`으로 변경.
+
+### 검증
+- `npm run build` 통과.
+- `npm run cap:sync` 통과.
+- 48px 축소 프리뷰에서 셰프 모자, 얼굴, 프라이팬, 음식 실루엣 식별 확인.
+
+### 참고
+- 스펙: `.Codex/specs/2026-05-04-kitchen-chaos-app-icon.md`
+- QA: `.Codex/specs/2026-05-04-kitchen-chaos-app-icon-qa.md`
+
+---
+
 ## [Phase 93] 2026-04-29 -- 버튼 인터랙션 전수 감사
 
 ### 개요
